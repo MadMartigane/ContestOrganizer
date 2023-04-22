@@ -8,6 +8,9 @@
     "start": "stencil build --dev --watch --serve",
     "test": "stencil test --spec --e2e",
     "test.watch": "stencil test --spec --e2e --watchAll",
+    "prod-clean": "rm -rf /var/www/marius.click/html/toolnament/*",
+    "prod-push": "cp -r dist/* /var/www/marius.click/html/toolnament/",
+    "prod": "npm run prod-clean && npm run prod-push",
     "generate": "stencil generate"
   },
   "devDependencies": {
