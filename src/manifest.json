@@ -1,6 +1,6 @@
 {
-  "name": "Stencil Starter",
-  "short_name": "Stencil",
+  "name": "Contest Organizer",
+  "short_name": "ContOrg",
   "start_url": "/",
   "display": "standalone",
   "icons": [{

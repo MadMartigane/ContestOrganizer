@@ -34,11 +34,16 @@ export class PageHome {
       <Fragment>
         <ion-header>
           <ion-toolbar color="primary">
-            <ion-title>Home</ion-title>
+            <ion-title>Accueil</ion-title>
           </ion-toolbar>
         </ion-header>
         <ion-content class="ion-padding">
-          <p>Welcome to Stencil App Starter.</p>
+          <p>Contest Organizer, un outil pour organiser vos tournois sportifs</p>
+
+          <ion-input label="Solid input" label-placement="floating" fill="solid" placeholder="Enter text"></ion-input>
+          <br />
+          <ion-input label="Outline input" label-placement="floating" fill="outline" placeholder="Enter text"></ion-input>
+
           <ion-list>
             <ion-radio-group value={this.mode} onIonChange={e => this.setMode(e.detail.value)}>
               <ion-list-header>
