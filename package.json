@@ -8,9 +8,11 @@
     "start": "stencil build --dev --watch --serve",
     "test": "stencil test --spec --e2e",
     "test.watch": "stencil test --spec --e2e --watchAll",
-    "prod-clean": "rm -rf /var/www/marius.click/html/toolnament/*",
-    "prod-push": "cp -r dist/* /var/www/marius.click/html/toolnament/",
-    "prod": "npm run prod-clean && npm run prod-push",
+    "prod-clean": "rm -rf /var/www/marius.click/html/contest/*",
+    "prod-push": "cp -r www/* /var/www/marius.click/html/contest/",
+    "setSrcBasePath": "sed -i 's/src=\"/src=\"\\/contest/g' www/index.html",
+    "setHrefBasePath": "sed -i 's/href=\"/href=\"\\/contest/g' www/index.html",
+    "prod": "npm run prod-clean && npm run setHrefBasePath && npm run setSrcBasePath && npm run prod-push",
     "generate": "stencil generate"
   },
   "devDependencies": {
