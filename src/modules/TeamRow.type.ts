@@ -6,7 +6,7 @@ export interface TeamRowProperties {
   scoredGoals: number;
   goalAverage: number;
 }
-export default class TeamRow {
+export class TeamRow {
   public id: number;
   public name?: string;
   public points: number;
@@ -69,3 +69,4 @@ export default class TeamRow {
   }
 }
 
+export default TeamRow;

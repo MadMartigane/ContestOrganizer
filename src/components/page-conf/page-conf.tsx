@@ -1,6 +1,6 @@
 import {InputChangeEventDetail, IonInputCustomEvent } from "@ionic/core";
 import { Component, Fragment, h, State } from '@stencil/core';
-import TeamRow from "../../modules/TeamRow.type";
+import { TeamRow, TeamRowProperties } from "../../modules/TeamRow.type";
 
 
 export interface PageConfConstants {
@@ -11,6 +11,7 @@ export interface PageConfConstants {
   concededGoalsMin: number,
   teamNumberStep: number,
   pointMin: number,
+  gridStorageKey: string,
   inputDebounce: number
 }
 
@@ -36,15 +37,38 @@ export class PageConf {
       scoredGoalsMin: 0,
       concededGoalsMin: 0,
       pointMin: 0,
+      gridStorageKey: "CONTEST_GRID",
       inputDebounce: 300
     }
 
     this.teamNumber = this.conf.teamNumberDefault;
-    this.grid = [];
+    this.grid = this.getStoredGrid();
   }
 
-  onTeamNumberChange (detail:InputChangeEventDetail): void {
-    this.teamNumber = Number(detail.value || this.conf.teamNumberDefault);
+  getStoredGrid() {
+    const storedGridStr = localStorage.getItem(this.conf.gridStorageKey);
+    const grid = storedGridStr ?
+      JSON.parse(storedGridStr).map((data: TeamRowProperties) => {
+        const team = new TeamRow(data.id);
+        team.fromData(data);
+
+        if (team.name === null) {
+          team.set("name", "");
+        }
+
+        return team;
+      }) :
+      [];
+    return grid;
+
+  }
+
+  setStoredGrid(grid: TeamRow[]): void {
+    localStorage.setItem(this.conf.gridStorageKey, JSON.stringify(grid.map((team) => team.toData())));
+  }
+
+  onTeamNumberChange (detail?: InputChangeEventDetail): void {
+    this.teamNumber = Number(detail && detail.value || this.conf.teamNumberDefault);
     this.updateGrid(this.teamNumber);
   }
 
@@ -58,6 +82,7 @@ export class PageConf {
       newGrid[i] = this.grid[i] || this.getVirginTeamRow(i);
     }
 
+    this.setStoredGrid(newGrid);
     this.grid = newGrid;
   }
 
@@ -69,12 +94,14 @@ export class PageConf {
   }
 
   goRanking(): void {
-    console.log("goRanking()");
     const gridClone = this.grid.map(team => team) as Array<TeamRow>;
     this.grid = gridClone.sort((a: TeamRow, b: TeamRow) => b.points - a.points);
-    console.log("newGrid: ", this.grid);
   }
 
+  resetGrid(): void {
+    this.grid = [];
+    this.teamNumber = this.conf.teamNumberDefault;
+  }
 
   render() {
     return (
@@ -85,7 +112,27 @@ export class PageConf {
           </ion-toolbar>
         </ion-header>
         <ion-content class="ion-padding">
-          <p><ion-icon name="construct-outline" size="large" color="primary"></ion-icon> Configurez votre tournois:</p>
+          <ion-grid>
+            <ion-row>
+              <ion-col size-xs="8" size="11">
+                <p><ion-icon name="construct-outline" size="large" color="primary"></ion-icon> Configurez votre tournois:</p>
+              </ion-col>
+              <ion-col>
+                <ion-button
+                  onClick={() => this.resetGrid()}
+                  color="medium"
+                  size-xs="normal"
+                  size="large">
+                  <ion-icon
+                    name="reload-outline"
+                    size-xs="normal"
+                    size="large"
+                    color="warning">
+                  </ion-icon>
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
 
           <ion-list>
             <ion-item>
