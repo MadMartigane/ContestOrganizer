@@ -41,8 +41,8 @@ export class PageConf {
       inputDebounce: 300
     }
 
-    this.teamNumber = this.conf.teamNumberDefault;
     this.grid = this.getStoredGrid();
+    this.teamNumber = this.grid.length || this.conf.teamNumberDefault;
   }
 
   getStoredGrid() {
@@ -95,6 +95,7 @@ export class PageConf {
 
   goRanking(): void {
     const gridClone = this.grid.map(team => team) as Array<TeamRow>;
+    gridClone.sort((a: TeamRow, b: TeamRow) => b.goalAverage - a.goalAverage);
     this.grid = gridClone.sort((a: TeamRow, b: TeamRow) => b.points - a.points);
   }
 
