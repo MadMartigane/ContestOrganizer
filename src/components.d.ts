@@ -10,7 +10,7 @@ export namespace Components {
     }
     interface AppTabs {
     }
-    interface PageHome {
+    interface PageConf {
     }
     interface PageNotice {
     }
@@ -31,11 +31,11 @@ declare global {
         prototype: HTMLAppTabsElement;
         new (): HTMLAppTabsElement;
     };
-    interface HTMLPageHomeElement extends Components.PageHome, HTMLStencilElement {
+    interface HTMLPageConfElement extends Components.PageConf, HTMLStencilElement {
     }
-    var HTMLPageHomeElement: {
-        prototype: HTMLPageHomeElement;
-        new (): HTMLPageHomeElement;
+    var HTMLPageConfElement: {
+        prototype: HTMLPageConfElement;
+        new (): HTMLPageConfElement;
     };
     interface HTMLPageNoticeElement extends Components.PageNotice, HTMLStencilElement {
     }
@@ -52,7 +52,7 @@ declare global {
     interface HTMLElementTagNameMap {
         "app-root": HTMLAppRootElement;
         "app-tabs": HTMLAppTabsElement;
-        "page-home": HTMLPageHomeElement;
+        "page-conf": HTMLPageConfElement;
         "page-notice": HTMLPageNoticeElement;
         "page-profile": HTMLPageProfileElement;
     }
@@ -62,7 +62,7 @@ declare namespace LocalJSX {
     }
     interface AppTabs {
     }
-    interface PageHome {
+    interface PageConf {
     }
     interface PageNotice {
     }
@@ -72,7 +72,7 @@ declare namespace LocalJSX {
     interface IntrinsicElements {
         "app-root": AppRoot;
         "app-tabs": AppTabs;
-        "page-home": PageHome;
+        "page-conf": PageConf;
         "page-notice": PageNotice;
         "page-profile": PageProfile;
     }
@@ -83,7 +83,7 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "app-root": LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
             "app-tabs": LocalJSX.AppTabs & JSXBase.HTMLAttributes<HTMLAppTabsElement>;
-            "page-home": LocalJSX.PageHome & JSXBase.HTMLAttributes<HTMLPageHomeElement>;
+            "page-conf": LocalJSX.PageConf & JSXBase.HTMLAttributes<HTMLPageConfElement>;
             "page-notice": LocalJSX.PageNotice & JSXBase.HTMLAttributes<HTMLPageNoticeElement>;
             "page-profile": LocalJSX.PageProfile & JSXBase.HTMLAttributes<HTMLPageProfileElement>;
         }

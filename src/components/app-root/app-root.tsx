@@ -10,10 +10,10 @@ export class AppRoot {
     return (
       <ion-app>
         <ion-router useHash={true}>
-          <ion-route-redirect from="/" to="/tab/home"></ion-route-redirect>
-          <ion-route url="/tab" component="app-tabs">
-            <ion-route url="/home" component="tab-home">
-              <ion-route component="page-home"></ion-route>
+          <ion-route-redirect from="/" to="/app/conf"></ion-route-redirect>
+          <ion-route url="/app" component="app-tabs">
+            <ion-route url="/conf" component="tab-conf">
+              <ion-route component="page-conf"></ion-route>
             </ion-route>
             <ion-route url="/notice" component="tab-notice">
               <ion-route component="page-notice"></ion-route>
