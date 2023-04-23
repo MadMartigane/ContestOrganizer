@@ -104,19 +104,20 @@ export class PageConf {
 
           <ion-grid>
             <ion-row>
-              <ion-col><ion-label color="primary">Nom de l’équipe</ion-label></ion-col>
-              <ion-col><ion-label color="primary">Points</ion-label></ion-col>
-              <ion-col><ion-label color="primary">Buts <ion-icon name="add-outline"></ion-icon></ion-label></ion-col>
-              <ion-col><ion-label color="primary">Buts <ion-icon name="remove-outline"></ion-icon></ion-label></ion-col>
-              <ion-col><ion-label color="primary">Goal average</ion-label></ion-col>
+              <ion-col size="4"><ion-label color="primary">Nom de l’équipe</ion-label></ion-col>
+              <ion-col><ion-label color="success">Points</ion-label></ion-col>
+              <ion-col><ion-label color="secondary">Buts <ion-icon name="add-outline"></ion-icon></ion-label></ion-col>
+              <ion-col><ion-label color="tertiary">Buts <ion-icon name="remove-outline"></ion-icon></ion-label></ion-col>
+              <ion-col><ion-label color="warning">Goal average</ion-label></ion-col>
             </ion-row>
 
             {this.grid.map((team) =>
               <ion-row>
-                <ion-col>
+                <ion-col size="4">
                   <ion-input
                     value={team.name}
                     type="text"
+                    color="primary"
                     onIonChange={(ev: IonInputCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev, team, "name")}
                     placeholder="AC Milan">
                   </ion-input>
@@ -125,6 +126,7 @@ export class PageConf {
                   <ion-input
                     value={team.points}
                     type="number"
+                    color="success"
                     min={this.conf.pointMin}
                     onIonChange={(ev: IonInputCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev, team, "points")}
                     placeholder="0">
@@ -135,7 +137,7 @@ export class PageConf {
                     value={team.scoredGoals}
                     type="number"
                     min="0"
-                    color="primary"
+                    color="secondary"
                     onIonChange={(ev: IonInputCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev, team, "scoredGoals")}
                     placeholder="0">
                   </ion-input>
@@ -145,6 +147,7 @@ export class PageConf {
                     value={team.concededGoals}
                     type="number"
                     min="0"
+                    color="tertiary"
                     onIonChange={(ev: IonInputCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev, team, "concededGoals")}
                     placeholder="0">
                   </ion-input>
@@ -153,6 +156,7 @@ export class PageConf {
                   <ion-input
                     value={team.goalAverage}
                     type="text"
+                    color="warning"
                     readonly
                     placeholder="0">
                   </ion-input>
