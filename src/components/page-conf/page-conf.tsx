@@ -1,7 +1,7 @@
 import {InputChangeEventDetail, IonInputCustomEvent } from "@ionic/core";
-import { Component, Fragment, h, State } from '@stencil/core';
+import { Component, Fragment, h, Listen, State } from '@stencil/core';
 import { TeamRow, TeamRowProperties } from "../../modules/TeamRow.type";
-
+import { MadInputNumberCustomEvent } from "../../components";
 
 export interface PageConfConstants {
   teamNumberMax: number,
@@ -27,6 +27,11 @@ export class PageConf {
   private conf: PageConfConstants;
 
   @State() grid: Array<TeamRow>;
+
+  @Listen('madNumberChange')
+  onTeamMadInputNumberChange (event: MadInputNumberCustomEvent<InputChangeEventDetail>,): void {
+    console.log('Received the custom todoCompleted event: ', event.detail);
+  }
 
   constructor() {
     this.conf = {
@@ -86,8 +91,8 @@ export class PageConf {
     this.grid = newGrid;
   }
 
-  onTeamChange (event: IonInputCustomEvent<InputChangeEventDetail>, team: TeamRow, key: string): void {
-    team.set(key, event.detail.value);
+  onTeamChange (detail: InputChangeEventDetail, team: TeamRow, key: string): void {
+    team.set(key, detail.value);
     team.goalAverage = team.scoredGoals - team.concededGoals;
 
     this.updateGrid();
@@ -166,19 +171,18 @@ export class PageConf {
                     value={team.name}
                     type="text"
                     color="primary"
-                    onIonChange={(ev: IonInputCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev, team, "name")}
+                    onIonChange={(ev: IonInputCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev.detail, team, "name")}
                     placeholder="AC Milan">
                   </ion-input>
                 </ion-col>
                 <ion-col>
-                  <ion-input
+                  <mad-input-number
                     value={team.points}
-                    type="number"
                     color="success"
                     min={this.conf.pointMin}
-                    onIonChange={(ev: IonInputCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev, team, "points")}
+                    onMadNumberChange={/* TODO doesn’t work */(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev.detail, team, "points")}
                     placeholder="0">
-                  </ion-input>
+                  </mad-input-number>
                 </ion-col>
                 <ion-col>
                   <ion-input
@@ -186,7 +190,7 @@ export class PageConf {
                     type="number"
                     min="0"
                     color="secondary"
-                    onIonChange={(ev: IonInputCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev, team, "scoredGoals")}
+                    onIonChange={(ev: IonInputCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev.detail, team, "scoredGoals")}
                     placeholder="0">
                   </ion-input>
                 </ion-col>
@@ -196,7 +200,7 @@ export class PageConf {
                     type="number"
                     min="0"
                     color="tertiary"
-                    onIonChange={(ev: IonInputCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev, team, "concededGoals")}
+                    onIonChange={(ev: IonInputCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev.detail, team, "concededGoals")}
                     placeholder="0">
                   </ion-input>
                 </ion-col>

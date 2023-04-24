@@ -5,10 +5,21 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+import { InputChangeEventDetail } from "@ionic/core";
+export { InputChangeEventDetail } from "@ionic/core";
 export namespace Components {
     interface AppRoot {
     }
     interface AppTabs {
+    }
+    interface MadInputNumber {
+        "color": string;
+        "label": string;
+        "max": number;
+        "min": number;
+        "placeholder": string;
+        "step": number;
+        "value": number;
     }
     interface PageConf {
     }
@@ -17,6 +28,10 @@ export namespace Components {
     interface PageProfile {
         "name": string;
     }
+}
+export interface MadInputNumberCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLMadInputNumberElement;
 }
 declare global {
     interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {
@@ -30,6 +45,12 @@ declare global {
     var HTMLAppTabsElement: {
         prototype: HTMLAppTabsElement;
         new (): HTMLAppTabsElement;
+    };
+    interface HTMLMadInputNumberElement extends Components.MadInputNumber, HTMLStencilElement {
+    }
+    var HTMLMadInputNumberElement: {
+        prototype: HTMLMadInputNumberElement;
+        new (): HTMLMadInputNumberElement;
     };
     interface HTMLPageConfElement extends Components.PageConf, HTMLStencilElement {
     }
@@ -52,6 +73,7 @@ declare global {
     interface HTMLElementTagNameMap {
         "app-root": HTMLAppRootElement;
         "app-tabs": HTMLAppTabsElement;
+        "mad-input-number": HTMLMadInputNumberElement;
         "page-conf": HTMLPageConfElement;
         "page-notice": HTMLPageNoticeElement;
         "page-profile": HTMLPageProfileElement;
@@ -61,6 +83,16 @@ declare namespace LocalJSX {
     interface AppRoot {
     }
     interface AppTabs {
+    }
+    interface MadInputNumber {
+        "color"?: string;
+        "label"?: string;
+        "max"?: number;
+        "min"?: number;
+        "onMadNumberChange"?: (event: MadInputNumberCustomEvent<InputChangeEventDetail>) => void;
+        "placeholder"?: string;
+        "step"?: number;
+        "value"?: number;
     }
     interface PageConf {
     }
@@ -72,6 +104,7 @@ declare namespace LocalJSX {
     interface IntrinsicElements {
         "app-root": AppRoot;
         "app-tabs": AppTabs;
+        "mad-input-number": MadInputNumber;
         "page-conf": PageConf;
         "page-notice": PageNotice;
         "page-profile": PageProfile;
@@ -83,6 +116,7 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "app-root": LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
             "app-tabs": LocalJSX.AppTabs & JSXBase.HTMLAttributes<HTMLAppTabsElement>;
+            "mad-input-number": LocalJSX.MadInputNumber & JSXBase.HTMLAttributes<HTMLMadInputNumberElement>;
             "page-conf": LocalJSX.PageConf & JSXBase.HTMLAttributes<HTMLPageConfElement>;
             "page-notice": LocalJSX.PageNotice & JSXBase.HTMLAttributes<HTMLPageNoticeElement>;
             "page-profile": LocalJSX.PageProfile & JSXBase.HTMLAttributes<HTMLPageProfileElement>;
