@@ -23,7 +23,7 @@ export class TeamRow {
     // return Object.fromEntries(Object.entries(this) as any);
     return {
       id: this.id,
-      name: this.name,
+      name: this.name || "",
       points: this.points,
       concededGoals: this.concededGoals,
       scoredGoals: this.scoredGoals,
