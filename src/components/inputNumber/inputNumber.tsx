@@ -9,7 +9,8 @@ import {
     Host,
     Prop,
     h,
-    State
+    State,
+    Watch
 } from '@stencil/core';
 
 @Component({
@@ -35,6 +36,11 @@ export class MadInputNumber {
         this.argColor = this.color || "primary";
         this.number = this.value || this.min || 0;
         this.itemId = "mad_input_number_" + Math.floor(Math.random() * 3000);
+    }
+
+    @Watch("value")
+    onPropValueChange () {
+      this.number = this.value;
     }
 
     onInputChange(ev: IonInputCustomEvent<InputChangeEventDetail>): void {
@@ -63,7 +69,10 @@ export class MadInputNumber {
 
     render() {
         return (
-            <Host>
+            <Host
+            class={{
+              "pointer": true
+            }}>
                 <ion-item
                     id={this.itemId}
                     color={this.argColor}

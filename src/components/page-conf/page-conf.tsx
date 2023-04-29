@@ -19,7 +19,7 @@ export interface PageConfConstants {
 @Component({
   tag: 'page-conf',
   styleUrl: 'page-conf.css',
-  // shadow: true,
+  shadow: true,
 })
 
 export class PageConf {
