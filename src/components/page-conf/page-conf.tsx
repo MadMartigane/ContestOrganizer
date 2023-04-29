@@ -1,5 +1,5 @@
 import {InputChangeEventDetail, IonInputCustomEvent } from "@ionic/core";
-import { Component, Fragment, h, Listen, State } from '@stencil/core';
+import { Component, Fragment, h, State } from '@stencil/core';
 import { TeamRow, TeamRowProperties } from "../../modules/TeamRow.type";
 import { MadInputNumberCustomEvent } from "../../components";
 
@@ -27,11 +27,6 @@ export class PageConf {
   private conf: PageConfConstants;
 
   @State() grid: Array<TeamRow>;
-
-  @Listen('madNumberChange')
-  onTeamMadInputNumberChange (event: MadInputNumberCustomEvent<InputChangeEventDetail>,): void {
-    console.log('Received the custom todoCompleted event: ', event.detail);
-  }
 
   constructor() {
     this.conf = {
@@ -180,29 +175,27 @@ export class PageConf {
                     value={team.points}
                     color="success"
                     min={this.conf.pointMin}
-                    onMadNumberChange={/* TODO doesn’t work */(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev.detail, team, "points")}
+                    onMadNumberChange={(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev.detail, team, "points")}
                     placeholder="0">
                   </mad-input-number>
                 </ion-col>
                 <ion-col>
-                  <ion-input
+                  <mad-input-number
                     value={team.scoredGoals}
-                    type="number"
-                    min="0"
+                    min={this.conf.scoredGoalsMin}
                     color="secondary"
-                    onIonChange={(ev: IonInputCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev.detail, team, "scoredGoals")}
+                    onMadNumberChange={(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev.detail, team, "scoredGoals")}
                     placeholder="0">
-                  </ion-input>
+                  </mad-input-number>
                 </ion-col>
                 <ion-col>
-                  <ion-input
+                  <mad-input-number
                     value={team.concededGoals}
-                    type="number"
-                    min="0"
+                    min={this.conf.concededGoalsMin}
                     color="tertiary"
-                    onIonChange={(ev: IonInputCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev.detail, team, "concededGoals")}
+                    onMadNumberChange={(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev.detail, team, "concededGoals")}
                     placeholder="0">
-                  </ion-input>
+                  </mad-input-number>
                 </ion-col>
                 <ion-col>
                   <ion-input

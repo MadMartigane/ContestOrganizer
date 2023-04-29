@@ -6,6 +6,7 @@ import {
     Component,
     Event,
     EventEmitter,
+    Host,
     Prop,
     h,
     State
@@ -34,36 +35,35 @@ export class MadInputNumber {
         this.argColor = this.color || "primary";
         this.number = this.value || this.min || 0;
         this.itemId = "mad_input_number_" + Math.floor(Math.random() * 3000);
-        console.log("this: ", this);
     }
 
     onInputChange(ev: IonInputCustomEvent<InputChangeEventDetail>): void {
         const newNumber = Number(ev.detail.value);
         this.number = newNumber;
-        console.log("new number: ", newNumber);
-        const event = this.madNumberChange.emit(ev.detail);
-        if(!event.defaultPrevented) {
-          // if not prevented, do some default handling code
-        }
+        this.madNumberChange.emit(ev.detail);
     }
 
     onIncrementNumber() {
-        console.log("this: ", this);
-        if (this.max === undefined || null) {
-            this.number++;
-        }
-        console.log("increment: ", this.number);
-        this.madNumberChange.emit({ value: String(this.number)});
+      if (this.max || this.number === this.max) {
+        return;
+      }
+
+      this.number++;
+      this.madNumberChange.emit({ value: String(this.number)});
     }
 
     onDecrementNumber() {
-        this.number--;
-        console.log("decrement: ", this.number);
-        this.madNumberChange.emit({ value: String(this.number)});
+      if (this.number === this.min) {
+        return;
+      }
+
+      this.number--;
+      this.madNumberChange.emit({ value: String(this.number)});
     }
+
     render() {
         return (
-            <div>
+            <Host>
                 <ion-item
                     id={this.itemId}
                     color={this.argColor}
@@ -108,7 +108,7 @@ export class MadInputNumber {
                         </ion-chip>
                     </ion-content>
                 </ion-popover>
-            </div>
+            </Host>
         );
     }
 }
