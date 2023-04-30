@@ -7,12 +7,8 @@ import { setupConfig } from '@ionic/core';
  * is wrapped in the function() that is exported.
  */
 export default async () => {
-  let mode = localStorage.getItem('mode')
-  switch (mode) {
-    case 'ios':
-    case 'md':
-      setupConfig({
-        mode
-      });
-  }
+  setupConfig({
+    rippleEffect: true,
+    mode: 'ios'
+  });
 };

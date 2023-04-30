@@ -1,7 +1,7 @@
 import {
     InputChangeEventDetail,
     IonInputCustomEvent
-} from '@ionic/core';
+} from "@ionic/core";
 import {
     Component,
     Event,
@@ -11,11 +11,11 @@ import {
     h,
     State,
     Watch
-} from '@stencil/core';
+} from "@stencil/core";
 
 @Component({
-  tag: 'mad-input-number',
-  styleUrl: './inputNumber.css',
+  tag: "mad-input-number",
+  styleUrl: "./inputNumber.css",
   shadow: false
 })
 export class MadInputNumber {
@@ -90,6 +90,7 @@ export class MadInputNumber {
                     </ion-text>
                 </ion-item>
                 <ion-popover
+                    mode="ios"
                     size="auto"
                     alignment="center"
                     animated="true"

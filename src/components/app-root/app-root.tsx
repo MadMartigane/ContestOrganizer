@@ -3,7 +3,7 @@ import { Component, h } from '@stencil/core';
 @Component({
   tag: 'app-root',
   styleUrl: 'app-root.css',
-  // shadow: true,
+  shadow: false,
 })
 export class AppRoot {
   render() {
@@ -19,7 +19,7 @@ export class AppRoot {
               <ion-route component="page-notice"></ion-route>
             </ion-route>
           </ion-route>
-          <ion-route url="/profile/:name" component="page-profile"></ion-route>
+          <ion-route url="/team-select/:teamId" component="page-team-select"></ion-route>
         </ion-router>
         <ion-nav></ion-nav>
       </ion-app>

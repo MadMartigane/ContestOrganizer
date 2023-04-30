@@ -1,19 +1,19 @@
-import { Component, Fragment, h } from '@stencil/core';
+import { Component, Fragment, h } from "@stencil/core";
 
 @Component({
-  tag: 'page-notice',
-  styleUrl: 'page-notice.css',
-  // shadow: true,
+  tag: "page-notice",
+  styleUrl: "page-notice.css",
+  shadow: false,
 })
 export class PageNotice {
 
   names = [
-    'Alice',
-    'Bob',
-    'Charlie',
-    'Dave',
-    'Eve',
-    'Frank',
+    "Alice",
+    "Bob",
+    "Charlie",
+    "Dave",
+    "Eve",
+    "Frank",
   ]
 
   render() {
