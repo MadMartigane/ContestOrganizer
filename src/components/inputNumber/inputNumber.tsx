@@ -16,6 +16,7 @@ import {
 @Component({
   tag: 'mad-input-number',
   styleUrl: './inputNumber.css',
+  shadow: false
 })
 export class MadInputNumber {
     private argColor: string;
@@ -96,25 +97,35 @@ export class MadInputNumber {
                     trigger={this.itemId}
                     trigger-action="click">
                     <ion-content class="ion-padding">
-                        <ion-chip>
+                        <div class="box">
+                          <ion-button
+                            color="warning"
+                            onclick={() => { this.onDecrementNumber() }}
+                            size="small">
                             <ion-icon
-                                size="large"
-                                onClick={() => { this.onDecrementNumber() }}
-                                color="primary"
-                                name="remove-outline"
+                              slod="icon-only"
+                              size="large"
+                              color="primary"
+                              name="remove-outline"
                             ></ion-icon>
-                            <ion-label
-                                size="large" /* TODO doesn’t work */
-                                outline="true"
-                                color={this.color}
-                            >{this.number}</ion-label>
-                            <ion-icon
+                          </ion-button>
+                          <ion-chip
+                              outline="true"
+                              color={this.color}
+                              >{this.number}
+                          </ion-chip>
+                          <ion-button
+                              color="warning"
+                              onclick={() => { this.onIncrementNumber() }}
+                              size="small">
+                              <ion-icon
+                                slod="icon-only"
                                 size="large"
-                                onClick={() => { this.onIncrementNumber() }}
                                 color="primary"
                                 name="add-outline"
-                            ></ion-icon>
-                        </ion-chip>
+                              ></ion-icon>
+                            </ion-button>
+                        </div>
                     </ion-content>
                 </ion-popover>
             </Host>
