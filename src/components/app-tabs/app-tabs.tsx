@@ -1,9 +1,9 @@
-import { Component, h } from '@stencil/core';
+import { Component, h } from "@stencil/core";
 
 @Component({
-  tag: 'app-tabs',
-  styleUrl: 'app-tabs.css',
-  // shadow: true,
+  tag: "app-tabs",
+  styleUrl: "app-tabs.css",
+  shadow: false,
 })
 export class AppTabs {
 

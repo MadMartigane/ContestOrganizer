@@ -1,6 +1,7 @@
+import { FutDBTeam } from "../components";
 export interface TeamRowProperties {
   id: number;
-  name?: string;
+  team?: FutDBTeam;
   points: number;
   concededGoals: number;
   scoredGoals: number;
@@ -8,7 +9,7 @@ export interface TeamRowProperties {
 }
 export class TeamRow {
   public id: number;
-  public name?: string;
+  public team?: FutDBTeam;
   public points: number;
   public concededGoals: number;
   public scoredGoals: number;
@@ -20,10 +21,10 @@ export class TeamRow {
   }
 
   public toData(): TeamRowProperties {
-    // return Object.fromEntries(Object.entries(this) as any);
+    // TODO return Object.fromEntries(Object.entries(this) as any);
     return {
       id: this.id,
-      name: this.name || "",
+      team: this.team,
       points: this.points,
       concededGoals: this.concededGoals,
       scoredGoals: this.scoredGoals,
@@ -32,23 +33,25 @@ export class TeamRow {
   }
 
   public fromData(data: TeamRowProperties): TeamRow {
-    Object.keys(data).forEach((key) => this.set(key, data[key]));
+    Object.keys(data).forEach((key) => {
+      if (key === "team") {
+        this.team = data[key];
+        return;
+      }
+      this.set(key, data[key]);
+    });
     return this;
   }
 
 
   public reset () {
-    this.name = null;
+    delete this.team;
     ["points", "concededGoals", "scoredGoals", "goalAverage"]
       .forEach((key) => this.set(key, "0"));
   }
 
   public set(key: string, value: string): void {
     switch (key) {
-      case "name": {
-        this.name = String(value);
-        break;
-      }
       case "points": {
         this.points = Number(value);
         break;

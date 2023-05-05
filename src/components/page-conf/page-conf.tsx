@@ -1,7 +1,7 @@
-import {InputChangeEventDetail, IonInputCustomEvent } from "@ionic/core";
-import { Component, Fragment, h, State } from '@stencil/core';
-import { TeamRow, TeamRowProperties } from "../../modules/TeamRow.type";
-import { MadInputNumberCustomEvent } from "../../components";
+import { InputChangeEventDetail } from "@ionic/core";
+import { Component, Fragment, h, State } from "@stencil/core";
+import { TeamRow, TeamRowProperties } from "../../modules/TeamRow";
+import { FutDBTeam, MadInputNumberCustomEvent, MadSelectTeamCustomEvent } from "../../components";
 
 export interface PageConfConstants {
   teamNumberMax: number,
@@ -17,9 +17,9 @@ export interface PageConfConstants {
 
 
 @Component({
-  tag: 'page-conf',
-  styleUrl: 'page-conf.css',
-  // shadow: true,
+  tag: "page-conf",
+  styleUrl: "page-conf.css",
+  shadow: false,
 })
 
 export class PageConf {
@@ -43,6 +43,7 @@ export class PageConf {
 
     this.grid = this.getStoredGrid();
     this.teamNumber = this.grid.length || this.conf.teamNumberDefault;
+
   }
 
   getStoredGrid() {
@@ -51,11 +52,6 @@ export class PageConf {
       JSON.parse(storedGridStr).map((data: TeamRowProperties) => {
         const team = new TeamRow(data.id);
         team.fromData(data);
-
-        if (team.name === null) {
-          team.set("name", "");
-        }
-
         return team;
       }) :
       [];
@@ -86,6 +82,12 @@ export class PageConf {
     this.grid = newGrid;
   }
 
+  onTeamTeamChange (detail: FutDBTeam, team: TeamRow): void {
+    team.team = detail;
+
+    this.updateGrid();
+  }
+
   onTeamChange (detail: InputChangeEventDetail, team: TeamRow, key: string): void {
     team.set(key, detail.value);
     team.goalAverage = team.scoredGoals - team.concededGoals;
@@ -97,6 +99,8 @@ export class PageConf {
     const gridClone = this.grid.map(team => team) as Array<TeamRow>;
     gridClone.sort((a: TeamRow, b: TeamRow) => b.goalAverage - a.goalAverage);
     this.grid = gridClone.sort((a: TeamRow, b: TeamRow) => b.points - a.points);
+
+    this.updateGrid();
   }
 
   resetGrid(): void {
@@ -137,7 +141,7 @@ export class PageConf {
 
           <ion-list>
             <ion-item>
-              <ion-label position="floating">Nombre d'équipes (min:{this.conf.teamNumberMin}, max:{this.conf.teamNumberMax})</ion-label>
+              <ion-label position="floating">Nombre d"équipes (min:{this.conf.teamNumberMin}, max:{this.conf.teamNumberMax})</ion-label>
               <ion-input
                 value={this.teamNumber}
                 onIonChange={(event:any) => this.onTeamNumberChange(event.detail)}
@@ -162,13 +166,12 @@ export class PageConf {
             {this.grid.map((team) =>
               <ion-row>
                 <ion-col size="4">
-                  <ion-input
-                    value={team.name}
-                    type="text"
+                  <mad-select-team
+                    value={team.team}
                     color="primary"
-                    onIonChange={(ev: IonInputCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev.detail, team, "name")}
+                    onMadSelectChange={(ev: MadSelectTeamCustomEvent<FutDBTeam>) => this.onTeamTeamChange(ev.detail, team)}
                     placeholder="AC Milan">
-                  </ion-input>
+                  </mad-select-team>
                 </ion-col>
                 <ion-col>
                   <mad-input-number
