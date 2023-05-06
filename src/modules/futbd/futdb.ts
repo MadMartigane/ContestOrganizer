@@ -4,7 +4,7 @@
 
 import httpRequest from "../httpRequest/http-request";
 import { FutDBLoadedImgBuffer, FutDBTeamReturn, FutDBTeam, FutDBPagination } from "./futdb.d";
-import { SECRETS } from "./futdb.constants";
+import { SECRETS, LOCAL_STORAGE_TEAM_KEY } from "./futdb.constants";
 
 export class ApiFutDB {
 
@@ -28,6 +28,27 @@ export class ApiFutDB {
       itemsPerPage: 0
     };
     this.countReturn = 0;
+
+    this.loadCache().then((cache) => {
+      this.allTeams = cache || [];
+    });
+  }
+
+  private async loadCache(): Promise<Array<FutDBTeam> | null> {
+    const cacheString = localStorage.getItem(LOCAL_STORAGE_TEAM_KEY);
+    let cache: Array<FutDBTeam>;
+
+    if (cacheString) {
+      try {
+        cache = JSON.parse(cacheString);
+      } catch (e) {
+        console.warn("[ApiFutDB] unable to parse stored teams. Clear cache:", e);
+        localStorage.removeItem(LOCAL_STORAGE_TEAM_KEY);
+        return null;
+      }
+    }
+
+    return cache;
   }
 
   private async loadTeamsPage(pageNumber: number, resolve: Function, reject: Function): Promise<FutDBPagination> {
@@ -52,6 +73,12 @@ export class ApiFutDB {
 
       if (this.countReturn >= this.pagination.pageTotal) {
         resolve(this.allTeams);
+
+        localStorage.setItem(
+          LOCAL_STORAGE_TEAM_KEY,
+          JSON.stringify(this.allTeams)
+        );
+
         this.isLoading = null;
       }
 
