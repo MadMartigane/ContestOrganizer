@@ -2,7 +2,7 @@
  * https://futdb.app/api/doc
  */
 
-import httpRequest from "../httpRequest/http-request";
+import httpRequest from "../http-request/http-request";
 import { FutDBLoadedImgBuffer, FutDBTeamReturn, FutDBTeam, FutDBPagination } from "./futdb.d";
 import { SECRETS, LOCAL_STORAGE_TEAM_KEY } from "./futdb.constants";
 

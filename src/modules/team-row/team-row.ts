@@ -1,22 +1,18 @@
-import { FutDBTeam } from "../components";
-export interface TeamRowProperties {
-  id: number;
-  team?: FutDBTeam;
-  points: number;
-  concededGoals: number;
-  scoredGoals: number;
-  goalAverage: number;
-}
+import { FutDBTeam } from "../futbd/futdb.d";
+import { TeamRowProperties } from "./team-row.d";
+import uuid from "../uuid/uuid";
+
 export class TeamRow {
-  public id: number;
+  public readonly id: number;
   public team?: FutDBTeam;
   public points: number;
   public concededGoals: number;
   public scoredGoals: number;
   public goalAverage: number;
 
-  constructor (id: number) {
-    this.id = id;
+  constructor (id?: number) {
+    this.id = id || uuid.new();
+
     this.reset();
   }
 
@@ -42,7 +38,6 @@ export class TeamRow {
     });
     return this;
   }
-
 
   public reset () {
     delete this.team;
