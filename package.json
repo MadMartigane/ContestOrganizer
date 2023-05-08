@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "description": "Stencil Ionic App Starter",
   "scripts": {
-    "build": "stencil build",
+    "build": "stencil build --no-cache",
     "start": "stencil build --dev --watch --serve",
     "test": "stencil test --spec --e2e",
     "test.watch": "stencil test --spec --e2e --watchAll",
@@ -12,14 +12,14 @@
     "oldprod-setHrefBasePath": "sed -i 's/href=\"/href=\"\\/contest2/g' /var/www/marius.click/html/contest2/index.html",
     "oldprod-update-paths":"npm run oldprod-setSrcBasePath && npm run oldprod-setHrefBasePath",
     "oldprod-clean": "rm -rf /var/www/marius.click/html/contest2/*",
-    "oldprod-push": "cp -r /var/www/marius.click/html/contest/ /var/www/marius.click/html/contest2/",
-    "oldprod":"npm run oldprod-clean && oldprod-push && oldprod-update-paths",
+    "oldprod-push": "cp -r www/* /var/www/marius.click/html/contest2/",
+    "backup":"npm run oldprod-clean && npm run oldprod-push && npm run oldprod-update-paths",
     "prod-clean": "rm -rf /var/www/marius.click/html/contest/*",
     "prod-push": "cp -r www/* /var/www/marius.click/html/contest/",
     "setSrcBasePath": "sed -i 's/src=\"/src=\"\\/contest/g' /var/www/marius.click/html/contest/index.html",
     "setHrefBasePath": "sed -i 's/href=\"/href=\"\\/contest/g' /var/www/marius.click/html/contest/index.html",
     "prod-update-paths":"npm run setSrcBasePath && npm run setHrefBasePath",
-    "prod": "npm run oldprod && npm run build && npm run prod-clean && npm run prod-push && npm run prod-update-paths",
+    "prod": "npm run backup && npm run build && npm run prod-clean && npm run prod-push && npm run prod-update-paths",
     "generate": "stencil generate"
   },
   "devDependencies": {
