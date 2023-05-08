@@ -15,21 +15,23 @@ import {
 
 @Component({
   tag: "mad-input-number",
-  styleUrl: "./inputNumber.css",
+  styleUrl: "./input-number.css",
   shadow: false
 })
 export class MadInputNumber {
     private argColor: string;
     private itemId: string;
+    private innerSep: number;
 
     @Prop() color: string;
     @Prop() placeholder: string;
-    @Prop() label: string;
-    @Prop() min: number;
-    @Prop() max: number;
-    @Prop() step: number;
-    @Prop() value: number;
-    @State() number: number;
+    @Prop() label?: string;
+    @Prop() min?: number;
+    @Prop() max?: number;
+    @Prop() step?: number;
+    @Prop() value?: number;
+
+    @State() private number: number;
 
     @Event() madNumberChange: EventEmitter<InputChangeEventDetail>;
 
@@ -37,6 +39,7 @@ export class MadInputNumber {
         this.argColor = this.color || "primary";
         this.number = this.value || this.min || 0;
         this.itemId = "mad_input_number_" + Math.floor(Math.random() * 3000);
+        this.innerSep = this.step || 1;
     }
 
     @Watch("value")
@@ -51,20 +54,22 @@ export class MadInputNumber {
     }
 
     onIncrementNumber() {
-      if (this.max || this.number === this.max) {
+      if (this.max && this.number >= this.max) {
+        this.number = this.max;
         return;
       }
 
-      this.number++;
+      this.number += this.innerSep;
       this.madNumberChange.emit({ value: String(this.number)});
     }
 
     onDecrementNumber() {
-      if (this.number === this.min) {
+      if (this.min && this.number <= this.min) {
+        this.number = this.min;
         return;
       }
 
-      this.number--;
+      this.number -= this.innerSep;
       this.madNumberChange.emit({ value: String(this.number)});
     }
 
@@ -79,15 +84,16 @@ export class MadInputNumber {
                     color={this.argColor}
                     lines="none"
                     fill="outline">
-                    {this.label ?
-                        <ion-label position="floating">{this.label}</ion-label> :
-                        null
-                    }
-                    <ion-text
-                        onIonChange={(ev: IonInputCustomEvent<InputChangeEventDetail>): void => { this.onInputChange(ev) }}
-                        color={this.value ? this.argColor : "medium"}>
-                        {this.number || this.placeholder}
-                    </ion-text>
+                    <ion-label>
+                      { this.label ?
+                          <span>{this.label}: </span> :
+                          null
+                      }
+                      <ion-text
+                          color={this.value ? this.argColor : "medium"}>
+                          {this.number || this.placeholder}
+                      </ion-text>
+                    </ion-label>
                 </ion-item>
                 <ion-popover
                     mode="ios"

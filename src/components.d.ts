@@ -18,12 +18,12 @@ export namespace Components {
     }
     interface MadInputNumber {
         "color": string;
-        "label": string;
-        "max": number;
-        "min": number;
+        "label"?: string;
+        "max"?: number;
+        "min"?: number;
         "placeholder": string;
-        "step": number;
-        "value": number;
+        "step"?: number;
+        "value"?: number;
     }
     interface MadSelectTeam {
         "color": string;
@@ -34,12 +34,15 @@ export namespace Components {
     interface MadTeamTile {
         "team": FutDBTeam;
     }
-    interface PageConf {
-    }
-    interface PageNotice {
+    interface PageHome {
     }
     interface PageTeamSelect {
         "teamId": string;
+    }
+    interface PageTournament {
+        "tournamentId": number;
+    }
+    interface PageTournamentSelect {
     }
 }
 export interface MadInputNumberCustomEvent<T> extends CustomEvent<T> {
@@ -85,17 +88,11 @@ declare global {
         prototype: HTMLMadTeamTileElement;
         new (): HTMLMadTeamTileElement;
     };
-    interface HTMLPageConfElement extends Components.PageConf, HTMLStencilElement {
+    interface HTMLPageHomeElement extends Components.PageHome, HTMLStencilElement {
     }
-    var HTMLPageConfElement: {
-        prototype: HTMLPageConfElement;
-        new (): HTMLPageConfElement;
-    };
-    interface HTMLPageNoticeElement extends Components.PageNotice, HTMLStencilElement {
-    }
-    var HTMLPageNoticeElement: {
-        prototype: HTMLPageNoticeElement;
-        new (): HTMLPageNoticeElement;
+    var HTMLPageHomeElement: {
+        prototype: HTMLPageHomeElement;
+        new (): HTMLPageHomeElement;
     };
     interface HTMLPageTeamSelectElement extends Components.PageTeamSelect, HTMLStencilElement {
     }
@@ -103,15 +100,28 @@ declare global {
         prototype: HTMLPageTeamSelectElement;
         new (): HTMLPageTeamSelectElement;
     };
+    interface HTMLPageTournamentElement extends Components.PageTournament, HTMLStencilElement {
+    }
+    var HTMLPageTournamentElement: {
+        prototype: HTMLPageTournamentElement;
+        new (): HTMLPageTournamentElement;
+    };
+    interface HTMLPageTournamentSelectElement extends Components.PageTournamentSelect, HTMLStencilElement {
+    }
+    var HTMLPageTournamentSelectElement: {
+        prototype: HTMLPageTournamentSelectElement;
+        new (): HTMLPageTournamentSelectElement;
+    };
     interface HTMLElementTagNameMap {
         "app-root": HTMLAppRootElement;
         "app-tabs": HTMLAppTabsElement;
         "mad-input-number": HTMLMadInputNumberElement;
         "mad-select-team": HTMLMadSelectTeamElement;
         "mad-team-tile": HTMLMadTeamTileElement;
-        "page-conf": HTMLPageConfElement;
-        "page-notice": HTMLPageNoticeElement;
+        "page-home": HTMLPageHomeElement;
         "page-team-select": HTMLPageTeamSelectElement;
+        "page-tournament": HTMLPageTournamentElement;
+        "page-tournament-select": HTMLPageTournamentSelectElement;
     }
 }
 declare namespace LocalJSX {
@@ -139,13 +149,16 @@ declare namespace LocalJSX {
     interface MadTeamTile {
         "team"?: FutDBTeam;
     }
-    interface PageConf {
-    }
-    interface PageNotice {
+    interface PageHome {
     }
     interface PageTeamSelect {
         "onPageTeamNewSelection"?: (event: PageTeamSelectCustomEvent<PageTeamSelectEventDatail>) => void;
         "teamId"?: string;
+    }
+    interface PageTournament {
+        "tournamentId"?: number;
+    }
+    interface PageTournamentSelect {
     }
     interface IntrinsicElements {
         "app-root": AppRoot;
@@ -153,9 +166,10 @@ declare namespace LocalJSX {
         "mad-input-number": MadInputNumber;
         "mad-select-team": MadSelectTeam;
         "mad-team-tile": MadTeamTile;
-        "page-conf": PageConf;
-        "page-notice": PageNotice;
+        "page-home": PageHome;
         "page-team-select": PageTeamSelect;
+        "page-tournament": PageTournament;
+        "page-tournament-select": PageTournamentSelect;
     }
 }
 export { LocalJSX as JSX };
@@ -167,9 +181,10 @@ declare module "@stencil/core" {
             "mad-input-number": LocalJSX.MadInputNumber & JSXBase.HTMLAttributes<HTMLMadInputNumberElement>;
             "mad-select-team": LocalJSX.MadSelectTeam & JSXBase.HTMLAttributes<HTMLMadSelectTeamElement>;
             "mad-team-tile": LocalJSX.MadTeamTile & JSXBase.HTMLAttributes<HTMLMadTeamTileElement>;
-            "page-conf": LocalJSX.PageConf & JSXBase.HTMLAttributes<HTMLPageConfElement>;
-            "page-notice": LocalJSX.PageNotice & JSXBase.HTMLAttributes<HTMLPageNoticeElement>;
+            "page-home": LocalJSX.PageHome & JSXBase.HTMLAttributes<HTMLPageHomeElement>;
             "page-team-select": LocalJSX.PageTeamSelect & JSXBase.HTMLAttributes<HTMLPageTeamSelectElement>;
+            "page-tournament": LocalJSX.PageTournament & JSXBase.HTMLAttributes<HTMLPageTournamentElement>;
+            "page-tournament-select": LocalJSX.PageTournamentSelect & JSXBase.HTMLAttributes<HTMLPageTournamentSelectElement>;
         }
     }
 }

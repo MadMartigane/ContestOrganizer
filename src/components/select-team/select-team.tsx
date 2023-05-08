@@ -11,11 +11,11 @@ import {
     Watch
 } from "@stencil/core";
 import { FutDBTeam } from "../../modules/futbd/futdb.d";
-import {PageTeamSelectEventDatail} from "../page-team-select/page-team-select.d";
+import { PageTeamSelectEventDatail } from "../page-team-select/page-team-select.d";
 
 @Component({
   tag: "mad-select-team",
-  styleUrl: "./selectTeam.css",
+  styleUrl: "./select-team.css",
   shadow: false
 })
 export class MadSelectTeam {
