@@ -2,6 +2,7 @@ import { Component, Fragment, h, State } from "@stencil/core";
 import { Tournament } from "../../modules/tournaments/tournaments.d";
 import tournaments from "../../modules/tournaments/tournaments";
 import uuid from "../../modules/uuid/uuid";
+import utils from "../../modules/utils/utils";
 
 @Component({
   tag: "page-tournament-select",
@@ -13,6 +14,7 @@ export class PageTournamentSelect {
   private readonly tournaments: typeof tournaments;
   private readonly inputId: string;
   private readonly uuid: typeof uuid;
+  private readonly utils: typeof utils;
 
   private uiNewName: string;
 
@@ -23,6 +25,7 @@ export class PageTournamentSelect {
     this.tournaments = tournaments;
     this.uuid = uuid;
     this.inputId = "pnii_" + this.uuid.new();
+    this.utils = utils;
 
     this.uiAddingTournament = false;
     this.numberOfTournaments = this.tournaments.length;
@@ -62,12 +65,7 @@ export class PageTournamentSelect {
 
   private displayUiAddingTournament () {
     this.uiAddingTournament = true;
-
-    setTimeout(() => {
-      // @ts-ignore
-      document.getElementById(this.inputId)?.setFocus();
-    }, 500);
-
+    this.utils.setFocus(`ion-input#${this.inputId}`);
   }
 
 
