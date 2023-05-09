@@ -72,12 +72,12 @@ export class MadSelectTeam {
               team={this.team}
             ></mad-team-tile> :
             <ion-text
-                        color="medium">
-                        {this.placeholder}
-                      </ion-text>
-                    }
-                </ion-item>
-              </Host>
-            );
-    }
+              color="medium">
+              {this.placeholder}
+            </ion-text>
+          }
+        </ion-item>
+      </Host>
+    );
+  }
 }

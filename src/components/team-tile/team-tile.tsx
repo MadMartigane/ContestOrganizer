@@ -45,7 +45,7 @@ export class MadInputNumber {
               <ion-thumbnail slot="start" >
                 <img alt={`${this.team.name} club logo`} src={this.imgSrc} />
               </ion-thumbnail>
-              <ion-label>{this.team.name}</ion-label>
+              <ion-label slot="end">{this.team.name}</ion-label>
             </ion-item>
           </Host>
       );
