@@ -16,8 +16,6 @@ export class PageTournamentSelect {
   private readonly uuid: typeof uuid;
   private readonly utils: typeof utils;
 
-  private uiNewName: string;
-
   @State() private uiAddingTournament: boolean;
   @State() private numberOfTournaments: number;
 
@@ -46,15 +44,20 @@ export class PageTournamentSelect {
   }
 
   private addTournament () {
-    this.numberOfTournaments = this.tournaments.add(this.uiNewName, []);
+    const input = document.querySelector(`ion-input#${this.inputId}`);
+    if (!input) {
+      console.warn("<page-tournament-select/> Unable to get input value.");
+      return;
+    }
+
+    // @ts-ignore
+    const value = input.value;
+    this.numberOfTournaments = this.tournaments.add(value, []);
     this.uiAddingTournament = false;
   }
 
   private onKeyPressNewName(event: KeyboardEvent) {
-    // @ts-ignore
-    this.uiNewName = String(event?.target?.value || "").trim();
-    const key = event.key;
-    if (key === "Enter") {
+    if (event.key === "Enter") {
       this.addTournament();
     }
   }
