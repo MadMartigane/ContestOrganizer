@@ -5,7 +5,7 @@ export default class Utils {
     setTimeout(() => {
       // @ts-ignore
       document.querySelector(selector)?.setFocus();
-    }, 500);
+    }, 400);
   }
 
   public static async confirmChoice(message = "Es-tu sûre ?", cancel = "Non", confirm = "Oui"): Promise<boolean> {

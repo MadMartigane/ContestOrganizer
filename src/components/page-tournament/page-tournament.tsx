@@ -27,12 +27,14 @@ export interface PageConfConstants {
 export class PageTournament {
   private readonly tournaments: typeof tournaments;
   private readonly conf: PageConfConstants;
+  private readonly inputNameId: string;
 
   private teamNumber: number;
 
   @Prop() public tournamentId: number;
   @State() private tournament: Tournament;
   @State() private uiError: string | null;
+  @State() private isEditTournamentName: boolean;
 
   constructor() {
     this.conf = {
@@ -54,6 +56,8 @@ export class PageTournament {
       return;
     }
     this.uiError = null;
+    this.isEditTournamentName = false;
+    this.inputNameId = "page-tournament-input-name-id";
 
     this.teamNumber = this.tournament.grid.length || this.conf.teamNumberDefault;
     this.updateTournament();
@@ -116,6 +120,33 @@ export class PageTournament {
     }
   }
 
+  private onEditTournamentName () {
+    this.isEditTournamentName = true;
+    Utils.setFocus(`ion-input#${this.inputNameId}`);
+  }
+
+  private onTournamentNameChange (event: KeyboardEvent) {
+    if (event.key === "Enter") {
+      this.editTournamentName();
+    }
+  }
+
+  private editTournamentName () {
+    const input = document.querySelector(`ion-input#${this.inputNameId}`);
+    if (!input) {
+      console.warn("<page-tournament/> Unable to get input tournament name value.");
+      return;
+    }
+
+    // @ts-ignore
+    const newName = String(input.value).trim();
+    this.tournament.name = newName;
+
+    this.isEditTournamentName = false;
+    this.updateTournament();
+  }
+
+
   render() {
     return (
       <Fragment>
@@ -125,8 +156,7 @@ export class PageTournament {
               <ion-back-button defaultHref="/app/tournaments"></ion-back-button>
             </ion-buttons>
             <ion-title>
-              <ion-text color="light" size="large" class="ion-margin">{ this.tournament?.name || "404" }</ion-text>
-              <ion-icon name="trophy-outline" size="default" color="light"></ion-icon>
+              <ion-text color="light" size="large" class="ion-margin">{ this.tournament?.name ? "🏆" : "404" }</ion-text>
             </ion-title>
           </ion-toolbar>
         </ion-header>
@@ -148,8 +178,40 @@ export class PageTournament {
               </ion-card>
             </div> :
             <div>
-              <ion-list>
-                <ion-item>
+              <div>
+                <div class="ion-padding-horizontal">
+                  {this.isEditTournamentName ?
+                    <div>
+                        <ion-input
+                          id={this.inputNameId}
+                          color="primary"
+                          inputmode="text"
+                          autofocus="true"
+                          name="tournamentName"
+                          value={this.tournament.name}
+                          onkeypress={(ev: KeyboardEvent) => this.onTournamentNameChange(ev)}
+                          class="ion-padding-horizontal"/>
+
+                        <ion-button size="default" color="tertiary" class="ion-padding-horizontal"
+                          onClick={() => {this.isEditTournamentName = false;}}
+                          fill="solid">
+                          <ion-icon slot="icon-only" name="close-circle-outline"></ion-icon>
+                        </ion-button>
+
+                        <ion-button size="default" color="secondary" class="ion-padding-horizontal"
+                          onClick={() => this.editTournamentName()}
+                          fill="solid">
+                          <ion-icon slot="icon-only" name="save-outline"></ion-icon>
+                        </ion-button>
+                    </div> :
+                    <h2 class="can-be-clicked" onClick={() => this.onEditTournamentName()}>
+                        <ion-icon name="trophy-outline" size="large" color="secondary"></ion-icon>
+                        <ion-text class="ion-padding-horizontal">{ this.tournament.name }</ion-text>
+                        <ion-icon name="pencil-outline" color="secondary"></ion-icon>
+                    </h2>
+                  }
+                </div>
+                <div class="ion-padding-horizontal">
                   <mad-input-number
                     value={this.teamNumber}
                     label={ `Nombre d’équipes (min:${this.conf.teamNumberMin}, max:${this.conf.teamNumberMax})` }
@@ -159,8 +221,8 @@ export class PageTournament {
                     step={this.conf.teamNumberStep}
                     placeholder={ String(this.conf.teamNumberDefault) }>
                   </mad-input-number>
-                </ion-item>
-              </ion-list>
+                </div>
+              </div>
 
               {this.teamNumber > 0 ?
                 <div>
