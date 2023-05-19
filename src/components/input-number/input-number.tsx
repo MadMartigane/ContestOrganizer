@@ -55,7 +55,7 @@ export class MadInputNumber {
     }
 
     onIncrementNumber() {
-      if (this.max && this.number >= this.max) {
+      if (this.max !== undefined && this.number >= this.max) {
         this.number = this.max;
         return;
       }
@@ -65,7 +65,7 @@ export class MadInputNumber {
     }
 
     onDecrementNumber() {
-      if (this.min && this.number <= this.min) {
+      if (this.min !== undefined && this.number <= this.min) {
         this.number = this.min;
         return;
       }
