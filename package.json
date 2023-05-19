@@ -19,7 +19,8 @@
     "setSrcBasePath": "sed -i 's/src=\"/src=\"\\/contest/g' /var/www/marius.click/html/contest/index.html",
     "setHrefBasePath": "sed -i 's/href=\"/href=\"\\/contest/g' /var/www/marius.click/html/contest/index.html",
     "prod-update-paths":"npm run setSrcBasePath && npm run setHrefBasePath",
-    "prod": "npm run backup && npm run build && npm run prod-clean && npm run prod-push && npm run prod-update-paths",
+    "prod": "npm run backup && npm run prod-only",
+    "prod-only": "npm run build && npm run prod-clean && npm run prod-push && npm run prod-update-paths",
     "generate": "stencil generate"
   },
   "devDependencies": {
