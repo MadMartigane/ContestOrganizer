@@ -2,7 +2,7 @@ import { Component, Fragment, h, State } from "@stencil/core";
 import { Tournament } from "../../modules/tournaments/tournaments.d";
 import tournaments from "../../modules/tournaments/tournaments";
 import uuid from "../../modules/uuid/uuid";
-import utils from "../../modules/utils/utils";
+import Utils from "../../modules/utils/utils";
 
 @Component({
   tag: "page-tournament-select",
@@ -14,7 +14,6 @@ export class PageTournamentSelect {
   private readonly tournaments: typeof tournaments;
   private readonly inputId: string;
   private readonly uuid: typeof uuid;
-  private readonly utils: typeof utils;
 
   @State() private uiAddingTournament: boolean;
   @State() private numberOfTournaments: number;
@@ -23,7 +22,6 @@ export class PageTournamentSelect {
     this.tournaments = tournaments;
     this.uuid = uuid;
     this.inputId = "pnii_" + this.uuid.new();
-    this.utils = utils;
 
     this.uiAddingTournament = false;
     this.numberOfTournaments = this.tournaments.length;
@@ -37,9 +35,18 @@ export class PageTournamentSelect {
       });
   }
 
-  private removeTournament(event: Event, id: number) {
+  private async confirmRemoveTournament (event: Event, id: number) {
     event.preventDefault();
     event.stopPropagation();
+
+    const tournament = this.tournaments.get(id);
+    const confirm = await Utils.confirmChoice(`Supprimer le tournoi: ${tournament.name}?`);
+    if (confirm) {
+      this.removeTournament(id);
+    }
+  }
+
+  private removeTournament(id: number) {
     this.numberOfTournaments = this.tournaments.remove(id);
   }
 
@@ -68,7 +75,7 @@ export class PageTournamentSelect {
 
   private displayUiAddingTournament () {
     this.uiAddingTournament = true;
-    this.utils.setFocus(`ion-input#${this.inputId}`);
+    Utils.setFocus(`ion-input#${this.inputId}`);
   }
 
 
@@ -90,7 +97,7 @@ export class PageTournamentSelect {
                       <ion-badge slot="start" class="ion-margin-end"
                         color="tertiary">{ tournament.grid.length }</ion-badge>
                       <ion-icon class="ion-margin-horizontal"
-                        onClick={(ev: Event) => this.removeTournament(ev, tournament.id)}
+                        onClick={(ev: Event) => this.confirmRemoveTournament(ev, tournament.id)}
                         slot="end" name="trash-outline"></ion-icon>
                     </ion-label>
                   </ion-item>
@@ -127,7 +134,7 @@ export class PageTournamentSelect {
                 <div>
                   <ion-button onClick={() => {this.displayUiAddingTournament()}} expand="full">
                     <ion-icon slot="start" name="add-outline"></ion-icon>
-                    Nouveau tournois
+                    Nouveau tournoi
                   </ion-button>
                 </div>
               }

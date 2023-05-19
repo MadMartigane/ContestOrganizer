@@ -2,7 +2,7 @@ import { Component, Event, EventEmitter, Fragment, h, Prop, State } from "@stenc
 import ApiFutDB from "../../modules/futbd/futdb";
 import { FutDBTeam } from "../../modules/futbd/futdb.d";
 import { PageTeamSelectEventDatail } from "./page-team-select.d";
-import utils from "../../modules/utils/utils";
+import Utils from "../../modules/utils/utils";
 
 @Component({
   tag: "page-team-select",
@@ -11,7 +11,6 @@ import utils from "../../modules/utils/utils";
 })
 export class PageTeamSelect {
   private readonly apiFutDB: typeof ApiFutDB;
-  private readonly utils: typeof utils;
 
   private teams: Array<FutDBTeam>;
   private searchValue: string;
@@ -28,7 +27,6 @@ export class PageTeamSelect {
 
   constructor () {
     this.apiFutDB = ApiFutDB;
-    this.utils = utils;
 
     this.teams = [];
     this.suggested = [];
@@ -45,7 +43,7 @@ export class PageTeamSelect {
       })
       .finally(() => {
         this.isLoading = false;
-        this.utils.setFocus("ion-searchbar#page-team-select-search");
+        Utils.setFocus("ion-searchbar#page-team-select-search");
       });
   }
 
