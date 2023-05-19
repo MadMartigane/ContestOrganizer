@@ -57,7 +57,7 @@ export class MadSelectTeam {
         class={{
           "pointer": true
         }}>
-        <ion-item
+        <ion-router-link
           href={`/team-select/${this.itemId}`} key="teamId"
           id={this.itemId}
           color={this.argColor}
@@ -68,15 +68,10 @@ export class MadSelectTeam {
             null
           }
           {this.team?.id ?
-            <mad-team-tile
-              team={this.team}
-            ></mad-team-tile> :
-            <ion-text
-              color="medium">
-              {this.placeholder}
-            </ion-text>
+            <mad-team-tile team={this.team}></mad-team-tile> :
+            <p class="placeholder ion-padding-top">{this.placeholder}</p>
           }
-        </ion-item>
+        </ion-router-link>
       </Host>
     );
   }

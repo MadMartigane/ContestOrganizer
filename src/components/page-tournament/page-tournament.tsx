@@ -1,5 +1,5 @@
 import { InputChangeEventDetail } from "@ionic/core";
-import { Component, Fragment, h, Prop, State } from "@stencil/core";
+import { Component, h, Host, Prop, State } from "@stencil/core";
 import { TeamRow } from "../../modules/team-row/team-row";
 import { FutDBTeam, MadInputNumberCustomEvent, MadSelectTeamCustomEvent } from "../../components";
 import tournaments from "../../modules/tournaments/tournaments";
@@ -30,6 +30,7 @@ export class PageTournament {
   private readonly inputNameId: string;
 
   private teamNumber: number;
+  private counter: number;
 
   @Prop() public tournamentId: number;
   @State() private tournament: Tournament;
@@ -58,6 +59,7 @@ export class PageTournament {
     this.uiError = null;
     this.isEditTournamentName = false;
     this.inputNameId = "page-tournament-input-name-id";
+    this.counter = 0;
 
     this.teamNumber = this.tournament.grid.length || this.conf.teamNumberDefault;
     this.updateTournament();
@@ -82,6 +84,7 @@ export class PageTournament {
       newTournament.grid[i] = this.tournament.grid[i] || this.getVirginTeamRow();
     }
 
+    this.counter = 0;
     this.tournaments.update(newTournament);
     this.tournament = newTournament;
   }
@@ -149,7 +152,7 @@ export class PageTournament {
 
   render() {
     return (
-      <Fragment>
+      <Host>
         <ion-header>
           <ion-toolbar color="primary">
             <ion-buttons slot="start">
@@ -228,7 +231,8 @@ export class PageTournament {
                 <div>
                   <ion-grid>
                     <ion-row>
-                      <ion-col size="4"><ion-label color="primary">Nom de l’équipe</ion-label></ion-col>
+                      <ion-col size="1"><ion-label color="primary"><ion-icon name="swap-vertical-outline"></ion-icon></ion-label></ion-col>
+                      <ion-col size="3"><ion-label color="primary">Équipes</ion-label></ion-col>
                       <ion-col><ion-label color="success">Points</ion-label></ion-col>
                       <ion-col><ion-label color="secondary">Buts <ion-icon name="add-outline"></ion-icon></ion-label></ion-col>
                       <ion-col><ion-label color="tertiary">Buts <ion-icon name="remove-outline"></ion-icon></ion-label></ion-col>
@@ -237,12 +241,15 @@ export class PageTournament {
 
                       {this.tournament.grid.map((team) =>
                       <ion-row>
-                        <ion-col size="4">
+                        <ion-col size="1">
+                          <p class="counter ion-padding-top">#{++this.counter}</p>
+                        </ion-col>
+                        <ion-col size="3">
                           <mad-select-team
                             value={team.team}
                             color="primary"
                             onMadSelectChange={(ev: MadSelectTeamCustomEvent<FutDBTeam>) => this.onTeamTeamChange(ev.detail, team)}
-                            placeholder="AC Milan">
+                            placeholder="Man City">
                           </mad-select-team>
                         </ion-col>
                         <ion-col>
@@ -273,13 +280,12 @@ export class PageTournament {
                           </mad-input-number>
                         </ion-col>
                         <ion-col>
-                          <ion-input
+                          <mad-input-number
                             value={team.goalAverage}
-                            type="text"
                             color="warning"
                             readonly
                             placeholder="0">
-                          </ion-input>
+                          </mad-input-number>
                         </ion-col>
                       </ion-row>
                     )}
@@ -309,7 +315,7 @@ export class PageTournament {
           </div>
         }
         </ion-content>
-      </Fragment>
+      </Host>
     );
   }
 

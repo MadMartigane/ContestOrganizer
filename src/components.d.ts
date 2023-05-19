@@ -22,6 +22,7 @@ export namespace Components {
         "max"?: number;
         "min"?: number;
         "placeholder": string;
+        "readonly"?: boolean;
         "step"?: number;
         "value"?: number;
     }
@@ -136,6 +137,7 @@ declare namespace LocalJSX {
         "min"?: number;
         "onMadNumberChange"?: (event: MadInputNumberCustomEvent<InputChangeEventDetail>) => void;
         "placeholder"?: string;
+        "readonly"?: boolean;
         "step"?: number;
         "value"?: number;
     }

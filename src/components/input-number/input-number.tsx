@@ -30,6 +30,7 @@ export class MadInputNumber {
     @Prop() max?: number;
     @Prop() step?: number;
     @Prop() value?: number;
+    @Prop() readonly?: boolean;
 
     @State() private number: number;
 
@@ -54,7 +55,7 @@ export class MadInputNumber {
     }
 
     onIncrementNumber() {
-      if (this.max && this.number >= this.max) {
+      if (this.max !== undefined && this.number >= this.max) {
         this.number = this.max;
         return;
       }
@@ -64,7 +65,7 @@ export class MadInputNumber {
     }
 
     onDecrementNumber() {
-      if (this.min && this.number <= this.min) {
+      if (this.min !== undefined && this.number <= this.min) {
         this.number = this.min;
         return;
       }
@@ -84,57 +85,60 @@ export class MadInputNumber {
                     color={this.argColor}
                     lines="none"
                     fill="outline">
-                    <ion-label>
+                    <div>
                       { this.label ?
                           <span>{this.label}: </span> :
                           null
                       }
-                      <ion-text
-                          color={this.value ? this.argColor : "medium"}>
-                          {this.number || this.placeholder}
-                      </ion-text>
-                    </ion-label>
+                      { this.value !== undefined ?
+                        <p class={["ion-padding-top", this.argColor].join(" ")}>{this.number}</p> :
+                        <p class="ion-padding-top placeholder">{this.placeholder}</p>
+                      }
+                    </div>
                 </ion-item>
-                <ion-popover
-                    mode="ios"
-                    size="auto"
-                    alignment="center"
-                    animated="true"
-                    arrow="true"
-                    trigger={this.itemId}
-                    trigger-action="click">
-                    <ion-content class="ion-padding">
-                        <div class="box">
-                          <ion-button
-                            color="warning"
-                            onclick={() => { this.onDecrementNumber() }}
-                            size="small">
-                            <ion-icon
-                              slod="icon-only"
-                              size="large"
-                              color="primary"
-                              name="remove-outline"
-                            ></ion-icon>
-                          </ion-button>
-                          <ion-chip
-                              outline="true"
-                              color={this.color}
-                              >{this.number}
-                          </ion-chip>
-                          <ion-button
+                { this.readonly ?
+                    null :
+                    <ion-popover
+                      mode="ios"
+                      size="auto"
+                      alignment="center"
+                      animated="true"
+                      arrow="true"
+                      trigger={this.itemId}
+                      trigger-action="click">
+                      <ion-content class="ion-padding">
+                          <div class="box">
+                            <ion-button
                               color="warning"
-                              onclick={() => { this.onIncrementNumber() }}
+                              onclick={() => { this.onDecrementNumber() }}
                               size="small">
                               <ion-icon
                                 slod="icon-only"
                                 size="large"
                                 color="primary"
-                                name="add-outline"
+                                name="remove-outline"
                               ></ion-icon>
                             </ion-button>
-                        </div>
-                    </ion-content>
-                </ion-popover>
+                            <ion-chip
+                                outline="true"
+                                color={this.color}
+                                >{this.number}
+                            </ion-chip>
+                            <ion-button
+                                color="warning"
+                                onclick={() => { this.onIncrementNumber() }}
+                                size="small">
+                                <ion-icon
+                                  slod="icon-only"
+                                  size="large"
+                                  color="primary"
+                                  name="add-outline"
+                                ></ion-icon>
+                              </ion-button>
+                          </div>
+                      </ion-content>
+                  </ion-popover>
+                }
             </Host>
         );
     }
