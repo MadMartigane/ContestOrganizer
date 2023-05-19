@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "description": "Stencil Ionic App Starter",
   "scripts": {
-    "build": "stencil build --no-cache",
+    "build": "stencil build",
     "start": "stencil build --dev --watch --serve",
     "test": "stencil test --spec --e2e",
     "test.watch": "stencil test --spec --e2e --watchAll",
@@ -19,7 +19,7 @@
     "setSrcBasePath": "sed -i 's/src=\"/src=\"\\/contest/g' /var/www/marius.click/html/contest/index.html",
     "setHrefBasePath": "sed -i 's/href=\"/href=\"\\/contest/g' /var/www/marius.click/html/contest/index.html",
     "prod-update-paths":"npm run setSrcBasePath && npm run setHrefBasePath",
-    "prod": "npm run backup && npm run prod-only",
+    "prod": "npm run backup && npm run build && npm run prod-only",
     "prod-only": "npm run build && npm run prod-clean && npm run prod-push && npm run prod-update-paths",
     "generate": "stencil generate"
   },
