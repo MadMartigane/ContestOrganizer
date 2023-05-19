@@ -90,7 +90,7 @@ export class MadInputNumber {
                           <span>{this.label}: </span> :
                           null
                       }
-                      { this.value ?
+                      { this.value !== undefined ?
                         <p class={["ion-padding-top", this.argColor].join(" ")}>{this.number}</p> :
                         <p class="ion-padding-top placeholder">{this.placeholder}</p>
                       }
