@@ -1,10 +1,10 @@
 import {
-    Component,
-    Host,
-    Prop,
-    h,
-    State,
-    Watch
+  Component,
+  Host,
+  Prop,
+  h,
+  State,
+  Watch
 } from '@stencil/core';
 import {FutDBTeam} from "../../modules/futbd/futdb.d";
 import ApiFutDB from "../../modules/futbd/futdb";
@@ -41,13 +41,19 @@ export class MadInputNumber {
   render() {
     return (
         <Host>
-            <ion-item>
-              <ion-thumbnail slot="start" >
-                <img alt={`${this.team.name} club logo`} src={this.imgSrc} />
-              </ion-thumbnail>
-              <ion-label slot="end">{this.team.name}</ion-label>
-            </ion-item>
-          </Host>
+          <ion-grid>
+            <ion-row>
+              <ion-col>
+                <ion-thumbnail>
+                  <img alt={`${this.team.name} club logo`} src={this.imgSrc} />
+                </ion-thumbnail>
+              </ion-col>
+              <ion-col>
+                <span>{this.team.name}</span>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </Host>
       );
   }
 }

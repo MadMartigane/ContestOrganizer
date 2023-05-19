@@ -6,3 +6,30 @@
   justify-content: space-between;
 }
 
+p.placeholder {
+  color: var(--ion-color-medium);
+}
+p.success {
+  color: var(--ion-color-success);
+}
+p.warning {
+  color: var(--ion-color-warning);
+}
+p.danger {
+  color: var(--ion-color-danger);
+}
+p.primary {
+  color: var(--ion-color-primary);
+}
+p.secondary {
+  color: var(--ion-color-secondary);
+}
+p.tertiary {
+  color: var(--ion-color-tertiary);
+}
+p.medium {
+  color: var(--ion-color-medium);
+}
+p.light {
+  color: var(--ion-color-light);
+}
