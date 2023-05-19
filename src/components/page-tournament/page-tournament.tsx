@@ -4,6 +4,7 @@ import { TeamRow } from "../../modules/team-row/team-row";
 import { FutDBTeam, MadInputNumberCustomEvent, MadSelectTeamCustomEvent } from "../../components";
 import tournaments from "../../modules/tournaments/tournaments";
 import {Tournament} from "../../modules/tournaments/tournaments.d";
+import Utils from "../../modules/utils/utils";
 
 export interface PageConfConstants {
   teamNumberMax: number,
@@ -94,7 +95,7 @@ export class PageTournament {
     this.updateTournament();
   }
 
-  goRanking(): void {
+  private goRanking(): void {
     const gridClone = this.tournament.grid.map(team => team) as Array<TeamRow>;
     gridClone.sort((a: TeamRow, b: TeamRow) => b.goalAverage - a.goalAverage);
     this.tournament.grid = gridClone.sort((a: TeamRow, b: TeamRow) => b.points - a.points);
@@ -102,10 +103,17 @@ export class PageTournament {
     this.updateTournament();
   }
 
-  resetGrid(): void {
+  private resetGrid(): void {
     this.tournament.grid = [];
     this.teamNumber = this.conf.teamNumberDefault;
     this.updateTournament();
+  }
+
+  private async confirmResetGrid(): Promise<void> {
+    const confirm = await Utils.confirmChoice("Es-tu sûre de vouloir effacer les noms, ainsi que les scores de toutes les équipes ?");
+    if (confirm) {
+      this.resetGrid();
+    }
   }
 
   render() {
@@ -223,8 +231,8 @@ export class PageTournament {
 
                   <ion-button
                     class="ion-margin"
+                    onClick={() => this.confirmResetGrid()}
                     expand="full"
-                    onClick={() => this.resetGrid()}
                     color="medium"
                     size="default">
                     <ion-icon name="trash-bin-outline" size-xs="normal" size="large" color="warning"></ion-icon>
@@ -238,7 +246,6 @@ export class PageTournament {
               }
           </div>
         }
-
         </ion-content>
       </Fragment>
     );
