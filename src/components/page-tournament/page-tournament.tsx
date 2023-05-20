@@ -181,139 +181,156 @@ export class PageTournament {
               </ion-card>
             </div> :
             <div>
-              <div>
-                <div class="ion-padding-horizontal">
-                  {this.isEditTournamentName ?
-                    <div>
-                        <ion-input
-                          id={this.inputNameId}
-                          color="primary"
-                          inputmode="text"
-                          autofocus="true"
-                          name="tournamentName"
-                          value={this.tournament.name}
-                          onkeypress={(ev: KeyboardEvent) => this.onTournamentNameChange(ev)}
-                          class="ion-padding-horizontal"/>
 
-                        <ion-button size="default" color="tertiary" class="ion-padding-horizontal"
-                          onClick={() => {this.isEditTournamentName = false;}}
-                          fill="solid">
-                          <ion-icon slot="icon-only" name="close-circle-outline"></ion-icon>
-                        </ion-button>
-
-                        <ion-button size="default" color="secondary" class="ion-padding-horizontal"
-                          onClick={() => this.editTournamentName()}
-                          fill="solid">
-                          <ion-icon slot="icon-only" name="save-outline"></ion-icon>
-                        </ion-button>
-                    </div> :
-                    <h2 class="can-be-clicked" onClick={() => this.onEditTournamentName()}>
-                        <ion-icon name="trophy-outline" size="large" color="secondary"></ion-icon>
-                        <ion-text class="ion-padding-horizontal">{ this.tournament.name }</ion-text>
-                        <ion-icon name="pencil-outline" color="secondary"></ion-icon>
-                    </h2>
-                  }
-                </div>
-                <div>
-                  <mad-input-number
-                    value={this.teamNumber}
-                    label={ `Nombre d’équipes (min:${this.conf.teamNumberMin}, max:${this.conf.teamNumberMax})` }
-                    onMadNumberChange={(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamNumberChange(ev.detail)}
-                    color="primary"
-                    min={this.conf.teamNumberMin}
-                    max={this.conf.teamNumberMax}
-                    step={this.conf.teamNumberStep}
-                    placeholder={ String(this.conf.teamNumberDefault) }>
-                  </mad-input-number>
-                </div>
-              </div>
-
-              {this.teamNumber > 0 ?
-                <div>
-                  <ion-grid class="page-tournament-grid">
-                    <ion-row class="page-tournament-grid-header ion-align-items-center">
-                      <ion-col size="1"><ion-label color="primary"><ion-icon name="swap-vertical-outline"></ion-icon></ion-label></ion-col>
-                      <ion-col size="3"><ion-label color="primary">Équipes</ion-label></ion-col>
-                      <ion-col><ion-label color="success">Points</ion-label></ion-col>
-                      <ion-col><ion-label color="secondary">Buts <ion-icon name="add-outline"></ion-icon></ion-label></ion-col>
-                      <ion-col><ion-label color="tertiary">Buts <ion-icon name="remove-outline"></ion-icon></ion-label></ion-col>
-                      <ion-col><ion-label color="warning">Goal average</ion-label></ion-col>
-                    </ion-row>
-
-                      {this.tournament.grid.map((team) =>
-                      <ion-row class="ion-align-items-center">
-                        <ion-col size="1">
-                          <span class="counter">#{++this.counter}</span>
-                        </ion-col>
-                        <ion-col size="3">
-                          <mad-select-team
-                            value={team.team}
-                            color="primary"
-                            onMadSelectChange={(ev: MadSelectTeamCustomEvent<FutDBTeam>) => this.onTeamTeamChange(ev.detail, team)}
-                            placeholder="Man City">
-                          </mad-select-team>
-                        </ion-col>
-                        <ion-col>
-                          <mad-input-number
-                            value={team.points}
-                            color="success"
-                            min={this.conf.pointMin}
-                            onMadNumberChange={(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev.detail, team, "points")}
-                            placeholder="0">
-                          </mad-input-number>
-                        </ion-col>
-                        <ion-col>
-                          <mad-input-number
-                            value={team.scoredGoals}
-                            min={this.conf.scoredGoalsMin}
-                            color="secondary"
-                            onMadNumberChange={(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev.detail, team, "scoredGoals")}
-                            placeholder="0">
-                          </mad-input-number>
-                        </ion-col>
-                        <ion-col>
-                          <mad-input-number
-                            value={team.concededGoals}
-                            min={this.conf.concededGoalsMin}
-                            color="tertiary"
-                            onMadNumberChange={(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev.detail, team, "concededGoals")}
-                            placeholder="0">
-                          </mad-input-number>
-                        </ion-col>
-                        <ion-col>
-                          <mad-input-number
-                            value={team.goalAverage}
-                            color="warning"
-                            readonly
-                            placeholder="0">
-                          </mad-input-number>
-                        </ion-col>
-                      </ion-row>
-                    )}
-                  </ion-grid>
-
-                  <ion-button expand="full" color="primary" class="ion-margin"
-                    onClick={() => this.goRanking()}>
-                    <ion-icon name="car-sport-outline" size-xs="normal" size="large"></ion-icon>
-                    <ion-text class="ion-margin">Classement !</ion-text>
-                  </ion-button>
-
-                  <ion-button
-                    class="ion-margin"
-                    onClick={() => this.confirmResetGrid()}
-                    expand="full"
-                    color="medium"
-                    size="default">
-                    <ion-icon name="trash-bin-outline" size-xs="normal" size="large" color="warning"></ion-icon>
-                    <ion-text class="ion-margin" color="warning">Effacer</ion-text>
-                  </ion-button>
-
-                </div> :
-                <div>
-                  <h2 class=""> Choisissez le nombre d’équipes pour commencer ! </h2>
-                </div>
+              {this.isEditTournamentName ?
+                <ion-grid class="grid-edit-tournament-name">
+                  <ion-row class="ion-align-items-end ion-justify-content-center">
+                    <ion-col size="1">
+                      <ion-button size="small" color="tertiary"
+                        onClick={() => {this.isEditTournamentName = false;}}
+                        fill="solid">
+                        <ion-icon slot="icon-only" name="close-circle-outline"></ion-icon>
+                      </ion-button>
+                    </ion-col>
+                    <ion-col size="10" size-sm="8" size-md="6" size-lg="4">
+                      <ion-input
+                        id={this.inputNameId}
+                        color="primary"
+                        inputmode="text"
+                        autofocus="true"
+                        name="tournamentName"
+                        value={this.tournament.name}
+                        onkeypress={(ev: KeyboardEvent) => this.onTournamentNameChange(ev)}/>
+                    </ion-col>
+                    <ion-col size="1">
+                      <ion-button size="small" color="secondary"
+                        onClick={() => this.editTournamentName()}
+                        fill="solid">
+                        <ion-icon slot="icon-only" name="save-outline"></ion-icon>
+                      </ion-button>
+                    </ion-col>
+                  </ion-row>
+                </ion-grid> :
+                <ion-grid class="can-be-clicked grid-edit-tournament-name" onClick={() => this.onEditTournamentName()}>
+                  <ion-row class="ion-align-items-end ion-justify-content-center">
+                    <ion-col size="1">
+                      <ion-icon name="trophy-outline" size="large" color="secondary"></ion-icon>
+                    </ion-col>
+                    <ion-col size="10" size-sm="8" size-md="6" size-lg="4">
+                      <h2 class="ion-padding-horizontal">{ this.tournament.name }</h2>
+                    </ion-col>
+                    <ion-col size="1">
+                      <ion-icon name="pencil-outline" size="large" color="secondary"></ion-icon>
+                    </ion-col>
+                  </ion-row>
+                </ion-grid>
               }
-          </div>
+
+              <ion-grid class="grid-edit-tournament-name">
+                <ion-row class="ion-align-items-end ion-justify-content-center">
+                  <ion-col size="10" size-sm="8" size-md="6" size-lg="4" class="ion-padding-vertical">
+
+                    <mad-input-number
+                      value={this.teamNumber}
+                      label={ `Nombre d’équipes (min:${this.conf.teamNumberMin}, max:${this.conf.teamNumberMax})` }
+                      onMadNumberChange={(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamNumberChange(ev.detail)}
+                      color="primary"
+                      min={this.conf.teamNumberMin}
+                      max={this.conf.teamNumberMax}
+                      step={this.conf.teamNumberStep}
+                      placeholder={ String(this.conf.teamNumberDefault) }>
+                  </mad-input-number>
+
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+
+            {this.teamNumber > 0 ?
+              <div>
+                <ion-grid class="page-tournament-grid">
+                  <ion-row class="page-tournament-grid-header ion-align-items-center">
+                    <ion-col size="1"><ion-label color="primary"><ion-icon name="swap-vertical-outline"></ion-icon></ion-label></ion-col>
+                    <ion-col size="3"><ion-label color="primary">Équipes</ion-label></ion-col>
+                    <ion-col><ion-label color="success">Points</ion-label></ion-col>
+                    <ion-col><ion-label color="secondary">Buts <ion-icon name="add-outline"></ion-icon></ion-label></ion-col>
+                    <ion-col><ion-label color="tertiary">Buts <ion-icon name="remove-outline"></ion-icon></ion-label></ion-col>
+                    <ion-col><ion-label color="warning">Goal average</ion-label></ion-col>
+                  </ion-row>
+
+                    {this.tournament.grid.map((team) =>
+                    <ion-row class="ion-align-items-center">
+                      <ion-col size="1">
+                        <span class="counter">#{++this.counter}</span>
+                      </ion-col>
+                      <ion-col size="3">
+                        <mad-select-team
+                          value={team.team}
+                          color="primary"
+                          onMadSelectChange={(ev: MadSelectTeamCustomEvent<FutDBTeam>) => this.onTeamTeamChange(ev.detail, team)}
+                          placeholder="Man City">
+                        </mad-select-team>
+                      </ion-col>
+                      <ion-col>
+                        <mad-input-number
+                          value={team.points}
+                          color="success"
+                          min={this.conf.pointMin}
+                          onMadNumberChange={(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev.detail, team, "points")}
+                          placeholder="0">
+                        </mad-input-number>
+                      </ion-col>
+                      <ion-col>
+                        <mad-input-number
+                          value={team.scoredGoals}
+                          min={this.conf.scoredGoalsMin}
+                          color="secondary"
+                          onMadNumberChange={(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev.detail, team, "scoredGoals")}
+                          placeholder="0">
+                        </mad-input-number>
+                      </ion-col>
+                      <ion-col>
+                        <mad-input-number
+                          value={team.concededGoals}
+                          min={this.conf.concededGoalsMin}
+                          color="tertiary"
+                          onMadNumberChange={(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev.detail, team, "concededGoals")}
+                          placeholder="0">
+                        </mad-input-number>
+                      </ion-col>
+                      <ion-col>
+                        <mad-input-number
+                          value={team.goalAverage}
+                          color="warning"
+                          readonly
+                          placeholder="0">
+                        </mad-input-number>
+                      </ion-col>
+                    </ion-row>
+                  )}
+                </ion-grid>
+
+                <ion-button expand="full" color="primary" class="ion-margin"
+                  onClick={() => this.goRanking()}>
+                  <ion-icon name="car-sport-outline" size-xs="normal" size="large"></ion-icon>
+                  <ion-text class="ion-margin">Classement !</ion-text>
+                </ion-button>
+
+                <ion-button
+                  class="ion-margin"
+                  onClick={() => this.confirmResetGrid()}
+                  expand="full"
+                  color="medium"
+                  size="default">
+                  <ion-icon name="trash-bin-outline" size-xs="normal" size="large" color="warning"></ion-icon>
+                  <ion-text class="ion-margin" color="warning">Effacer</ion-text>
+                </ion-button>
+
+              </div> :
+              <div>
+                <h2 class=""> Choisissez le nombre d’équipes pour commencer ! </h2>
+              </div>
+            }
+        </div>
         }
         </ion-content>
       </Host>
