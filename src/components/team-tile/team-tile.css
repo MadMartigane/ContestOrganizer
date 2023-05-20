@@ -2,3 +2,8 @@ ion-thumbnail {
   --size: 42px;
   --border-radius: 10%;
 }
+
+ion-grid.grid-team-tile > ion-row > ion-col {
+  text-align: left;
+}
+

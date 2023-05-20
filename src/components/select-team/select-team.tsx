@@ -12,6 +12,7 @@ import {
 } from "@stencil/core";
 import { FutDBTeam } from "../../modules/futbd/futdb.d";
 import { PageTeamSelectEventDatail } from "../page-team-select/page-team-select.d";
+import uuid from "../../modules/uuid/uuid";
 
 @Component({
   tag: "mad-select-team",
@@ -48,7 +49,7 @@ export class MadSelectTeam {
   constructor() {
     this.argColor = this.color || "primary";
     this.team = this.value;
-    this.itemId = String(Math.floor(Math.random() * 999999));
+    this.itemId = String(uuid.new());
   }
 
   render() {
@@ -58,18 +59,14 @@ export class MadSelectTeam {
           "pointer": true
         }}>
         <ion-router-link
-          href={`/team-select/${this.itemId}`} key="teamId"
-          id={this.itemId}
-          color={this.argColor}
-          lines="none"
-          fill="outline">
+          href={`/team-select/${this.itemId}`} key="teamId">
           {this.label ?
-            <ion-label position="floating">{this.label}</ion-label> :
+            <span>{this.label}</span> :
             null
           }
           {this.team?.id ?
-            <mad-team-tile team={this.team}></mad-team-tile> :
-            <p class="placeholder ion-padding-top">{this.placeholder}</p>
+            <mad-team-tile color={this.argColor} team={this.team}></mad-team-tile> :
+            <span class="placeholder">{this.placeholder}</span>
           }
         </ion-router-link>
       </Host>

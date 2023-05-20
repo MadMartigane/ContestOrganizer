@@ -6,30 +6,30 @@
   justify-content: space-between;
 }
 
-p.placeholder {
+span.placeholder {
   color: var(--ion-color-medium);
 }
-p.success {
+span.success {
   color: var(--ion-color-success);
 }
-p.warning {
+span.warning {
   color: var(--ion-color-warning);
 }
-p.danger {
+span.danger {
   color: var(--ion-color-danger);
 }
-p.primary {
+span.primary {
   color: var(--ion-color-primary);
 }
-p.secondary {
+span.secondary {
   color: var(--ion-color-secondary);
 }
-p.tertiary {
+span.tertiary {
   color: var(--ion-color-tertiary);
 }
-p.medium {
+span.medium {
   color: var(--ion-color-medium);
 }
-p.light {
+span.light {
   color: var(--ion-color-light);
 }

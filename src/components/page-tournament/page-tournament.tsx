@@ -214,11 +214,12 @@ export class PageTournament {
                     </h2>
                   }
                 </div>
-                <div class="ion-padding-horizontal">
+                <div>
                   <mad-input-number
                     value={this.teamNumber}
                     label={ `Nombre d’équipes (min:${this.conf.teamNumberMin}, max:${this.conf.teamNumberMax})` }
                     onMadNumberChange={(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamNumberChange(ev.detail)}
+                    color="primary"
                     min={this.conf.teamNumberMin}
                     max={this.conf.teamNumberMax}
                     step={this.conf.teamNumberStep}
@@ -229,8 +230,8 @@ export class PageTournament {
 
               {this.teamNumber > 0 ?
                 <div>
-                  <ion-grid>
-                    <ion-row>
+                  <ion-grid class="page-tournament-grid">
+                    <ion-row class="page-tournament-grid-header ion-align-items-center">
                       <ion-col size="1"><ion-label color="primary"><ion-icon name="swap-vertical-outline"></ion-icon></ion-label></ion-col>
                       <ion-col size="3"><ion-label color="primary">Équipes</ion-label></ion-col>
                       <ion-col><ion-label color="success">Points</ion-label></ion-col>
@@ -240,9 +241,9 @@ export class PageTournament {
                     </ion-row>
 
                       {this.tournament.grid.map((team) =>
-                      <ion-row>
+                      <ion-row class="ion-align-items-center">
                         <ion-col size="1">
-                          <p class="counter ion-padding-top">#{++this.counter}</p>
+                          <span class="counter">#{++this.counter}</span>
                         </ion-col>
                         <ion-col size="3">
                           <mad-select-team
