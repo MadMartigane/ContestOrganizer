@@ -41,8 +41,8 @@ export class MadInputNumber {
   render() {
     return (
         <Host>
-          <ion-grid>
-            <ion-row>
+          <ion-grid class="grid-team-tile">
+            <ion-row class="ion-align-items-center">
               <ion-col>
                 <ion-thumbnail>
                   <img alt={`${this.team.name} club logo`} src={this.imgSrc} />

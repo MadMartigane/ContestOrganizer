@@ -80,22 +80,16 @@ export class MadInputNumber {
             class={{
               "pointer": true
             }}>
-                <ion-item
-                    id={this.itemId}
-                    color={this.argColor}
-                    lines="none"
-                    fill="outline">
-                    <div>
-                      { this.label ?
-                          <span>{this.label}: </span> :
-                          null
-                      }
-                      { this.value !== undefined ?
-                        <p class={["ion-padding-top", this.argColor].join(" ")}>{this.number}</p> :
-                        <p class="ion-padding-top placeholder">{this.placeholder}</p>
-                      }
-                    </div>
-                </ion-item>
+                <div id={this.itemId}>
+                  { this.label ?
+                    <span>{this.label}: </span> :
+                      null
+                  }
+                  { this.value !== undefined ?
+                    <span class={this.argColor}>{this.number}</span> :
+                    <span class="placeholder">{this.placeholder}</span>
+                  }
+                </div>
                 { this.readonly ?
                     null :
                     <ion-popover
