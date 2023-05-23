@@ -40,7 +40,7 @@ export class PageTournament {
   constructor() {
     this.conf = {
       teamNumberDefault: 4,
-      teamNumberMax: 16,
+      teamNumberMax: 32,
       teamNumberMin: 2,
       teamNumberStep: 2,
       scoredGoalsMin: 0,
@@ -260,7 +260,7 @@ export class PageTournament {
                     {this.tournament.grid.map((team) =>
                     <ion-row class="ion-align-items-center">
                       <ion-col size="1">
-                        <span class="counter">#{++this.counter}</span>
+                          <span class="counter">{ this.counter > 8 ? null : "0"}{++this.counter}</span>
                       </ion-col>
                       <ion-col size="3">
                         <mad-select-team
