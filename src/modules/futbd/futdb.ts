@@ -36,7 +36,7 @@ export class ApiFutDB {
 
   private async loadCache(): Promise<Array<FutDBTeam> | null> {
     const cacheString = localStorage.getItem(LOCAL_STORAGE_TEAM_KEY);
-    let cache: Array<FutDBTeam>;
+    let cache = null as Array<FutDBTeam> | null;
 
     if (cacheString) {
       try {

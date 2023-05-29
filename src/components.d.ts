@@ -37,6 +37,9 @@ export namespace Components {
     }
     interface PageHome {
     }
+    interface PageMatch {
+        "tournamentId": number;
+    }
     interface PageTeamSelect {
         "teamId": string;
     }
@@ -95,6 +98,12 @@ declare global {
         prototype: HTMLPageHomeElement;
         new (): HTMLPageHomeElement;
     };
+    interface HTMLPageMatchElement extends Components.PageMatch, HTMLStencilElement {
+    }
+    var HTMLPageMatchElement: {
+        prototype: HTMLPageMatchElement;
+        new (): HTMLPageMatchElement;
+    };
     interface HTMLPageTeamSelectElement extends Components.PageTeamSelect, HTMLStencilElement {
     }
     var HTMLPageTeamSelectElement: {
@@ -120,6 +129,7 @@ declare global {
         "mad-select-team": HTMLMadSelectTeamElement;
         "mad-team-tile": HTMLMadTeamTileElement;
         "page-home": HTMLPageHomeElement;
+        "page-match": HTMLPageMatchElement;
         "page-team-select": HTMLPageTeamSelectElement;
         "page-tournament": HTMLPageTournamentElement;
         "page-tournament-select": HTMLPageTournamentSelectElement;
@@ -153,6 +163,9 @@ declare namespace LocalJSX {
     }
     interface PageHome {
     }
+    interface PageMatch {
+        "tournamentId"?: number;
+    }
     interface PageTeamSelect {
         "onPageTeamNewSelection"?: (event: PageTeamSelectCustomEvent<PageTeamSelectEventDatail>) => void;
         "teamId"?: string;
@@ -169,6 +182,7 @@ declare namespace LocalJSX {
         "mad-select-team": MadSelectTeam;
         "mad-team-tile": MadTeamTile;
         "page-home": PageHome;
+        "page-match": PageMatch;
         "page-team-select": PageTeamSelect;
         "page-tournament": PageTournament;
         "page-tournament-select": PageTournamentSelect;
@@ -184,6 +198,7 @@ declare module "@stencil/core" {
             "mad-select-team": LocalJSX.MadSelectTeam & JSXBase.HTMLAttributes<HTMLMadSelectTeamElement>;
             "mad-team-tile": LocalJSX.MadTeamTile & JSXBase.HTMLAttributes<HTMLMadTeamTileElement>;
             "page-home": LocalJSX.PageHome & JSXBase.HTMLAttributes<HTMLPageHomeElement>;
+            "page-match": LocalJSX.PageMatch & JSXBase.HTMLAttributes<HTMLPageMatchElement>;
             "page-team-select": LocalJSX.PageTeamSelect & JSXBase.HTMLAttributes<HTMLPageTeamSelectElement>;
             "page-tournament": LocalJSX.PageTournament & JSXBase.HTMLAttributes<HTMLPageTournamentElement>;
             "page-tournament-select": LocalJSX.PageTournamentSelect & JSXBase.HTMLAttributes<HTMLPageTournamentSelectElement>;

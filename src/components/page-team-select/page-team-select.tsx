@@ -66,7 +66,7 @@ export class PageTeamSelect {
     });
 
     const router = document.querySelector('ion-router');
-    router.back();
+    router?.back();
   }
 
   render() {

@@ -4,7 +4,17 @@ import { CACHE_KEY } from "./tournaments.constants";
 import uuid from "../uuid/uuid";
 import TeamRow from "../team-row/team-row";
 
+export class Match {
+  public readonly id: number;
+  public host: TeamRow | null;
+  public visitor: TeamRow | null;
 
+  constructor(host = null, visitor = null) {
+    this.id = uuid.new();
+    this.host = host;
+    this.visitor = visitor;
+  }
+}
 class Tournaments {
 
   private readonly CACHE_KEY: typeof CACHE_KEY;
@@ -39,27 +49,6 @@ class Tournaments {
       }
     }
 
-    // TODO remove backward compatibility
-    const oldGridString = localStorage.getItem("CONTEST_GRID");
-    if (oldGridString) {
-      let oldGrid = [];
-      try {
-        oldGrid = JSON.parse(oldGridString);
-      } catch (e) {
-        console.warn("[Tournaments] Unable to parse old store tourmament. Cleanning the cache. ", e);
-        localStorage.removeItem("CONTEST_GRID");
-      }
-
-      this.tournaments.push({
-        id: this.uuid.new(),
-        name: "Premier tournois",
-        grid: oldGrid
-      });
-      localStorage.removeItem("CONTEST_GRID");
-      this.store();
-    }
-    // end of TODO
-
     /* From stored data to instanciated object */
     this.tournaments.forEach((t) => {
       for (let i = 0, imax = t.grid.length; i < imax; i++) {
@@ -81,11 +70,12 @@ class Tournaments {
     return this.store();
   }
 
-  public add (name: string, grid: Array<TeamRow>): number {
+  public add (name: string, grid: Array<TeamRow>, matchs: Match[]): number {
     this.tournaments.push({
       id: this.uuid.new(),
       name,
-      grid
+      grid,
+      matchs
     });
 
     return this.store();
@@ -100,7 +90,7 @@ class Tournaments {
 
     if (i === -1) {
       console.warn("[Tournaments] Unable to update the tourmament #%s.", tournament.id);
-      return;
+      return this.tournaments.length;
     }
 
     this.tournaments[i] = tournament;

@@ -29,14 +29,7 @@ export class TeamRow {
   }
 
   public fromData(data: TeamRowProperties): TeamRow {
-    Object.keys(data).forEach((key) => {
-      if (key === "team") {
-        this.team = data[key];
-        return;
-      }
-      this.set(key, data[key]);
-    });
-    return this;
+    return Object.assign(this, data);
   }
 
   public reset () {

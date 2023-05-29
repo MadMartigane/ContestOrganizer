@@ -1,0 +1,24 @@
+
+ion-grid.page-match-grid > ion-row > ion-col {
+  text-align: center;
+}
+
+ion-grid.page-match-grid > ion-row.page-match-grid-header {
+  border: solid 1px var(--ion-color-light);
+  background-color: var(--ion-color-light);
+}
+
+ion-grid.page-match-grid > ion-row {
+  border: solid 1px var(--ion-color-light);
+}
+
+ion-grid.grid-edit-tournament-name > ion-row > ion-col {
+  text-align: center;
+}
+
+.clickable {
+  cursor: pointer;
+}
+.clickable:hover {
+  background-color: var(--ion-color-light-tint);
+}

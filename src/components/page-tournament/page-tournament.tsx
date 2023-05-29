@@ -3,6 +3,7 @@ import { Component, h, Host, Prop, State } from "@stencil/core";
 import { TeamRow } from "../../modules/team-row/team-row";
 import { FutDBTeam, MadInputNumberCustomEvent, MadSelectTeamCustomEvent } from "../../components";
 import tournaments from "../../modules/tournaments/tournaments";
+import {Match} from "../../modules/tournaments/tournaments";
 import {Tournament} from "../../modules/tournaments/tournaments.d";
 import Utils from "../../modules/utils/utils";
 
@@ -33,7 +34,7 @@ export class PageTournament {
   private counter: number;
 
   @Prop() public tournamentId: number;
-  @State() private tournament: Tournament;
+  @State() private tournament: Tournament | null;
   @State() private uiError: string | null;
   @State() private isEditTournamentName: boolean;
 
@@ -74,19 +75,14 @@ export class PageTournament {
   getVirginTeamRow () : TeamRow { return new TeamRow(); }
 
   updateTournament (): void {
-    const newTournament = {
-      id: this.tournament.id,
-      name: this.tournament.name,
-      grid: []
-    };
+    if (!this.tournament) { return; }
 
     for(let i = 0; i < this.teamNumber; i++) {
-      newTournament.grid[i] = this.tournament.grid[i] || this.getVirginTeamRow();
+      this.tournament.grid[i] = this.tournament.grid[i] || this.getVirginTeamRow();
     }
 
     this.counter = 0;
-    this.tournaments.update(newTournament);
-    this.tournament = newTournament;
+    this.tournaments.update(this.tournament);
   }
 
   onTeamTeamChange (detail: FutDBTeam, team: TeamRow): void {
@@ -96,13 +92,15 @@ export class PageTournament {
   }
 
   onTeamChange (detail: InputChangeEventDetail, team: TeamRow, key: string): void {
-    team.set(key, detail.value);
+    team.set(key, String(detail.value));
     team.goalAverage = team.scoredGoals - team.concededGoals;
 
     this.updateTournament();
   }
 
   private goRanking(): void {
+    if (!this.tournament) { return; }
+
     const gridClone = this.tournament.grid.map(team => team) as Array<TeamRow>;
     gridClone.sort((a: TeamRow, b: TeamRow) => b.goalAverage - a.goalAverage);
     this.tournament.grid = gridClone.sort((a: TeamRow, b: TeamRow) => b.points - a.points);
@@ -111,6 +109,8 @@ export class PageTournament {
   }
 
   private resetGrid(): void {
+    if (!this.tournament) { return; }
+
     this.tournament.grid = [];
     this.teamNumber = this.conf.teamNumberDefault;
     this.updateTournament();
@@ -135,6 +135,8 @@ export class PageTournament {
   }
 
   private editTournamentName () {
+    if (!this.tournament) { return; }
+
     const input = document.querySelector(`ion-input#${this.inputNameId}`);
     if (!input) {
       console.warn("<page-tournament/> Unable to get input tournament name value.");
@@ -148,7 +150,6 @@ export class PageTournament {
     this.isEditTournamentName = false;
     this.updateTournament();
   }
-
 
   render() {
     return (
@@ -199,7 +200,7 @@ export class PageTournament {
                         inputmode="text"
                         autofocus="true"
                         name="tournamentName"
-                        value={this.tournament.name}
+                        value={this.tournament?.name}
                         onkeypress={(ev: KeyboardEvent) => this.onTournamentNameChange(ev)}/>
                     </ion-col>
                     <ion-col size="1">
@@ -217,7 +218,7 @@ export class PageTournament {
                       <ion-icon name="trophy-outline" size="large" color="secondary"></ion-icon>
                     </ion-col>
                     <ion-col size="10" size-sm="8" size-md="6" size-lg="4">
-                      <h2 class="ion-padding-horizontal">{ this.tournament.name }</h2>
+                      <h2 class="ion-padding-horizontal">{ this.tournament?.name }</h2>
                     </ion-col>
                     <ion-col size="1">
                       <ion-icon name="pencil-outline" size="large" color="secondary"></ion-icon>
@@ -257,7 +258,7 @@ export class PageTournament {
                     <ion-col><ion-label color="warning">Goal average</ion-label></ion-col>
                   </ion-row>
 
-                    {this.tournament.grid.map((team) =>
+                    {this.tournament?.grid.map((team) =>
                     <ion-row class="ion-align-items-center">
                       <ion-col size="1">
                           <span class="counter">{ this.counter > 8 ? null : "0"}{++this.counter}</span>
@@ -324,6 +325,13 @@ export class PageTournament {
                   <ion-icon name="trash-bin-outline" size-xs="normal" size="large" color="warning"></ion-icon>
                   <ion-text class="ion-margin" color="warning">Effacer</ion-text>
                 </ion-button>
+
+                <ion-button expand="full" color="secondary" class="ion-margin"
+                  href={`/match/${this.tournament?.id}`} key={this.tournament?.id}>
+                  <ion-icon name="football-outline" size-xs="normal" size="large"></ion-icon>
+                  <ion-text class="ion-margin">Match !</ion-text>
+                </ion-button>
+
 
               </div> :
               <div>

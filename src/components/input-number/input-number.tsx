@@ -45,7 +45,7 @@ export class MadInputNumber {
 
     @Watch("value")
     onPropValueChange () {
-      this.number = this.value;
+      this.number = this.value || 0;
     }
 
     onInputChange(ev: IonInputCustomEvent<InputChangeEventDetail>): void {
