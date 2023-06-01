@@ -22,3 +22,7 @@ ion-grid.grid-edit-tournament-name > ion-row > ion-col {
 .clickable:hover {
   background-color: var(--ion-color-light-tint);
 }
+
+div.ion-text-center.ion-justify-content-center div div.light-border.ion-padding-vertical {
+  border: solid 1px var(--ion-color-light);
+}

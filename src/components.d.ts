@@ -6,9 +6,11 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { InputChangeEventDetail } from "@ionic/core";
+import { TeamRow } from "./modules/team-row/team-row";
 import { FutDBTeam } from "./modules/futbd/futdb.d";
 import { PageTeamSelectEventDatail } from "./components/page-team-select/page-team-select.d";
 export { InputChangeEventDetail } from "@ionic/core";
+export { TeamRow } from "./modules/team-row/team-row";
 export { FutDBTeam } from "./modules/futbd/futdb.d";
 export { PageTeamSelectEventDatail } from "./components/page-team-select/page-team-select.d";
 export namespace Components {
@@ -26,6 +28,10 @@ export namespace Components {
         "step"?: number;
         "value"?: number;
     }
+    interface MadMatchTile {
+        "host": TeamRow | null;
+        "visitor": TeamRow | null;
+    }
     interface MadSelectTeam {
         "color": string;
         "label": string;
@@ -33,7 +39,8 @@ export namespace Components {
         "value": FutDBTeam;
     }
     interface MadTeamTile {
-        "team": FutDBTeam;
+        "reverse": Boolean | null;
+        "team": FutDBTeam | null;
     }
     interface PageHome {
     }
@@ -79,6 +86,12 @@ declare global {
     var HTMLMadInputNumberElement: {
         prototype: HTMLMadInputNumberElement;
         new (): HTMLMadInputNumberElement;
+    };
+    interface HTMLMadMatchTileElement extends Components.MadMatchTile, HTMLStencilElement {
+    }
+    var HTMLMadMatchTileElement: {
+        prototype: HTMLMadMatchTileElement;
+        new (): HTMLMadMatchTileElement;
     };
     interface HTMLMadSelectTeamElement extends Components.MadSelectTeam, HTMLStencilElement {
     }
@@ -126,6 +139,7 @@ declare global {
         "app-root": HTMLAppRootElement;
         "app-tabs": HTMLAppTabsElement;
         "mad-input-number": HTMLMadInputNumberElement;
+        "mad-match-tile": HTMLMadMatchTileElement;
         "mad-select-team": HTMLMadSelectTeamElement;
         "mad-team-tile": HTMLMadTeamTileElement;
         "page-home": HTMLPageHomeElement;
@@ -151,6 +165,10 @@ declare namespace LocalJSX {
         "step"?: number;
         "value"?: number;
     }
+    interface MadMatchTile {
+        "host"?: TeamRow | null;
+        "visitor"?: TeamRow | null;
+    }
     interface MadSelectTeam {
         "color"?: string;
         "label"?: string;
@@ -159,7 +177,8 @@ declare namespace LocalJSX {
         "value"?: FutDBTeam;
     }
     interface MadTeamTile {
-        "team"?: FutDBTeam;
+        "reverse"?: Boolean | null;
+        "team"?: FutDBTeam | null;
     }
     interface PageHome {
     }
@@ -179,6 +198,7 @@ declare namespace LocalJSX {
         "app-root": AppRoot;
         "app-tabs": AppTabs;
         "mad-input-number": MadInputNumber;
+        "mad-match-tile": MadMatchTile;
         "mad-select-team": MadSelectTeam;
         "mad-team-tile": MadTeamTile;
         "page-home": PageHome;
@@ -195,6 +215,7 @@ declare module "@stencil/core" {
             "app-root": LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
             "app-tabs": LocalJSX.AppTabs & JSXBase.HTMLAttributes<HTMLAppTabsElement>;
             "mad-input-number": LocalJSX.MadInputNumber & JSXBase.HTMLAttributes<HTMLMadInputNumberElement>;
+            "mad-match-tile": LocalJSX.MadMatchTile & JSXBase.HTMLAttributes<HTMLMadMatchTileElement>;
             "mad-select-team": LocalJSX.MadSelectTeam & JSXBase.HTMLAttributes<HTMLMadSelectTeamElement>;
             "mad-team-tile": LocalJSX.MadTeamTile & JSXBase.HTMLAttributes<HTMLMadTeamTileElement>;
             "page-home": LocalJSX.PageHome & JSXBase.HTMLAttributes<HTMLPageHomeElement>;

@@ -3,7 +3,6 @@ import { Component, h, Host, Prop, State } from "@stencil/core";
 import { TeamRow } from "../../modules/team-row/team-row";
 import { FutDBTeam, MadInputNumberCustomEvent, MadSelectTeamCustomEvent } from "../../components";
 import tournaments from "../../modules/tournaments/tournaments";
-import {Match} from "../../modules/tournaments/tournaments";
 import {Tournament} from "../../modules/tournaments/tournaments.d";
 import Utils from "../../modules/utils/utils";
 
@@ -30,13 +29,13 @@ export class PageTournament {
   private readonly conf: PageConfConstants;
   private readonly inputNameId: string;
 
-  private teamNumber: number;
   private counter: number;
 
   @Prop() public tournamentId: number;
   @State() private tournament: Tournament | null;
   @State() private uiError: string | null;
   @State() private isEditTournamentName: boolean;
+  @State() private teamNumber: number;
 
   constructor() {
     this.conf = {
@@ -77,8 +76,11 @@ export class PageTournament {
   updateTournament (): void {
     if (!this.tournament) { return; }
 
+    const oldGrid = this.tournament.grid;
+    this.tournament.grid = [];
+
     for(let i = 0; i < this.teamNumber; i++) {
-      this.tournament.grid[i] = this.tournament.grid[i] || this.getVirginTeamRow();
+      this.tournament.grid[i] = oldGrid[i] || this.getVirginTeamRow();
     }
 
     this.counter = 0;
@@ -211,7 +213,8 @@ export class PageTournament {
                       </ion-button>
                     </ion-col>
                   </ion-row>
-                </ion-grid> :
+                </ion-grid>
+                :
                 <ion-grid class="can-be-clicked grid-edit-tournament-name" onClick={() => this.onEditTournamentName()}>
                   <ion-row class="ion-align-items-end ion-justify-content-center">
                     <ion-col size="1">
@@ -310,14 +313,14 @@ export class PageTournament {
                   )}
                 </ion-grid>
 
-                <ion-button expand="full" color="primary" class="ion-margin"
+                <ion-button expand="full" color="primary" class="ion-margin-vertical"
                   onClick={() => this.goRanking()}>
                   <ion-icon name="car-sport-outline" size-xs="normal" size="large"></ion-icon>
                   <ion-text class="ion-margin">Classement !</ion-text>
                 </ion-button>
 
                 <ion-button
-                  class="ion-margin"
+                  class="ion-margin-vertical"
                   onClick={() => this.confirmResetGrid()}
                   expand="full"
                   color="medium"
@@ -326,7 +329,7 @@ export class PageTournament {
                   <ion-text class="ion-margin" color="warning">Effacer</ion-text>
                 </ion-button>
 
-                <ion-button expand="full" color="secondary" class="ion-margin"
+                <ion-button expand="full" color="secondary" class="ion-margin-vertical"
                   href={`/match/${this.tournament?.id}`} key={this.tournament?.id}>
                   <ion-icon name="football-outline" size-xs="normal" size="large"></ion-icon>
                   <ion-text class="ion-margin">Match !</ion-text>
