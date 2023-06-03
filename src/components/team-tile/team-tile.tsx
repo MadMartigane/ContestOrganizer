@@ -14,16 +14,20 @@ import ApiFutDB from "../../modules/futbd/futdb";
   styleUrl: './team-tile.css',
   shadow: false
 })
-export class MadInputNumber {
+export class MadTeamTile {
   private apiFutDB: typeof ApiFutDB;
 
   @State() private imgSrc: string;
 
-  @Prop() team: FutDBTeam;
+  @Prop() team: FutDBTeam | null;
+  @Prop() reverse: Boolean | null;
 
   constructor () {
     this.apiFutDB = ApiFutDB;
-    this.loadImg(this.team.id);
+
+    if (this.team) {
+      this.loadImg(this.team.id);
+    }
   }
 
   private loadImg(id: number) {
@@ -34,26 +38,37 @@ export class MadInputNumber {
   }
 
   @Watch("team")
-  onTeamChange (newTeam: FutDBTeam) {
+  onTeamChange (newTeam: FutDBTeam | null) {
+    if (!newTeam) { return; }
+
     this.loadImg(newTeam.id);
   }
 
   render() {
     return (
-        <Host>
-          <ion-grid class="grid-team-tile">
-            <ion-row class="ion-align-items-center">
-              <ion-col>
-                <ion-thumbnail>
-                  <img alt={`${this.team.name} club logo`} src={this.imgSrc} />
+      <Host>
+        <ion-grid class="grid-team-tile">
+          <ion-row class="ion-align-items-center">
+            <ion-col size="12" size-md="6" push-md={this.reverse ? "6" : null}>
+              {this.team && this.imgSrc ?
+                <ion-thumbnail class={this.reverse ? "ion-float-end" : "ion-float-start"}>
+                  <img alt={`${this.team?.name} club logo`} src={this.imgSrc} />
                 </ion-thumbnail>
-              </ion-col>
-              <ion-col>
-                <span>{this.team.name}</span>
-              </ion-col>
-            </ion-row>
-          </ion-grid>
-        </Host>
-      );
+                :
+                <span></span>
+              }
+            </ion-col>
+            <ion-col size="12" size-md="6" pull-md={this.reverse ? "6" : null}
+              class={this.reverse ? "ion-text-end" : "ion-text-start"}>
+              {this.team ?
+                <span>{this.team?.name}</span>
+                :
+                <span>⏳</span>
+              }
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </Host>
+    );
   }
 }

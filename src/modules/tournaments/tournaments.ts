@@ -4,7 +4,19 @@ import { CACHE_KEY } from "./tournaments.constants";
 import uuid from "../uuid/uuid";
 import TeamRow from "../team-row/team-row";
 
+export class Match {
+  public readonly id: number;
+  public hostId: number | null;
+  public visitorId: number | null;
+  public goals: { visitor: number, host: number };
 
+  constructor(host = null, visitor = null) {
+    this.id = uuid.new();
+    this.hostId = host;
+    this.visitorId = visitor;
+    this.goals = { host: 0, visitor: 0 };
+  }
+}
 class Tournaments {
 
   private readonly CACHE_KEY: typeof CACHE_KEY;
@@ -39,27 +51,6 @@ class Tournaments {
       }
     }
 
-    // TODO remove backward compatibility
-    const oldGridString = localStorage.getItem("CONTEST_GRID");
-    if (oldGridString) {
-      let oldGrid = [];
-      try {
-        oldGrid = JSON.parse(oldGridString);
-      } catch (e) {
-        console.warn("[Tournaments] Unable to parse old store tourmament. Cleanning the cache. ", e);
-        localStorage.removeItem("CONTEST_GRID");
-      }
-
-      this.tournaments.push({
-        id: this.uuid.new(),
-        name: "Premier tournois",
-        grid: oldGrid
-      });
-      localStorage.removeItem("CONTEST_GRID");
-      this.store();
-    }
-    // end of TODO
-
     /* From stored data to instanciated object */
     this.tournaments.forEach((t) => {
       for (let i = 0, imax = t.grid.length; i < imax; i++) {
@@ -67,6 +58,8 @@ class Tournaments {
         team.fromData(t.grid[i]);
         t.grid[i] = team;
       }
+
+      if (!t.matchs) { t.matchs = [] }
     });
   }
 
@@ -76,22 +69,79 @@ class Tournaments {
     return this.tournaments.length;
   }
 
+  private throwOnUpdate () {
+    this.callbackCollector.forEach((callback) => {
+      setTimeout(() => {
+          callback();
+      });
+    });
+  }
+
+  private resetScores(tournament: Tournament) {
+    tournament.grid.forEach((team) => {
+      team.concededGoals = 0;
+      team.scoredGoals = 0;
+      team.goalAverage = 0;
+      team.points = 0;
+    });
+  }
+
+  private updateScores(tournament: Tournament) {
+    if (!tournament.matchs || tournament.matchs.length === 0) { return; }
+
+    this.resetScores(tournament);
+
+    tournament.matchs.forEach((match) => {
+      const vScore = match.goals.visitor || 0;
+      const hScore = match.goals.host || 0;
+      const host = this.getTournamentTeam(tournament, match.hostId);
+      const visitor = this.getTournamentTeam(tournament, match.visitorId);
+
+      if (host) {
+        if (vScore === hScore) { host.points += 1; }
+        if (hScore > vScore) { host.points += 3; }
+
+        host.scoredGoals += hScore;
+        host.concededGoals += vScore;
+        host.goalAverage = host.scoredGoals - host.concededGoals;
+      }
+
+      if (visitor) {
+        if (vScore === hScore) { visitor.points += 1; }
+        if (vScore > hScore) { visitor.points += 3; }
+
+        visitor.scoredGoals += vScore;
+        visitor.concededGoals += hScore;
+        visitor.goalAverage = visitor.scoredGoals - visitor.concededGoals;
+      }
+    })
+  }
+
+  public getTournamentTeam(tournament: Tournament, teamId: number | null): TeamRow | null {
+    if (!teamId) { return null; }
+
+    return tournament.grid.find((team) => team.id === teamId) || null;
+  }
+
   public remove(id: number): number {
     this.tournaments = this.tournaments.filter((t) => t.id !== id);
     return this.store();
   }
 
-  public add (name: string, grid: Array<TeamRow>): number {
+  public add (name: string, grid: Array<TeamRow>, matchs: Match[]): number {
     this.tournaments.push({
       id: this.uuid.new(),
       name,
-      grid
+      grid,
+      matchs
     });
 
     return this.store();
   }
 
-  public get (id: number): Tournament | null {
+  public get(id: number | null): Tournament | null {
+    if (!id) { return null; }
+
     return this.tournaments.find((t) => t.id === id) || null;
   }
 
@@ -100,23 +150,16 @@ class Tournaments {
 
     if (i === -1) {
       console.warn("[Tournaments] Unable to update the tourmament #%s.", tournament.id);
-      return;
+      return this.tournaments.length;
     }
 
+    this.updateScores(tournament);
     this.tournaments[i] = tournament;
     return this.store();
   }
 
   public map (callback: Function): Array<any> {
     return this.tournaments.map((value: Tournament, index: number, array: Tournament[]) => callback(value, index, array));
-  }
-
-  private throwOnUpdate () {
-    this.callbackCollector.forEach((callback) => {
-      setTimeout(() => {
-          callback();
-      });
-    });
   }
 
   public onUpdate (callback: Function) {

@@ -40,7 +40,7 @@ export class PageTournamentSelect {
     event.stopPropagation();
 
     const tournament = this.tournaments.get(id);
-    const confirm = await Utils.confirmChoice(`Supprimer le tournoi: ${tournament.name}?`);
+    const confirm = await Utils.confirmChoice(`Supprimer le tournoi: ${tournament?.name}?`);
     if (confirm) {
       this.removeTournament(id);
     }
@@ -59,7 +59,7 @@ export class PageTournamentSelect {
 
     // @ts-ignore
     const value = input.value;
-    this.numberOfTournaments = this.tournaments.add(value, []);
+    this.numberOfTournaments = this.tournaments.add(value, [], []);
     this.uiAddingTournament = false;
   }
 
