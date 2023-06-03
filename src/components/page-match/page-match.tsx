@@ -75,21 +75,18 @@ export class PageMatch {
   private goMatch() {
     this.displayTeamSelector = true;
     this.currentMatch = new Match();
-
-    if (!this.tournament) { return;  }
-
-    if (!this.tournament.matchs) {
-      this.tournament.matchs = [];
-    }
-    this.tournament.matchs.push(this.currentMatch);
-
-    this.matchNumber = this.tournament.matchs.length;
-    this.updateTournament();
+    this.resetRowStates();
   }
 
   private refreshUI() {
     // change ref
     this.teamToSelect = this.teamToSelect.map(row => (row));
+  }
+
+  private resetRowStates() {
+    this.teamToSelect.forEach((row) => {
+      row.selected = false;
+    });
   }
 
   private cleanRowStates() {
@@ -138,11 +135,31 @@ export class PageMatch {
       }
     }
 
+    this.matchNumber = this.tournament.matchs.length;
+
     this.updateTournament();
     this.refreshUI();
   }
 
   private goValidateSelection() {
+    if (!this.tournament) { return;  }
+
+    if (!this.tournament.matchs) {
+      this.tournament.matchs = [];
+    }
+
+    if (this.currentMatch) {
+      this.tournament.matchs.push(this.currentMatch);
+    }
+
+    this.matchNumber = this.tournament.matchs.length;
+    this.updateTournament();
+
+    this.displayTeamSelector = false;
+    this.currentMatch = null;
+  }
+
+  private cancelSelection() {
     this.displayTeamSelector = false;
     this.currentMatch = null;
   }
@@ -251,7 +268,7 @@ export class PageMatch {
                           <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
                         </ion-button>
 
-                        <ion-button onClick={() => this.selectMatch(match)}
+                        <ion-button onClick={() => this.selectMatch(match)} disabled
                           class="ion-margin-horizontal" color="secondary" size="delault">
                           <ion-icon slot="icon-only" name="play-outline"></ion-icon>
                         </ion-button>
@@ -298,20 +315,34 @@ export class PageMatch {
                     )}
                   </ion-grid>
 
-                  <ion-button expand="full" color="secondary" class="ion-margin-vertical"
-                    onClick={() => this.goValidateSelection()}>
-                    <ion-icon name="rocket-outline" size-xs="normal" size="large"></ion-icon>
-                    <ion-text class="ion-margin">Valider !</ion-text>
-                  </ion-button>
+                  <ion-grid>
+                    <ion-row>
+                      <ion-col size="6">
+                        <ion-button expand="full" color="secondary" class="ion-margin-vertical"
+                          onClick={() => this.cancelSelection()}>
+                          <ion-icon name="ban-outline" size-xs="normal" size="large"></ion-icon>
+                          <ion-text class="ion-margin">Annuler</ion-text>
+                        </ion-button>
 
+                      </ion-col>
+                      <ion-col size="6">
+                        <ion-button expand="full" color="secondary" class="ion-margin-vertical"
+                          onClick={() => this.goValidateSelection()}>
+                          <ion-icon name="rocket-outline" size-xs="normal" size="large"></ion-icon>
+                          <ion-text class="ion-margin">Valider</ion-text>
+                        </ion-button>
+
+                      </ion-col>
+                    </ion-row>
+                  </ion-grid>
                 </div>
                 :
                 <div>
 
                   <ion-button expand="full" color="secondary" class="ion-margin-vertical"
                     onClick={() => this.goMatch()}>
-                    <ion-icon name="football-outline" size-xs="normal" size="large"></ion-icon>
-                    <ion-text class="ion-margin">Nouveau match !</ion-text>
+                    <ion-icon name="add-outline" size-xs="normal" size="large"></ion-icon>
+                    <ion-text class="ion-margin">Nouveau match</ion-text>
                   </ion-button>
 
                 </div>

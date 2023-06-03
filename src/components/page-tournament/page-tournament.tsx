@@ -126,6 +126,7 @@ export class PageTournament {
     if (!this.tournament) { return; }
 
     this.tournament.grid = [];
+    this.tournament.matchs = [];
     this.teamNumber = this.conf.teamNumberDefault;
     this.updateTournament();
   }
@@ -343,8 +344,9 @@ export class PageTournament {
 
                 <ion-button expand="full" color="secondary" class="ion-margin-vertical"
                   href={`/match/${this.tournament?.id}`} key={this.tournament?.id}>
-                  <ion-icon name="football-outline" size-xs="normal" size="large"></ion-icon>
-                  <ion-text class="ion-margin">Match !</ion-text>
+                  <ion-icon name="medal-outline" size-xs="normal" size="large"></ion-icon>
+                  <ion-text class="ion-margin">Go Match</ion-text>
+                  <ion-icon name="arrow-forward-outline" size-xs="normal" size="large"></ion-icon>
                 </ion-button>
 
 

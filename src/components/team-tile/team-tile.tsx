@@ -49,8 +49,8 @@ export class MadTeamTile {
       <Host>
         <ion-grid class="grid-team-tile">
           <ion-row class="ion-align-items-center">
-            <ion-col size="6" push={this.reverse ? "6" : null}>
-              {this.team ?
+            <ion-col size="12" size-md="6" push-md={this.reverse ? "6" : null}>
+              {this.team && this.imgSrc ?
                 <ion-thumbnail class={this.reverse ? "ion-float-end" : "ion-float-start"}>
                   <img alt={`${this.team?.name} club logo`} src={this.imgSrc} />
                 </ion-thumbnail>
@@ -58,7 +58,7 @@ export class MadTeamTile {
                 <span></span>
               }
             </ion-col>
-            <ion-col size="6" pull={this.reverse ? "6" : null}
+            <ion-col size="12" size-md="6" pull-md={this.reverse ? "6" : null}
               class={this.reverse ? "ion-text-end" : "ion-text-start"}>
               {this.team ?
                 <span>{this.team?.name}</span>
