@@ -8,3 +8,5 @@ export interface Tournament {
   grid: Array<TeamRow>,
   matchs: Array<Match>
 }
+
+export const enum MatchTeamType { HOST = "Host", VISITOR = "Visitor" }

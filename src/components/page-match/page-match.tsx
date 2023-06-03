@@ -3,12 +3,16 @@ import { Component, h, Host, Prop, State } from "@stencil/core";
 import { TeamRow } from "../../modules/team-row/team-row";
 import tournaments from "../../modules/tournaments/tournaments";
 import { Match } from "../../modules/tournaments/tournaments";
-import {Tournament} from "../../modules/tournaments/tournaments.d";
+import { Tournament, MatchTeamType } from "../../modules/tournaments/tournaments.d";
 import Utils from "../../modules/utils/utils";
+import { MadInputNumberCustomEvent } from "../../components";
 
 type Row = {
   selected: boolean;
   team: TeamRow
+}
+type Config = {
+  minGoal: number;
 }
 
 @Component({
@@ -18,6 +22,7 @@ type Row = {
 })
 export class PageMatch {
   private readonly tournaments: typeof tournaments;
+  private readonly config: Config;
 
   private currentMatch: Match | null;
 
@@ -45,6 +50,10 @@ export class PageMatch {
       selected: false,
       team
     }));
+
+    this.config = {
+      minGoal: 0
+    };
 
     this.matchNumber = this.tournament.matchs.length;
     this.updateTournament();
@@ -85,8 +94,8 @@ export class PageMatch {
 
   private cleanRowStates() {
     this.teamToSelect.forEach((row) => {
-      if (row.team.id !== this.currentMatch?.host?.id &&
-        row.team.id !== this.currentMatch?.visitor?.id) {
+      if (row.team.id !== this.currentMatch?.hostId &&
+        row.team.id !== this.currentMatch?.visitorId) {
         row.selected = false;
       }
     });
@@ -98,18 +107,18 @@ export class PageMatch {
     if (!this.currentMatch) { return; }
 
     if (row.selected) {
-      if (!this.currentMatch.host) {
-        this.currentMatch.host = row.team;
+      if (!this.currentMatch.hostId) {
+        this.currentMatch.hostId = row.team.id;
       } else {
-        this.currentMatch.visitor = row.team;
+        this.currentMatch.visitorId = row.team.id;
       }
 
       this.cleanRowStates();
     } else {
-      if (this.currentMatch.host?.id === row.team.id) {
-        this.currentMatch.host = null;
+      if (this.currentMatch.hostId === row.team.id) {
+        this.currentMatch.hostId = null;
       } else {
-        this.currentMatch.visitor = null;
+        this.currentMatch.visitorId = null;
       }
     }
 
@@ -140,6 +149,23 @@ export class PageMatch {
 
   private selectMatch(match: Match) {
     console.log("selected match: ", match);
+  }
+
+  private onTeamScores(match: Match, teamType: MatchTeamType, ev: InputChangeEventDetail) {
+    const value = Number(ev.value);
+    if (teamType === MatchTeamType.VISITOR) {
+      match.goals.visitor = value;
+    } else {
+      match.goals.host = value;
+    }
+
+    this.updateTournament();
+  }
+
+  private getTeam(teamId: number | null): TeamRow | null {
+    if (!this.tournament) { return null; }
+
+    return this.tournaments.getTournamentTeam(this.tournament, teamId);
   }
 
   render() {
@@ -192,19 +218,44 @@ export class PageMatch {
                   </ion-grid>
 
                   {this.tournament?.matchs.map((match) =>
-                    <div class="light-border ion-padding-vertical">
+                    <div class="light-border ion-padding-vertical ion-margin-vertical">
 
-                      <mad-match-tile host={match.host} visitor={match.visitor}></mad-match-tile>
+                      <mad-match-tile host={this.getTeam(match.hostId)} visitor={this.getTeam(match.visitorId)}></mad-match-tile>
 
-                      <ion-button onClick={() => this.deleteMatch(match)}
-                        class="ion-margin-horizontal" color="warning" size="default">
-                        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-                      </ion-button>
+                      <ion-grid>
+                        <ion-row class="ion-align-items-center">
+                          <ion-col size="6">
 
-                      <ion-button onClick={() => this.selectMatch(match)}
-                        class="ion-margin-horizontal" color="secondary" size="delault">
-                        <ion-icon slot="icon-only" name="play-outline"></ion-icon>
-                      </ion-button>
+                            <mad-input-number color="primary" label="⚽️" class="ion-margin"
+                              onMadNumberChange={
+                                (ev: MadInputNumberCustomEvent<InputChangeEventDetail>) =>
+                                  this.onTeamScores(match, MatchTeamType.HOST, ev.detail)
+                              }
+                              min={this.config.minGoal} value={match.goals.host}></mad-input-number>
+                          </ion-col>
+
+                          <ion-col size="6">
+                            <mad-input-number color="primary" label="⚽️" class="ion-margin"
+                              onMadNumberChange={
+                                (ev: MadInputNumberCustomEvent<InputChangeEventDetail>) =>
+                                  this.onTeamScores(match, MatchTeamType.VISITOR, ev.detail)
+                              }
+                              min={this.config.minGoal} value={match.goals.visitor}></mad-input-number>
+                          </ion-col>
+                        </ion-row>
+                      </ion-grid>
+
+                      <div>
+                        <ion-button onClick={() => this.deleteMatch(match)}
+                          class="ion-margin-horizontal" color="warning" size="default">
+                          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                        </ion-button>
+
+                        <ion-button onClick={() => this.selectMatch(match)}
+                          class="ion-margin-horizontal" color="secondary" size="delault">
+                          <ion-icon slot="icon-only" name="play-outline"></ion-icon>
+                        </ion-button>
+                      </div>
 
                     </div>
                   )}
@@ -219,7 +270,8 @@ export class PageMatch {
                 <div>
 
                   <h3>Équipes sélectionnées:</h3>
-                  <mad-match-tile host={ this.currentMatch?.host } visitor={ this.currentMatch?.visitor }></mad-match-tile>
+                  <mad-match-tile host={this.getTeam(this.currentMatch?.hostId || null)}
+                    visitor={this.getTeam(this.currentMatch?.visitorId || null)}></mad-match-tile>
 
                   <ion-grid class="page-match-grid">
                     <ion-row class="page-match-grid-header ion-align-items-center">

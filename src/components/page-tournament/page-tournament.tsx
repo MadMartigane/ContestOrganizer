@@ -1,5 +1,5 @@
 import { InputChangeEventDetail } from "@ionic/core";
-import { Component, h, Host, Prop, State } from "@stencil/core";
+import { Component, h, Host, Listen, Prop, State } from "@stencil/core";
 import { TeamRow } from "../../modules/team-row/team-row";
 import { FutDBTeam, MadInputNumberCustomEvent, MadSelectTeamCustomEvent } from "../../components";
 import tournaments from "../../modules/tournaments/tournaments";
@@ -66,6 +66,12 @@ export class PageTournament {
 
   }
 
+  @Listen("ionRouteDidChange", {
+    target: "window"
+  }) routerGoesHere() {
+    this.updateTournament();
+  }
+
   onTeamNumberChange (detail?: InputChangeEventDetail): void {
     this.teamNumber = Number(detail && detail.value || this.conf.teamNumberDefault);
     this.updateTournament();
@@ -77,7 +83,13 @@ export class PageTournament {
     if (!this.tournament) { return; }
 
     const oldGrid = this.tournament.grid;
-    this.tournament.grid = [];
+    // Change ref to refresh UI
+    this.tournament = {
+      id: this.tournament.id,
+      name: this.tournament.name,
+      grid: [],
+      matchs: this.tournament.matchs
+    };
 
     for(let i = 0; i < this.teamNumber; i++) {
       this.tournament.grid[i] = oldGrid[i] || this.getVirginTeamRow();

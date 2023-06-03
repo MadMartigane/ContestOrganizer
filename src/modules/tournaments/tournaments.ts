@@ -6,13 +6,15 @@ import TeamRow from "../team-row/team-row";
 
 export class Match {
   public readonly id: number;
-  public host: TeamRow | null;
-  public visitor: TeamRow | null;
+  public hostId: number | null;
+  public visitorId: number | null;
+  public goals: { visitor: number, host: number };
 
   constructor(host = null, visitor = null) {
     this.id = uuid.new();
-    this.host = host;
-    this.visitor = visitor;
+    this.hostId = host;
+    this.visitorId = visitor;
+    this.goals = { host: 0, visitor: 0 };
   }
 }
 class Tournaments {
@@ -56,6 +58,8 @@ class Tournaments {
         team.fromData(t.grid[i]);
         t.grid[i] = team;
       }
+
+      if (!t.matchs) { t.matchs = [] }
     });
   }
 
@@ -63,6 +67,60 @@ class Tournaments {
     localStorage.setItem(this.CACHE_KEY, JSON.stringify(this.tournaments));
     this.throwOnUpdate();
     return this.tournaments.length;
+  }
+
+  private throwOnUpdate () {
+    this.callbackCollector.forEach((callback) => {
+      setTimeout(() => {
+          callback();
+      });
+    });
+  }
+
+  private resetScores(tournament: Tournament) {
+    tournament.grid.forEach((team) => {
+      team.concededGoals = 0;
+      team.scoredGoals = 0;
+      team.goalAverage = 0;
+      team.points = 0;
+    });
+  }
+
+  private updateScores(tournament: Tournament) {
+    if (!tournament.matchs || tournament.matchs.length === 0) { return; }
+
+    this.resetScores(tournament);
+
+    tournament.matchs.forEach((match) => {
+      const vScore = match.goals.visitor || 0;
+      const hScore = match.goals.host || 0;
+      const host = this.getTournamentTeam(tournament, match.hostId);
+      const visitor = this.getTournamentTeam(tournament, match.visitorId);
+
+      if (host) {
+        if (vScore === hScore) { host.points += 1; }
+        if (hScore > vScore) { host.points += 3; }
+
+        host.scoredGoals += hScore;
+        host.concededGoals += vScore;
+        host.goalAverage = host.scoredGoals - host.concededGoals;
+      }
+
+      if (visitor) {
+        if (vScore === hScore) { visitor.points += 1; }
+        if (vScore > hScore) { visitor.points += 3; }
+
+        visitor.scoredGoals += vScore;
+        visitor.concededGoals += hScore;
+        visitor.goalAverage = visitor.scoredGoals - visitor.concededGoals;
+      }
+    })
+  }
+
+  public getTournamentTeam(tournament: Tournament, teamId: number | null): TeamRow | null {
+    if (!teamId) { return null; }
+
+    return tournament.grid.find((team) => team.id === teamId) || null;
   }
 
   public remove(id: number): number {
@@ -81,7 +139,9 @@ class Tournaments {
     return this.store();
   }
 
-  public get (id: number): Tournament | null {
+  public get(id: number | null): Tournament | null {
+    if (!id) { return null; }
+
     return this.tournaments.find((t) => t.id === id) || null;
   }
 
@@ -93,20 +153,13 @@ class Tournaments {
       return this.tournaments.length;
     }
 
+    this.updateScores(tournament);
     this.tournaments[i] = tournament;
     return this.store();
   }
 
   public map (callback: Function): Array<any> {
     return this.tournaments.map((value: Tournament, index: number, array: Tournament[]) => callback(value, index, array));
-  }
-
-  private throwOnUpdate () {
-    this.callbackCollector.forEach((callback) => {
-      setTimeout(() => {
-          callback();
-      });
-    });
   }
 
   public onUpdate (callback: Function) {
