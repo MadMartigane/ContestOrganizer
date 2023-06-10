@@ -1,5 +1,5 @@
 
-import { Tournament } from "./tournaments.d";
+import { MatchStatus, Tournament } from "./tournaments.d";
 import { CACHE_KEY } from "./tournaments.constants";
 import uuid from "../uuid/uuid";
 import TeamRow from "../team-row/team-row";
@@ -9,12 +9,14 @@ export class Match {
   public hostId: number | null;
   public visitorId: number | null;
   public goals: { visitor: number, host: number };
+  public status: MatchStatus;
 
-  constructor(host = null, visitor = null) {
+  constructor(host = null, visitor = null, status = null) {
     this.id = uuid.new();
     this.hostId = host;
     this.visitorId = visitor;
     this.goals = { host: 0, visitor: 0 };
+    this.status = status || MatchStatus.PENDING;
   }
 }
 class Tournaments {
@@ -92,6 +94,8 @@ class Tournaments {
     this.resetScores(tournament);
 
     tournament.matchs.forEach((match) => {
+      if (match.status !== MatchStatus.DONE) { return; }
+
       const vScore = match.goals.visitor || 0;
       const hScore = match.goals.host || 0;
       const host = this.getTournamentTeam(tournament, match.hostId);

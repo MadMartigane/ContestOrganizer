@@ -3,7 +3,7 @@ import { Component, h, Host, Prop, State } from "@stencil/core";
 import { TeamRow } from "../../modules/team-row/team-row";
 import tournaments from "../../modules/tournaments/tournaments";
 import { Match } from "../../modules/tournaments/tournaments";
-import { Tournament, MatchTeamType } from "../../modules/tournaments/tournaments.d";
+import { Tournament, MatchTeamType, MatchStatus } from "../../modules/tournaments/tournaments.d";
 import Utils from "../../modules/utils/utils";
 import { MadInputNumberCustomEvent } from "../../components";
 
@@ -164,10 +164,6 @@ export class PageMatch {
     this.currentMatch = null;
   }
 
-  private selectMatch(match: Match) {
-    console.log("selected match: ", match);
-  }
-
   private onTeamScores(match: Match, teamType: MatchTeamType, ev: InputChangeEventDetail) {
     const value = Number(ev.value);
     if (teamType === MatchTeamType.VISITOR) {
@@ -184,6 +180,19 @@ export class PageMatch {
 
     return this.tournaments.getTournamentTeam(this.tournament, teamId);
   }
+
+  private playMatch(match: Match) {
+    match.status = MatchStatus.DOING;
+    this.updateTournament();
+    this.refreshUI();
+  }
+
+  private stopMatch(match: Match) {
+    match.status = MatchStatus.DONE;
+    this.updateTournament();
+    this.refreshUI();
+  }
+
 
   render() {
     return (
@@ -237,6 +246,27 @@ export class PageMatch {
                   {this.tournament?.matchs.map((match) =>
                     <div class="light-border ion-padding-vertical ion-margin-vertical">
 
+                      <div>
+                        {match.status === MatchStatus.PENDING &&
+                          <ion-chip color="tertiary">
+                            Match programmé
+                            <ion-icon name="calendar-number-outline"></ion-icon>
+                          </ion-chip>
+                        }
+                        {match.status === MatchStatus.DOING &&
+                          <ion-chip color="success">
+                            Match en cours
+                            <ion-spinner class="ion-margin-horizontal2" name="lines-sharp-small"></ion-spinner>
+                          </ion-chip>
+                        }
+                        {match.status === MatchStatus.DONE &&
+                          <ion-chip color="danger">
+                            Match terminé
+                            <ion-icon name="checkmark-circle-outline"></ion-icon>
+                          </ion-chip>
+                        }
+                      </div>
+
                       <mad-match-tile host={this.getTeam(match.hostId)} visitor={this.getTeam(match.visitorId)}></mad-match-tile>
 
                       <ion-grid>
@@ -244,6 +274,7 @@ export class PageMatch {
                           <ion-col size="6">
 
                             <mad-input-number color="primary" label="⚽️" class="ion-margin"
+                              readonly={match.status !== MatchStatus.DOING}
                               onMadNumberChange={
                                 (ev: MadInputNumberCustomEvent<InputChangeEventDetail>) =>
                                   this.onTeamScores(match, MatchTeamType.HOST, ev.detail)
@@ -253,6 +284,7 @@ export class PageMatch {
 
                           <ion-col size="6">
                             <mad-input-number color="primary" label="⚽️" class="ion-margin"
+                              readonly={match.status !== MatchStatus.DOING}
                               onMadNumberChange={
                                 (ev: MadInputNumberCustomEvent<InputChangeEventDetail>) =>
                                   this.onTeamScores(match, MatchTeamType.VISITOR, ev.detail)
@@ -268,11 +300,19 @@ export class PageMatch {
                           <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
                         </ion-button>
 
-                        <ion-button onClick={() => this.selectMatch(match)} disabled
-                          class="ion-margin-horizontal" color="secondary" size="delault">
-                          <ion-icon slot="icon-only" name="play-outline"></ion-icon>
-                        </ion-button>
-                      </div>
+                        { match.status === MatchStatus.DOING ?
+                          <ion-button onClick={() => this.stopMatch(match)}
+                            class="ion-margin-horizontal" color="secondary" size="delault">
+                            <ion-icon slot="icon-only" name="stop-outline"></ion-icon>
+                          </ion-button>
+                          :
+                           <ion-button onClick={() => this.playMatch(match)}
+                            class="ion-margin-horizontal" color="secondary" size="delault">
+                            <ion-icon slot="icon-only" name="play-outline"></ion-icon>
+                          </ion-button>
+                        }
+
+                     </div>
 
                     </div>
                   )}
@@ -327,6 +367,12 @@ export class PageMatch {
                       </ion-col>
                       <ion-col size="6">
                         <ion-button expand="full" color="secondary" class="ion-margin-vertical"
+                          disabled={
+                            this.currentMatch && (
+                              !this.currentMatch.visitorId ||
+                              !this.currentMatch.hostId
+                            )
+                          }
                           onClick={() => this.goValidateSelection()}>
                           <ion-icon name="rocket-outline" size-xs="normal" size="large"></ion-icon>
                           <ion-text class="ion-margin">Valider</ion-text>
