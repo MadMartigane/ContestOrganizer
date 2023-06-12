@@ -200,7 +200,7 @@ export class PageMatch {
         <ion-header>
           <ion-toolbar color="primary">
             <ion-buttons slot="start">
-              <ion-back-button defaultHref={`/tournament/${this.tournament?.id}`}></ion-back-button>
+              <ion-back-button text="Retour" defaultHref={`/tournament/${this.tournament?.id}`}></ion-back-button>
             </ion-buttons>
             <ion-title>
               <ion-text color="light" size="large" class="ion-margin">{ this.tournament?.name ? "⚽️" : "404" }</ion-text>

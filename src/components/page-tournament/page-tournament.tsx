@@ -172,7 +172,7 @@ export class PageTournament {
         <ion-header>
           <ion-toolbar color="primary">
             <ion-buttons slot="start">
-              <ion-back-button defaultHref="/app/tournaments"></ion-back-button>
+              <ion-back-button text="Retour" defaultHref="/app/tournaments"></ion-back-button>
             </ion-buttons>
             <ion-title>
               <ion-text color="light" size="large" class="ion-margin">{ this.tournament?.name ? "🏆" : "404" }</ion-text>
