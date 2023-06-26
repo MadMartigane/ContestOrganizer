@@ -7,8 +7,12 @@ export interface Tournament {
   name: string,
   grid: Array<TeamRow>,
   matchs: Array<Match>
+  type: TournamentType
 }
 
 export const enum MatchTeamType { HOST = "Host", VISITOR = "Visitor" }
 
 export const enum MatchStatus { PENDING = "Pending", DOING = "Doing", DONE = "Done" }
+
+export const enum TournamentType { FOOT = "Foot", BASKET = "Basket" }
+

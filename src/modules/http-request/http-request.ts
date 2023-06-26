@@ -59,20 +59,25 @@ export class HttpRequest {
     return promise;
   }
 
-  public async resolve(thing: any) {
-    return new Promise((resolve) => {
+  private async promise(thing: any, action: string) {
+    return new Promise((resolve, reject) => {
       setTimeout(() => {
-        resolve(thing);
+        if (action === "reject") {
+          reject(thing);
+        } else {
+          resolve(thing);
+        }
       });
     })
   }
 
+
+  public async resolve(thing: any) {
+    return this.promise(thing, "resolve");
+  }
+
   public async reject(thing: any) {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        reject(thing);
-      });
-    })
+    return this.promise(thing, "reject");
   }
 
 }

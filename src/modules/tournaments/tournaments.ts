@@ -1,5 +1,5 @@
 
-import { MatchStatus, Tournament } from "./tournaments.d";
+import { MatchStatus, Tournament, TournamentType } from "./tournaments.d";
 import { CACHE_KEY } from "./tournaments.constants";
 import uuid from "../uuid/uuid";
 import TeamRow from "../team-row/team-row";
@@ -19,6 +19,7 @@ export class Match {
     this.status = status || MatchStatus.PENDING;
   }
 }
+
 class Tournaments {
 
   private readonly CACHE_KEY: typeof CACHE_KEY;
@@ -132,12 +133,21 @@ class Tournaments {
     return this.store();
   }
 
-  public add (name: string, grid: Array<TeamRow>, matchs: Match[]): number {
+  public add(arg: {
+    name: string,
+    grid: Array<TeamRow>,
+    matchs: Match[],
+    type: TournamentType
+  }): number {
+
+    const { name, grid, matchs, type } = arg;
+
     this.tournaments.push({
       id: this.uuid.new(),
       name,
       grid,
-      matchs
+      matchs,
+      type
     });
 
     return this.store();

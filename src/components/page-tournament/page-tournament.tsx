@@ -88,7 +88,8 @@ export class PageTournament {
       id: this.tournament.id,
       name: this.tournament.name,
       grid: [],
-      matchs: this.tournament.matchs
+      matchs: this.tournament.matchs,
+      type: this.tournament.type
     };
 
     for (let i = 0; i < this.teamNumber; i++) {
