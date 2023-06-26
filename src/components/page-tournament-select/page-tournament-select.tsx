@@ -1,5 +1,5 @@
 import { Component, Fragment, h, State } from "@stencil/core";
-import { Tournament, TournamentType } from "../../modules/tournaments/tournaments.d";
+import { Tournament, TournamentType, TournamentTypeLabel } from "../../modules/tournaments/tournaments.d";
 import tournaments from "../../modules/tournaments/tournaments";
 import uuid from "../../modules/uuid/uuid";
 import Utils from "../../modules/utils/utils";
@@ -20,6 +20,7 @@ export class PageTournamentSelect {
 
   @State() private uiAddingTournament: boolean;
   @State() private numberOfTournaments: number;
+  @State() private isNewTournamentNameReady: boolean;
 
   constructor () {
     this.tournaments = tournaments;
@@ -56,25 +57,45 @@ export class PageTournamentSelect {
     this.numberOfTournaments = this.tournaments.remove(id);
   }
 
-  private addTournament () {
-    const input = document.querySelector(`ion-input#${this.inputId}`);
-    if (!input) {
-      console.warn("<page-tournament-select/> Unable to get input value.");
-      return;
-    }
+  private async getNewTournamentNameValue(): Promise<string | null> {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const input = document.querySelector(`ion-input#${this.inputId}`) as HTMLInputElement;
+        if (!input) {
+          console.warn("<page-tournament-select/> Unable to get input value.");
+          reject(null);
+        }
 
-    // @ts-ignore
-    const value = input.value;
+        resolve(input.value || null);
+      });
+    });
+  }
+
+  private async addTournament () {
+    const value = await this.getNewTournamentNameValue();
+    if (!value) { return; }
+
     this.numberOfTournaments = this.tournaments.add({
       name: value,
       grid: [],
       matchs: [],
       type: this.currentTournamentTypeSelected || TournamentType.FOOT
     });
+
     this.uiAddingTournament = false;
   }
 
-  private onKeyPressNewName(event: KeyboardEvent) {
+  private async onKeyPressNewName(event: KeyboardEvent) {
+    const value = await this.getNewTournamentNameValue();
+    if (!value) { return; }
+
+    if (value.length < 3) {
+      this.isNewTournamentNameReady = false;
+      return;
+    }
+
+    this.isNewTournamentNameReady = true;
+
     if (event.key === "Enter") {
       this.addTournament();
     }
@@ -87,6 +108,8 @@ export class PageTournamentSelect {
   private displayUiAddingTournament () {
     this.uiAddingTournament = true;
     this.currentTournamentTypeSelected = null;
+    this.isNewTournamentNameReady = false;
+    
     Utils.setFocus(`ion-input#${this.inputId}`);
     setTimeout(() => {
       this.watchSelectTournamentType();
@@ -118,7 +141,7 @@ export class PageTournamentSelect {
             { this.numberOfTournaments ?
                 this.tournaments.map((tournament: Tournament) =>
                   <ion-item href={`/tournament/${tournament.id}`} key={tournament.id}>
-                    <ion-label slot="start">{tournament.name}</ion-label>
+                    <ion-label slot="start">{tournament.name} - {this.tournaments.getTournamentTypeLabel(tournament.type)}</ion-label>
                     <ion-label slot="end">
                       <ion-badge slot="start" class="ion-margin-end"
                         color="tertiary">{ tournament.grid.length }</ion-badge>
@@ -142,20 +165,21 @@ export class PageTournamentSelect {
                 <div>
                   <ion-item>
                     <ion-label position="floating">Nom du tournois</ion-label>
-                    <ion-input color="primary" placeholder="Ligue 1" autofocus="true" inputmode="text" name="tournoiNewName"
-                      onkeypress={(ev: KeyboardEvent) => this.onKeyPressNewName(ev)}
+                    <ion-input color="primary" placeholder="Ligue 1" autofocus="true" inputmode="text"
+                      name="tournoiNewName" onkeydown={(ev: KeyboardEvent) => this.onKeyPressNewName(ev)}
                       id={this.inputId} type="text"></ion-input>
                   </ion-item>
 
                   <ion-item>
                     <ion-select id={this.selectTournamentTypeId} interface="action-sheet"
                       placeholder="Quel sport ? (defaut: Foot ⚽️)">
-                      <ion-select-option value="foot">Foot ⚽️</ion-select-option>
-                      <ion-select-option value="basket">Basket 🏀</ion-select-option>
+                      <ion-select-option value={TournamentType.BASKET_NBA}>{TournamentTypeLabel.BASKET_NBA}</ion-select-option>
+                      <ion-select-option value={TournamentType.FOOT}>{TournamentTypeLabel.FOOT}</ion-select-option>
                     </ion-select>
                   </ion-item>
 
-                  <ion-button onClick={() => this.addTournament()} expand="full">
+                  <ion-button onClick={() => this.addTournament()} expand="full"
+                    disabled={!this.isNewTournamentNameReady}>
                     <ion-icon slot="start" name="add-outline"></ion-icon>
                     Ajouter
                   </ion-button>

@@ -1,5 +1,5 @@
 
-import { MatchStatus, Tournament, TournamentType } from "./tournaments.d";
+import { MatchStatus, Tournament, TournamentType, TournamentTypeLabel } from "./tournaments.d";
 import { CACHE_KEY } from "./tournaments.constants";
 import uuid from "../uuid/uuid";
 import TeamRow from "../team-row/team-row";
@@ -178,6 +178,21 @@ class Tournaments {
 
   public onUpdate (callback: Function) {
     this.callbackCollector.push(callback);
+  }
+
+  public getTournamentTypeLabel(type: TournamentType): string {
+    let label;
+
+    switch (type) {
+      case TournamentType.BASKET_NBA:
+        label = TournamentTypeLabel.BASKET_NBA;
+        break;
+      default:
+        label = TournamentTypeLabel.FOOT;
+        break;
+    }
+
+    return label;
   }
 }
 
