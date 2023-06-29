@@ -19,7 +19,7 @@ export class AppRoot {
               <ion-route component="page-tournament-select"></ion-route>
             </ion-route>
           </ion-route>
-          <ion-route url="/team-select/:teamId" component="page-team-select"></ion-route>
+          <ion-route url="/team-select/:teamId/:teamType" component="page-team-select"></ion-route>
           <ion-route url="/tournament/:tournamentId" component="page-tournament"></ion-route>
           <ion-route url="/match/:tournamentId" component="page-match"></ion-route>
         </ion-router>

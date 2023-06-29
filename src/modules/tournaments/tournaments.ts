@@ -57,9 +57,9 @@ class Tournaments {
     /* From stored data to instanciated object */
     this.tournaments.forEach((t) => {
       for (let i = 0, imax = t.grid.length; i < imax; i++) {
-        const team = new TeamRow(t.grid[i].id);
-        team.fromData(t.grid[i]);
-        t.grid[i] = team;
+        const teamRow = new TeamRow({ id: t.grid[i].id, type: t.grid[i].type });
+        teamRow.fromData(t.grid[i]);
+        t.grid[i] = teamRow;
       }
 
       if (!t.matchs) { t.matchs = [] }
@@ -184,8 +184,17 @@ class Tournaments {
     let label;
 
     switch (type) {
-      case TournamentType.BASKET_NBA:
-        label = TournamentTypeLabel.BASKET_NBA;
+      case TournamentType.NBA:
+        label = TournamentTypeLabel.NBA;
+        break;
+      case TournamentType.BASKET:
+        label = TournamentTypeLabel.BASKET;
+        break;
+      case TournamentType.NFL:
+        label = TournamentTypeLabel.NFL;
+        break;
+      case TournamentType.RUGBY:
+        label = TournamentTypeLabel.RUGBY;
         break;
       default:
         label = TournamentTypeLabel.FOOT;

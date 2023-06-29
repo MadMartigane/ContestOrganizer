@@ -1,8 +1,25 @@
-import { FutDBTeam } from "../futbd/futdb.d";
+import { TournamentType } from "../tournaments/tournaments.d"
+
+export type GenericTeamCountry = {
+  id: number,
+  name: string,
+  flag: string,
+  code: string
+}
+
+export type GenericTeam = {
+  id: number,
+  name: string,
+  type: TournamentType,
+  league?: number,
+  logo?: string,
+  country?: GenericTeamCountry
+}
 
 export interface TeamRowProperties {
   id: number;
-  team?: FutDBTeam;
+  team?: GenericTeam;
+  type: TournamentType;
   points: number;
   concededGoals: number;
   scoredGoals: number;

@@ -1,38 +1,25 @@
+import { GenericTeam } from "../team-row/team-row.d"
+import { TournamentType } from "../tournaments/tournaments.d"
 
-// TODO 
 export interface ApiSportsReturnError {
   status: number,
   message: string
-}
-
-export type ApiSportsContry = {
-  id: number,
-  name: string,
-  flag: string,
-  code: string
-}
-
-export type ApiSportsTeam = {
-  id: number,
-  name: string,
-  nationnal: boolean,
-  logo: string,
-  country: ApiSportsContry
 }
 
 export type ApiSportsTeamReturn = {
   errors: ApiSportsReturnError[],
   get: string,
   results: number,
-  response: ApiSportsTeam[]
+  response: GenericTeam[]
 }
 
 export type ApiSportsSearchCache = {
   search: string,
+  type: TournamentType,
   results: number[]
 }
 
 export type ApiSportsCache = {
-  allTeams: ApiSportsTeam[],
+  allTeams: GenericTeam[],
   allSearch: ApiSportsSearchCache[]
 }

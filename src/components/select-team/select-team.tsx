@@ -10,9 +10,10 @@ import {
     State,
     Watch
 } from "@stencil/core";
-import { FutDBTeam } from "../../modules/futbd/futdb.d";
 import { PageTeamSelectEventDatail } from "../page-team-select/page-team-select.d";
 import uuid from "../../modules/uuid/uuid";
+import { TournamentType } from "../../modules/tournaments/tournaments.d";
+import { GenericTeam } from "../../modules/team-row/team-row.d";
 
 @Component({
   tag: "mad-select-team",
@@ -26,10 +27,12 @@ export class MadSelectTeam {
   @Prop() color: string;
   @Prop() placeholder: string;
   @Prop() label: string;
-  @Prop() value: FutDBTeam;
-  @State() team: FutDBTeam;
+  @Prop() value: GenericTeam;
+  @Prop() type: TournamentType;
 
-  @Event() madSelectChange: EventEmitter<FutDBTeam>;
+  @State() team: GenericTeam;
+
+  @Event() madSelectChange: EventEmitter<GenericTeam>;
 
   @Listen("pageTeamNewSelection", {
     target: "window"
@@ -59,7 +62,7 @@ export class MadSelectTeam {
           "pointer": true
         }}>
         <ion-router-link
-          href={`/team-select/${this.itemId}`} key="teamId">
+          href={`/team-select/${this.itemId}/${this.type}`}>
           {this.label ?
             <span>{this.label}</span> :
             null

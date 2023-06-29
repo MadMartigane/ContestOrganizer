@@ -16,10 +16,16 @@ export const enum MatchStatus { PENDING = "Pending", DOING = "Doing", DONE = "Do
 
 export const enum TournamentType {
   FOOT = "Foot",
-  BASKET_NBA = "Basket_NBA"
+  BASKET = "Basket",
+  NBA = "NBA",
+  NFL = "NFL",
+  RUGBY = "Rugby"
 }
 
 export const enum TournamentTypeLabel {
-  FOOT = "Foot ⚽️",
-  BASKET_NBA = "Basket - NBA 🏀"
+  FOOT = "⚽ Foot",
+  NBA = "🏀 NBA",
+  BASKET = "🏀 Basket",
+  NFL = "🏈 NFL",
+  RUGBY = "🏉 Rugby"
 }

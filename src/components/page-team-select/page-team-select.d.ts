@@ -1,8 +1,9 @@
-import { FutDBTeam } from "../../modules/futbd/futdb.d";
+
+import { GenericTeam } from "../../components.d";
 
 export interface PageTeamSelectEventDatail {
   id: string,
-  team: FutDBTeam
+  team: GenericTeam
 }
 
 

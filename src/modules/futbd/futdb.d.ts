@@ -1,4 +1,6 @@
 
+import { GenericTeam } from "../team-row/team-row.d";
+
 export interface FutDBPagination {
   countCurrent: number,
   countTotal: number,
@@ -7,15 +9,9 @@ export interface FutDBPagination {
   itemsPerPage: number
 }
 
-export interface FutDBTeam {
-  id: number,
-  name: string,
-  league: number
-}
-
 export interface FutDBTeamReturn {
   pagination: FutDBPagination,
-  items: Array<FutDBTeam>
+  items: Array<GenericTeam>
 }
 
 export interface FutDBLoadedImgBuffer {

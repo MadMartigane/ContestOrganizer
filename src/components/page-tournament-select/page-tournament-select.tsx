@@ -140,7 +140,7 @@ export class PageTournamentSelect {
           <ion-list>
             { this.numberOfTournaments ?
                 this.tournaments.map((tournament: Tournament) =>
-                  <ion-item href={`/tournament/${tournament.id}`} key={tournament.id}>
+                  <ion-item href={`/tournament/${tournament.id}`}>
                     <ion-label slot="start">{tournament.name} - {this.tournaments.getTournamentTypeLabel(tournament.type)}</ion-label>
                     <ion-label slot="end">
                       <ion-badge slot="start" class="ion-margin-end"
@@ -173,7 +173,10 @@ export class PageTournamentSelect {
                   <ion-item>
                     <ion-select id={this.selectTournamentTypeId} interface="action-sheet"
                       placeholder="Quel sport ? (defaut: Foot ⚽️)">
-                      <ion-select-option value={TournamentType.BASKET_NBA}>{TournamentTypeLabel.BASKET_NBA}</ion-select-option>
+                      <ion-select-option value={TournamentType.NBA}>{TournamentTypeLabel.NBA}</ion-select-option>
+                      <ion-select-option value={TournamentType.RUGBY}>{TournamentTypeLabel.RUGBY}</ion-select-option>
+                      <ion-select-option value={TournamentType.NFL}>{TournamentTypeLabel.NFL}</ion-select-option>
+                      <ion-select-option value={TournamentType.BASKET}>{TournamentTypeLabel.BASKET}</ion-select-option>
                       <ion-select-option value={TournamentType.FOOT}>{TournamentTypeLabel.FOOT}</ion-select-option>
                     </ion-select>
                   </ion-item>

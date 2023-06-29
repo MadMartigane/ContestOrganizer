@@ -1,5 +1,4 @@
 import { Component, Fragment, h } from "@stencil/core";
-import apiSports from "../../modules/api-sports/api-sports";
 
 @Component({
   tag: "page-home",
@@ -8,12 +7,6 @@ import apiSports from "../../modules/api-sports/api-sports";
 })
 
 export class PageHome {
-
-  private async testApi() {
-    console.log("TEST API !!");
-    const team = await apiSports.searchTeam("chicago");
-    console.log("TEAM: ", team);
-  }
 
   render() {
     return (
@@ -32,7 +25,6 @@ export class PageHome {
               <ion-card-title color="primary">Bienvenue !</ion-card-title>
             </ion-card-header>
 
-        <ion-button onClick={() => this.testApi()}>Test !!</ion-button>
             <ion-card-content class="ion-text-center">
               <p>Retrouve tous tes tournois via le menu tout en bas et clique sur <ion-icon name="trophy-outline" size="small" color="warning"></ion-icon></p>
               <p><ion-img
