@@ -1,5 +1,5 @@
 
-import { MatchStatus, Tournament } from "./tournaments.d";
+import { MatchStatus, Tournament, TournamentType, TournamentTypeLabel } from "./tournaments.d";
 import { CACHE_KEY } from "./tournaments.constants";
 import uuid from "../uuid/uuid";
 import TeamRow from "../team-row/team-row";
@@ -19,6 +19,7 @@ export class Match {
     this.status = status || MatchStatus.PENDING;
   }
 }
+
 class Tournaments {
 
   private readonly CACHE_KEY: typeof CACHE_KEY;
@@ -56,9 +57,9 @@ class Tournaments {
     /* From stored data to instanciated object */
     this.tournaments.forEach((t) => {
       for (let i = 0, imax = t.grid.length; i < imax; i++) {
-        const team = new TeamRow(t.grid[i].id);
-        team.fromData(t.grid[i]);
-        t.grid[i] = team;
+        const teamRow = new TeamRow({ id: t.grid[i].id, type: t.grid[i].type });
+        teamRow.fromData(t.grid[i]);
+        t.grid[i] = teamRow;
       }
 
       if (!t.matchs) { t.matchs = [] }
@@ -132,12 +133,21 @@ class Tournaments {
     return this.store();
   }
 
-  public add (name: string, grid: Array<TeamRow>, matchs: Match[]): number {
+  public add(arg: {
+    name: string,
+    grid: Array<TeamRow>,
+    matchs: Match[],
+    type: TournamentType
+  }): number {
+
+    const { name, grid, matchs, type } = arg;
+
     this.tournaments.push({
       id: this.uuid.new(),
       name,
       grid,
-      matchs
+      matchs,
+      type
     });
 
     return this.store();
@@ -168,6 +178,30 @@ class Tournaments {
 
   public onUpdate (callback: Function) {
     this.callbackCollector.push(callback);
+  }
+
+  public getTournamentTypeLabel(type: TournamentType): string {
+    let label;
+
+    switch (type) {
+      case TournamentType.NBA:
+        label = TournamentTypeLabel.NBA;
+        break;
+      case TournamentType.BASKET:
+        label = TournamentTypeLabel.BASKET;
+        break;
+      case TournamentType.NFL:
+        label = TournamentTypeLabel.NFL;
+        break;
+      case TournamentType.RUGBY:
+        label = TournamentTypeLabel.RUGBY;
+        break;
+      default:
+        label = TournamentTypeLabel.FOOT;
+        break;
+    }
+
+    return label;
   }
 }
 

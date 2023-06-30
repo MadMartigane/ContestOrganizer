@@ -1,17 +1,20 @@
-import { FutDBTeam } from "../futbd/futdb.d";
-import { TeamRowProperties } from "./team-row.d";
+import { GenericTeam, TeamRowProperties } from "./team-row.d";
 import uuid from "../uuid/uuid";
+import { TournamentType } from "../tournaments/tournaments.d";
+
 
 export class TeamRow {
   public readonly id: number;
-  public team?: FutDBTeam;
+  public team?: GenericTeam;
   public points: number;
   public concededGoals: number;
   public scoredGoals: number;
   public goalAverage: number;
+  public type: TournamentType;
 
-  constructor (id?: number) {
-    this.id = id || uuid.new();
+  constructor(options: { id?: number, type: TournamentType }) {
+    this.id = options.id || uuid.new();
+    this.type = options.type;
 
     this.reset();
   }
@@ -21,6 +24,7 @@ export class TeamRow {
     return {
       id: this.id,
       team: this.team,
+      type: this.type,
       points: this.points,
       concededGoals: this.concededGoals,
       scoredGoals: this.scoredGoals,

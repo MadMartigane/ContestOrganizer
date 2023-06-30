@@ -58,6 +58,28 @@ export class HttpRequest {
 
     return promise;
   }
+
+  private async promise(thing: any, action: string) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (action === "reject") {
+          reject(thing);
+        } else {
+          resolve(thing);
+        }
+      });
+    })
+  }
+
+
+  public async resolve(thing: any) {
+    return this.promise(thing, "resolve");
+  }
+
+  public async reject(thing: any) {
+    return this.promise(thing, "reject");
+  }
+
 }
 
 const httpRequest = new HttpRequest();

@@ -1,10 +1,11 @@
 import { InputChangeEventDetail } from "@ionic/core";
 import { Component, h, Host, Listen, Prop, State } from "@stencil/core";
 import { TeamRow } from "../../modules/team-row/team-row";
-import { FutDBTeam, MadInputNumberCustomEvent, MadSelectTeamCustomEvent } from "../../components";
+import { MadInputNumberCustomEvent, MadSelectTeamCustomEvent } from "../../components";
 import tournaments from "../../modules/tournaments/tournaments";
-import { Tournament } from "../../modules/tournaments/tournaments.d";
+import { Tournament, TournamentType } from "../../modules/tournaments/tournaments.d";
 import Utils from "../../modules/utils/utils";
+import { GenericTeam } from "../../components.d";
 
 export interface PageConfConstants {
   teamNumberMax: number,
@@ -32,6 +33,7 @@ export class PageTournament {
   private counter: number;
 
   @Prop() public tournamentId: number;
+
   @State() private tournament: Tournament | null;
   @State() private uiError: string | null;
   @State() private isEditTournamentName: boolean;
@@ -77,7 +79,7 @@ export class PageTournament {
     this.updateTournament();
   }
 
-  getVirginTeamRow(): TeamRow { return new TeamRow(); }
+  getVirginTeamRow(type: TournamentType): TeamRow { return new TeamRow({ type }); }
 
   updateTournament(): void {
     if (!this.tournament) { return; }
@@ -88,18 +90,19 @@ export class PageTournament {
       id: this.tournament.id,
       name: this.tournament.name,
       grid: [],
-      matchs: this.tournament.matchs
+      matchs: this.tournament.matchs,
+      type: this.tournament.type
     };
 
     for (let i = 0; i < this.teamNumber; i++) {
-      this.tournament.grid[i] = oldGrid[i] || this.getVirginTeamRow();
+      this.tournament.grid[i] = oldGrid[i] || this.getVirginTeamRow(this.tournament.type);
     }
 
     this.counter = 0;
     this.tournaments.update(this.tournament);
   }
 
-  onTeamTeamChange(detail: FutDBTeam, team: TeamRow): void {
+  onTeamTeamChange(detail: GenericTeam, team: TeamRow): void {
     team.team = detail;
 
     this.updateTournament();
@@ -199,7 +202,7 @@ export class PageTournament {
             <div>
 
               {this.isEditTournamentName ?
-                <ion-grid class="grid-edit-tournament-name">
+                <ion-grid class="grid-edit-tournament-center">
                   <ion-row class="ion-align-items-end ion-justify-content-center">
                     <ion-col size="1">
                       <ion-button size="small" color="tertiary"
@@ -228,7 +231,7 @@ export class PageTournament {
                   </ion-row>
                 </ion-grid>
                 :
-                <ion-grid class="can-be-clicked grid-edit-tournament-name" onClick={() => this.onEditTournamentName()}>
+                <ion-grid class="can-be-clicked grid-edit-tournament-center" onClick={() => this.onEditTournamentName()}>
                   <ion-row class="ion-align-items-end ion-justify-content-center">
                     <ion-col size="1">
                       <ion-icon name="trophy-outline" size="large" color="secondary"></ion-icon>
@@ -243,7 +246,7 @@ export class PageTournament {
                 </ion-grid>
               }
 
-              <ion-grid class="grid-edit-tournament-name">
+              <ion-grid class="grid-edit-tournament-center">
                 <ion-row class="ion-align-items-end ion-justify-content-center">
                   <ion-col size="10" size-sm="8" size-md="6" size-lg="4" class="ion-padding-vertical">
 
@@ -283,8 +286,9 @@ export class PageTournament {
                           <mad-select-team
                             value={team.team}
                             color="primary"
-                            onMadSelectChange={(ev: MadSelectTeamCustomEvent<FutDBTeam>) => this.onTeamTeamChange(ev.detail, team)}
-                            placeholder="Man City">
+                            type={this.tournament?.type}
+                            onMadSelectChange={(ev: MadSelectTeamCustomEvent<GenericTeam>) => this.onTeamTeamChange(ev.detail, team)}
+                            placeholder="Équipe vide">
                           </mad-select-team>
                         </ion-col>
                         <ion-col>

@@ -3,15 +3,17 @@
  */
 
 import httpRequest from "../http-request/http-request";
-import { FutDBLoadedImgBuffer, FutDBTeamReturn, FutDBTeam, FutDBPagination } from "./futdb.d";
+import { FutDBLoadedImgBuffer, FutDBTeamReturn, FutDBPagination } from "./futdb.d";
 import { SECRETS, LOCAL_STORAGE_TEAM_KEY } from "./futdb.constants";
+import { GenericTeam } from "../team-row/team-row.d";
+import { TournamentType } from "../tournaments/tournaments.d";
 
 export class ApiFutDB {
 
   private readonly loadedImg: Array<FutDBLoadedImgBuffer>;
 
-  private isLoading: Promise<Array<FutDBTeam>> | null;
-  private allTeams: Array<FutDBTeam>;
+  private isLoading: Promise<Array<GenericTeam>> | null;
+  private allTeams: Array<GenericTeam>;
   private pagination: FutDBPagination;
   private countReturn: number;
 
@@ -34,9 +36,9 @@ export class ApiFutDB {
     });
   }
 
-  private async loadCache(): Promise<Array<FutDBTeam> | null> {
+  private async loadCache(): Promise<Array<GenericTeam> | null> {
     const cacheString = localStorage.getItem(LOCAL_STORAGE_TEAM_KEY);
-    let cache = null as Array<FutDBTeam> | null;
+    let cache = null as Array<GenericTeam> | null;
 
     if (cacheString) {
       try {
@@ -61,6 +63,7 @@ export class ApiFutDB {
     .then((rawData) => {
       const data = rawData as FutDBTeamReturn;
       if (data?.items.length) {
+        data.items.forEach((team) => { team.type = TournamentType.FOOT; });
         this.allTeams = this.allTeams.concat((data.items));
         this.pagination.countCurrent = this.allTeams.length;
       }
@@ -86,7 +89,7 @@ export class ApiFutDB {
     });
   }
 
-  public async loadTeams (): Promise<Array<FutDBTeam>> {
+  public async loadTeams (): Promise<Array<GenericTeam>> {
 
     if (this.isLoading) {
       return this.isLoading;

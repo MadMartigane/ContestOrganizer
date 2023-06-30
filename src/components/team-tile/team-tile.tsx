@@ -6,8 +6,8 @@ import {
   State,
   Watch
 } from '@stencil/core';
-import {FutDBTeam} from "../../modules/futbd/futdb.d";
-import ApiFutDB from "../../modules/futbd/futdb";
+import apiFutDB from "../../modules/futbd/futdb";
+import { GenericTeam } from '../../components.d';
 
 @Component({
   tag: 'mad-team-tile',
@@ -15,30 +15,34 @@ import ApiFutDB from "../../modules/futbd/futdb";
   shadow: false
 })
 export class MadTeamTile {
-  private apiFutDB: typeof ApiFutDB;
+  private apiFutDB: typeof apiFutDB;
 
   @State() private imgSrc: string;
 
-  @Prop() team: FutDBTeam | null;
+  @Prop() team: GenericTeam | null;
   @Prop() reverse: Boolean | null;
 
   constructor () {
-    this.apiFutDB = ApiFutDB;
+    this.apiFutDB = apiFutDB;
 
-    if (this.team) {
-      this.loadImg(this.team.id);
+    this.loadImg(this.team?.id || null);
+  }
+
+  private loadImg(id: number|null) {
+    if (this.team?.logo) {
+      setTimeout(() => {
+        this.imgSrc = this.team?.logo || "";
+      });
+    } else if (id) {
+      this.apiFutDB.loadTeamImage(id)
+        .then((base64Img) => {
+          this.imgSrc = base64Img;
+        });
     }
   }
 
-  private loadImg(id: number) {
-    this.apiFutDB.loadTeamImage(id)
-      .then((base64Img) => {
-          this.imgSrc = base64Img;
-      });
-  }
-
   @Watch("team")
-  onTeamChange (newTeam: FutDBTeam | null) {
+  onTeamChange (newTeam: GenericTeam | null) {
     if (!newTeam) { return; }
 
     this.loadImg(newTeam.id);

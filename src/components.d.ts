@@ -7,11 +7,15 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { InputChangeEventDetail } from "@ionic/core";
 import { TeamRow } from "./modules/team-row/team-row";
-import { FutDBTeam } from "./modules/futbd/futdb.d";
+import { GenericTeam } from "./modules/team-row/team-row.d";
+import { TournamentType } from "./modules/tournaments/tournaments.d";
+import { GenericTeam as GenericTeam1, TournamentType as TournamentType1 } from "./components.d";
 import { PageTeamSelectEventDatail } from "./components/page-team-select/page-team-select.d";
 export { InputChangeEventDetail } from "@ionic/core";
 export { TeamRow } from "./modules/team-row/team-row";
-export { FutDBTeam } from "./modules/futbd/futdb.d";
+export { GenericTeam } from "./modules/team-row/team-row.d";
+export { TournamentType } from "./modules/tournaments/tournaments.d";
+export { GenericTeam as GenericTeam1, TournamentType as TournamentType1 } from "./components.d";
 export { PageTeamSelectEventDatail } from "./components/page-team-select/page-team-select.d";
 export namespace Components {
     interface AppRoot {
@@ -36,11 +40,12 @@ export namespace Components {
         "color": string;
         "label": string;
         "placeholder": string;
-        "value": FutDBTeam;
+        "type": TournamentType;
+        "value": GenericTeam;
     }
     interface MadTeamTile {
         "reverse": Boolean | null;
-        "team": FutDBTeam | null;
+        "team": GenericTeam1 | null;
     }
     interface PageHome {
     }
@@ -49,6 +54,7 @@ export namespace Components {
     }
     interface PageTeamSelect {
         "teamId": string;
+        "teamType": TournamentType1;
     }
     interface PageTournament {
         "tournamentId": number;
@@ -172,13 +178,14 @@ declare namespace LocalJSX {
     interface MadSelectTeam {
         "color"?: string;
         "label"?: string;
-        "onMadSelectChange"?: (event: MadSelectTeamCustomEvent<FutDBTeam>) => void;
+        "onMadSelectChange"?: (event: MadSelectTeamCustomEvent<GenericTeam>) => void;
         "placeholder"?: string;
-        "value"?: FutDBTeam;
+        "type"?: TournamentType;
+        "value"?: GenericTeam;
     }
     interface MadTeamTile {
         "reverse"?: Boolean | null;
-        "team"?: FutDBTeam | null;
+        "team"?: GenericTeam1 | null;
     }
     interface PageHome {
     }
@@ -188,6 +195,7 @@ declare namespace LocalJSX {
     interface PageTeamSelect {
         "onPageTeamNewSelection"?: (event: PageTeamSelectCustomEvent<PageTeamSelectEventDatail>) => void;
         "teamId"?: string;
+        "teamType"?: TournamentType1;
     }
     interface PageTournament {
         "tournamentId"?: number;

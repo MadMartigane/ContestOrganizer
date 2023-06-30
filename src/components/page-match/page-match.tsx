@@ -3,7 +3,7 @@ import { Component, h, Host, Prop, State } from "@stencil/core";
 import { TeamRow } from "../../modules/team-row/team-row";
 import tournaments from "../../modules/tournaments/tournaments";
 import { Match } from "../../modules/tournaments/tournaments";
-import { Tournament, MatchTeamType, MatchStatus } from "../../modules/tournaments/tournaments.d";
+import { Tournament, MatchTeamType, MatchStatus, TournamentType } from "../../modules/tournaments/tournaments.d";
 import Utils from "../../modules/utils/utils";
 import { MadInputNumberCustomEvent } from "../../components";
 
@@ -193,6 +193,32 @@ export class PageMatch {
     this.refreshUI();
   }
 
+  private getTypeLogo(): string {
+    if (!this.tournament) {
+      return "404";
+    }
+
+    let logo;
+    switch (this.tournament.type) {
+      case TournamentType.NBA:
+        logo = "🏀";
+        break;
+      case TournamentType.BASKET:
+        logo = "🏀";
+        break;
+      case TournamentType.NFL:
+        logo = "🏈";
+        break;
+      case TournamentType.RUGBY:
+        logo = "🏉";
+        break;
+      default:
+        logo = "⚽️";
+        break;
+    }
+
+    return logo;
+  }
 
   render() {
     return (
@@ -203,7 +229,7 @@ export class PageMatch {
               <ion-back-button text="Retour" defaultHref={`/tournament/${this.tournament?.id}`}></ion-back-button>
             </ion-buttons>
             <ion-title>
-              <ion-text color="light" size="large" class="ion-margin">{ this.tournament?.name ? "⚽️" : "404" }</ion-text>
+              <ion-text color="light" size="large" class="ion-margin">{ this.getTypeLogo() }</ion-text>
             </ion-title>
           </ion-toolbar>
         </ion-header>

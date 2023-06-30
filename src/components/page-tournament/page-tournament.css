@@ -16,7 +16,7 @@ ion-grid.page-tournament-grid > ion-row {
   border: solid 1px var(--ion-color-light);
 }
 
-ion-grid.grid-edit-tournament-name > ion-row > ion-col {
+ion-grid.grid-edit-tournament-center > ion-row > ion-col {
   text-align: center;
 }
 
