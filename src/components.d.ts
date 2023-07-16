@@ -36,6 +36,15 @@ export namespace Components {
         "host": TeamRow | null;
         "visitor": TeamRow | null;
     }
+    interface MadScorerBasket {
+        "color": string;
+        "label"?: string;
+        "max"?: number;
+        "min"?: number;
+        "placeholder": string;
+        "readonly"?: boolean;
+        "value"?: number;
+    }
     interface MadSelectTeam {
         "color": string;
         "label": string;
@@ -65,6 +74,10 @@ export namespace Components {
 export interface MadInputNumberCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLMadInputNumberElement;
+}
+export interface MadScorerBasketCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLMadScorerBasketElement;
 }
 export interface MadSelectTeamCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -98,6 +111,12 @@ declare global {
     var HTMLMadMatchTileElement: {
         prototype: HTMLMadMatchTileElement;
         new (): HTMLMadMatchTileElement;
+    };
+    interface HTMLMadScorerBasketElement extends Components.MadScorerBasket, HTMLStencilElement {
+    }
+    var HTMLMadScorerBasketElement: {
+        prototype: HTMLMadScorerBasketElement;
+        new (): HTMLMadScorerBasketElement;
     };
     interface HTMLMadSelectTeamElement extends Components.MadSelectTeam, HTMLStencilElement {
     }
@@ -146,6 +165,7 @@ declare global {
         "app-tabs": HTMLAppTabsElement;
         "mad-input-number": HTMLMadInputNumberElement;
         "mad-match-tile": HTMLMadMatchTileElement;
+        "mad-scorer-basket": HTMLMadScorerBasketElement;
         "mad-select-team": HTMLMadSelectTeamElement;
         "mad-team-tile": HTMLMadTeamTileElement;
         "page-home": HTMLPageHomeElement;
@@ -174,6 +194,16 @@ declare namespace LocalJSX {
     interface MadMatchTile {
         "host"?: TeamRow | null;
         "visitor"?: TeamRow | null;
+    }
+    interface MadScorerBasket {
+        "color"?: string;
+        "label"?: string;
+        "max"?: number;
+        "min"?: number;
+        "onMadNumberChange"?: (event: MadScorerBasketCustomEvent<InputChangeEventDetail>) => void;
+        "placeholder"?: string;
+        "readonly"?: boolean;
+        "value"?: number;
     }
     interface MadSelectTeam {
         "color"?: string;
@@ -207,6 +237,7 @@ declare namespace LocalJSX {
         "app-tabs": AppTabs;
         "mad-input-number": MadInputNumber;
         "mad-match-tile": MadMatchTile;
+        "mad-scorer-basket": MadScorerBasket;
         "mad-select-team": MadSelectTeam;
         "mad-team-tile": MadTeamTile;
         "page-home": PageHome;
@@ -224,6 +255,7 @@ declare module "@stencil/core" {
             "app-tabs": LocalJSX.AppTabs & JSXBase.HTMLAttributes<HTMLAppTabsElement>;
             "mad-input-number": LocalJSX.MadInputNumber & JSXBase.HTMLAttributes<HTMLMadInputNumberElement>;
             "mad-match-tile": LocalJSX.MadMatchTile & JSXBase.HTMLAttributes<HTMLMadMatchTileElement>;
+            "mad-scorer-basket": LocalJSX.MadScorerBasket & JSXBase.HTMLAttributes<HTMLMadScorerBasketElement>;
             "mad-select-team": LocalJSX.MadSelectTeam & JSXBase.HTMLAttributes<HTMLMadSelectTeamElement>;
             "mad-team-tile": LocalJSX.MadTeamTile & JSXBase.HTMLAttributes<HTMLMadTeamTileElement>;
             "page-home": LocalJSX.PageHome & JSXBase.HTMLAttributes<HTMLPageHomeElement>;

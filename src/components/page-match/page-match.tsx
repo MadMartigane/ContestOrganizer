@@ -299,23 +299,93 @@ export class PageMatch {
                         <ion-row class="ion-align-items-center">
                           <ion-col size="6">
 
-                            <mad-input-number color="primary" label="⚽️" class="ion-margin"
-                              readonly={match.status !== MatchStatus.DOING}
-                              onMadNumberChange={
-                                (ev: MadInputNumberCustomEvent<InputChangeEventDetail>) =>
-                                  this.onTeamScores(match, MatchTeamType.HOST, ev.detail)
-                              }
-                              min={this.config.minGoal} value={match.goals.host}></mad-input-number>
+                            {(this.tournament?.type === TournamentType.NBA || this.tournament?.type === TournamentType.BASKET)
+                              &&
+                              <mad-scorer-basket color="primary" label="🏀" class="ion-margin"
+                                readonly={match.status !== MatchStatus.DOING}
+                                onMadNumberChange={
+                                  (ev: MadInputNumberCustomEvent<InputChangeEventDetail>) =>
+                                    this.onTeamScores(match, MatchTeamType.HOST, ev.detail)
+                                }
+                                min={this.config.minGoal} value={match.goals.host}></mad-scorer-basket>
+                            }
+                            
+                            {this.tournament?.type === TournamentType.FOOT &&
+                              <mad-input-number color="primary" label="⚽️" class="ion-margin"
+                                readonly={match.status !== MatchStatus.DOING}
+                                onMadNumberChange={
+                                  (ev: MadInputNumberCustomEvent<InputChangeEventDetail>) =>
+                                    this.onTeamScores(match, MatchTeamType.HOST, ev.detail)
+                                }
+                                min={this.config.minGoal} value={match.goals.host}></mad-input-number>
+                            }
+  
+                            {this.tournament?.type === TournamentType.NFL &&
+                              <mad-input-number color="primary" label="🏈" class="ion-margin"
+                                readonly={match.status !== MatchStatus.DOING}
+                                onMadNumberChange={
+                                  (ev: MadInputNumberCustomEvent<InputChangeEventDetail>) =>
+                                    this.onTeamScores(match, MatchTeamType.HOST, ev.detail)
+                                }
+                                min={this.config.minGoal} value={match.goals.host}></mad-input-number>
+                            }
+  
+                            {this.tournament?.type === TournamentType.RUGBY &&
+                              <mad-input-number color="primary" label="🏉" class="ion-margin"
+                                readonly={match.status !== MatchStatus.DOING}
+                                onMadNumberChange={
+                                  (ev: MadInputNumberCustomEvent<InputChangeEventDetail>) =>
+                                    this.onTeamScores(match, MatchTeamType.HOST, ev.detail)
+                                }
+                                min={this.config.minGoal} value={match.goals.host}></mad-input-number>
+                            }
+
+
                           </ion-col>
 
                           <ion-col size="6">
-                            <mad-input-number color="primary" label="⚽️" class="ion-margin"
-                              readonly={match.status !== MatchStatus.DOING}
-                              onMadNumberChange={
-                                (ev: MadInputNumberCustomEvent<InputChangeEventDetail>) =>
-                                  this.onTeamScores(match, MatchTeamType.VISITOR, ev.detail)
-                              }
-                              min={this.config.minGoal} value={match.goals.visitor}></mad-input-number>
+
+                            {(this.tournament?.type === TournamentType.NBA || this.tournament?.type === TournamentType.BASKET)
+                              &&
+                              <mad-scorer-basket color="primary" label="🏀" class="ion-margin"
+                                readonly={match.status !== MatchStatus.DOING}
+                                onMadNumberChange={
+                                  (ev: MadInputNumberCustomEvent<InputChangeEventDetail>) =>
+                                    this.onTeamScores(match, MatchTeamType.VISITOR, ev.detail)
+                                }
+                                min={this.config.minGoal} value={match.goals.visitor}></mad-scorer-basket>
+                            }
+                            
+                            {this.tournament?.type === TournamentType.FOOT &&
+                              <mad-input-number color="primary" label="⚽️" class="ion-margin"
+                                readonly={match.status !== MatchStatus.DOING}
+                                onMadNumberChange={
+                                  (ev: MadInputNumberCustomEvent<InputChangeEventDetail>) =>
+                                    this.onTeamScores(match, MatchTeamType.VISITOR, ev.detail)
+                                }
+                                min={this.config.minGoal} value={match.goals.visitor}></mad-input-number>
+                            }
+  
+                            {this.tournament?.type === TournamentType.NFL &&
+                              <mad-input-number color="primary" label="🏈" class="ion-margin"
+                                readonly={match.status !== MatchStatus.DOING}
+                                onMadNumberChange={
+                                  (ev: MadInputNumberCustomEvent<InputChangeEventDetail>) =>
+                                    this.onTeamScores(match, MatchTeamType.VISITOR, ev.detail)
+                                }
+                                min={this.config.minGoal} value={match.goals.visitor}></mad-input-number>
+                            }
+  
+                            {this.tournament?.type === TournamentType.RUGBY &&
+                              <mad-input-number color="primary" label="🏉" class="ion-margin"
+                                readonly={match.status !== MatchStatus.DOING}
+                                onMadNumberChange={
+                                  (ev: MadInputNumberCustomEvent<InputChangeEventDetail>) =>
+                                    this.onTeamScores(match, MatchTeamType.VISITOR, ev.detail)
+                                }
+                                min={this.config.minGoal} value={match.goals.visitor}></mad-input-number>
+                            }
+
                           </ion-col>
                         </ion-row>
                       </ion-grid>
