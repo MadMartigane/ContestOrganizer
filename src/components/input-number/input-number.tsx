@@ -21,7 +21,7 @@ import uuid from "../../modules/uuid/uuid";
 export class MadInputNumber {
   private argColor: string;
   private itemId: string;
-  private innerSep: number;
+  private innerStep: number;
 
   @Prop() color: string;
   @Prop() placeholder: string;
@@ -40,7 +40,7 @@ export class MadInputNumber {
     this.argColor = this.color || "primary";
     this.number = this.value || this.min || 0;
     this.itemId = `mad_input_number_${uuid.new()}`;
-    this.innerSep = this.step || 1;
+    this.innerStep = this.step || 1;
   }
 
   @Watch("value")
@@ -54,7 +54,7 @@ export class MadInputNumber {
       return;
     }
 
-    this.number += this.innerSep;
+    this.number += this.innerStep;
     this.madNumberChange.emit({ value: String(this.number) });
   }
 
@@ -64,7 +64,7 @@ export class MadInputNumber {
       return;
     }
 
-    this.number -= this.innerSep;
+    this.number -= this.innerStep;
     this.madNumberChange.emit({ value: String(this.number) });
   }
 
