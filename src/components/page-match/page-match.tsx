@@ -414,8 +414,12 @@ export class PageMatch {
                   )}
                 </div>
                 :
-                <div class="ion-text-center ion-justify-content-center">
-                  <h2><ion-text color="warning"> Aucun match en cours </ion-text></h2>
+                <div>
+                  { this.displayTeamSelector ? null :
+                    <div class="ion-text-center ion-justify-content-center">
+                      <h2><ion-text color="warning"> Aucun match en cours </ion-text></h2>
+                    </div>
+                  }
                 </div>
               }
 

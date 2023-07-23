@@ -259,7 +259,7 @@ export class PageTournament {
                       max={this.conf.teamNumberMax}
                       step={this.conf.teamNumberStep}
                       placeholder={String(this.conf.teamNumberDefault)}>
-                    </mad-input-number>
+                    </mad-input-number> <ion-icon name="pencil-outline"></ion-icon>
 
                   </ion-col>
                 </ion-row>
