@@ -71,7 +71,7 @@ export class MadInputNumber {
   render() {
     return (
       <Host>
-        <div id={this.itemId} class={{
+        <span id={this.itemId} class={{
           "pointer": !this.readonly
         }}>
           {this.label ?
@@ -82,7 +82,7 @@ export class MadInputNumber {
             <span class={this.argColor}>{this.number}</span> :
             <span class="placeholder">{this.placeholder}</span>
           }
-        </div>
+        </span>
         {this.readonly ?
           null :
           <ion-popover
