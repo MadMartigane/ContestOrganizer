@@ -11,11 +11,7 @@ export default class Utils {
   public static async confirmChoice(message = "Es-tu sûre ?", cancel = "Non", confirm = "Oui"): Promise<boolean> {
     const alert = document.createElement("ion-alert");
     alert.header = "🚨";
-    alert.message = [
-      "<h3 class='confirm-alert-message'>",
-      message,
-      "</h3>"
-    ].join("");
+    alert.message = message;
     alert.keyboardClose = true;
     alert.cssClass = "confirm-alert";
     alert.buttons = [

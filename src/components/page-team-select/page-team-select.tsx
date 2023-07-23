@@ -66,6 +66,7 @@ export class PageTeamSelect {
   }
 
   private async onSearchChange (ev: CustomEvent): Promise<void> {
+    console.log("onSearchChange - customEvent: ", ev);
     this.searchValue = ev.detail.value;
 
     if (this.searchValue.length < this.minNumberSearchLetter) {
@@ -126,11 +127,12 @@ export class PageTeamSelect {
             <ion-card-content>
               <ion-searchbar
                 id="page-team-select-search"
-                debounce="250"
+                debounce="400"
                 inputmode="search"
+                enterkeyhint="search"
                 disabled={this.isLoading}
                 animated="true"
-                onIonChange={(ev: CustomEvent) => this.onSearchChange(ev)}
+                onIonInput={(ev: CustomEvent) => this.onSearchChange(ev)}
                 placeholder="Recherche"></ion-searchbar>
 
                 <ion-list>
