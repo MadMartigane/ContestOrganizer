@@ -1,8 +1,8 @@
 {
-  "name": "ContestOrganizer",
+  "name": "contest-organizer",
   "private": true,
   "version": "0.0.1",
-  "description": "Stencil Ionic App Starter",
+  "description": "Tool to organize & enjoy your sport contest.",
   "scripts": {
     "build": "stencil build",
     "start": "stencil build --dev --watch --serve",
