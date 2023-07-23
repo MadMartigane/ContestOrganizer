@@ -66,7 +66,6 @@ export class PageTeamSelect {
   }
 
   private async onSearchChange (ev: CustomEvent): Promise<void> {
-    console.log("onSearchChange - customEvent: ", ev);
     this.searchValue = ev.detail.value;
 
     if (this.searchValue.length < this.minNumberSearchLetter) {
