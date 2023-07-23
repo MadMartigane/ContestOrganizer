@@ -50,8 +50,12 @@ ion-input {
 }
 
 /* CONFIRM ALERT */
-h3.confirm-alert-message {
+.alert-title.sc-ion-alert-ios {
+  font-size: xx-large;
+}
+.alert-message.sc-ion-alert-ios, .alert-input-group.sc-ion-alert-ios {
   color: var(--ion-color-primary);
+  font-size: large;
 }
 button.alert-button.alert-button-role-confirm {
   background-color: var(--ion-color-warning);
