@@ -204,14 +204,14 @@ export class PageTournament {
               {this.isEditTournamentName ?
                 <ion-grid class="grid-edit-tournament-center">
                   <ion-row class="ion-align-items-end ion-justify-content-center">
-                    <ion-col size="1">
+                    <ion-col size="2">
                       <ion-button size="small" color="tertiary"
                         onClick={() => { this.isEditTournamentName = false; }}
                         fill="solid">
                         <ion-icon slot="icon-only" name="close-circle-outline"></ion-icon>
                       </ion-button>
                     </ion-col>
-                    <ion-col size="10" size-sm="8" size-md="6" size-lg="4">
+                    <ion-col size="8" size-md="6" size-lg="4">
                       <ion-input
                         id={this.inputNameId}
                         color="primary"
@@ -221,7 +221,7 @@ export class PageTournament {
                         value={this.tournament?.name}
                         onkeypress={(ev: KeyboardEvent) => this.onTournamentNameChange(ev)} />
                     </ion-col>
-                    <ion-col size="1">
+                    <ion-col size="2">
                       <ion-button size="small" color="secondary"
                         onClick={() => this.editTournamentName()}
                         fill="solid">
@@ -233,13 +233,13 @@ export class PageTournament {
                 :
                 <ion-grid class="can-be-clicked grid-edit-tournament-center" onClick={() => this.onEditTournamentName()}>
                   <ion-row class="ion-align-items-end ion-justify-content-center">
-                    <ion-col size="1">
+                    <ion-col size="2">
                       <ion-icon name="trophy-outline" size="large" color="secondary"></ion-icon>
                     </ion-col>
-                    <ion-col size="10" size-sm="8" size-md="6" size-lg="4">
+                    <ion-col size="8" size-md="6" size-lg="4">
                       <h2 class="ion-padding-horizontal">{this.tournament?.name}</h2>
                     </ion-col>
-                    <ion-col size="1">
+                    <ion-col size="2">
                       <ion-icon name="pencil-outline" size="large" color="secondary"></ion-icon>
                     </ion-col>
                   </ion-row>
