@@ -1,5 +1,5 @@
 import { GenericTeam } from "../team-row/team-row.d"
-import { TournamentType } from "../tournaments/tournaments.d"
+import { TournamentType } from "../tournaments/tournaments.types"
 
 export interface ApiSportsReturnError {
   status: number,

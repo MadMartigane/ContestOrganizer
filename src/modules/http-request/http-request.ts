@@ -1,4 +1,4 @@
-import { HttpHeader, HttpRequestResponseTypesContants } from "./http-request.d";
+import { HTTP_REQUEST_TYPE, HttpHeader, HttpRequestResponseTypesContants } from "./http-request.types";
 import { HttpRequestResponseTypes } from "./http-request.constants";
 
 export class HttpRequest {
@@ -23,15 +23,17 @@ export class HttpRequest {
     return promise;
   }
 
-  public load(
+  private async request(
     url: string,
+    data: XMLHttpRequestBodyInit | null,
     responseType: XMLHttpRequestResponseType = HttpRequestResponseTypes.JSON,
-    headers?: Array<HttpHeader>
+    headers?: Array<HttpHeader>,
+    type: HTTP_REQUEST_TYPE = "GET"
   ): Promise<unknown> {
 
     const promise = new Promise((resolve, reject) => {
       const req = new XMLHttpRequest();
-      req.open("GET", url);
+      req.open(type, url);
       req.responseType = responseType;
 
       req.onerror = () => this.xmlHttpOnError(req, reject, "Request failed.", promise);
@@ -53,7 +55,7 @@ export class HttpRequest {
         headers.forEach((header) => req.setRequestHeader(header.name, header.value));
       }
 
-      req.send(null);
+      req.send(data);
     });
 
     return promise;
@@ -71,6 +73,22 @@ export class HttpRequest {
     })
   }
 
+  public load(
+    url: string,
+    responseType: XMLHttpRequestResponseType = HttpRequestResponseTypes.JSON,
+    headers?: Array<HttpHeader>
+  ): Promise<unknown> {
+    return this.request(url, null, responseType, headers, "GET");
+  }
+
+  public post(
+    url: string,
+    data: XMLHttpRequestBodyInit,
+    responseType: XMLHttpRequestResponseType = HttpRequestResponseTypes.JSON,
+    headers?: Array<HttpHeader>
+  ): Promise<unknown> {
+    return this.request(url, data, responseType, headers, "POST");
+  }
 
   public async resolve(thing: any) {
     return this.promise(thing, "resolve");

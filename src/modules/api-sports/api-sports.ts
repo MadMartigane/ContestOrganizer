@@ -6,7 +6,7 @@ import httpRequest from "../http-request/http-request";
 import { ApiSportsTeamReturn, ApiSportsCache, ApiSportsSearchCache } from "./api-sports.d";
 import { SECRETS, LOCAL_STORAGE_TEAM_KEY, URLS } from "./api-sports.constants";
 import { GenericTeam } from "../team-row/team-row.d";
-import { TournamentType } from "../tournaments/tournaments.d";
+import { TournamentType } from "../tournaments/tournaments.types";
 
 export class ApiSports {
 

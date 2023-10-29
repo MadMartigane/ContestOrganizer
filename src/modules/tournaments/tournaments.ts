@@ -1,8 +1,11 @@
 
-import { MatchStatus, Tournament, TournamentType, TournamentTypeLabel } from "./tournaments.d";
+import { MatchStatus, Tournament, TournamentType, TournamentTypeLabel } from "./tournaments.types";
 import { CACHE_KEY } from "./tournaments.constants";
 import uuid from "../uuid/uuid";
 import TeamRow from "../team-row/team-row";
+import { HttpRequest } from "../http-request/http-request";
+import { ProcedureContentStoredTournaments, ProcedureData } from "../procedure/procedure.types";
+import { Procedure } from "../procedure/procedure";
 
 export class Match {
   public readonly id: number;
@@ -25,8 +28,10 @@ class Tournaments {
   private readonly CACHE_KEY: typeof CACHE_KEY;
   private readonly uuid: typeof uuid;
   private readonly callbackCollector: Array<Function>;
+  private readonly httpRequest: HttpRequest;
 
   private tournaments: Array<Tournament>;
+  private isBusy: Promise<unknown> | null;
 
   public get length () {
     return this.tournaments.length;
@@ -36,26 +41,60 @@ class Tournaments {
     this.CACHE_KEY = CACHE_KEY;
     this.uuid = uuid;
     this.callbackCollector = [];
+    this.httpRequest = new HttpRequest();
 
     this.tournaments = [];
 
-    this.restore();
+    this.isBusy = this.restore()
+      .finally(() => { this.isBusy = null; });
   }
 
-  private restore (): void {
+  private async restore (): Promise<number> {
     const tournamentsString = localStorage.getItem(this.CACHE_KEY);
+    let localTournaments;
 
     if (tournamentsString) {
       try {
-        this.tournaments = JSON.parse(tournamentsString);
+        localTournaments = JSON.parse(tournamentsString);
       } catch (e) {
         console.warn("[Tournaments] Unable to parse stored tourmaments. Cleanning of cache. ", e);
         localStorage.removeItem(this.CACHE_KEY);
       }
     }
 
+    // TODO REMOVE THIS BACKWARD COMPATIBILITY
+    if (!localTournaments || Array.isArray(localTournaments)) {
+      localTournaments = { timestamp: 0, tournaments: localTournaments || [] };
+    }
+    // END OF TODO REMOVE THIS BACKWARD COMPATIBILITY
+
+    let backendTournaments = null as ProcedureContentStoredTournaments | null;
+    try {
+      backendTournaments = await this.getBackendTournaments();
+    } catch (e) {
+      console.warn("[Tournaments] Unable to fetch the tournaments from the backend.", e);
+    }
+
+    let mergedTournaments: Array<Tournament>;
+    if (backendTournaments) {
+
+      let recentTournaments: Array<Tournament>;
+      let oldestTournaments: Array<Tournament>;
+      if (localTournaments.timestamp > backendTournaments?.timestamp) {
+        recentTournaments = localTournaments.tourmaments;
+        oldestTournaments = backendTournaments?.tournaments;
+      } else {
+        recentTournaments = backendTournaments.tournaments;
+        oldestTournaments = localTournaments?.tournaments;
+      }
+
+      mergedTournaments = this.mergeTournaments(recentTournaments, oldestTournaments);
+    } else {
+      mergedTournaments = localTournaments.tourmaments;
+    }
+
     /* From stored data to instanciated object */
-    this.tournaments.forEach((t) => {
+    mergedTournaments.forEach((t) => {
       for (let i = 0, imax = t.grid.length; i < imax; i++) {
         const teamRow = new TeamRow({ id: t.grid[i].id, type: t.grid[i].type });
         teamRow.fromData(t.grid[i]);
@@ -64,10 +103,82 @@ class Tournaments {
 
       if (!t.matchs) { t.matchs = [] }
     });
+
+    this.tournaments = mergedTournaments;
+    return await this.store();
   }
 
-  private store () {
-    localStorage.setItem(this.CACHE_KEY, JSON.stringify(this.tournaments));
+  private mergeTournaments(primary: Array<Tournament>, secondary: Array<Tournament>): Array<Tournament> {
+    if (!primary || !primary.length) {
+      return (secondary && secondary.length) ? secondary : [];
+    }
+
+    const merged = [...primary] as Array<Tournament>;
+    secondary.forEach((tournamentTwo) => {
+      const tournamentOne = merged.find((candidate) => candidate.id === tournamentTwo.id);
+      if (!tournamentOne) {
+        // That mean the tournament has been deleted in the most recent (primary) tournament list
+        return;
+      }
+
+      // TODO REMOVE THIS BACKWARD COMPATIBILITY
+      if(!tournamentOne.timestamp) { tournamentOne.timestamp = Date.now()}
+      if(!tournamentTwo.timestamp) { tournamentTwo.timestamp = Date.now()}
+      // END OF TODO REMOVE THIS BACKWARD COMPATIBILITY
+
+      if (tournamentOne.timestamp < tournamentTwo.timestamp) {
+        tournamentOne.name = tournamentTwo.name;
+        tournamentOne.type = tournamentTwo.type;
+        tournamentOne.grid = tournamentTwo.grid;
+        tournamentOne.matchs = tournamentTwo.matchs;
+      }
+    });
+
+    return merged;
+  }
+
+  private async getBackendTournaments(): Promise<ProcedureContentStoredTournaments | null> {
+    const backendData = await this.httpRequest.load(
+      "https://marius.click/contest/api/index.php/list/tournaments"
+    ) as ProcedureData;
+
+    const procedure = new Procedure(backendData);
+    if (procedure.isError()) {
+      throw new Error(procedure.toString());
+    }
+
+    const procedureContent = procedure.getData() as ProcedureContentStoredTournaments;
+    if (
+      procedureContent &&
+      procedureContent.timestamp &&
+      Array.isArray(procedureContent.tournaments)
+    ) {
+      return procedureContent;
+    }
+
+    return null;
+  }
+
+  private async storeBackendTournaments(content: ProcedureContentStoredTournaments): Promise<void> {
+    const procedureData = await this.httpRequest.post(
+      "https://marius.click/contest/api/index.php/store/tournaments",
+      JSON.stringify(content)
+    ) as ProcedureData;
+
+    const procedure = new Procedure(procedureData);
+    if (procedure.isError()) {
+      throw new Error(procedure.toString());
+    }
+  }
+
+  private async store (): Promise<number>{
+    const content = { timestamp: Date.now(), tournaments: this.tournaments };
+    localStorage.setItem(this.CACHE_KEY, JSON.stringify(content));
+    try {
+      await this.storeBackendTournaments(content);
+    } catch (e) {
+      console.warn("[Tournaments] Unable to save the tournaments on the backend: ", e);
+    }
     this.throwOnUpdate();
     return this.tournaments.length;
   }
@@ -89,18 +200,18 @@ class Tournaments {
     });
   }
 
-  private updateScores(tournament: Tournament) {
+  private async updateScores(tournament: Tournament): Promise<void> {
     if (!tournament.matchs || tournament.matchs.length === 0) { return; }
 
     this.resetScores(tournament);
 
-    tournament.matchs.forEach((match) => {
+    tournament.matchs.forEach(async (match) => {
       if (match.status !== MatchStatus.DONE) { return; }
 
       const vScore = match.goals.visitor || 0;
       const hScore = match.goals.host || 0;
-      const host = this.getTournamentTeam(tournament, match.hostId);
-      const visitor = this.getTournamentTeam(tournament, match.visitorId);
+      const host = await this.getTournamentTeam(tournament, match.hostId);
+      const visitor = await this.getTournamentTeam(tournament, match.visitorId);
 
       if (host) {
         if (vScore === hScore) { host.points += 1; }
@@ -122,54 +233,71 @@ class Tournaments {
     })
   }
 
-  public getTournamentTeam(tournament: Tournament, teamId: number | null): TeamRow | null {
-    if (!teamId) { return null; }
+  public async getTournamentTeam(tournament: Tournament, teamId: number | null): Promise<TeamRow | null> {
+    if (!teamId) { return Promise.resolve(null); }
 
-    return tournament.grid.find((team) => team.id === teamId) || null;
+    const promise = this.isBusy || Promise.resolve();
+
+    return promise.then(() => tournament.grid.find((team) => team.id === teamId) || null);
   }
 
-  public remove(id: number): number {
-    this.tournaments = this.tournaments.filter((t) => t.id !== id);
-    return this.store();
+  public async remove(id: number): Promise<number> {
+    if (!id) { return Promise.reject(new Error("[Tournaments.remove()] Missing tournament id.")) }
+
+    const promise = this.isBusy || Promise.resolve();
+    return promise.then(() => {
+      this.tournaments = this.tournaments.filter((t) => t.id !== id);
+      return this.store();
+    });
   }
 
-  public add(arg: {
+  public async add(arg: {
     name: string,
     grid: Array<TeamRow>,
     matchs: Match[],
     type: TournamentType
-  }): number {
+  }): Promise<number> {
 
     const { name, grid, matchs, type } = arg;
+    const promise = this.isBusy || Promise.resolve();
 
-    this.tournaments.push({
-      id: this.uuid.new(),
-      name,
-      grid,
-      matchs,
-      type
+    return promise.then(() => {
+      this.tournaments.push({
+        id: this.uuid.new(),
+        name,
+        grid,
+        matchs,
+        type
+      });
+
+      return this.store();
     });
-
-    return this.store();
   }
 
-  public get(id: number | null): Tournament | null {
-    if (!id) { return null; }
+  public async get(id: number | null): Promise<Tournament | null> {
+    if (!id) { return Promise.resolve(null); }
 
-    return this.tournaments.find((t) => t.id === id) || null;
+    const promise = this.isBusy || Promise.resolve();
+
+    return promise.then(() => this.tournaments.find((t) => t.id === id) || null);
   }
 
-  public update (tournament: Tournament): number {
-    const i = this.tournaments.findIndex((t) => t.id === tournament.id);
+  public async update(tournament: Tournament): Promise<number> {
+    const promise = this.isBusy || Promise.resolve();
 
-    if (i === -1) {
-      console.warn("[Tournaments] Unable to update the tourmament #%s.", tournament.id);
-      return this.tournaments.length;
-    }
+    return promise.then(() => {
 
-    this.updateScores(tournament);
-    this.tournaments[i] = tournament;
-    return this.store();
+      const i = this.tournaments.findIndex((t) => t.id === tournament.id);
+
+      if (i === -1) {
+        console.warn("[Tournaments] Unable to update the tourmament #%s.", tournament.id);
+        return this.tournaments.length;
+      }
+
+      this.updateScores(tournament);
+      this.tournaments[i] = tournament;
+      return this.store();
+    });
   }
 
   public map (callback: Function): Array<any> {
