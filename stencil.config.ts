@@ -7,8 +7,8 @@ export const config: Config = {
   globalScript: 'src/global/app.ts',
   taskQueue: 'async',
   buildEs5: false,
-  enableCache: false,
-  sourceMap: false,
+  enableCache: true,
+  sourceMap: true,
   outputTargets: [
     {
       type: 'www',

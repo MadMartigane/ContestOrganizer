@@ -8,13 +8,13 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { InputChangeEventDetail } from "@ionic/core";
 import { TeamRow } from "./modules/team-row/team-row";
 import { GenericTeam } from "./modules/team-row/team-row.d";
-import { TournamentType } from "./modules/tournaments/tournaments.d";
+import { TournamentType } from "./modules/tournaments/tournaments.types";
 import { GenericTeam as GenericTeam1, TournamentType as TournamentType1 } from "./components.d";
 import { PageTeamSelectEventDatail } from "./components/page-team-select/page-team-select.d";
 export { InputChangeEventDetail } from "@ionic/core";
 export { TeamRow } from "./modules/team-row/team-row";
 export { GenericTeam } from "./modules/team-row/team-row.d";
-export { TournamentType } from "./modules/tournaments/tournaments.d";
+export { TournamentType } from "./modules/tournaments/tournaments.types";
 export { GenericTeam as GenericTeam1, TournamentType as TournamentType1 } from "./components.d";
 export { PageTeamSelectEventDatail } from "./components/page-team-select/page-team-select.d";
 export namespace Components {
@@ -33,8 +33,8 @@ export namespace Components {
         "value"?: number;
     }
     interface MadMatchTile {
-        "host": TeamRow | null;
-        "visitor": TeamRow | null;
+        "hostPending": Promise<TeamRow | null>;
+        "visitorPending": Promise<TeamRow | null>;
     }
     interface MadScorerBasket {
         "color": string;
@@ -192,8 +192,8 @@ declare namespace LocalJSX {
         "value"?: number;
     }
     interface MadMatchTile {
-        "host"?: TeamRow | null;
-        "visitor"?: TeamRow | null;
+        "hostPending"?: Promise<TeamRow | null>;
+        "visitorPending"?: Promise<TeamRow | null>;
     }
     interface MadScorerBasket {
         "color"?: string;

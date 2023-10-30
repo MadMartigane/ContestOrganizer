@@ -1,6 +1,6 @@
 import { GenericTeam, TeamRowProperties } from "./team-row.d";
 import uuid from "../uuid/uuid";
-import { TournamentType } from "../tournaments/tournaments.d";
+import { TournamentType } from "../tournaments/tournaments.types";
 
 
 export class TeamRow {

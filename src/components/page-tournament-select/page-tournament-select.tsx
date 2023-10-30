@@ -1,5 +1,5 @@
 import { Component, Fragment, h, State } from "@stencil/core";
-import { Tournament, TournamentType, TournamentTypeLabel } from "../../modules/tournaments/tournaments.d";
+import { Tournament, TournamentType, TournamentTypeLabel } from "../../modules/tournaments/tournaments.types";
 import tournaments from "../../modules/tournaments/tournaments";
 import uuid from "../../modules/uuid/uuid";
 import Utils from "../../modules/utils/utils";
@@ -46,15 +46,15 @@ export class PageTournamentSelect {
     event.preventDefault();
     event.stopPropagation();
 
-    const tournament = this.tournaments.get(id);
+    const tournament = await this.tournaments.get(id);
     const confirm = await Utils.confirmChoice(`Supprimer le tournoi: ${tournament?.name}?`);
     if (confirm) {
       this.removeTournament(id);
     }
   }
 
-  private removeTournament(id: number) {
-    this.numberOfTournaments = this.tournaments.remove(id);
+  private async removeTournament(id: number) {
+    this.numberOfTournaments = await this.tournaments.remove(id);
   }
 
   private async getNewTournamentNameValue(): Promise<string | null> {
@@ -75,7 +75,7 @@ export class PageTournamentSelect {
     const value = await this.getNewTournamentNameValue();
     if (!value) { return; }
 
-    this.numberOfTournaments = this.tournaments.add({
+    this.numberOfTournaments = await this.tournaments.add({
       name: value,
       grid: [],
       matchs: [],

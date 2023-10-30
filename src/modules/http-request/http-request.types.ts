@@ -18,4 +18,4 @@ export interface HttpHeader {
   value: string
 }
 
-
+export type HTTP_REQUEST_TYPE = "GET" | "POST";

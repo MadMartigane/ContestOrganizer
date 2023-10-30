@@ -1,4 +1,4 @@
-import { TournamentType } from "../tournaments/tournaments.d"
+import { TournamentType } from "../tournaments/tournaments.types"
 
 export type GenericTeamCountry = {
   id: number,

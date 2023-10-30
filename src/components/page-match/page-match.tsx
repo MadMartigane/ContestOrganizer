@@ -3,7 +3,7 @@ import { Component, h, Host, Prop, State } from "@stencil/core";
 import { TeamRow } from "../../modules/team-row/team-row";
 import tournaments from "../../modules/tournaments/tournaments";
 import { Match } from "../../modules/tournaments/tournaments";
-import { Tournament, MatchTeamType, MatchStatus, TournamentType } from "../../modules/tournaments/tournaments.d";
+import { Tournament, MatchTeamType, MatchStatus, TournamentType } from "../../modules/tournaments/tournaments.types";
 import Utils from "../../modules/utils/utils";
 import { MadInputNumberCustomEvent } from "../../components";
 
@@ -36,33 +36,37 @@ export class PageMatch {
   constructor() {
     this.tournaments = tournaments;
 
-    this.tournament = this.tournaments.get(this.tournamentId);
-
-    if (!this.tournament) {
-      this.uiError = `Tournois #${this.tournamentId} non trouvé.`;
-      return;
-    }
-
     this.uiError = null;
     this.displayTeamSelector = false;
     this.currentMatch = null;
+    this.config = {
+      minGoal: 0
+    };
+
+    this.initTournaments();
+  }
+
+  private async initTournaments(): Promise<number> {
+    this.tournament = await this.tournaments.get(this.tournamentId);
+
+    if (!this.tournament) {
+      this.uiError = `Tournois #${this.tournamentId} non trouvé.`;
+      return 0;
+    }
+ 
     this.teamToSelect = this.tournament.grid.map((team) => ({
       selected: false,
       team
     }));
 
-    this.config = {
-      minGoal: 0
-    };
-
     this.matchNumber = this.tournament.matchs.length;
-    this.updateTournament();
+    return this.updateTournament();
   }
 
-  updateTournament (): void {
-    if (!this.tournament) { return; }
+  async updateTournament (): Promise<number> {
+    if (!this.tournament) { return 0; }
 
-    this.tournaments.update(this.tournament);
+    return this.tournaments.update(this.tournament);
   }
 
   onTeamChange (detail: InputChangeEventDetail, team: TeamRow, key: string): void {
@@ -175,8 +179,8 @@ export class PageMatch {
     this.updateTournament();
   }
 
-  private getTeam(teamId: number | null): TeamRow | null {
-    if (!this.tournament) { return null; }
+  private async getTeam(teamId: number | null): Promise<TeamRow | null> {
+    if (!this.tournament) { return Promise.resolve(null); }
 
     return this.tournaments.getTournamentTeam(this.tournament, teamId);
   }
@@ -293,7 +297,7 @@ export class PageMatch {
                         }
                       </div>
 
-                      <mad-match-tile host={this.getTeam(match.hostId)} visitor={this.getTeam(match.visitorId)}></mad-match-tile>
+                      <mad-match-tile hostPending={this.getTeam(match.hostId)} visitorPending={this.getTeam(match.visitorId)}></mad-match-tile>
 
                       <ion-grid>
                         <ion-row class="ion-align-items-center">
@@ -310,7 +314,7 @@ export class PageMatch {
                                 min={this.config.minGoal} value={match.goals.host}></mad-scorer-basket>
                             }
                             
-                            {this.tournament?.type === TournamentType.FOOT &&
+                            {(this.tournament?.type === TournamentType.FOOT || !this.tournament?.type) &&
                               <mad-input-number color="primary" label="⚽️" class="ion-margin"
                                 readonly={match.status !== MatchStatus.DOING}
                                 onMadNumberChange={
@@ -427,8 +431,8 @@ export class PageMatch {
                 <div>
 
                   <h3>Équipes sélectionnées:</h3>
-                  <mad-match-tile host={this.getTeam(this.currentMatch?.hostId || null)}
-                    visitor={this.getTeam(this.currentMatch?.visitorId || null)}></mad-match-tile>
+                  <mad-match-tile hostPending={this.getTeam(this.currentMatch?.hostId || null)}
+                    visitorPending={this.getTeam(this.currentMatch?.visitorId || null)}></mad-match-tile>
 
                   <ion-grid class="page-match-grid">
                     <ion-row class="page-match-grid-header ion-align-items-center">

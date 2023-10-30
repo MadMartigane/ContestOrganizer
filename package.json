@@ -32,5 +32,9 @@
     "jest-cli": "^29.6.2",
     "puppeteer": "^21.0.1"
   },
+  "engines": {
+    "node": ">= 18.x",
+    "npm": ">= 8.x"
+  },
   "license": "MIT"
 }

@@ -3,7 +3,7 @@ import { Component, h, Host, Listen, Prop, State } from "@stencil/core";
 import { TeamRow } from "../../modules/team-row/team-row";
 import { MadInputNumberCustomEvent, MadSelectTeamCustomEvent } from "../../components";
 import tournaments from "../../modules/tournaments/tournaments";
-import { Tournament, TournamentType } from "../../modules/tournaments/tournaments.d";
+import { Tournament, TournamentType } from "../../modules/tournaments/tournaments.types";
 import Utils from "../../modules/utils/utils";
 import { GenericTeam } from "../../components.d";
 
@@ -52,26 +52,30 @@ export class PageTournament {
     }
     this.tournaments = tournaments;
 
-    this.tournament = this.tournaments.get(this.tournamentId);
-
-    if (!this.tournament) {
-      this.uiError = `Tournois #${this.tournamentId} non trouvé.`;
-      return;
-    }
     this.uiError = null;
     this.isEditTournamentName = false;
     this.inputNameId = "page-tournament-input-name-id";
     this.counter = 0;
 
-    this.teamNumber = this.tournament.grid.length || this.conf.teamNumberDefault;
-    this.updateTournament();
-
+    this.initTournaments();
   }
 
   @Listen("ionRouteDidChange", {
     target: "window"
   }) routerGoesHere() {
     this.updateTournament();
+  }
+
+  private async initTournaments(): Promise<number> {
+    this.tournament = await this.tournaments.get(this.tournamentId);
+
+    if (!this.tournament) {
+      this.uiError = `Tournois #${this.tournamentId} non trouvé.`;
+      return Promise.resolve(0);
+    }
+
+    this.teamNumber = this.tournament.grid.length || this.conf.teamNumberDefault;
+    return this.updateTournament();
   }
 
   onTeamNumberChange(detail?: InputChangeEventDetail): void {
@@ -81,8 +85,8 @@ export class PageTournament {
 
   getVirginTeamRow(type: TournamentType): TeamRow { return new TeamRow({ type }); }
 
-  updateTournament(): void {
-    if (!this.tournament) { return; }
+  private async updateTournament(): Promise<number> {
+    if (!this.tournament) { return Promise.resolve(0); }
 
     const oldGrid = this.tournament.grid;
     // Change ref to refresh UI
@@ -99,7 +103,7 @@ export class PageTournament {
     }
 
     this.counter = 0;
-    this.tournaments.update(this.tournament);
+    return this.tournaments.update(this.tournament);
   }
 
   onTeamTeamChange(detail: GenericTeam, team: TeamRow): void {

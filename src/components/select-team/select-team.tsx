@@ -12,7 +12,7 @@ import {
 } from "@stencil/core";
 import { PageTeamSelectEventDatail } from "../page-team-select/page-team-select.d";
 import uuid from "../../modules/uuid/uuid";
-import { TournamentType } from "../../modules/tournaments/tournaments.d";
+import { TournamentType } from "../../modules/tournaments/tournaments.types";
 import { GenericTeam } from "../../modules/team-row/team-row.d";
 
 @Component({

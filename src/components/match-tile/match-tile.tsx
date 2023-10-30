@@ -2,7 +2,8 @@ import {
   Component,
   Host,
   Prop,
-  h
+  h,
+  State
 } from '@stencil/core';
 import { TeamRow } from "../../modules/team-row/team-row";
 
@@ -13,21 +14,35 @@ import { TeamRow } from "../../modules/team-row/team-row";
 })
 export class MadMatchTile {
 
-  @Prop() host: TeamRow | null;
-  @Prop() visitor: TeamRow | null;
+  @State() host: TeamRow | null;
+  @State() visitor: TeamRow | null;
+
+  @Prop() hostPending: Promise<TeamRow | null>;
+  @Prop() visitorPending: Promise<TeamRow | null>;
+
+  constructor() {
+    this.hostPending.then((team: TeamRow | null) => { this.host = team; })
+    this.visitorPending.then((team: TeamRow | null) => { this.visitor = team; })
+  }
 
   render() {
     return (
       <Host>
         <ion-row class="ion-align-items-center">
           <ion-col size="5">
-            <mad-team-tile reverse={true} team={this.host?.team}></mad-team-tile>
+            {this.host ?
+              <mad-team-tile reverse={true} team={this.host?.team}></mad-team-tile> :
+              <span>loading…</span>
+            }
           </ion-col>
           <ion-col size="2">
             <p> VS </p>
           </ion-col>
           <ion-col size="5">
-            <mad-team-tile team={this.visitor?.team}></mad-team-tile>
+            {this.visitor ?
+              <mad-team-tile team={this.visitor?.team}></mad-team-tile> :
+              <span>loading…</span>
+            }
           </ion-col>
         </ion-row>
       </Host>
