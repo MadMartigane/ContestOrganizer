@@ -53,7 +53,7 @@ export class PageMatch {
       this.uiError = `Tournois #${this.tournamentId} non trouvé.`;
       return 0;
     }
- 
+
     this.teamToSelect = this.tournament.grid.map((team) => ({
       selected: false,
       team
