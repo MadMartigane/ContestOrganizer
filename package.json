@@ -24,7 +24,10 @@
     "prod-update-paths": "npm run setSrcBasePath && npm run setHrefBasePath",
     "prod": "npm run backup && npm run build && npm run prod-only",
     "prod-only": "npm run build && npm run prod-clean && npm run prod-push && npm run prod-update-paths && npm run restore-api",
-    "restore-api": "cp -r /var/www/marius.click/html/contest2/api /var/www/marius.click/html/contest/api",
+    "restore-api-files": "cp -r /var/www/marius.click/html/contest2/api /var/www/marius.click/html/contest/api",
+    "restore-api-group": "chown -R fedora:nginx /var/www/marius.click/html/contest/api/data",
+    "restore-api-rights-grw": "chmod -R g+rw /var/www/marius.click/html/contest/api/data/*",
+    "restore-api": "npm run restore-api-files && npm run restore-api-group && npm run restore-api-rights-grw",
     "generate": "stencil generate"
   },
   "devDependencies": {
