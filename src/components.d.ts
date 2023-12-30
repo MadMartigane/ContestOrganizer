@@ -5,22 +5,25 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+import { Tournament, TournamentType, TournamentUpdateEvent } from "./modules/tournaments/tournaments.types";
 import { InputChangeEventDetail } from "@ionic/core";
 import { TeamRow } from "./modules/team-row/team-row";
 import { GenericTeam } from "./modules/team-row/team-row.d";
-import { TournamentType } from "./modules/tournaments/tournaments.types";
 import { GenericTeam as GenericTeam1, TournamentType as TournamentType1 } from "./components.d";
 import { PageTeamSelectEventDatail } from "./components/page-team-select/page-team-select.d";
+export { Tournament, TournamentType, TournamentUpdateEvent } from "./modules/tournaments/tournaments.types";
 export { InputChangeEventDetail } from "@ionic/core";
 export { TeamRow } from "./modules/team-row/team-row";
 export { GenericTeam } from "./modules/team-row/team-row.d";
-export { TournamentType } from "./modules/tournaments/tournaments.types";
 export { GenericTeam as GenericTeam1, TournamentType as TournamentType1 } from "./components.d";
 export { PageTeamSelectEventDatail } from "./components/page-team-select/page-team-select.d";
 export namespace Components {
     interface AppRoot {
     }
     interface AppTabs {
+    }
+    interface GridDefault {
+        "tournament": Tournament | null;
     }
     interface MadInputNumber {
         "color": string;
@@ -71,6 +74,10 @@ export namespace Components {
     interface PageTournamentSelect {
     }
 }
+export interface GridDefaultCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLGridDefaultElement;
+}
 export interface MadInputNumberCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLMadInputNumberElement;
@@ -99,6 +106,12 @@ declare global {
     var HTMLAppTabsElement: {
         prototype: HTMLAppTabsElement;
         new (): HTMLAppTabsElement;
+    };
+    interface HTMLGridDefaultElement extends Components.GridDefault, HTMLStencilElement {
+    }
+    var HTMLGridDefaultElement: {
+        prototype: HTMLGridDefaultElement;
+        new (): HTMLGridDefaultElement;
     };
     interface HTMLMadInputNumberElement extends Components.MadInputNumber, HTMLStencilElement {
     }
@@ -163,6 +176,7 @@ declare global {
     interface HTMLElementTagNameMap {
         "app-root": HTMLAppRootElement;
         "app-tabs": HTMLAppTabsElement;
+        "grid-default": HTMLGridDefaultElement;
         "mad-input-number": HTMLMadInputNumberElement;
         "mad-match-tile": HTMLMadMatchTileElement;
         "mad-scorer-basket": HTMLMadScorerBasketElement;
@@ -179,6 +193,10 @@ declare namespace LocalJSX {
     interface AppRoot {
     }
     interface AppTabs {
+    }
+    interface GridDefault {
+        "onGridTournamentChange"?: (event: GridDefaultCustomEvent<TournamentUpdateEvent>) => void;
+        "tournament"?: Tournament | null;
     }
     interface MadInputNumber {
         "color"?: string;
@@ -235,6 +253,7 @@ declare namespace LocalJSX {
     interface IntrinsicElements {
         "app-root": AppRoot;
         "app-tabs": AppTabs;
+        "grid-default": GridDefault;
         "mad-input-number": MadInputNumber;
         "mad-match-tile": MadMatchTile;
         "mad-scorer-basket": MadScorerBasket;
@@ -253,6 +272,7 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "app-root": LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
             "app-tabs": LocalJSX.AppTabs & JSXBase.HTMLAttributes<HTMLAppTabsElement>;
+            "grid-default": LocalJSX.GridDefault & JSXBase.HTMLAttributes<HTMLGridDefaultElement>;
             "mad-input-number": LocalJSX.MadInputNumber & JSXBase.HTMLAttributes<HTMLMadInputNumberElement>;
             "mad-match-tile": LocalJSX.MadMatchTile & JSXBase.HTMLAttributes<HTMLMadMatchTileElement>;
             "mad-scorer-basket": LocalJSX.MadScorerBasket & JSXBase.HTMLAttributes<HTMLMadScorerBasketElement>;

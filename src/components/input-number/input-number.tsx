@@ -1,22 +1,11 @@
-import {
-  InputChangeEventDetail
-} from "@ionic/core";
-import {
-  Component,
-  Event,
-  EventEmitter,
-  Host,
-  Prop,
-  h,
-  State,
-  Watch
-} from "@stencil/core";
-import uuid from "../../modules/uuid/uuid";
+import { InputChangeEventDetail } from '@ionic/core';
+import { Component, Event, EventEmitter, Host, Prop, h, State, Watch } from '@stencil/core';
+import uuid from '../../modules/uuid/uuid';
 
 @Component({
-  tag: "mad-input-number",
-  styleUrl: "./input-number.css",
-  shadow: false
+  tag: 'mad-input-number',
+  styleUrl: './input-number.css',
+  shadow: false,
 })
 export class MadInputNumber {
   private argColor: string;
@@ -37,13 +26,13 @@ export class MadInputNumber {
   @Event() madNumberChange: EventEmitter<InputChangeEventDetail>;
 
   constructor() {
-    this.argColor = this.color || "primary";
+    this.argColor = this.color || 'primary';
     this.number = this.value || this.min || 0;
     this.itemId = `mad_input_number_${uuid.new()}`;
     this.innerStep = this.step || 1;
   }
 
-  @Watch("value")
+  @Watch('value')
   public onPropValueChange() {
     this.number = this.value || 0;
   }
@@ -71,61 +60,44 @@ export class MadInputNumber {
   render() {
     return (
       <Host>
-        <span id={this.itemId} class={{
-          "pointer": !this.readonly
-        }}>
-          {this.label ?
-            <span>{this.label}: </span> :
-            null
-          }
-          {this.value !== undefined ?
-            <span class={this.argColor}>{this.number}</span> :
-            <span class="placeholder">{this.placeholder}</span>
-          }
+        <span
+          id={this.itemId}
+          class={{
+            pointer: !this.readonly,
+          }}
+        >
+          {this.label ? <span>{this.label}: </span> : null}
+          {this.value !== undefined ? <span class={this.argColor}>{this.number}</span> : <span class="placeholder">{this.placeholder}</span>}
         </span>
-        {this.readonly ?
-          null :
-          <ion-popover
-            mode="ios"
-            size="auto"
-            alignment="center"
-            animated="true"
-            arrow="true"
-            trigger={this.itemId}
-            trigger-action="click">
+        {this.readonly ? null : (
+          <ion-popover mode="ios" size="auto" alignment="center" animated="true" arrow="true" trigger={this.itemId} trigger-action="click">
             <ion-content class="ion-padding">
               <div class="box">
                 <ion-button
                   color="warning"
-                  onclick={() => { this.onDecrementNumber() }}
-                  size="small">
-                  <ion-icon
-                    slod="icon-only"
-                    size="large"
-                    color="primary"
-                    name="remove-outline"
-                  ></ion-icon>
+                  onclick={() => {
+                    this.onDecrementNumber();
+                  }}
+                  size="small"
+                >
+                  <ion-icon slod="icon-only" size="large" color="primary" name="remove-outline"></ion-icon>
                 </ion-button>
-                <ion-chip
-                  outline="true"
-                  color={this.color}
-                >{this.number}
+                <ion-chip outline="true" color={this.color}>
+                  {this.number}
                 </ion-chip>
                 <ion-button
                   color="warning"
-                  onclick={() => { this.onIncrementNumber() }}
-                  size="small">
-                  <ion-icon
-                    slod="icon-only"
-                    size="large"
-                    color="primary"
-                    name="add-outline"
-                  ></ion-icon>
+                  onclick={() => {
+                    this.onIncrementNumber();
+                  }}
+                  size="small"
+                >
+                  <ion-icon slod="icon-only" size="large" color="primary" name="add-outline"></ion-icon>
                 </ion-button>
               </div>
             </ion-content>
           </ion-popover>
-        }
+        )}
       </Host>
     );
   }
