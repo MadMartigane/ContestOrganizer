@@ -5,13 +5,13 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { Tournament, TournamentType, TournamentUpdateEvent } from "./modules/tournaments/tournaments.types";
+import { TournamentType, TournamentUpdateEvent } from "./modules/tournaments/tournaments.types";
 import { InputChangeEventDetail } from "@ionic/core";
 import { TeamRow } from "./modules/team-row/team-row";
 import { GenericTeam } from "./modules/team-row/team-row.d";
 import { GenericTeam as GenericTeam1, TournamentType as TournamentType1 } from "./components.d";
 import { PageTeamSelectEventDatail } from "./components/page-team-select/page-team-select.d";
-export { Tournament, TournamentType, TournamentUpdateEvent } from "./modules/tournaments/tournaments.types";
+export { TournamentType, TournamentUpdateEvent } from "./modules/tournaments/tournaments.types";
 export { InputChangeEventDetail } from "@ionic/core";
 export { TeamRow } from "./modules/team-row/team-row";
 export { GenericTeam } from "./modules/team-row/team-row.d";
@@ -23,7 +23,7 @@ export namespace Components {
     interface AppTabs {
     }
     interface GridDefault {
-        "tournament": Tournament | null;
+        "tournamentId": number | null;
     }
     interface MadInputNumber {
         "color": string;
@@ -196,7 +196,7 @@ declare namespace LocalJSX {
     }
     interface GridDefault {
         "onGridTournamentChange"?: (event: GridDefaultCustomEvent<TournamentUpdateEvent>) => void;
-        "tournament"?: Tournament | null;
+        "tournamentId"?: number | null;
     }
     interface MadInputNumber {
         "color"?: string;

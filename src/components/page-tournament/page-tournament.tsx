@@ -86,9 +86,9 @@ export class PageTournament {
     return new TeamRow({ type });
   }
 
-  private async updateTournament(updatedTournament?: Tournament): Promise<number> {
-    if (updatedTournament) {
-      this.tournament = updatedTournament;
+  private async updateTournament(tournamentId?: number): Promise<number> {
+    if (tournamentId) {
+      this.tournament = await this.tournaments.get(tournamentId);
     }
 
     if (!this.tournament) {
@@ -100,7 +100,7 @@ export class PageTournament {
     this.tournament = {
       id: this.tournament.id,
       name: this.tournament.name,
-      grid: [],
+      grid: [] as Array<TeamRow>,
       matchs: this.tournament.matchs,
       type: this.tournament.type,
     };
@@ -291,9 +291,9 @@ export class PageTournament {
               {this.teamNumber > 0 ? (
                 <div>
                   <grid-default
-                    tournament={this.tournament}
+                    tournamentId={this.tournament?.id}
                     onGridTournamentChange={ev => {
-                      this.updateTournament(ev.detail.tournament);
+                      this.updateTournament(ev.detail.tournamentId);
                     }}
                   ></grid-default>
                   <ion-button expand="full" color="primary" class="ion-margin-vertical" onClick={() => this.goRanking()}>

@@ -38,5 +38,5 @@ export const enum TournamentTypeLabel {
 }
 
 export type TournamentUpdateEvent = {
-  tournament: Tournament;
+  tournamentId: number;
 };

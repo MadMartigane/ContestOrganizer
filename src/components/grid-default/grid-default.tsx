@@ -2,10 +2,11 @@ import { InputChangeEventDetail } from '@ionic/core';
 import { Component, Event, EventEmitter, h, Host, Prop, State } from '@stencil/core';
 import { TeamRow } from '../../modules/team-row/team-row';
 import { MadInputNumberCustomEvent, MadSelectTeamCustomEvent } from '../../components';
-import { Tournament, TournamentType, TournamentUpdateEvent } from '../../modules/tournaments/tournaments.types';
+import { Tournament, TournamentUpdateEvent } from '../../modules/tournaments/tournaments.types';
+import tournaments from '../../modules/tournaments/tournaments';
 import { GenericTeam } from '../../components.d';
 
-export interface PageConfConstants {
+export interface GridConfConstants {
   teamNumberMax: number;
   teamNumberMin: number;
   teamNumberDefault: number;
@@ -22,13 +23,14 @@ export interface PageConfConstants {
   shadow: false,
 })
 export class GridDefault {
-  private readonly conf: PageConfConstants;
+  private readonly conf: GridConfConstants;
+  private readonly tournaments: typeof tournaments;
 
   private counter: number;
 
-  @Prop() public tournament: Tournament | null;
+  @State() private tournament: Tournament | null;
 
-  @State() private teamNumber: number;
+  @Prop() public tournamentId: number | null;
 
   @Event() gridTournamentChange: EventEmitter<TournamentUpdateEvent>;
 
@@ -44,35 +46,27 @@ export class GridDefault {
       inputDebounce: 300,
     };
 
-    this.counter = 0;
+    this.tournaments = tournaments;
+
+    this.forceGridRender();
+    this.tournaments.onUpdate(() => this.onExternalTournamentUpdate());
   }
 
-  getVirginTeamRow(type: TournamentType): TeamRow {
-    return new TeamRow({ type });
+  private async forceGridRender() {
+    this.tournament = null;
+    this.counter = 0;
+
+    this.tournament = await this.tournaments.get(this.tournamentId);
+  }
+
+  private onExternalTournamentUpdate() {
+    this.forceGridRender();
   }
 
   private updateTournament(): void {
-    if (!this.tournament) {
-      return;
+    if (this.tournament) {
+      this.gridTournamentChange.emit({ tournamentId: this.tournament.id });
     }
-
-    const oldGrid = this.tournament.grid;
-    // Change ref to refresh UI
-    this.tournament = {
-      id: this.tournament.id,
-      name: this.tournament.name,
-      grid: [],
-      matchs: this.tournament.matchs,
-      type: this.tournament.type,
-    };
-
-    for (let i = 0; i < this.teamNumber; i++) {
-      this.tournament.grid[i] = oldGrid[i] || this.getVirginTeamRow(this.tournament.type);
-    }
-
-    this.counter = 0;
-
-    this.gridTournamentChange.emit({ tournament: this.tournament });
   }
 
   onTeamTeamChange(detail: GenericTeam, team: TeamRow): void {
