@@ -28,8 +28,6 @@ export class PageTournament {
   private readonly conf: PageConfConstants;
   private readonly inputNameId: string;
 
-  private counter: number;
-
   @Prop() public tournamentId: number;
 
   @State() private tournament: Tournament | null;
@@ -53,7 +51,6 @@ export class PageTournament {
     this.uiError = null;
     this.isEditTournamentName = false;
     this.inputNameId = 'page-tournament-input-name-id';
-    this.counter = 0;
 
     this.initTournaments();
   }
@@ -109,8 +106,6 @@ export class PageTournament {
       this.tournament.grid[i] = oldGrid[i] || this.getVirginTeamRow(this.tournament.type);
     }
 
-    this.counter = 0;
-    console.log(this.counter);
     return this.tournaments.update(this.tournament);
   }
 
