@@ -8,11 +8,11 @@ import { GenericTeam } from '../../components.d';
 import { GridConfConstants } from '../../modules/grid-common/grid-common.types';
 
 @Component({
-  tag: 'grid-default',
-  styleUrl: 'grid-default.css',
+  tag: 'grid-basket',
+  styleUrl: 'grid-basket.css',
   shadow: false,
 })
-export class GridDefault {
+export class GridBasket {
   private readonly conf: GridConfConstants;
   private readonly tournaments: typeof tournaments;
 
