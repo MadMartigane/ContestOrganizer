@@ -22,6 +22,9 @@ export namespace Components {
     }
     interface AppTabs {
     }
+    interface GridBasket {
+        "tournamentId": number | null;
+    }
     interface GridDefault {
         "tournamentId": number | null;
     }
@@ -74,6 +77,10 @@ export namespace Components {
     interface PageTournamentSelect {
     }
 }
+export interface GridBasketCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLGridBasketElement;
+}
 export interface GridDefaultCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLGridDefaultElement;
@@ -106,6 +113,12 @@ declare global {
     var HTMLAppTabsElement: {
         prototype: HTMLAppTabsElement;
         new (): HTMLAppTabsElement;
+    };
+    interface HTMLGridBasketElement extends Components.GridBasket, HTMLStencilElement {
+    }
+    var HTMLGridBasketElement: {
+        prototype: HTMLGridBasketElement;
+        new (): HTMLGridBasketElement;
     };
     interface HTMLGridDefaultElement extends Components.GridDefault, HTMLStencilElement {
     }
@@ -176,6 +189,7 @@ declare global {
     interface HTMLElementTagNameMap {
         "app-root": HTMLAppRootElement;
         "app-tabs": HTMLAppTabsElement;
+        "grid-basket": HTMLGridBasketElement;
         "grid-default": HTMLGridDefaultElement;
         "mad-input-number": HTMLMadInputNumberElement;
         "mad-match-tile": HTMLMadMatchTileElement;
@@ -193,6 +207,10 @@ declare namespace LocalJSX {
     interface AppRoot {
     }
     interface AppTabs {
+    }
+    interface GridBasket {
+        "onGridTournamentChange"?: (event: GridBasketCustomEvent<TournamentUpdateEvent>) => void;
+        "tournamentId"?: number | null;
     }
     interface GridDefault {
         "onGridTournamentChange"?: (event: GridDefaultCustomEvent<TournamentUpdateEvent>) => void;
@@ -253,6 +271,7 @@ declare namespace LocalJSX {
     interface IntrinsicElements {
         "app-root": AppRoot;
         "app-tabs": AppTabs;
+        "grid-basket": GridBasket;
         "grid-default": GridDefault;
         "mad-input-number": MadInputNumber;
         "mad-match-tile": MadMatchTile;
@@ -272,6 +291,7 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "app-root": LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
             "app-tabs": LocalJSX.AppTabs & JSXBase.HTMLAttributes<HTMLAppTabsElement>;
+            "grid-basket": LocalJSX.GridBasket & JSXBase.HTMLAttributes<HTMLGridBasketElement>;
             "grid-default": LocalJSX.GridDefault & JSXBase.HTMLAttributes<HTMLGridDefaultElement>;
             "mad-input-number": LocalJSX.MadInputNumber & JSXBase.HTMLAttributes<HTMLMadInputNumberElement>;
             "mad-match-tile": LocalJSX.MadMatchTile & JSXBase.HTMLAttributes<HTMLMadMatchTileElement>;

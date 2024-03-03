@@ -181,6 +181,28 @@ export class PageTournament {
     this.updateTournament();
   }
 
+  private renderGrid() {
+    if (this.tournament?.type === TournamentType.NBA || this.tournament?.type === TournamentType.BASKET) {
+      return (
+        <grid-basket
+          tournamentId={this.tournament?.id}
+          onGridTournamentChange={ev => {
+            this.updateTournament(ev.detail.tournamentId);
+          }}
+        ></grid-basket>
+      );
+    }
+
+    return (
+      <grid-default
+        tournamentId={this.tournament?.id}
+        onGridTournamentChange={ev => {
+          this.updateTournament(ev.detail.tournamentId);
+        }}
+      ></grid-default>
+    );
+  }
+
   render() {
     return (
       <Host>
@@ -285,12 +307,7 @@ export class PageTournament {
 
               {this.teamNumber > 0 ? (
                 <div>
-                  <grid-default
-                    tournamentId={this.tournament?.id}
-                    onGridTournamentChange={ev => {
-                      this.updateTournament(ev.detail.tournamentId);
-                    }}
-                  ></grid-default>
+                  {this.renderGrid()}
                   <ion-button expand="full" color="primary" class="ion-margin-vertical" onClick={() => this.goRanking()}>
                     <ion-icon name="car-sport-outline" size-xs="normal" size="large"></ion-icon>
                     <ion-text class="ion-margin">Classement !</ion-text>
