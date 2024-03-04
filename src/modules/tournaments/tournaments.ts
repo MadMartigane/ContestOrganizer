@@ -1,17 +1,16 @@
-
-import { MatchStatus, Tournament, TournamentType, TournamentTypeLabel } from "./tournaments.types";
-import { CACHE_KEY } from "./tournaments.constants";
-import uuid from "../uuid/uuid";
-import TeamRow from "../team-row/team-row";
-import { HttpRequest } from "../http-request/http-request";
-import { ProcedureContentStoredTournaments, ProcedureData } from "../procedure/procedure.types";
-import { Procedure } from "../procedure/procedure";
+import { MatchStatus, Tournament, TournamentType, TournamentTypeLabel } from './tournaments.types';
+import { CACHE_KEY } from './tournaments.constants';
+import uuid from '../uuid/uuid';
+import TeamRow from '../team-row/team-row';
+import { HttpRequest } from '../http-request/http-request';
+import { ProcedureContentStoredTournaments, ProcedureData } from '../procedure/procedure.types';
+import { Procedure } from '../procedure/procedure';
 
 export class Match {
   public readonly id: number;
   public hostId: number | null;
   public visitorId: number | null;
-  public goals: { visitor: number, host: number };
+  public goals: { visitor: number; host: number };
   public status: MatchStatus;
 
   constructor(host = null, visitor = null, status = null) {
@@ -24,7 +23,6 @@ export class Match {
 }
 
 class Tournaments {
-
   private readonly CACHE_KEY: typeof CACHE_KEY;
   private readonly uuid: typeof uuid;
   private readonly callbackCollector: Array<Function>;
@@ -33,11 +31,11 @@ class Tournaments {
   private tournaments: Array<Tournament>;
   private isBusy: Promise<unknown> | null;
 
-  public get length () {
+  public get length() {
     return this.tournaments.length;
   }
 
-  constructor () {
+  constructor() {
     this.CACHE_KEY = CACHE_KEY;
     this.uuid = uuid;
     this.callbackCollector = [];
@@ -45,11 +43,12 @@ class Tournaments {
 
     this.tournaments = [];
 
-    this.isBusy = this.restore()
-      .finally(() => { this.isBusy = null; });
+    this.isBusy = this.restore().finally(() => {
+      this.isBusy = null;
+    });
   }
 
-  private async restore (): Promise<number> {
+  private async restore(): Promise<number> {
     const tournamentsString = localStorage.getItem(this.CACHE_KEY);
     let localTournaments;
 
@@ -57,27 +56,20 @@ class Tournaments {
       try {
         localTournaments = JSON.parse(tournamentsString);
       } catch (e) {
-        console.warn("[Tournaments] Unable to parse stored tourmaments. Cleanning of cache. ", e);
+        console.warn('[Tournaments] Unable to parse stored tourmaments. Cleanning of cache. ', e);
         localStorage.removeItem(this.CACHE_KEY);
       }
     }
-
-    // TODO REMOVE THIS BACKWARD COMPATIBILITY
-    if (!localTournaments || Array.isArray(localTournaments)) {
-      localTournaments = { timestamp: 0, tournaments: localTournaments || [] };
-    }
-    // END OF TODO REMOVE THIS BACKWARD COMPATIBILITY
 
     let backendTournaments = null as ProcedureContentStoredTournaments | null;
     try {
       backendTournaments = await this.getBackendTournaments();
     } catch (e) {
-      console.warn("[Tournaments] Unable to fetch the tournaments from the backend.", e);
+      console.warn('[Tournaments] Unable to fetch the tournaments from the backend.', e);
     }
 
     let mergedTournaments: Array<Tournament>;
     if (backendTournaments) {
-
       let recentTournaments: Array<Tournament>;
       let oldestTournaments: Array<Tournament>;
       if (localTournaments.timestamp > backendTournaments?.timestamp) {
@@ -94,14 +86,16 @@ class Tournaments {
     }
 
     /* From stored data to instanciated object */
-    mergedTournaments.forEach((t) => {
+    mergedTournaments.forEach(t => {
       for (let i = 0, imax = t.grid.length; i < imax; i++) {
         const teamRow = new TeamRow({ id: t.grid[i].id, type: t.grid[i].type });
         teamRow.fromData(t.grid[i]);
         t.grid[i] = teamRow;
       }
 
-      if (!t.matchs) { t.matchs = [] }
+      if (!t.matchs) {
+        t.matchs = [];
+      }
     });
 
     this.tournaments = mergedTournaments;
@@ -110,21 +104,23 @@ class Tournaments {
 
   private mergeTournaments(primary: Array<Tournament>, secondary: Array<Tournament>): Array<Tournament> {
     if (!primary || !primary.length) {
-      return (secondary && secondary.length) ? secondary : [];
+      return secondary && secondary.length ? secondary : [];
     }
 
     const merged = [...primary] as Array<Tournament>;
-    secondary.forEach((tournamentTwo) => {
-      const tournamentOne = merged.find((candidate) => candidate.id === tournamentTwo.id);
+    secondary.forEach(tournamentTwo => {
+      const tournamentOne = merged.find(candidate => candidate.id === tournamentTwo.id);
       if (!tournamentOne) {
         // That mean the tournament has been deleted in the most recent (primary) tournament list
         return;
       }
 
-      // TODO REMOVE THIS BACKWARD COMPATIBILITY
-      if(!tournamentOne.timestamp) { tournamentOne.timestamp = Date.now()}
-      if(!tournamentTwo.timestamp) { tournamentTwo.timestamp = Date.now()}
-      // END OF TODO REMOVE THIS BACKWARD COMPATIBILITY
+      if (!tournamentOne.timestamp) {
+        tournamentOne.timestamp = Date.now();
+      }
+      if (!tournamentTwo.timestamp) {
+        tournamentTwo.timestamp = Date.now();
+      }
 
       if (tournamentOne.timestamp < tournamentTwo.timestamp) {
         tournamentOne.name = tournamentTwo.name;
@@ -138,9 +134,7 @@ class Tournaments {
   }
 
   private async getBackendTournaments(): Promise<ProcedureContentStoredTournaments | null> {
-    const backendData = await this.httpRequest.load(
-      "https://marius.click/contest/api/index.php/list/tournaments"
-    ) as ProcedureData;
+    const backendData = (await this.httpRequest.load('https://marius.click/contest/api/index.php/list/tournaments')) as ProcedureData;
 
     const procedure = new Procedure(backendData);
     if (procedure.isError()) {
@@ -148,11 +142,7 @@ class Tournaments {
     }
 
     const procedureContent = procedure.getData() as ProcedureContentStoredTournaments;
-    if (
-      procedureContent &&
-      procedureContent.timestamp &&
-      Array.isArray(procedureContent.tournaments)
-    ) {
+    if (procedureContent && procedureContent.timestamp && Array.isArray(procedureContent.tournaments)) {
       return procedureContent;
     }
 
@@ -160,10 +150,7 @@ class Tournaments {
   }
 
   private async storeBackendTournaments(content: ProcedureContentStoredTournaments): Promise<void> {
-    const procedureData = await this.httpRequest.post(
-      "https://marius.click/contest/api/index.php/store/tournaments",
-      JSON.stringify(content)
-    ) as ProcedureData;
+    const procedureData = (await this.httpRequest.post('https://marius.click/contest/api/index.php/store/tournaments', JSON.stringify(content))) as ProcedureData;
 
     const procedure = new Procedure(procedureData);
     if (procedure.isError()) {
@@ -171,28 +158,32 @@ class Tournaments {
     }
   }
 
-  private async store (): Promise<number>{
+  private async store(): Promise<number> {
     const content = { timestamp: Date.now(), tournaments: this.tournaments };
+
     localStorage.setItem(this.CACHE_KEY, JSON.stringify(content));
+
+    this.throwOnUpdate();
+
     try {
       await this.storeBackendTournaments(content);
     } catch (e) {
-      console.warn("[Tournaments] Unable to save the tournaments on the backend: ", e);
+      console.warn('[Tournaments] Unable to save the tournaments on the backend: ', e);
     }
-    this.throwOnUpdate();
+
     return this.tournaments.length;
   }
 
-  private throwOnUpdate () {
-    this.callbackCollector.forEach((callback) => {
+  private throwOnUpdate() {
+    this.callbackCollector.forEach(callback => {
       setTimeout(() => {
-          callback();
+        callback();
       });
     });
   }
 
   private resetScores(tournament: Tournament) {
-    tournament.grid.forEach((team) => {
+    tournament.grid.forEach(team => {
       team.concededGoals = 0;
       team.scoredGoals = 0;
       team.goalAverage = 0;
@@ -201,12 +192,16 @@ class Tournaments {
   }
 
   private async updateScores(tournament: Tournament): Promise<void> {
-    if (!tournament.matchs || tournament.matchs.length === 0) { return; }
+    if (!tournament.matchs || tournament.matchs.length === 0) {
+      return;
+    }
 
     this.resetScores(tournament);
 
-    tournament.matchs.forEach(async (match) => {
-      if (match.status !== MatchStatus.DONE) { return; }
+    tournament.matchs.forEach(async match => {
+      if (match.status !== MatchStatus.DONE) {
+        return;
+      }
 
       const vScore = match.goals.visitor || 0;
       const hScore = match.goals.host || 0;
@@ -214,8 +209,12 @@ class Tournaments {
       const visitor = await this.getTournamentTeam(tournament, match.visitorId);
 
       if (host) {
-        if (vScore === hScore) { host.points += 1; }
-        if (hScore > vScore) { host.points += 3; }
+        if (vScore === hScore) {
+          host.points += 1;
+        }
+        if (hScore > vScore) {
+          host.points += 3;
+        }
 
         host.scoredGoals += hScore;
         host.concededGoals += vScore;
@@ -223,41 +222,43 @@ class Tournaments {
       }
 
       if (visitor) {
-        if (vScore === hScore) { visitor.points += 1; }
-        if (vScore > hScore) { visitor.points += 3; }
+        if (vScore === hScore) {
+          visitor.points += 1;
+        }
+        if (vScore > hScore) {
+          visitor.points += 3;
+        }
 
         visitor.scoredGoals += vScore;
         visitor.concededGoals += hScore;
         visitor.goalAverage = visitor.scoredGoals - visitor.concededGoals;
       }
-    })
+    });
   }
 
   public async getTournamentTeam(tournament: Tournament, teamId: number | null): Promise<TeamRow | null> {
-    if (!teamId) { return Promise.resolve(null); }
+    if (!teamId) {
+      return Promise.resolve(null);
+    }
 
     const promise = this.isBusy || Promise.resolve();
 
-    return promise.then(() => tournament.grid.find((team) => team.id === teamId) || null);
+    return promise.then(() => tournament.grid.find(team => team.id === teamId) || null);
   }
 
   public async remove(id: number): Promise<number> {
-    if (!id) { return Promise.reject(new Error("[Tournaments.remove()] Missing tournament id.")) }
+    if (!id) {
+      return Promise.reject(new Error('[Tournaments.remove()] Missing tournament id.'));
+    }
 
     const promise = this.isBusy || Promise.resolve();
     return promise.then(() => {
-      this.tournaments = this.tournaments.filter((t) => t.id !== id);
+      this.tournaments = this.tournaments.filter(t => t.id !== id);
       return this.store();
     });
   }
 
-  public async add(arg: {
-    name: string,
-    grid: Array<TeamRow>,
-    matchs: Match[],
-    type: TournamentType
-  }): Promise<number> {
-
+  public async add(arg: { name: string; grid: Array<TeamRow>; matchs: Match[]; type: TournamentType }): Promise<number> {
     const { name, grid, matchs, type } = arg;
     const promise = this.isBusy || Promise.resolve();
 
@@ -267,7 +268,7 @@ class Tournaments {
         name,
         grid,
         matchs,
-        type
+        type,
       });
 
       return this.store();
@@ -275,22 +276,23 @@ class Tournaments {
   }
 
   public async get(id: number | null): Promise<Tournament | null> {
-    if (!id) { return Promise.resolve(null); }
+    if (!id) {
+      return Promise.resolve(null);
+    }
 
     const promise = this.isBusy || Promise.resolve();
 
-    return promise.then(() => this.tournaments.find((t) => t.id === id) || null);
+    return promise.then(() => this.tournaments.find(t => t.id === id) || null);
   }
 
   public async update(tournament: Tournament): Promise<number> {
     const promise = this.isBusy || Promise.resolve();
 
     return promise.then(() => {
-
-      const i = this.tournaments.findIndex((t) => t.id === tournament.id);
+      const i = this.tournaments.findIndex(t => t.id === tournament.id);
 
       if (i === -1) {
-        console.warn("[Tournaments] Unable to update the tourmament #%s.", tournament.id);
+        console.warn('[Tournaments] Unable to update the tourmament #%s.', tournament.id);
         return this.tournaments.length;
       }
 
@@ -300,11 +302,11 @@ class Tournaments {
     });
   }
 
-  public map (callback: Function): Array<any> {
+  public map(callback: Function): Array<any> {
     return this.tournaments.map((value: Tournament, index: number, array: Tournament[]) => callback(value, index, array));
   }
 
-  public onUpdate (callback: Function) {
+  public onUpdate(callback: Function) {
     this.callbackCollector.push(callback);
   }
 
