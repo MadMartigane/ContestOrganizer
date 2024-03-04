@@ -9,12 +9,14 @@ import { TournamentType, TournamentUpdateEvent } from "./modules/tournaments/tou
 import { InputChangeEventDetail } from "@ionic/core";
 import { TeamRow } from "./modules/team-row/team-row";
 import { GenericTeam } from "./modules/team-row/team-row.d";
+import { GridTeamOnUpdateDetail } from "./modules/grid-common/grid-common.types";
 import { GenericTeam as GenericTeam1, TournamentType as TournamentType1 } from "./components.d";
 import { PageTeamSelectEventDatail } from "./components/page-team-select/page-team-select.d";
 export { TournamentType, TournamentUpdateEvent } from "./modules/tournaments/tournaments.types";
 export { InputChangeEventDetail } from "@ionic/core";
 export { TeamRow } from "./modules/team-row/team-row";
 export { GenericTeam } from "./modules/team-row/team-row.d";
+export { GridTeamOnUpdateDetail } from "./modules/grid-common/grid-common.types";
 export { GenericTeam as GenericTeam1, TournamentType as TournamentType1 } from "./components.d";
 export { PageTeamSelectEventDatail } from "./components/page-team-select/page-team-select.d";
 export namespace Components {
@@ -55,6 +57,7 @@ export namespace Components {
         "color": string;
         "label": string;
         "placeholder": string;
+        "tournamentGridId"?: number;
         "type": TournamentType;
         "value": GenericTeam;
     }
@@ -244,8 +247,9 @@ declare namespace LocalJSX {
     interface MadSelectTeam {
         "color"?: string;
         "label"?: string;
-        "onMadSelectChange"?: (event: MadSelectTeamCustomEvent<GenericTeam>) => void;
+        "onMadSelectChange"?: (event: MadSelectTeamCustomEvent<GridTeamOnUpdateDetail>) => void;
         "placeholder"?: string;
+        "tournamentGridId"?: number;
         "type"?: TournamentType;
         "value"?: GenericTeam;
     }

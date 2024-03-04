@@ -1,3 +1,5 @@
+import { GenericTeam } from '../team-row/team-row.d';
+
 export interface GridConfConstants {
   teamNumberMax: number;
   teamNumberMin: number;
@@ -8,3 +10,8 @@ export interface GridConfConstants {
   pointMin: number;
   inputDebounce: number;
 }
+
+export type GridTeamOnUpdateDetail = {
+  genericTeam: GenericTeam;
+  tournamentGridId: number | null;
+};

@@ -1,13 +1,13 @@
-import { Component, Event, EventEmitter, Fragment, h, Prop, State } from "@stencil/core";
-import apiFutDB from "../../modules/futbd/futdb";
-import { PageTeamSelectEventDatail } from "./page-team-select.d";
-import Utils from "../../modules/utils/utils";
-import { GenericTeam, TournamentType } from "../../components.d";
-import apiSports from "../../modules/api-sports/api-sports";
+import { Component, Event, EventEmitter, Fragment, h, Prop, State } from '@stencil/core';
+import apiFutDB from '../../modules/futbd/futdb';
+import { PageTeamSelectEventDatail } from './page-team-select.d';
+import Utils from '../../modules/utils/utils';
+import { GenericTeam, TournamentType } from '../../components.d';
+import apiSports from '../../modules/api-sports/api-sports';
 
 @Component({
-  tag: "page-team-select",
-  styleUrl: "page-team-select.css",
+  tag: 'page-team-select',
+  styleUrl: 'page-team-select.css',
   shadow: false,
 })
 export class PageTeamSelect {
@@ -21,21 +21,22 @@ export class PageTeamSelect {
   @State() private isLoading: boolean;
   @State() private suggested: Array<GenericTeam>;
 
-  @Prop() teamId: string
+  @Prop() teamId: string;
   @Prop() teamType: TournamentType;
 
   @Event({
     composed: true,
-    bubbles: true
-  }) pageTeamNewSelection: EventEmitter<PageTeamSelectEventDatail>;
+    bubbles: true,
+  })
+  pageTeamNewSelection: EventEmitter<PageTeamSelectEventDatail>;
 
-  constructor () {
+  constructor() {
     this.apiFutDB = apiFutDB;
     this.apiSports = apiSports;
 
     this.teams = [];
     this.suggested = [];
-    this.searchValue = "";
+    this.searchValue = '';
 
     switch (this.teamType) {
       case TournamentType.NBA:
@@ -44,7 +45,7 @@ export class PageTeamSelect {
       case TournamentType.RUGBY:
         this.minNumberSearchLetter = 3;
         this.isLoading = false;
-        Utils.setFocus("ion-searchbar#page-team-select-search");
+        Utils.setFocus('ion-searchbar#page-team-select-search');
         break;
       default:
         this.minNumberSearchLetter = 2;
@@ -55,17 +56,17 @@ export class PageTeamSelect {
             this.teams = teams;
           })
           .catch((error: any) => {
-            console.log("teams on load error: ", error);
+            console.warn('teams on load error: ', error);
           })
           .finally(() => {
             this.isLoading = false;
-            Utils.setFocus("ion-searchbar#page-team-select-search");
+            Utils.setFocus('ion-searchbar#page-team-select-search');
           });
         break;
     }
   }
 
-  private async onSearchChange (ev: CustomEvent): Promise<void> {
+  private async onSearchChange(ev: CustomEvent): Promise<void> {
     this.searchValue = ev.detail.value;
 
     if (this.searchValue.length < this.minNumberSearchLetter) {
@@ -73,7 +74,7 @@ export class PageTeamSelect {
       return;
     }
 
-    const pattern = new RegExp(this.searchValue, "i");
+    const pattern = new RegExp(this.searchValue, 'i');
 
     switch (this.teamType) {
       case TournamentType.NBA:
@@ -83,15 +84,15 @@ export class PageTeamSelect {
         this.suggested = await this.apiSports.searchTeam(this.teamType, this.searchValue);
         break;
       default:
-        this.suggested = this.teams.filter((team) => pattern.test(team.name));
+        this.suggested = this.teams.filter(team => pattern.test(team.name));
         break;
     }
   }
 
-  onTeamSelected (team: GenericTeam) {
+  onTeamSelected(team: GenericTeam) {
     this.pageTeamNewSelection.emit({
       id: this.teamId,
-      team
+      team,
     });
 
     const router = document.querySelector('ion-router');
@@ -110,18 +111,10 @@ export class PageTeamSelect {
           </ion-toolbar>
         </ion-header>
         <ion-content fullscreen class="ion-padding">
-          { this.isLoading ?
-            <ion-progress-bar type="indeterminate" color="secondary"></ion-progress-bar> :
-            null
-          }
+          {this.isLoading ? <ion-progress-bar type="indeterminate" color="secondary"></ion-progress-bar> : null}
           <ion-card>
             <ion-card-header>
-              <h1>
-                { this.isLoading ?
-                  "Changement des équipes…" :
-                  `Recherche ton équipe. (${this.minNumberSearchLetter} lettres min)`
-                }
-              </h1>
+              <h1>{this.isLoading ? 'Changement des équipes…' : `Recherche ton équipe. (${this.minNumberSearchLetter} lettres min)`}</h1>
             </ion-card-header>
             <ion-card-content>
               <ion-searchbar
@@ -132,36 +125,32 @@ export class PageTeamSelect {
                 disabled={this.isLoading}
                 animated="true"
                 onIonInput={(ev: CustomEvent) => this.onSearchChange(ev)}
-                placeholder="Recherche"></ion-searchbar>
+                placeholder="Recherche"
+              ></ion-searchbar>
 
-                <ion-list>
-                  <ion-radio-group value="selectedTeam">
-                    { this.suggested.map((team) =>
-                        <ion-item onClick={() => this.onTeamSelected(team)}>
-                          <mad-team-tile
-                            team={team}
-                          ></mad-team-tile>
-                          <ion-radio slot="end" value={team.id}></ion-radio>
-                        </ion-item>
+              <ion-list>
+                <ion-radio-group value="selectedTeam">
+                  {this.suggested.map(team => (
+                    <ion-item onClick={() => this.onTeamSelected(team)}>
+                      <mad-team-tile team={team}></mad-team-tile>
+                      <ion-radio slot="end" value={team.id}></ion-radio>
+                    </ion-item>
+                  ))}
+                </ion-radio-group>
+              </ion-list>
 
-                    )}
-                  </ion-radio-group>
-                </ion-list>
-
-                { this.searchValue?.length > 2 && !this.suggested.length ?
-                  <ion-item color="warning">
-                    <ion-icon name="sad-outline"></ion-icon>
-                    <ion-label>
-                      <h2>Aucun résultat</h2>
-                    </ion-label>
-                  </ion-item> :
-                  null
-                }
+              {this.searchValue?.length > 2 && !this.suggested.length ? (
+                <ion-item color="warning">
+                  <ion-icon name="sad-outline"></ion-icon>
+                  <ion-label>
+                    <h2>Aucun résultat</h2>
+                  </ion-label>
+                </ion-item>
+              ) : null}
             </ion-card-content>
           </ion-card>
         </ion-content>
       </Fragment>
     );
   }
-
 }

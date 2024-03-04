@@ -203,6 +203,40 @@ export class PageTournament {
     );
   }
 
+  private renderSortingButton() {
+    if (this.tournament?.type === TournamentType.NBA || this.tournament?.type === TournamentType.BASKET) {
+      return null;
+    }
+
+    return (
+      <ion-button expand="full" color="primary" class="ion-margin-vertical" onClick={() => this.goRanking()}>
+        <ion-icon name="car-sport-outline" size-xs="normal" size="large"></ion-icon>
+        <ion-text class="ion-margin">Classement !</ion-text>
+      </ion-button>
+    );
+  }
+
+  private renderFooterActions() {
+    return (
+      <div>
+        {this.renderSortingButton()}
+
+        <ion-button class="ion-margin-vertical" onClick={() => this.confirmResetGrid()} expand="full" color="medium" size="default">
+          <ion-icon name="trash-bin-outline" size-xs="normal" size="large" color="warning"></ion-icon>
+          <ion-text class="ion-margin" color="warning">
+            Effacer
+          </ion-text>
+        </ion-button>
+
+        <ion-button expand="full" color="secondary" class="ion-margin-vertical" href={`/match/${this.tournament?.id}`} key={this.tournament?.id}>
+          <ion-icon name="medal-outline" size-xs="normal" size="large"></ion-icon>
+          <ion-text class="ion-margin">Go Match</ion-text>
+          <ion-icon name="arrow-forward-outline" size-xs="normal" size="large"></ion-icon>
+        </ion-button>
+      </div>
+    );
+  }
+
   render() {
     return (
       <Host>
@@ -308,23 +342,7 @@ export class PageTournament {
               {this.teamNumber > 0 ? (
                 <div>
                   {this.renderGrid()}
-                  <ion-button expand="full" color="primary" class="ion-margin-vertical" onClick={() => this.goRanking()}>
-                    <ion-icon name="car-sport-outline" size-xs="normal" size="large"></ion-icon>
-                    <ion-text class="ion-margin">Classement !</ion-text>
-                  </ion-button>
-
-                  <ion-button class="ion-margin-vertical" onClick={() => this.confirmResetGrid()} expand="full" color="medium" size="default">
-                    <ion-icon name="trash-bin-outline" size-xs="normal" size="large" color="warning"></ion-icon>
-                    <ion-text class="ion-margin" color="warning">
-                      Effacer
-                    </ion-text>
-                  </ion-button>
-
-                  <ion-button expand="full" color="secondary" class="ion-margin-vertical" href={`/match/${this.tournament?.id}`} key={this.tournament?.id}>
-                    <ion-icon name="medal-outline" size-xs="normal" size="large"></ion-icon>
-                    <ion-text class="ion-margin">Go Match</ion-text>
-                    <ion-icon name="arrow-forward-outline" size-xs="normal" size="large"></ion-icon>
-                  </ion-button>
+                  {this.renderFooterActions()}
                 </div>
               ) : (
                 <div>

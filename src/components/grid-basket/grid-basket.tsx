@@ -1,10 +1,9 @@
 import { Component, Event, EventEmitter, h, Host, Prop, State } from '@stencil/core';
-import { MadSelectTeamCustomEvent } from '../../components';
 import { Tournament, TournamentUpdateEvent } from '../../modules/tournaments/tournaments.types';
 import tournaments from '../../modules/tournaments/tournaments';
-import { GenericTeam } from '../../components.d';
 import Basket from '../../modules/data-basket/data-basket';
-import { BasketGridConfConstants, BasketGridData } from '../../modules/data-basket/data-basket.types';
+import { BasketGridConfConstants } from '../../modules/data-basket/data-basket.types';
+import { GridTeamOnUpdateDetail } from '../../modules/grid-common/grid-common.types';
 
 @Component({
   tag: 'grid-basket',
@@ -53,10 +52,11 @@ export class GridBasket {
     }
   }
 
-  private onTeamTeamChange(genericTeam: GenericTeam, gridData: BasketGridData | null): void {
-    const team = this.tournament?.grid.find(teamRow => teamRow.id === gridData?.team.id);
-    if (team) {
-      team.team = genericTeam;
+  private onTeamTeamChange(detail: GridTeamOnUpdateDetail): void {
+    const gridRaw = this.tournament?.grid.find(grid => grid.id === detail.tournamentGridId);
+
+    if (gridRaw) {
+      gridRaw.team = detail.genericTeam;
     }
 
     this.updateTournament();
@@ -151,7 +151,8 @@ export class GridBasket {
             value={gridData?.team}
             color="primary"
             type={this.tournament?.type}
-            onMadSelectChange={(ev: MadSelectTeamCustomEvent<GenericTeam>) => this.onTeamTeamChange(ev.detail, gridData)}
+            tournamentGridId={gridData?.tournamentGridId}
+            onMadSelectChange={(ev: CustomEvent<GridTeamOnUpdateDetail>) => this.onTeamTeamChange(ev.detail)}
             placeholder="Équipe vide"
           ></mad-select-team>
         </ion-col>

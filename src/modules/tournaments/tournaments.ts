@@ -61,12 +61,6 @@ class Tournaments {
       }
     }
 
-    // TODO REMOVE THIS BACKWARD COMPATIBILITY
-    if (!localTournaments || Array.isArray(localTournaments)) {
-      localTournaments = { timestamp: 0, tournaments: localTournaments || [] };
-    }
-    // END OF TODO REMOVE THIS BACKWARD COMPATIBILITY
-
     let backendTournaments = null as ProcedureContentStoredTournaments | null;
     try {
       backendTournaments = await this.getBackendTournaments();
@@ -121,14 +115,12 @@ class Tournaments {
         return;
       }
 
-      // TODO REMOVE THIS BACKWARD COMPATIBILITY
       if (!tournamentOne.timestamp) {
         tournamentOne.timestamp = Date.now();
       }
       if (!tournamentTwo.timestamp) {
         tournamentTwo.timestamp = Date.now();
       }
-      // END OF TODO REMOVE THIS BACKWARD COMPATIBILITY
 
       if (tournamentOne.timestamp < tournamentTwo.timestamp) {
         tournamentOne.name = tournamentTwo.name;

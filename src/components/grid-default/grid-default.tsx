@@ -1,11 +1,10 @@
 import { InputChangeEventDetail } from '@ionic/core';
 import { Component, Event, EventEmitter, h, Host, Prop, State } from '@stencil/core';
 import { TeamRow } from '../../modules/team-row/team-row';
-import { MadInputNumberCustomEvent, MadSelectTeamCustomEvent } from '../../components';
+import { MadInputNumberCustomEvent } from '../../components';
 import { Tournament, TournamentUpdateEvent } from '../../modules/tournaments/tournaments.types';
 import tournaments from '../../modules/tournaments/tournaments';
-import { GenericTeam } from '../../components.d';
-import { GridConfConstants } from '../../modules/grid-common/grid-common.types';
+import { GridConfConstants, GridTeamOnUpdateDetail } from '../../modules/grid-common/grid-common.types';
 
 @Component({
   tag: 'grid-default',
@@ -59,13 +58,17 @@ export class GridDefault {
     }
   }
 
-  onTeamTeamChange(detail: GenericTeam, team: TeamRow): void {
-    team.team = detail;
+  private onTeamTeamChange(detail: GridTeamOnUpdateDetail): void {
+    const gridRaw = this.tournament?.grid.find(grid => grid.id === detail.tournamentGridId);
+
+    if (gridRaw) {
+      gridRaw.team = detail.genericTeam;
+    }
 
     this.updateTournament();
   }
 
-  onTeamChange(detail: InputChangeEventDetail, team: TeamRow, key: string): void {
+  private onTeamChange(detail: InputChangeEventDetail, team: TeamRow, key: string): void {
     team.set(key, String(detail.value));
     team.goalAverage = team.scoredGoals - team.concededGoals;
 
@@ -103,7 +106,7 @@ export class GridDefault {
             </ion-col>
           </ion-row>
 
-          {this.tournament?.grid.map(team => (
+          {this.tournament?.grid.map(gridRow => (
             <ion-row class="ion-align-items-center">
               <ion-col size="1">
                 <span class="counter">
@@ -113,45 +116,46 @@ export class GridDefault {
               </ion-col>
               <ion-col size="3">
                 <mad-select-team
-                  value={team.team}
+                  value={gridRow.team}
                   color="primary"
                   type={this.tournament?.type}
-                  onMadSelectChange={(ev: MadSelectTeamCustomEvent<GenericTeam>) => this.onTeamTeamChange(ev.detail, team)}
+                  tournamentGridId={gridRow.id}
+                  onMadSelectChange={(ev: CustomEvent<GridTeamOnUpdateDetail>) => this.onTeamTeamChange(ev.detail)}
                   placeholder="Équipe vide"
                 ></mad-select-team>
               </ion-col>
               <ion-col>
                 <mad-input-number
                   readonly
-                  value={team.points}
+                  value={gridRow.points}
                   color="success"
                   min={this.conf.pointMin}
-                  onMadNumberChange={(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev.detail, team, 'points')}
+                  onMadNumberChange={(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev.detail, gridRow, 'points')}
                   placeholder="0"
                 ></mad-input-number>
               </ion-col>
               <ion-col>
                 <mad-input-number
                   readonly
-                  value={team.scoredGoals}
+                  value={gridRow.scoredGoals}
                   min={this.conf.scoredGoalsMin}
                   color="secondary"
-                  onMadNumberChange={(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev.detail, team, 'scoredGoals')}
+                  onMadNumberChange={(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev.detail, gridRow, 'scoredGoals')}
                   placeholder="0"
                 ></mad-input-number>
               </ion-col>
               <ion-col>
                 <mad-input-number
                   readonly
-                  value={team.concededGoals}
+                  value={gridRow.concededGoals}
                   min={this.conf.concededGoalsMin}
                   color="tertiary"
-                  onMadNumberChange={(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev.detail, team, 'concededGoals')}
+                  onMadNumberChange={(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamChange(ev.detail, gridRow, 'concededGoals')}
                   placeholder="0"
                 ></mad-input-number>
               </ion-col>
               <ion-col>
-                <mad-input-number readonly value={team.goalAverage} color="warning" placeholder="0"></mad-input-number>
+                <mad-input-number readonly value={gridRow.goalAverage} color="warning" placeholder="0"></mad-input-number>
               </ion-col>
             </ion-row>
           ))}

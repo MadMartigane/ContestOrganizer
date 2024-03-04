@@ -7,6 +7,7 @@ export type BasketGridData = {
   winGamesPercent: number;
   concededPoints: number;
   scoredPoints: number;
+  tournamentGridId: number;
 };
 
 export type BasketGridConfConstants = {

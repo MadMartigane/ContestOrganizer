@@ -5,10 +5,6 @@ import { BasketGridData } from './data-basket.types';
 export default class Basket {
   public static data(tournament: Tournament) {
     const basketData = tournament.grid.map(teamRow => {
-      if (!teamRow.team) {
-        return null;
-      }
-
       return this.getOneTeamData(tournament, teamRow);
     });
 
@@ -26,6 +22,7 @@ export default class Basket {
 
     const gridData = {
       team: team.team,
+      tournamentGridId: teamId,
       concededPoints: 0,
       scoredPoints: 0,
       winGames: 0,
