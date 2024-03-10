@@ -11,7 +11,7 @@ const REQUEST_API_PATTERN = /\/api\//;
 
 const API_OPTIONS = {
  hostname: 'marius.click',
-  protocol: 'https:',
+ protocol: 'https:',
   port: 443,
   path: '/contest2',
 };
@@ -37,7 +37,7 @@ function requestListener(clientReq, clientRes, stencilProxy) {
 
   const proxy = https.request(options, function (res) {
    clientRes.writeHead(res.statusCode, res.headers);
-    res.pipe(clientRes, {
+   res.pipe(clientRes, {
       end: true,
     });
   });
