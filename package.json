@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.1",
   "description": "Tool to organize & enjoy your sport contest.",
+  "type": "module",
   "scripts": {
     "build": "stencil build",
     "start": "stencil build --dev --watch --serve",
@@ -29,6 +30,7 @@
     "restore-api-group": "chown -R debian:www-data /var/www/marius.click/html/contest/api/data",
     "restore-api-rights-grw": "chmod -R g+rw /var/www/marius.click/html/contest/api/data/*",
     "restore-api": "npm run restore-api-files && npm run restore-api-group && npm run restore-api-rights-grw",
+    "proxy": "node ./scripts/proxy.js",
     "generate": "stencil generate"
   },
   "devDependencies": {
