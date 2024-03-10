@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.1",
   "description": "Tool to organize & enjoy your sport contest.",
+  "type": "module",
   "scripts": {
     "build": "stencil build",
     "start": "stencil build --dev --watch --serve",
@@ -17,7 +18,7 @@
     "oldprod-api-rights-grw": "chmod -R g+rw /var/www/marius.click/html/contest2/api/data/*",
     "backup-api": "cp -r /var/www/marius.click/html/contest/api /var/www/marius.click/html/contest2/",
     "backup-api-data": "cp -r /var/www/marius.click/html/contest/api/data/* ~/backup/contest-data/",
-    "backup": "npm run oldprod-clean && npm run oldprod-push && npm run oldprod-update-paths && npm run oldprod-api-group && npm run oldprod-api-rights-grw && npm run backup-api-data && npm run backup-api",
+    "backup": "npm run oldprod-clean && npm run oldprod-push && npm run oldprod-update-paths && npm run backup-api-data && npm run backup-api && npm run oldprod-api-group && npm run oldprod-api-rights-grw",
     "prod-clean": "rm -rf /var/www/marius.click/html/contest/*",
     "prod-push": "cp -r www/* /var/www/marius.click/html/contest/",
     "setSrcBasePath": "sed -i 's/src=\"/src=\"\\/contest/g' /var/www/marius.click/html/contest/index.html",
@@ -29,12 +30,14 @@
     "restore-api-group": "chown -R debian:www-data /var/www/marius.click/html/contest/api/data",
     "restore-api-rights-grw": "chmod -R g+rw /var/www/marius.click/html/contest/api/data/*",
     "restore-api": "npm run restore-api-files && npm run restore-api-group && npm run restore-api-rights-grw",
+    "proxy": "node ./scripts/proxy.js",
     "generate": "stencil generate"
   },
   "devDependencies": {
     "@ionic/core": "^7.2.2",
     "@stencil/core": "^4.0.3",
     "@types/jest": "^29.5.3",
+    "http-proxy": "^1.18.1",
     "ionicons": "^7.1.2",
     "jest": "^29.6.2",
     "jest-cli": "^29.6.2",

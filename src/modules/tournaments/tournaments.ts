@@ -13,12 +13,12 @@ export class Match {
   public goals: { visitor: number; host: number };
   public status: MatchStatus;
 
-  constructor(host = null, visitor = null, status = null) {
+  constructor(host = null, visitor = null, status = MatchStatus.PENDING) {
     this.id = uuid.new();
     this.hostId = host;
     this.visitorId = visitor;
     this.goals = { host: 0, visitor: 0 };
-    this.status = status || MatchStatus.PENDING;
+    this.status = status;
   }
 }
 
@@ -134,7 +134,7 @@ class Tournaments {
   }
 
   private async getBackendTournaments(): Promise<ProcedureContentStoredTournaments | null> {
-    const backendData = (await this.httpRequest.load('https://marius.click/contest/api/index.php/list/tournaments')) as ProcedureData;
+    const backendData = (await this.httpRequest.load('/api/index.php/list/tournaments')) as ProcedureData;
 
     const procedure = new Procedure(backendData);
     if (procedure.isError()) {
@@ -150,7 +150,7 @@ class Tournaments {
   }
 
   private async storeBackendTournaments(content: ProcedureContentStoredTournaments): Promise<void> {
-    const procedureData = (await this.httpRequest.post('https://marius.click/contest/api/index.php/store/tournaments', JSON.stringify(content))) as ProcedureData;
+    const procedureData = (await this.httpRequest.post('/api/index.php/store/tournaments', JSON.stringify(content))) as ProcedureData;
 
     const procedure = new Procedure(procedureData);
     if (procedure.isError()) {
