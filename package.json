@@ -18,7 +18,7 @@
     "oldprod-api-rights-grw": "chmod -R g+rw /var/www/marius.click/html/contest2/api/data/*",
     "backup-api": "cp -r /var/www/marius.click/html/contest/api /var/www/marius.click/html/contest2/",
     "backup-api-data": "cp -r /var/www/marius.click/html/contest/api/data/* ~/backup/contest-data/",
-    "backup": "npm run oldprod-clean && npm run oldprod-push && npm run oldprod-update-paths && npm run oldprod-api-group && npm run oldprod-api-rights-grw && npm run backup-api-data && npm run backup-api",
+    "backup": "npm run oldprod-clean && npm run oldprod-push && npm run oldprod-update-paths && npm run backup-api-data && npm run backup-api && npm run oldprod-api-group && npm run oldprod-api-rights-grw",
     "prod-clean": "rm -rf /var/www/marius.click/html/contest/*",
     "prod-push": "cp -r www/* /var/www/marius.click/html/contest/",
     "setSrcBasePath": "sed -i 's/src=\"/src=\"\\/contest/g' /var/www/marius.click/html/contest/index.html",
