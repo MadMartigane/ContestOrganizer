@@ -69,7 +69,9 @@ class Tournaments {
     }
 
     let mergedTournaments: Array<Tournament>;
-    if (backendTournaments) {
+    if (backendTournaments && !localTournaments) {
+      mergedTournaments = backendTournaments.tournaments;
+    } else if (backendTournaments) {
       let recentTournaments: Array<Tournament>;
       let oldestTournaments: Array<Tournament>;
       if (localTournaments.timestamp > backendTournaments?.timestamp) {
