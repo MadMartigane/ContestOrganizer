@@ -1,21 +1,21 @@
 import TeamRow from '../team-row/team-row';
 import { Tournament } from '../tournaments/tournaments.types';
 import { MatchStatus } from '../matchs/matchs.d';
-import { BasketGridData } from './data-basket.d';
+import { CommonGridData } from './data-common.d';
 
-export default class Basket {
+export default class Common {
   public static data(tournament: Tournament) {
-    const basketData = tournament.grid.map(teamRow => {
+    const commonData = tournament.grid.map(teamRow => {
       return this.getOneTeamData(tournament, teamRow);
     });
 
-    basketData.sort((teamA, teamB) => (teamA?.concededPoints || 0) - (teamB?.concededPoints || 0));
-    basketData.sort((teamA, teamB) => (teamB?.scoredPoints || 0) - (teamA?.scoredPoints || 0));
-    basketData.sort((teamA, teamB) => (teamA?.looseGames || 0) - (teamB?.looseGames || 0));
-    basketData.sort((teamA, teamB) => (teamB?.winGames || 0) - (teamA?.winGames || 0));
-    basketData.sort((teamA, teamB) => (teamB?.winGamesPercent || 0) - (teamA?.winGamesPercent || 0));
+    commonData.sort((teamA, teamB) => (teamA?.concededPoints || 0) - (teamB?.concededPoints || 0));
+    commonData.sort((teamA, teamB) => (teamB?.scoredPoints || 0) - (teamA?.scoredPoints || 0));
+    commonData.sort((teamA, teamB) => (teamA?.looseGames || 0) - (teamB?.looseGames || 0));
+    commonData.sort((teamA, teamB) => (teamB?.winGames || 0) - (teamA?.winGames || 0));
+    commonData.sort((teamA, teamB) => (teamB?.winGamesPercent || 0) - (teamA?.winGamesPercent || 0));
 
-    return basketData;
+    return commonData;
   }
 
   public static getOneTeamData(tournament: Tournament, team: TeamRow) {
@@ -29,7 +29,7 @@ export default class Basket {
       winGames: 0,
       looseGames: 0,
       winGamesPercent: 0,
-    } as BasketGridData;
+    } as CommonGridData;
 
     tournament.matchs.forEach(match => {
       if (match.status !== MatchStatus.DONE) {

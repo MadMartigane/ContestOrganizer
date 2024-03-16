@@ -2,7 +2,7 @@ import { Component, Event, EventEmitter, h, Host, Prop, State } from '@stencil/c
 import { Tournament, TournamentUpdateEvent } from '../../modules/tournaments/tournaments.types';
 import tournaments from '../../modules/tournaments/tournaments';
 import Basket from '../../modules/data-basket/data-basket';
-import { BasketGridConfConstants } from '../../modules/data-basket/data-basket.types';
+import { BasketGridConfConstants } from '../../modules/data-basket/data-basket.d';
 import { GridTeamOnUpdateDetail } from '../../modules/grid-common/grid-common.types';
 
 @Component({

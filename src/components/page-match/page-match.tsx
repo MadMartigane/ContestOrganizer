@@ -2,8 +2,8 @@ import { InputChangeEventDetail } from '@ionic/core';
 import { Component, h, Host, Prop, State } from '@stencil/core';
 import { TeamRow } from '../../modules/team-row/team-row';
 import tournaments from '../../modules/tournaments/tournaments';
-import { Match } from '../../modules/tournaments/tournaments';
-import { Tournament, MatchTeamType, MatchStatus, TournamentType } from '../../modules/tournaments/tournaments.types';
+import { Match, MatchTeamType, MatchStatus } from '../../modules/matchs/matchs';
+import { Tournament, TournamentType } from '../../modules/tournaments/tournaments.types';
 import Utils from '../../modules/utils/utils';
 import { MadInputNumberCustomEvent } from '../../components';
 

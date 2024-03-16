@@ -2,6 +2,8 @@ import { GenericTeam, TeamRowProperties } from './team-row.d';
 import uuid from '../uuid/uuid';
 import { TournamentType } from '../tournaments/tournaments.types';
 
+export * from './team-row.d';
+
 export class TeamRow {
   public readonly id: number;
   public team?: GenericTeam;
