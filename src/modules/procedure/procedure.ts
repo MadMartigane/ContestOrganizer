@@ -8,6 +8,11 @@ export class Procedure {
   private debug: Array<string> | null;
 
   constructor(data: ProcedureData) {
+    this.type = null;
+    this.data = null;
+    this.error = null;
+    this.debug = null;
+
     if (data) {
       this.setData(data);
     }
@@ -56,4 +61,3 @@ export class Procedure {
     return this.isOk() ? JSON.stringify(this.data) : (this.error && this.error.message) || '';
   }
 }
-

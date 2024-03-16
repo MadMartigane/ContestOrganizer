@@ -21,6 +21,9 @@ export class GridBasket {
   @Event() gridTournamentChange: EventEmitter<TournamentUpdateEvent>;
 
   constructor() {
+    this.tournament = null;
+    this.tournamentId = null;
+
     this.conf = {
       concededPointsMin: 0,
       scoredPointsMin: 0,

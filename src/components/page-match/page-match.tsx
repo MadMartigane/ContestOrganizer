@@ -240,7 +240,7 @@ export class PageMatch {
               <ion-back-button text="Retour" defaultHref={`/tournament/${this.tournament?.id}`}></ion-back-button>
             </ion-buttons>
             <ion-title>
-              <ion-text color="light" size="large" class="ion-margin">
+              <ion-text color="light" class="ion-margin">
                 {this.getTypeLogo()}
               </ion-text>
             </ion-title>
@@ -423,11 +423,11 @@ export class PageMatch {
                         </ion-button>
 
                         {match.status === MatchStatus.DOING ? (
-                          <ion-button onClick={() => this.stopMatch(match)} class="ion-margin-horizontal" color="secondary" size="delault">
+                          <ion-button onClick={() => this.stopMatch(match)} class="ion-margin-horizontal" color="secondary" size="default">
                             <ion-icon slot="icon-only" name="stop-outline"></ion-icon>
                           </ion-button>
                         ) : (
-                          <ion-button onClick={() => this.playMatch(match)} class="ion-margin-horizontal" color="secondary" size="delault">
+                          <ion-button onClick={() => this.playMatch(match)} class="ion-margin-horizontal" color="secondary" size="default">
                             <ion-icon slot="icon-only" name="play-outline"></ion-icon>
                           </ion-button>
                         )}
@@ -468,7 +468,7 @@ export class PageMatch {
                     </ion-row>
 
                     {this.teamToSelect.map(row => (
-                      <ion-row onclick={() => this.onTeamSelected(row)} class="ion-align-items-center clickable">
+                      <ion-row onClick={() => this.onTeamSelected(row)} class="ion-align-items-center clickable">
                         <ion-col size="2">
                           {row.selected ? (
                             <ion-icon color="success" size="large" name="checkbox-outline"></ion-icon>
@@ -496,7 +496,7 @@ export class PageMatch {
                           expand="full"
                           color="secondary"
                           class="ion-margin-vertical"
-                          disabled={this.currentMatch && (!this.currentMatch.visitorId || !this.currentMatch.hostId)}
+                          disabled={Boolean(this.currentMatch && (!this.currentMatch.visitorId || !this.currentMatch.hostId))}
                           onClick={() => this.goValidateSelection()}
                         >
                           <ion-icon name="rocket-outline" size-xs="normal" size="large"></ion-icon>

@@ -246,7 +246,7 @@ export class PageTournament {
               <ion-back-button text="Retour" defaultHref="/app/tournaments"></ion-back-button>
             </ion-buttons>
             <ion-title>
-              <ion-text color="light" size="large" class="ion-margin">
+              <ion-text color="light" class="ion-margin">
                 {this.tournament?.name ? '🏆' : '404'}
               </ion-text>
             </ion-title>
@@ -292,10 +292,10 @@ export class PageTournament {
                         id={this.inputNameId}
                         color="primary"
                         inputmode="text"
-                        autofocus="true"
+                        autofocus
                         name="tournamentName"
                         value={this.tournament?.name}
-                        onkeypress={(ev: KeyboardEvent) => this.onTournamentNameChange(ev)}
+                        onKeyPress={(ev: KeyboardEvent) => this.onTournamentNameChange(ev)}
                       />
                     </ion-col>
                     <ion-col size="2">
