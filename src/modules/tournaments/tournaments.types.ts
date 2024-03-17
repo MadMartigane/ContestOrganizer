@@ -1,5 +1,5 @@
 import TeamRow from '../team-row/team-row';
-import { Match } from './tournaments';
+import { Match } from '../matchs/matchs';
 
 export type Tournament = {
   id: number;
@@ -9,17 +9,6 @@ export type Tournament = {
   type: TournamentType;
   timestamp?: number;
 };
-
-export const enum MatchTeamType {
-  HOST = 'Host',
-  VISITOR = 'Visitor',
-}
-
-export const enum MatchStatus {
-  PENDING = 'Pending',
-  DOING = 'Doing',
-  DONE = 'Done',
-}
 
 export const enum TournamentType {
   FOOT = 'Foot',

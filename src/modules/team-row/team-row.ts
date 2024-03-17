@@ -1,7 +1,8 @@
-import { GenericTeam, TeamRowProperties } from "./team-row.d";
-import uuid from "../uuid/uuid";
-import { TournamentType } from "../tournaments/tournaments.types";
+import { GenericTeam, TeamRowProperties } from './team-row.d';
+import uuid from '../uuid/uuid';
+import { TournamentType } from '../tournaments/tournaments.types';
 
+export * from './team-row.d';
 
 export class TeamRow {
   public readonly id: number;
@@ -12,11 +13,14 @@ export class TeamRow {
   public goalAverage: number;
   public type: TournamentType;
 
-  constructor(options: { id?: number, type: TournamentType }) {
+  constructor(options: { id?: number; type: TournamentType }) {
     this.id = options.id || uuid.new();
     this.type = options.type;
 
-    this.reset();
+    this.points = 0;
+    this.concededGoals = 0;
+    this.scoredGoals = 0;
+    this.goalAverage = 0;
   }
 
   public toData(): TeamRowProperties {
@@ -28,7 +32,7 @@ export class TeamRow {
       points: this.points,
       concededGoals: this.concededGoals,
       scoredGoals: this.scoredGoals,
-      goalAverage: this.goalAverage
+      goalAverage: this.goalAverage,
     };
   }
 
@@ -36,27 +40,26 @@ export class TeamRow {
     return Object.assign(this, data);
   }
 
-  public reset () {
+  public reset() {
     delete this.team;
-    ["points", "concededGoals", "scoredGoals", "goalAverage"]
-      .forEach((key) => this.set(key, "0"));
+    ['points', 'concededGoals', 'scoredGoals', 'goalAverage'].forEach(key => this.set(key, '0'));
   }
 
   public set(key: string, value: string): void {
     switch (key) {
-      case "points": {
+      case 'points': {
         this.points = Number(value);
         break;
       }
-      case "concededGoals": {
+      case 'concededGoals': {
         this.concededGoals = Number(value);
         break;
       }
-      case "scoredGoals": {
+      case 'scoredGoals': {
         this.scoredGoals = Number(value);
         break;
       }
-      case "goalAverage": {
+      case 'goalAverage': {
         this.goalAverage = Number(value);
         break;
       }

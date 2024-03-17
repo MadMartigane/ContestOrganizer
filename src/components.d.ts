@@ -117,19 +117,52 @@ declare global {
         prototype: HTMLAppTabsElement;
         new (): HTMLAppTabsElement;
     };
+    interface HTMLGridBasketElementEventMap {
+        "gridTournamentChange": TournamentUpdateEvent;
+    }
     interface HTMLGridBasketElement extends Components.GridBasket, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLGridBasketElementEventMap>(type: K, listener: (this: HTMLGridBasketElement, ev: GridBasketCustomEvent<HTMLGridBasketElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLGridBasketElementEventMap>(type: K, listener: (this: HTMLGridBasketElement, ev: GridBasketCustomEvent<HTMLGridBasketElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLGridBasketElement: {
         prototype: HTMLGridBasketElement;
         new (): HTMLGridBasketElement;
     };
+    interface HTMLGridDefaultElementEventMap {
+        "gridTournamentChange": TournamentUpdateEvent;
+    }
     interface HTMLGridDefaultElement extends Components.GridDefault, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLGridDefaultElementEventMap>(type: K, listener: (this: HTMLGridDefaultElement, ev: GridDefaultCustomEvent<HTMLGridDefaultElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLGridDefaultElementEventMap>(type: K, listener: (this: HTMLGridDefaultElement, ev: GridDefaultCustomEvent<HTMLGridDefaultElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLGridDefaultElement: {
         prototype: HTMLGridDefaultElement;
         new (): HTMLGridDefaultElement;
     };
+    interface HTMLMadInputNumberElementEventMap {
+        "madNumberChange": InputChangeEventDetail;
+    }
     interface HTMLMadInputNumberElement extends Components.MadInputNumber, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLMadInputNumberElementEventMap>(type: K, listener: (this: HTMLMadInputNumberElement, ev: MadInputNumberCustomEvent<HTMLMadInputNumberElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLMadInputNumberElementEventMap>(type: K, listener: (this: HTMLMadInputNumberElement, ev: MadInputNumberCustomEvent<HTMLMadInputNumberElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLMadInputNumberElement: {
         prototype: HTMLMadInputNumberElement;
@@ -141,13 +174,35 @@ declare global {
         prototype: HTMLMadMatchTileElement;
         new (): HTMLMadMatchTileElement;
     };
+    interface HTMLMadScorerBasketElementEventMap {
+        "madNumberChange": InputChangeEventDetail;
+    }
     interface HTMLMadScorerBasketElement extends Components.MadScorerBasket, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLMadScorerBasketElementEventMap>(type: K, listener: (this: HTMLMadScorerBasketElement, ev: MadScorerBasketCustomEvent<HTMLMadScorerBasketElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLMadScorerBasketElementEventMap>(type: K, listener: (this: HTMLMadScorerBasketElement, ev: MadScorerBasketCustomEvent<HTMLMadScorerBasketElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLMadScorerBasketElement: {
         prototype: HTMLMadScorerBasketElement;
         new (): HTMLMadScorerBasketElement;
     };
+    interface HTMLMadSelectTeamElementEventMap {
+        "madSelectChange": GridTeamOnUpdateDetail;
+    }
     interface HTMLMadSelectTeamElement extends Components.MadSelectTeam, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLMadSelectTeamElementEventMap>(type: K, listener: (this: HTMLMadSelectTeamElement, ev: MadSelectTeamCustomEvent<HTMLMadSelectTeamElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLMadSelectTeamElementEventMap>(type: K, listener: (this: HTMLMadSelectTeamElement, ev: MadSelectTeamCustomEvent<HTMLMadSelectTeamElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLMadSelectTeamElement: {
         prototype: HTMLMadSelectTeamElement;
@@ -171,7 +226,18 @@ declare global {
         prototype: HTMLPageMatchElement;
         new (): HTMLPageMatchElement;
     };
+    interface HTMLPageTeamSelectElementEventMap {
+        "pageTeamNewSelection": PageTeamSelectEventDatail;
+    }
     interface HTMLPageTeamSelectElement extends Components.PageTeamSelect, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLPageTeamSelectElementEventMap>(type: K, listener: (this: HTMLPageTeamSelectElement, ev: PageTeamSelectCustomEvent<HTMLPageTeamSelectElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLPageTeamSelectElementEventMap>(type: K, listener: (this: HTMLPageTeamSelectElement, ev: PageTeamSelectCustomEvent<HTMLPageTeamSelectElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLPageTeamSelectElement: {
         prototype: HTMLPageTeamSelectElement;

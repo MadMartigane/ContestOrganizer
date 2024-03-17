@@ -119,11 +119,12 @@ export class PageTeamSelect {
             <ion-card-content>
               <ion-searchbar
                 id="page-team-select-search"
-                debounce="400"
+                debounce={400}
                 inputmode="search"
                 enterkeyhint="search"
                 disabled={this.isLoading}
-                animated="true"
+                autocapitalize="off"
+                animated
                 onIonInput={(ev: CustomEvent) => this.onSearchChange(ev)}
                 placeholder="Recherche"
               ></ion-searchbar>

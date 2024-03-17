@@ -70,29 +70,29 @@ export class MadInputNumber {
           {this.value !== undefined ? <span class={this.argColor}>{this.number}</span> : <span class="placeholder">{this.placeholder}</span>}
         </span>
         {this.readonly ? null : (
-          <ion-popover mode="ios" size="auto" alignment="center" animated="true" arrow="true" trigger={this.itemId} trigger-action="click">
+          <ion-popover mode="ios" size="auto" alignment="center" animated arrow trigger={this.itemId} trigger-action="click">
             <ion-content class="ion-padding">
               <div class="box">
                 <ion-button
                   color="warning"
-                  onclick={() => {
+                  onClick={() => {
                     this.onDecrementNumber();
                   }}
                   size="small"
                 >
-                  <ion-icon slod="icon-only" size="large" color="primary" name="remove-outline"></ion-icon>
+                  <ion-icon slot="icon-only" size="large" color="primary" name="remove-outline"></ion-icon>
                 </ion-button>
-                <ion-chip outline="true" color={this.color}>
+                <ion-chip outline color={this.color}>
                   {this.number}
                 </ion-chip>
                 <ion-button
                   color="warning"
-                  onclick={() => {
+                  onClick={() => {
                     this.onIncrementNumber();
                   }}
                   size="small"
                 >
-                  <ion-icon slod="icon-only" size="large" color="primary" name="add-outline"></ion-icon>
+                  <ion-icon slot="icon-only" size="large" color="primary" name="add-outline"></ion-icon>
                 </ion-button>
               </div>
             </ion-content>

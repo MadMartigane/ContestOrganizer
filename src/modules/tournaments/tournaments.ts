@@ -1,26 +1,12 @@
-import { MatchStatus, Tournament, TournamentType, TournamentTypeLabel } from './tournaments.types';
+import { Tournament, TournamentType, TournamentTypeLabel } from './tournaments.types';
+import { MatchStatus } from '../matchs/matchs.d';
+import { Match } from '../matchs/matchs';
 import { CACHE_KEY } from './tournaments.constants';
 import uuid from '../uuid/uuid';
 import TeamRow from '../team-row/team-row';
 import { HttpRequest } from '../http-request/http-request';
 import { ProcedureContentStoredTournaments, ProcedureData } from '../procedure/procedure.types';
 import { Procedure } from '../procedure/procedure';
-
-export class Match {
-  public readonly id: number;
-  public hostId: number | null;
-  public visitorId: number | null;
-  public goals: { visitor: number; host: number };
-  public status: MatchStatus;
-
-  constructor(host = null, visitor = null, status = MatchStatus.PENDING) {
-    this.id = uuid.new();
-    this.hostId = host;
-    this.visitorId = visitor;
-    this.goals = { host: 0, visitor: 0 };
-    this.status = status;
-  }
-}
 
 class Tournaments {
   private readonly CACHE_KEY: typeof CACHE_KEY;
@@ -50,13 +36,13 @@ class Tournaments {
 
   private async restore(): Promise<number> {
     const tournamentsString = localStorage.getItem(this.CACHE_KEY);
-    let localTournaments;
+    let localTournaments: { timestamp: number; tournaments: Array<Tournament> } | null = null;
 
     if (tournamentsString) {
       try {
         localTournaments = JSON.parse(tournamentsString);
       } catch (e) {
-        console.warn('[Tournaments] Unable to parse stored tourmaments. Cleanning of cache. ', e);
+        console.warn('[Tournaments] Unable to parse stored tournaments. Cleanning of cache. ', e);
         localStorage.removeItem(this.CACHE_KEY);
       }
     }
@@ -74,17 +60,17 @@ class Tournaments {
     } else if (backendTournaments) {
       let recentTournaments: Array<Tournament>;
       let oldestTournaments: Array<Tournament>;
-      if (localTournaments.timestamp > backendTournaments?.timestamp) {
-        recentTournaments = localTournaments.tourmaments;
+      if (localTournaments?.timestamp || 0 > backendTournaments?.timestamp) {
+        recentTournaments = localTournaments?.tournaments || [];
         oldestTournaments = backendTournaments?.tournaments;
       } else {
         recentTournaments = backendTournaments.tournaments;
-        oldestTournaments = localTournaments?.tournaments;
+        oldestTournaments = localTournaments?.tournaments || [];
       }
 
       mergedTournaments = this.mergeTournaments(recentTournaments, oldestTournaments);
     } else {
-      mergedTournaments = localTournaments.tourmaments;
+      mergedTournaments = localTournaments?.tournaments || [];
     }
 
     /* From stored data to instanciated object */
