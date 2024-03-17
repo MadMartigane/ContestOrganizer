@@ -2,15 +2,11 @@ import { InputChangeEventDetail } from '@ionic/core';
 import { Component, h, Host, Prop, State } from '@stencil/core';
 import { TeamRow } from '../../modules/team-row/team-row';
 import tournaments from '../../modules/tournaments/tournaments';
-import { Match, MatchTeamType, MatchStatus } from '../../modules/matchs/matchs';
+import Matchs, { Match, MatchTeamType, MatchStatus, Row } from '../../modules/matchs/matchs';
 import { Tournament, TournamentType } from '../../modules/tournaments/tournaments.types';
 import Utils from '../../modules/utils/utils';
 import { MadInputNumberCustomEvent } from '../../components';
 
-type Row = {
-  selected: boolean;
-  team: TeamRow;
-};
 type Config = {
   minGoal: number;
 };
@@ -28,7 +24,7 @@ export class PageMatch {
   @State() private tournament: Tournament | null;
   @State() private uiError: string | null;
   @State() private displayTeamSelector: boolean;
-  @State() private teamToSelect: Row[];
+  @State() private teamToSelect: Row[] | null;
   @State() private matchNumber: number;
   @State() private currentMatch: Match | null;
 
@@ -53,11 +49,6 @@ export class PageMatch {
       return 0;
     }
 
-    this.teamToSelect = this.tournament.grid.map(team => ({
-      selected: false,
-      team,
-    }));
-
     this.matchNumber = this.tournament.matchs.length;
     return this.updateTournament();
   }
@@ -70,7 +61,7 @@ export class PageMatch {
     return this.tournaments.update(this.tournament);
   }
 
-  onTeamChange(detail: InputChangeEventDetail, team: TeamRow, key: string): void {
+  public onTeamChange(detail: InputChangeEventDetail, team: TeamRow, key: string): void {
     team.set(key, String(detail.value));
     team.goalAverage = team.scoredGoals - team.concededGoals;
 
@@ -80,22 +71,27 @@ export class PageMatch {
   private goMatch() {
     this.displayTeamSelector = true;
     this.currentMatch = new Match();
+
+    if (this.tournament) {
+      this.teamToSelect = Matchs.teamSortedByMatch(this.tournament);
+    }
+
     this.resetRowStates();
   }
 
   private refreshUI() {
     // Change ref
-    this.teamToSelect = this.teamToSelect.map(row => row);
+    this.teamToSelect = this.teamToSelect?.map(row => row) || null;
   }
 
   private resetRowStates() {
-    this.teamToSelect.forEach(row => {
+    this.teamToSelect?.forEach(row => {
       row.selected = false;
     });
   }
 
   private cleanRowStates() {
-    this.teamToSelect.forEach(row => {
+    this.teamToSelect?.forEach(row => {
       if (row.team.id !== this.currentMatch?.hostId && row.team.id !== this.currentMatch?.visitorId) {
         row.selected = false;
       }
@@ -462,12 +458,33 @@ export class PageMatch {
                           <ion-icon name="checkbox-outline"></ion-icon>
                         </ion-label>
                       </ion-col>
-                      <ion-col size="5">
+                      <ion-col>
                         <ion-label color="primary">Équipes</ion-label>
+                      </ion-col>
+                      <ion-col>
+                        <ion-text class="ion-hide-lg-down">Matchs </ion-text>
+                        <ion-text class="ion-hide-md-down">Total </ion-text>
+                        <ion-text class="ion-hide-lg-up">
+                          <ion-icon name="checkmark-done-circle-outline"></ion-icon>
+                        </ion-text>
+                      </ion-col>
+                      <ion-col>
+                        <ion-text class="ion-hide-lg-down">Matchs </ion-text>
+                        <ion-text class="ion-hide-md-down">Joués </ion-text>
+                        <ion-text class="ion-hide-lg-up">
+                          <ion-icon name="checkmark-circle-outline"></ion-icon>
+                        </ion-text>
+                      </ion-col>
+                      <ion-col>
+                        <ion-text class="ion-hide-lg-down">Matchs </ion-text>
+                        <ion-text class="ion-hide-md-down">Programmés </ion-text>
+                        <ion-text class="ion-hide-lg-up">
+                          <ion-icon name="calendar-number-outline"></ion-icon>
+                        </ion-text>
                       </ion-col>
                     </ion-row>
 
-                    {this.teamToSelect.map(row => (
+                    {this.teamToSelect?.map(row => (
                       <ion-row onClick={() => this.onTeamSelected(row)} class="ion-align-items-center clickable">
                         <ion-col size="2">
                           {row.selected ? (
@@ -476,9 +493,12 @@ export class PageMatch {
                             <ion-icon color="secondary" size="large" name="square-outline"></ion-icon>
                           )}
                         </ion-col>
-                        <ion-col size="5">
+                        <ion-col>
                           <mad-team-tile team={row.team.team}></mad-team-tile>
                         </ion-col>
+                        <ion-col>{row.totalMatchs}</ion-col>
+                        <ion-col>{row.doneMatchs}</ion-col>
+                        <ion-col>{row.scheduledMatchs}</ion-col>
                       </ion-row>
                     ))}
                   </ion-grid>
