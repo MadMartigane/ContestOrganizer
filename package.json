@@ -61,5 +61,8 @@
     "node": ">= 18.x",
     "npm": ">= 8.x"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "css.gg": "^2.1.1"
+  }
 }

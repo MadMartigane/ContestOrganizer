@@ -222,16 +222,16 @@ export class PageTournament {
         {this.renderSortingButton()}
 
         <ion-button class="ion-margin-vertical" onClick={() => this.confirmResetGrid()} expand="full" color="medium" size="default">
-          <ion-icon name="trash-bin-outline" size-xs="normal" size="large" color="warning"></ion-icon>
+          <mad-icon name="trash" xl warning></mad-icon>
           <ion-text class="ion-margin" color="warning">
             Effacer
           </ion-text>
         </ion-button>
 
         <ion-button expand="full" color="secondary" class="ion-margin-vertical" href={`/match/${this.tournament?.id}`} key={this.tournament?.id}>
-          <ion-icon name="medal-outline" size-xs="normal" size="large"></ion-icon>
+          <mad-icon name="board" xl light></mad-icon>
           <ion-text class="ion-margin">Go Match</ion-text>
-          <ion-icon name="arrow-forward-outline" size-xs="normal" size="large"></ion-icon>
+          <mad-icon name="arrow-right" xl light></mad-icon>
         </ion-button>
       </div>
     );
@@ -309,13 +309,13 @@ export class PageTournament {
                 <ion-grid class="can-be-clicked grid-edit-tournament-center" onClick={() => this.onEditTournamentName()}>
                   <ion-row class="ion-align-items-end ion-justify-content-center">
                     <ion-col size="2">
-                      <ion-icon name="trophy-outline" size="large" color="secondary"></ion-icon>
+                      <mad-icon name="trophy" m secondary></mad-icon>
                     </ion-col>
                     <ion-col size="8" size-md="6" size-lg="4">
                       <h2 class="ion-padding-horizontal">{this.tournament?.name}</h2>
                     </ion-col>
                     <ion-col size="2">
-                      <ion-icon name="pencil-outline" size="large" color="secondary"></ion-icon>
+                      <mad-icon name="pen" m secondary></mad-icon>
                     </ion-col>
                   </ion-row>
                 </ion-grid>
