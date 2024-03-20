@@ -1,0 +1,51 @@
+@import url('../../../node_modules/css.gg/icons/css/trash.css');
+@import url('../../../node_modules/css.gg/icons/css/spinner-two.css');
+@import url('../../../node_modules/css.gg/icons/css/board.css');
+@import url('../../../node_modules/css.gg/icons/css/arrow-right.css');
+@import url('../../../node_modules/css.gg/icons/css/band-aid.css');
+@import url('../../../node_modules/css.gg/icons/css/pen.css');
+@import url('../../../node_modules/css.gg/icons/css/trophy.css');
+
+.gg-xxs {
+  transform: scale(0.3);
+}
+.gg-xs {
+  transform: scale(0.6);
+}
+.gg-s {
+  transform: scale(0.9);
+}
+.gg-m {
+  transform: scale(1.2);
+}
+.gg-l {
+  transform: scale(1.5);
+}
+.gg-xl {
+  transform: scale(2.1);
+}
+.gg-xxl {
+  transform: scale(2.6);
+}
+
+.gg-xxs.gg-pen {
+  transform: scale(0.3) rotate(-45deg);
+}
+.gg-xs.gg-pen {
+  transform: scale(0.6) rotate(-45deg);
+}
+.gg-s.gg-pen {
+  transform: scale(0.9) rotate(-45deg);
+}
+.gg-m.gg-pen {
+  transform: scale(1.2) rotate(-45deg);
+}
+.gg-l.gg-pen {
+  transform: scale(1.5) rotate(-45deg);
+}
+.gg-xl.gg-pen {
+  transform: scale(2.1) rotate(-45deg);
+}
+.gg-xxl.gg-pen {
+  transform: scale(2.6) rotate(-45deg);
+}

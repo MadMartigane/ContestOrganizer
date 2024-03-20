@@ -41,6 +41,10 @@
 
 @import './variables.css';
 
+/* ####### CSS GG ######## */
+@import '../components/icon/icon.css';
+/* ####### END OFF CSS GG ######## */
+
 /* CUSTOM STUFF */
 ion-input {
   --placeholder-opacity: 0.6;

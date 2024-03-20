@@ -30,6 +30,25 @@ export namespace Components {
     interface GridDefault {
         "tournamentId": number | null;
     }
+    interface MadIcon {
+        "danger": boolean;
+        "dark": boolean;
+        "l": boolean;
+        "light": boolean;
+        "m": boolean;
+        "medium": boolean;
+        "name": string;
+        "primary": boolean;
+        "s": boolean;
+        "secondary": boolean;
+        "success": boolean;
+        "tertiary": boolean;
+        "warning": boolean;
+        "xl": boolean;
+        "xs": boolean;
+        "xxl": boolean;
+        "xxs": boolean;
+    }
     interface MadInputNumber {
         "color": string;
         "label"?: string;
@@ -151,6 +170,12 @@ declare global {
         prototype: HTMLGridDefaultElement;
         new (): HTMLGridDefaultElement;
     };
+    interface HTMLMadIconElement extends Components.MadIcon, HTMLStencilElement {
+    }
+    var HTMLMadIconElement: {
+        prototype: HTMLMadIconElement;
+        new (): HTMLMadIconElement;
+    };
     interface HTMLMadInputNumberElementEventMap {
         "madNumberChange": InputChangeEventDetail;
     }
@@ -260,6 +285,7 @@ declare global {
         "app-tabs": HTMLAppTabsElement;
         "grid-basket": HTMLGridBasketElement;
         "grid-default": HTMLGridDefaultElement;
+        "mad-icon": HTMLMadIconElement;
         "mad-input-number": HTMLMadInputNumberElement;
         "mad-match-tile": HTMLMadMatchTileElement;
         "mad-scorer-basket": HTMLMadScorerBasketElement;
@@ -284,6 +310,25 @@ declare namespace LocalJSX {
     interface GridDefault {
         "onGridTournamentChange"?: (event: GridDefaultCustomEvent<TournamentUpdateEvent>) => void;
         "tournamentId"?: number | null;
+    }
+    interface MadIcon {
+        "danger"?: boolean;
+        "dark"?: boolean;
+        "l"?: boolean;
+        "light"?: boolean;
+        "m"?: boolean;
+        "medium"?: boolean;
+        "name"?: string;
+        "primary"?: boolean;
+        "s"?: boolean;
+        "secondary"?: boolean;
+        "success"?: boolean;
+        "tertiary"?: boolean;
+        "warning"?: boolean;
+        "xl"?: boolean;
+        "xs"?: boolean;
+        "xxl"?: boolean;
+        "xxs"?: boolean;
     }
     interface MadInputNumber {
         "color"?: string;
@@ -343,6 +388,7 @@ declare namespace LocalJSX {
         "app-tabs": AppTabs;
         "grid-basket": GridBasket;
         "grid-default": GridDefault;
+        "mad-icon": MadIcon;
         "mad-input-number": MadInputNumber;
         "mad-match-tile": MadMatchTile;
         "mad-scorer-basket": MadScorerBasket;
@@ -363,6 +409,7 @@ declare module "@stencil/core" {
             "app-tabs": LocalJSX.AppTabs & JSXBase.HTMLAttributes<HTMLAppTabsElement>;
             "grid-basket": LocalJSX.GridBasket & JSXBase.HTMLAttributes<HTMLGridBasketElement>;
             "grid-default": LocalJSX.GridDefault & JSXBase.HTMLAttributes<HTMLGridDefaultElement>;
+            "mad-icon": LocalJSX.MadIcon & JSXBase.HTMLAttributes<HTMLMadIconElement>;
             "mad-input-number": LocalJSX.MadInputNumber & JSXBase.HTMLAttributes<HTMLMadInputNumberElement>;
             "mad-match-tile": LocalJSX.MadMatchTile & JSXBase.HTMLAttributes<HTMLMadMatchTileElement>;
             "mad-scorer-basket": LocalJSX.MadScorerBasket & JSXBase.HTMLAttributes<HTMLMadScorerBasketElement>;
