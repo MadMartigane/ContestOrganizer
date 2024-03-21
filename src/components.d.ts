@@ -31,23 +31,23 @@ export namespace Components {
         "tournamentId": number | null;
     }
     interface MadIcon {
-        "danger": boolean;
-        "dark": boolean;
-        "l": boolean;
-        "light": boolean;
-        "m": boolean;
-        "medium": boolean;
+        "danger"?: boolean;
+        "dark"?: boolean;
+        "l"?: boolean;
+        "light"?: boolean;
+        "m"?: boolean;
+        "medium"?: boolean;
         "name": string;
-        "primary": boolean;
-        "s": boolean;
-        "secondary": boolean;
-        "success": boolean;
-        "tertiary": boolean;
-        "warning": boolean;
-        "xl": boolean;
-        "xs": boolean;
-        "xxl": boolean;
-        "xxs": boolean;
+        "primary"?: boolean;
+        "s"?: boolean;
+        "secondary"?: boolean;
+        "success"?: boolean;
+        "tertiary"?: boolean;
+        "warning"?: boolean;
+        "xl"?: boolean;
+        "xs"?: boolean;
+        "xxl"?: boolean;
+        "xxs"?: boolean;
     }
     interface MadInputNumber {
         "color": string;
@@ -118,6 +118,10 @@ export interface MadScorerBasketCustomEvent<T> extends CustomEvent<T> {
 export interface MadSelectTeamCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLMadSelectTeamElement;
+}
+export interface PageHomeCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLPageHomeElement;
 }
 export interface PageTeamSelectCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -239,7 +243,18 @@ declare global {
         prototype: HTMLMadTeamTileElement;
         new (): HTMLMadTeamTileElement;
     };
+    interface HTMLPageHomeElementEventMap {
+        "darkModeChange": boolean;
+    }
     interface HTMLPageHomeElement extends Components.PageHome, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLPageHomeElementEventMap>(type: K, listener: (this: HTMLPageHomeElement, ev: PageHomeCustomEvent<HTMLPageHomeElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLPageHomeElementEventMap>(type: K, listener: (this: HTMLPageHomeElement, ev: PageHomeCustomEvent<HTMLPageHomeElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLPageHomeElement: {
         prototype: HTMLPageHomeElement;
@@ -369,6 +384,7 @@ declare namespace LocalJSX {
         "team"?: GenericTeam1 | null;
     }
     interface PageHome {
+        "onDarkModeChange"?: (event: PageHomeCustomEvent<boolean>) => void;
     }
     interface PageMatch {
         "tournamentId"?: number;

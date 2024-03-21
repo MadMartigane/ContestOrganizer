@@ -1,22 +1,16 @@
-
 span.counter {
   color: var(--ion-color-primary);
 }
 
-ion-grid.page-tournament-grid > ion-row > ion-col {
+ion-grid.default-grid > ion-row > ion-col {
   text-align: center;
 }
 
-ion-grid.page-tournament-grid > ion-row.page-tournament-grid-header {
+ion-grid.default-grid > ion-row.default-grid-header {
   border: solid 1px var(--ion-color-light);
   background-color: var(--ion-color-light);
 }
 
-ion-grid.page-tournament-grid > ion-row {
+ion-grid.default-grid > ion-row {
   border: solid 1px var(--ion-color-light);
 }
-
-ion-grid.grid-edit-tournament-center > ion-row > ion-col {
-  text-align: center;
-}
-

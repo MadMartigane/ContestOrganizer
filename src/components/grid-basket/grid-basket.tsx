@@ -77,9 +77,8 @@ export class GridBasket {
     return (
       <ion-row class="basket-grid-header ion-align-items-center">
         <ion-col size="1">
-          <ion-label color="primary">
-            <ion-icon name="swap-vertical-outline"></ion-icon>
-          </ion-label>
+          <mad-icon class="ion-hide-sm-down" name="format-line-height" primary></mad-icon>
+          <mad-icon class="ion-hide-sm-up" name="format-line-height" primary s></mad-icon>
         </ion-col>
         <ion-col size="3">
           <ion-label color="primary">
@@ -107,8 +106,8 @@ export class GridBasket {
         </ion-col>
         <ion-col>
           <ion-label color="primary">
-            <ion-icon class="ion-hide-sm-down" name="stats-chart-outline"></ion-icon>
-            <ion-text> %</ion-text>
+            <mad-icon class="ion-hide-sm-down" name="math-percent" primary></mad-icon>
+            <mad-icon class="ion-hide-sm-up" name="math-percent" primary s></mad-icon>
           </ion-label>
         </ion-col>
         <ion-col>
@@ -116,7 +115,8 @@ export class GridBasket {
             <ion-text class="ion-hide-md-down">Points </ion-text>
             <ion-text class="ion-hide-lg-down">Marqués</ion-text>
             <ion-text class="ion-hide-lg-up">
-              <ion-icon name="add-outline"></ion-icon>
+              <mad-icon class="ion-hide-sm-down" name="math-plus" success></mad-icon>
+              <mad-icon class="ion-hide-sm-up" name="math-plus" success s></mad-icon>
             </ion-text>
           </ion-label>
         </ion-col>
@@ -125,7 +125,8 @@ export class GridBasket {
             <ion-text class="ion-hide-md-down">Points </ion-text>
             <ion-text class="ion-hide-lg-down">Encaissés</ion-text>
             <ion-text class="ion-hide-lg-up">
-              <ion-icon name="remove-outline"></ion-icon>
+              <mad-icon class="ion-hide-sm-down" name="math-minus" secondary></mad-icon>
+              <mad-icon class="ion-hide-sm-up" name="math-minus" secondary s></mad-icon>
             </ion-text>
           </ion-label>
         </ion-col>

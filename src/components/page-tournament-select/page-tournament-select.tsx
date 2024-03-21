@@ -153,14 +153,14 @@ export class PageTournamentSelect {
                     <ion-badge slot="start" class="ion-margin-end" color="tertiary">
                       {tournament.grid.length}
                     </ion-badge>
-                    <ion-icon class="ion-margin-horizontal" onClick={(ev: Event) => this.confirmRemoveTournament(ev, tournament.id)} slot="end" name="trash-outline"></ion-icon>
+                    <mad-icon class="ion-margin-horizontal" onClick={(ev: Event) => this.confirmRemoveTournament(ev, tournament.id)} slot="end" name="trash" medium></mad-icon>
                   </ion-label>
                 </ion-item>
               ))
             ) : (
               <div class="ion-text-center">
                 <h1>
-                  <ion-icon name="accessibility-outline"></ion-icon> Pas encore de tournois <ion-icon name="football-outline"></ion-icon>
+                  <mad-icon name="trophy" l secondary></mad-icon> Pas encore de tournois <mad-icon name="games" l secondary></mad-icon>
                 </h1>
               </div>
             )}
@@ -196,7 +196,7 @@ export class PageTournamentSelect {
                   </ion-item>
 
                   <ion-button onClick={() => this.addTournament()} expand="full" disabled={!this.isNewTournamentNameReady}>
-                    <ion-icon slot="start" name="add-outline"></ion-icon>
+                    <mad-icon slot="start" name="math-plus" m light></mad-icon>
                     Ajouter
                   </ion-button>
 
@@ -207,7 +207,7 @@ export class PageTournamentSelect {
                     expand="full"
                     color="secondary"
                   >
-                    <ion-icon slot="start" name="remove-outline"></ion-icon>
+                    <mad-icon slot="start" name="math-minus" m light></mad-icon>
                     Annuler
                   </ion-button>
                 </div>
@@ -219,7 +219,7 @@ export class PageTournamentSelect {
                     }}
                     expand="full"
                   >
-                    <ion-icon slot="start" name="add-outline"></ion-icon>
+                    <mad-icon slot="start" name="math-plus" m light></mad-icon>
                     Nouveau tournoi
                   </ion-button>
                 </div>
