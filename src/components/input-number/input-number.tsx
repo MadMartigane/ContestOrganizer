@@ -80,7 +80,7 @@ export class MadInputNumber {
                   }}
                   size="small"
                 >
-                  <ion-icon slot="icon-only" size="large" color="primary" name="remove-outline"></ion-icon>
+                  <mad-icon slot="icon-only" l primary name="math-minus"></mad-icon>
                 </ion-button>
                 <ion-chip outline color={this.color}>
                   {this.number}
@@ -92,7 +92,7 @@ export class MadInputNumber {
                   }}
                   size="small"
                 >
-                  <ion-icon slot="icon-only" size="large" color="primary" name="add-outline"></ion-icon>
+                  <mad-icon slot="icon-only" l primary name="math-plus"></mad-icon>
                 </ion-button>
               </div>
             </ion-content>

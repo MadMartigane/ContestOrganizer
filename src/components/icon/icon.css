@@ -1,10 +1,37 @@
-@import url('../../../node_modules/css.gg/icons/css/trash.css');
-@import url('../../../node_modules/css.gg/icons/css/spinner-two.css');
-@import url('../../../node_modules/css.gg/icons/css/board.css');
+@import url('../../../node_modules/css.gg/icons/css/add.css');
 @import url('../../../node_modules/css.gg/icons/css/arrow-right.css');
 @import url('../../../node_modules/css.gg/icons/css/band-aid.css');
+@import url('../../../node_modules/css.gg/icons/css/board.css');
+@import url('../../../node_modules/css.gg/icons/css/close-o.css');
+@import url('../../../node_modules/css.gg/icons/css/debug.css');
+@import url('../../../node_modules/css.gg/icons/css/format-line-height.css');
+@import url('../../../node_modules/css.gg/icons/css/games.css');
+@import url('../../../node_modules/css.gg/icons/css/home.css');
+@import url('../../../node_modules/css.gg/icons/css/math-minus.css');
+@import url('../../../node_modules/css.gg/icons/css/math-percent.css');
+@import url('../../../node_modules/css.gg/icons/css/math-plus.css');
 @import url('../../../node_modules/css.gg/icons/css/pen.css');
+@import url('../../../node_modules/css.gg/icons/css/play-button-o.css');
+@import url('../../../node_modules/css.gg/icons/css/play-stop-o.css');
+@import url('../../../node_modules/css.gg/icons/css/reorder.css');
+@import url('../../../node_modules/css.gg/icons/css/shape-square.css');
+@import url('../../../node_modules/css.gg/icons/css/smile-sad.css');
+@import url('../../../node_modules/css.gg/icons/css/spinner-two.css');
+@import url('../../../node_modules/css.gg/icons/css/square.css');
+@import url('../../../node_modules/css.gg/icons/css/swap.css');
+@import url('../../../node_modules/css.gg/icons/css/swap-vertical.css');
+@import url('../../../node_modules/css.gg/icons/css/trash.css');
 @import url('../../../node_modules/css.gg/icons/css/trophy.css');
+@import url('../../../node_modules/css.gg/icons/css/unavailable.css');
+
+i.mad-icon {
+  display: inline-block;
+}
+
+.gg-reorder,
+.gg-pen {
+  margin-bottom: 10px;
+}
 
 .gg-xxs {
   transform: scale(0.3);
@@ -28,24 +55,38 @@
   transform: scale(2.6);
 }
 
-.gg-xxs.gg-pen {
+.gg-xxs.gg-pen,
+.gg-xxs.gg-unavailable,
+.gg-xxs.gg-math-percent {
   transform: scale(0.3) rotate(-45deg);
 }
-.gg-xs.gg-pen {
+.gg-xs.gg-pen,
+.gg-xs.gg-unavailable,
+.gg-xs.gg-math-percent {
   transform: scale(0.6) rotate(-45deg);
 }
-.gg-s.gg-pen {
+.gg-s.gg-pen,
+.gg-s.gg-unavailable,
+.gg-s.gg-math-percent {
   transform: scale(0.9) rotate(-45deg);
 }
-.gg-m.gg-pen {
+.gg-m.gg-pen,
+.gg-m.gg-unavailable,
+.gg-m.gg-math-percent {
   transform: scale(1.2) rotate(-45deg);
 }
-.gg-l.gg-pen {
+.gg-l.gg-pen,
+.gg-l.gg-unavailable,
+.gg-l.gg-math-percent {
   transform: scale(1.5) rotate(-45deg);
 }
-.gg-xl.gg-pen {
+.gg-xl.gg-pen,
+.gg-xl.gg-unavailable,
+.gg-xl.gg-math-percent {
   transform: scale(2.1) rotate(-45deg);
 }
-.gg-xxl.gg-pen {
+.gg-xxl.gg-pen,
+.gg-xxl.gg-unavailable,
+.gg-xxl.gg-math-percent {
   transform: scale(2.6) rotate(-45deg);
 }

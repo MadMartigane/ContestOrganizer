@@ -210,7 +210,7 @@ export class PageTournament {
 
     return (
       <ion-button expand="full" color="primary" class="ion-margin-vertical" onClick={() => this.goRanking()}>
-        <ion-icon name="car-sport-outline" size-xs="normal" size="large"></ion-icon>
+        <mad-icon name="reorder" xl light></mad-icon>
         <ion-text class="ion-margin">Classement !</ion-text>
       </ion-button>
     );
@@ -258,7 +258,7 @@ export class PageTournament {
               <ion-card color="danger">
                 <ion-card-header>
                   <ion-card-title>
-                    <ion-icon name="skull-outline" size="default" color="light"></ion-icon>
+                    <mad-icon name="debug" xxl light></mad-icon>
                     <ion-text color="light" class="ion-margin">
                       Erreur
                     </ion-text>
@@ -284,7 +284,7 @@ export class PageTournament {
                         }}
                         fill="solid"
                       >
-                        <ion-icon slot="icon-only" name="close-circle-outline"></ion-icon>
+                        <mad-icon slot="icon-only" name="close-o" primary s></mad-icon>
                       </ion-button>
                     </ion-col>
                     <ion-col size="8" size-md="6" size-lg="4">
@@ -300,7 +300,7 @@ export class PageTournament {
                     </ion-col>
                     <ion-col size="2">
                       <ion-button size="small" color="secondary" onClick={() => this.editTournamentName()} fill="solid">
-                        <ion-icon slot="icon-only" name="save-outline"></ion-icon>
+                        <mad-icon slot="icon-only" name="add" light s></mad-icon>
                       </ion-button>
                     </ion-col>
                   </ion-row>
@@ -334,7 +334,7 @@ export class PageTournament {
                       step={this.conf.teamNumberStep}
                       placeholder={String(this.conf.teamNumberDefault)}
                     ></mad-input-number>{' '}
-                    <ion-icon name="pencil-outline"></ion-icon>
+                    <mad-icon name="pen" xs primary></mad-icon>
                   </ion-col>
                 </ion-row>
               </ion-grid>

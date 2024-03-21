@@ -6,6 +6,22 @@ import { Component, h } from '@stencil/core';
   shadow: false,
 })
 export class AppRoot {
+  constructor() {
+    // Use matchMedia to check the user preference
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+    this.toggleDarkTheme(prefersDark.matches);
+
+    // Listen for changes to the prefers-color-scheme media query
+    prefersDark.addEventListener('change', mediaQuery => this.toggleDarkTheme(mediaQuery.matches));
+  }
+
+  // Add or remove the "dark" class on the document body
+  private toggleDarkTheme(shouldBeDark: boolean) {
+    document.body.classList.toggle('dark', shouldBeDark);
+    document.body.classList.toggle('light', !shouldBeDark);
+  }
+
   render() {
     return (
       <ion-app>
@@ -25,6 +41,6 @@ export class AppRoot {
         </ion-router>
         <ion-nav></ion-nav>
       </ion-app>
-    )
+    );
   }
 }

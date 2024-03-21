@@ -78,31 +78,28 @@ export class GridDefault {
   render() {
     return (
       <Host>
-        <ion-grid class="grid-default-grid">
-          <ion-row class="grid-default-grid-header ion-align-items-center">
+        <ion-grid class="default-grid">
+          <ion-row class="default-grid-header ion-align-items-center">
             <ion-col size="1">
-              <ion-label color="primary">
-                <ion-icon name="swap-vertical-outline"></ion-icon>
-              </ion-label>
+              <mad-icon class="ion-hide-sm-down" name="format-line-height" primary></mad-icon>
+              <mad-icon class="ion-hide-sm-up" name="format-line-height" primary s></mad-icon>
             </ion-col>
             <ion-col size="3">
-              <ion-label color="primary">Équipes</ion-label>
+              <ion-text color="primary">Équipes</ion-text>
             </ion-col>
             <ion-col>
-              <ion-label color="success">Points</ion-label>
+              <ion-text color="success">Points</ion-text>
             </ion-col>
             <ion-col>
-              <ion-label color="secondary">
-                Buts <ion-icon name="add-outline"></ion-icon>
-              </ion-label>
+              <ion-text color="secondary">Buts</ion-text>
+              <mad-icon name="math-plus" s secondary></mad-icon>
             </ion-col>
             <ion-col>
-              <ion-label color="tertiary">
-                Buts <ion-icon name="remove-outline"></ion-icon>
-              </ion-label>
+              <ion-text color="tertiary">Buts</ion-text>
+              <mad-icon name="math-minus" xs tertiary></mad-icon>
             </ion-col>
             <ion-col>
-              <ion-label color="warning">Goal average</ion-label>
+              <ion-text color="warning">Goal average</ion-text>
             </ion-col>
           </ion-row>
 

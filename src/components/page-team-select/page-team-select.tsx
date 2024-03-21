@@ -142,7 +142,7 @@ export class PageTeamSelect {
 
               {this.searchValue?.length > 2 && !this.suggested.length ? (
                 <ion-item color="warning">
-                  <ion-icon name="sad-outline"></ion-icon>
+                  <mad-icon name="smile-sad" primary l></mad-icon>
                   <ion-label>
                     <h2>Aucun résultat</h2>
                   </ion-label>

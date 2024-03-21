@@ -77,7 +77,7 @@ export class MadScorerBasket {
                     }}
                     size="default"
                   >
-                    <ion-icon slot="icon-only" size="default" color="primary" name={this.minusMode ? 'remove-outline' : 'add-outline'}></ion-icon>
+                    <mad-icon slot="icon-only" m primary name={this.minusMode ? 'math-minus' : 'math-plus'}></mad-icon>
                     <span>1</span>
                   </ion-button>
                 </ion-col>
@@ -89,7 +89,7 @@ export class MadScorerBasket {
                     }}
                     size="default"
                   >
-                    <ion-icon slot="icon-only" size="default" color="primary" name={this.minusMode ? 'remove-outline' : 'add-outline'}></ion-icon>
+                    <mad-icon slot="icon-only" m primary name={this.minusMode ? 'math-minus' : 'math-plus'}></mad-icon>
                     <span>2</span>
                   </ion-button>
                 </ion-col>
@@ -101,19 +101,19 @@ export class MadScorerBasket {
                     }}
                     size="default"
                   >
-                    <ion-icon slot="icon-only" size="default" color="primary" name={this.minusMode ? 'remove-outline' : 'add-outline'}></ion-icon>
+                    <mad-icon slot="icon-only" m primary name={this.minusMode ? 'math-minus' : 'math-plus'}></mad-icon>
                     <span>3</span>
                   </ion-button>
                 </ion-col>
                 <ion-col>
                   <ion-button
-                    color="primary"
+                    color={this.minusMode ? 'secondary' : 'primary'}
                     onClick={() => {
                       this.switchMode();
                     }}
                     size="default"
                   >
-                    <ion-icon slot="icon-only" size="default" color="light" name="repeat-outline"></ion-icon>
+                    <mad-icon slot="icon-only" l light name={this.minusMode ? 'swap' : 'swap-vertical'}></mad-icon>
                   </ion-button>
                 </ion-col>
               </ion-row>
