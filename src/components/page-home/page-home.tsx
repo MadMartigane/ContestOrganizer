@@ -1,5 +1,6 @@
 import { ToggleCustomEvent, ToggleChangeEventDetail } from '@ionic/core';
 import { Component, Event, EventEmitter, Fragment, h } from '@stencil/core';
+import '@spectrum-web-components/switch/sp-switch.js';
 
 @Component({
   tag: 'page-home',
@@ -21,6 +22,9 @@ export class PageHome {
         <ion-header>
           <ion-toolbar color="primary">
             <ion-title>Accueil</ion-title>
+            <sp-switch emphasized size="xl" checked>
+              Switch On
+            </sp-switch>
             <ion-toggle
               label-placement="start"
               enable-on-off-labels="true"
