@@ -10,7 +10,3 @@ ion-grid.basket-grid > ion-row.basket-grid-header {
 ion-grid.basket-grid > ion-row {
   border: solid 1px var(--ion-color-light);
 }
-
-ion-grid.grid-edit-tournament-center > ion-row > ion-col {
-  text-align: center;
-}
