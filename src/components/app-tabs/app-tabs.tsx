@@ -31,13 +31,13 @@ export class AppTabs {
         </ion-tab>
         <ion-tab-bar slot="bottom">
           <ion-tab-button tab="tab-home">
-            <mad-icon name="home" primary l></mad-icon>
-            <ion-label>Home</ion-label>
+            <mad-icon name="home" primary m></mad-icon>
+            <p>Home</p>
           </ion-tab-button>
           <ion-tab-button tab="tab-tournament-select">
-            <mad-icon name="trophy" primary l></mad-icon>
+            <mad-icon name="trophy" primary m></mad-icon>
             <ion-badge color="warning">{this.numberOfTournaments}</ion-badge>
-            <ion-label>Tournois</ion-label>
+            <p>Tournois</p>
           </ion-tab-button>
         </ion-tab-bar>
       </ion-tabs>

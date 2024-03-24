@@ -1,13 +1,17 @@
 import { Component, Host, Prop, Watch, h } from '@stencil/core';
+import setting, { GlobalSetting } from '../../modules/global-setting/global-setting';
 
 @Component({
   tag: 'mad-icon',
   shadow: false,
 })
 export class MadIcon {
+  private readonly globalSetting: GlobalSetting;
   private className: string;
   private classSize: string;
   private classColor: string;
+  private classScale: string;
+  private isDarkThemeActive: boolean;
 
   @Prop() name: string;
   @Prop() xxs?: boolean;
@@ -28,24 +32,49 @@ export class MadIcon {
   @Prop() warning?: boolean;
 
   constructor() {
-    this.setClassName();
+    this.globalSetting = setting;
 
+    this.setClassName();
+    this.setClassSize();
+    this.setClassColor();
+
+    this.globalSetting.onDarkThemeChange(() => {
+      this.isDarkThemeActive = this.globalSetting.isDarkThemeActive();
+    });
+  }
+
+  @Watch('name')
+  private setClassName() {
+    this.className = `gg-${this.name || 'band-aid'}`;
+  }
+
+  private setClassSize() {
     if (this.xxs) {
       this.classSize = 'gg-xxs';
+      this.classScale = 'small';
     } else if (this.xs) {
       this.classSize = 'gg-xs';
+      this.classScale = 'small';
     } else if (this.s) {
       this.classSize = 'gg-s';
+      this.classScale = 'medium';
     } else if (this.l) {
       this.classSize = 'gg-l';
+      this.classScale = 'medium';
     } else if (this.xl) {
       this.classSize = 'gg-xl';
+      this.classScale = 'large';
     } else if (this.xxl) {
       this.classSize = 'gg-xxl';
+      this.classScale = 'large';
     } else {
       this.classSize = 'gg-m';
+      this.classScale = 'medium';
     }
+  }
 
+  // TODO: transition ionic => spectrum
+  private setClassColor() {
     if (this.danger) {
       this.classColor = 'danger';
     } else if (this.dark) {
@@ -67,17 +96,12 @@ export class MadIcon {
     }
   }
 
-  @Watch('name')
-  setClassName() {
-    this.className = `gg-${this.name || 'band-aid'}`;
-  }
-
   render() {
     return (
       <Host>
-        <ion-text class="ion-margin" color={this.classColor}>
-          <i class={`mad-icon ${this.classSize} ${this.className}`}></i>
-        </ion-text>
+        <sp-theme scale={this.classScale} color={this.isDarkThemeActive ? 'light' : 'dark'}>
+          <i class={`mad-icon ${this.classSize} ${this.classColor} ${this.className}`}></i>
+        </sp-theme>
       </Host>
     );
   }

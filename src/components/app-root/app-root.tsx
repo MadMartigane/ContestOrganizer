@@ -11,21 +11,7 @@ export class AppRoot {
   private spectrum: boolean;
 
   constructor() {
-    // Use matchMedia to check the user preference
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-
-    this.toggleDarkTheme(prefersDark.matches);
-
-    // Listen for changes to the prefers-color-scheme media query
-    prefersDark.addEventListener('change', mediaQuery => this.toggleDarkTheme(mediaQuery.matches));
-
     this.spectrum = false;
-  }
-
-  // Add or remove the "dark" class on the document body
-  private toggleDarkTheme(shouldBeDark: boolean) {
-    document.body.classList.toggle('dark', shouldBeDark);
-    document.body.classList.toggle('light', !shouldBeDark);
   }
 
   private renderIonicApp() {
