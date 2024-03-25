@@ -3,6 +3,7 @@
 @import url('../../../node_modules/css.gg/icons/css/band-aid.css');
 @import url('../../../node_modules/css.gg/icons/css/board.css');
 @import url('../../../node_modules/css.gg/icons/css/close-o.css');
+@import url('../../../node_modules/css.gg/icons/css/dark-mode.css');
 @import url('../../../node_modules/css.gg/icons/css/debug.css');
 @import url('../../../node_modules/css.gg/icons/css/format-line-height.css');
 @import url('../../../node_modules/css.gg/icons/css/games.css');
@@ -24,12 +25,13 @@
 @import url('../../../node_modules/css.gg/icons/css/trophy.css');
 @import url('../../../node_modules/css.gg/icons/css/unavailable.css');
 
-i.mad-icon {
+.mad-icon {
   display: inline-block;
+  margin: 5px;
 }
 
-.gg-reorder,
-.gg-pen {
+i.gg-reorder,
+i.gg-pen {
   margin-bottom: 10px;
 }
 

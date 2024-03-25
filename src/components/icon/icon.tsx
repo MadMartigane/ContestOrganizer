@@ -29,7 +29,16 @@ export class MadIcon {
 
   constructor() {
     this.setClassName();
+    this.setClassSize();
+    this.setClassColor();
+  }
 
+  @Watch('name')
+  private setClassName() {
+    this.className = `gg-${this.name || 'band-aid'}`;
+  }
+
+  private setClassSize() {
     if (this.xxs) {
       this.classSize = 'gg-xxs';
     } else if (this.xs) {
@@ -45,7 +54,10 @@ export class MadIcon {
     } else {
       this.classSize = 'gg-m';
     }
+  }
 
+  // TODO: transition ionic => spectrum
+  private setClassColor() {
     if (this.danger) {
       this.classColor = 'danger';
     } else if (this.dark) {
@@ -65,11 +77,6 @@ export class MadIcon {
     } else {
       this.classColor = 'primary';
     }
-  }
-
-  @Watch('name')
-  setClassName() {
-    this.className = `gg-${this.name || 'band-aid'}`;
   }
 
   render() {
