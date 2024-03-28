@@ -230,7 +230,9 @@ export class PageTournament {
 
         <ion-button expand="full" color="secondary" class="ion-margin-vertical" href={`/match/${this.tournament?.id}`} key={this.tournament?.id}>
           <mad-icon name="board" xl light></mad-icon>
-          <ion-text class="ion-margin">Go Match</ion-text>
+          <ion-text color="light" class="ion-margin">
+            Go Match
+          </ion-text>
           <mad-icon name="arrow-right" xl light></mad-icon>
         </ion-button>
       </div>
@@ -284,13 +286,13 @@ export class PageTournament {
                         }}
                         fill="solid"
                       >
-                        <mad-icon slot="icon-only" name="close-o" primary s></mad-icon>
+                        <mad-icon slot="icon-only" name="close-o" dark s></mad-icon>
                       </ion-button>
                     </ion-col>
                     <ion-col size="8" size-md="6" size-lg="4">
                       <ion-input
                         id={this.inputNameId}
-                        color="primary"
+                        color="dark"
                         inputmode="text"
                         autofocus
                         name="tournamentName"
@@ -300,7 +302,7 @@ export class PageTournament {
                     </ion-col>
                     <ion-col size="2">
                       <ion-button size="small" color="secondary" onClick={() => this.editTournamentName()} fill="solid">
-                        <mad-icon slot="icon-only" name="add" light s></mad-icon>
+                        <mad-icon slot="icon-only" name="add" dark s></mad-icon>
                       </ion-button>
                     </ion-col>
                   </ion-row>
@@ -328,13 +330,13 @@ export class PageTournament {
                       value={this.teamNumber}
                       label={`Nombre d’équipes (min:${this.conf.teamNumberMin}, max:${this.conf.teamNumberMax})`}
                       onMadNumberChange={(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamNumberChange(ev.detail)}
-                      color="primary"
+                      color="dark"
                       min={this.conf.teamNumberMin}
                       max={this.conf.teamNumberMax}
                       step={this.conf.teamNumberStep}
                       placeholder={String(this.conf.teamNumberDefault)}
                     ></mad-input-number>{' '}
-                    <mad-icon name="pen" xs primary></mad-icon>
+                    <mad-icon name="pen" xs secondary></mad-icon>
                   </ion-col>
                 </ion-row>
               </ion-grid>

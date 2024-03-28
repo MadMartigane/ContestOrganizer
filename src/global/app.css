@@ -59,7 +59,7 @@ ion-input {
 }
 .alert-message.sc-ion-alert-ios,
 .alert-input-group.sc-ion-alert-ios {
-  color: var(--ion-color-primary);
+  color: var(--ion-color-dark);
   font-size: large;
 }
 button.alert-button.alert-button-role-confirm {

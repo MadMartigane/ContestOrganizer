@@ -271,15 +271,13 @@ export class PageMatch {
                   <ion-grid class="page-match-grid">
                     <ion-row class="page-match-grid-header ion-align-items-center">
                       <ion-col size="5">
-                        <ion-label color="primary">Locaux</ion-label>
+                        <ion-label color="dark">Locaux</ion-label>
                       </ion-col>
                       <ion-col size="2">
-                        <ion-label color="primary">
-                          <mad-icon name="medal-outline"></mad-icon>
-                        </ion-label>
+                        <mad-icon secondary xl name="adidas"></mad-icon>
                       </ion-col>
                       <ion-col size="5">
-                        <ion-label color="primary">Visiteurs</ion-label>
+                        <ion-label color="dark">Visiteurs</ion-label>
                       </ion-col>
                     </ion-row>
                   </ion-grid>
@@ -290,7 +288,7 @@ export class PageMatch {
                         {match.status === MatchStatus.PENDING && (
                           <ion-chip color="tertiary">
                             Match programmé
-                            <mad-icon name="calendar-number-outline"></mad-icon>
+                            <mad-icon name="calendar-today" tertiary m></mad-icon>
                           </ion-chip>
                         )}
                         {match.status === MatchStatus.DOING && (
@@ -302,7 +300,7 @@ export class PageMatch {
                         {match.status === MatchStatus.DONE && (
                           <ion-chip color="danger">
                             Match terminé
-                            <mad-icon name="checkmark-circle-outline"></mad-icon>
+                            <mad-icon name="check-r" danger m></mad-icon>
                           </ion-chip>
                         )}
                       </div>
