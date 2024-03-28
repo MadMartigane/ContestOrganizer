@@ -77,17 +77,17 @@ export class GridBasket {
     return (
       <ion-row class="basket-grid-header ion-align-items-center">
         <ion-col size="1">
-          <mad-icon class="ion-hide-sm-down" name="format-line-height" primary></mad-icon>
-          <mad-icon class="ion-hide-sm-up" name="format-line-height" primary s></mad-icon>
+          <mad-icon class="ion-hide-sm-down" name="format-line-height" dark></mad-icon>
+          <mad-icon class="ion-hide-sm-up" name="format-line-height" dark s></mad-icon>
         </ion-col>
         <ion-col size="3">
-          <ion-label color="primary">
+          <ion-label color="dark">
             <ion-text class="ion-hide-sm-down">Équipes</ion-text>
             <ion-text class="ion-hide-sm-up">Éq</ion-text>
           </ion-label>
         </ion-col>
         <ion-col>
-          <ion-label color="primary">
+          <ion-label color="dark">
             <ion-text class="ion-hide-sm-down">Joués</ion-text>
             <ion-text class="ion-hide-sm-up">J</ion-text>
           </ion-label>
@@ -105,10 +105,8 @@ export class GridBasket {
           </ion-label>
         </ion-col>
         <ion-col>
-          <ion-label color="primary">
-            <mad-icon class="ion-hide-sm-down" name="math-percent" primary></mad-icon>
-            <mad-icon class="ion-hide-sm-up" name="math-percent" primary s></mad-icon>
-          </ion-label>
+          <mad-icon class="ion-hide-sm-down" name="math-percent" dark></mad-icon>
+          <mad-icon class="ion-hide-sm-up" name="math-percent" dark s></mad-icon>
         </ion-col>
         <ion-col>
           <ion-label color="success">
@@ -138,7 +136,7 @@ export class GridBasket {
     let counter = 0;
     const gridDatas = this.getTournamentFormatedDatas();
     if (!gridDatas) {
-      // TODO display message ?!
+      // TODO: display message ?!
       return null;
     }
 
@@ -153,7 +151,7 @@ export class GridBasket {
         <ion-col size="3">
           <mad-select-team
             value={gridData?.team}
-            color="primary"
+            color="dark"
             type={this.tournament?.type}
             tournamentGridId={gridData?.tournamentGridId}
             onMadSelectChange={(ev: CustomEvent<GridTeamOnUpdateDetail>) => this.onTeamTeamChange(ev.detail)}
@@ -161,7 +159,7 @@ export class GridBasket {
           ></mad-select-team>
         </ion-col>
         <ion-col>
-          <ion-label color="primary">{(gridData?.winGames || 0) + (gridData?.looseGames || 0)}</ion-label>
+          <ion-label color="dark">{(gridData?.winGames || 0) + (gridData?.looseGames || 0)}</ion-label>
         </ion-col>
         <ion-col>
           <mad-input-number readonly value={gridData?.winGames} color="success" min={this.conf.winGamesMin} placeholder="0"></mad-input-number>
@@ -170,7 +168,7 @@ export class GridBasket {
           <mad-input-number readonly value={gridData?.looseGames} color="secondary" min={this.conf.looseGamesMin} placeholder="0"></mad-input-number>
         </ion-col>
         <ion-col>
-          <mad-input-number readonly value={gridData?.winGamesPercent} color="primary" min={this.conf.winGamesPercentMin} placeholder="0"></mad-input-number>
+          <mad-input-number readonly value={gridData?.winGamesPercent} color="dark" min={this.conf.winGamesPercentMin} placeholder="0"></mad-input-number>
         </ion-col>
         <ion-col>
           <mad-input-number readonly value={gridData?.scoredPoints} color="success" min={this.conf.scoredPointsMin} placeholder="0"></mad-input-number>

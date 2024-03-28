@@ -214,12 +214,13 @@ export class PageTournamentSelect {
               ) : (
                 <div>
                   <ion-button
+                    color="primary"
                     onClick={() => {
                       this.displayUiAddingTournament();
                     }}
                     expand="full"
                   >
-                    <mad-icon slot="start" name="math-plus" m light></mad-icon>
+                    <mad-icon slot="start" name="math-plus" m dark></mad-icon>
                     Nouveau tournoi
                   </ion-button>
                 </div>

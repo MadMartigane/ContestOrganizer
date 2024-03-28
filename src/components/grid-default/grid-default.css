@@ -1,7 +1,3 @@
-span.counter {
-  color: var(--ion-color-primary);
-}
-
 ion-grid.default-grid > ion-row > ion-col {
   text-align: center;
 }

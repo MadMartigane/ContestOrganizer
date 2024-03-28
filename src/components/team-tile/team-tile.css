@@ -7,3 +7,6 @@ ion-grid.grid-team-tile > ion-row > ion-col {
   text-align: left;
 }
 
+span.grid-team-text {
+  color: var(--ion-text-color);
+}
