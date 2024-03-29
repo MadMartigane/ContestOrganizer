@@ -174,7 +174,7 @@ export class PageTournamentSelect {
                   <ion-item>
                     <ion-label position="floating">Nom du tournois</ion-label>
                     <ion-input
-                      color="primary"
+                      color="dark"
                       placeholder="Ligue 1"
                       autofocus
                       inputmode="text"
@@ -187,7 +187,9 @@ export class PageTournamentSelect {
 
                   <ion-item>
                     <ion-select id={`${this.selectTournamentTypeId}`} interface="action-sheet" placeholder="Quel sport ? (defaut: Foot ⚽️)">
-                      <ion-select-option value={TournamentType.NBA}>{TournamentTypeLabel.NBA}</ion-select-option>
+                      <ion-select-option value={TournamentType.NBA}>
+                        <ion-text color="dark">{TournamentTypeLabel.NBA}</ion-text>
+                      </ion-select-option>
                       <ion-select-option value={TournamentType.RUGBY}>{TournamentTypeLabel.RUGBY}</ion-select-option>
                       <ion-select-option value={TournamentType.NFL}>{TournamentTypeLabel.NFL}</ion-select-option>
                       <ion-select-option value={TournamentType.BASKET}>{TournamentTypeLabel.BASKET}</ion-select-option>
@@ -196,7 +198,7 @@ export class PageTournamentSelect {
                   </ion-item>
 
                   <ion-button onClick={() => this.addTournament()} expand="full" disabled={!this.isNewTournamentNameReady}>
-                    <mad-icon slot="start" name="math-plus" m light></mad-icon>
+                    <mad-icon slot="start" name="math-plus" m dark></mad-icon>
                     Ajouter
                   </ion-button>
 
@@ -207,7 +209,7 @@ export class PageTournamentSelect {
                     expand="full"
                     color="secondary"
                   >
-                    <mad-icon slot="start" name="math-minus" m light></mad-icon>
+                    <mad-icon slot="start" name="math-minus" m dark></mad-icon>
                     Annuler
                   </ion-button>
                 </div>
@@ -220,7 +222,7 @@ export class PageTournamentSelect {
                     }}
                     expand="full"
                   >
-                    <mad-icon slot="start" name="math-plus" m dark></mad-icon>
+                    <mad-icon slot="start" name="math-plus" m></mad-icon>
                     Nouveau tournoi
                   </ion-button>
                 </div>

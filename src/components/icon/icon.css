@@ -95,3 +95,25 @@ i.gg-pen {
 .gg-xxl.gg-math-percent {
   transform: scale(2.6) rotate(-45deg);
 }
+
+.gg-xxs.gg-swap-vertical {
+  transform: scale(0.3) rotate(90deg);
+}
+.gg-xs.gg-swap-vertical {
+  transform: scale(0.6) rotate(90deg);
+}
+.gg-s.gg-swap-vertical {
+  transform: scale(0.9) rotate(90deg);
+}
+.gg-m.gg-swap-vertical {
+  transform: scale(1.2) rotate(90deg);
+}
+.gg-l.gg-swap-vertical {
+  transform: scale(1.5) rotate(90deg);
+}
+.gg-xl.gg-swap-vertical {
+  transform: scale(2.1) rotate(90deg);
+}
+.gg-xxl.gg-swap-vertical {
+  transform: scale(2.6) rotate(90deg);
+}

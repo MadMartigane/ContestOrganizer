@@ -413,7 +413,7 @@ export class PageMatch {
 
                       <div>
                         <ion-button onClick={() => this.deleteMatch(match)} class="ion-margin-horizontal" color="warning" size="default">
-                          <mad-icon slot="icon-only" name="trash" primary l></mad-icon>
+                          <mad-icon slot="icon-only" name="trash" light l></mad-icon>
                         </ion-button>
 
                         {match.status === MatchStatus.DOING ? (

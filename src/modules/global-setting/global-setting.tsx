@@ -3,7 +3,7 @@ import { SettingStorageData } from './global-setting.d';
 export class GlobalSetting {
   private readonly STORE_KEY: string;
   private alreadyInit: boolean;
-  private prefersDark: boolean; // Device system setting
+  private devicePrefersDark: boolean; // Device system setting
   private darkModeSet: boolean | null; // The user choice
   private darkThemeChangeCallbacks: Function[];
 
@@ -12,27 +12,29 @@ export class GlobalSetting {
 
     this.darkThemeChangeCallbacks = [];
     this.alreadyInit = false;
-    this.prefersDark = false;
+    this.devicePrefersDark = false;
     this.darkModeSet = null; // Not a user choice yet
   }
 
   init() {
+    console.log('[G-SETTING] init().');
     if (this.alreadyInit) {
       return;
     }
 
     // Use matchMedia to check the user preference
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    console.log('[G-SETTING] device prefer dark mode: ', prefersDark.matches);
     if (prefersDark) {
-      this.prefersDark = prefersDark.matches;
+      this.devicePrefersDark = prefersDark.matches;
     }
 
     const stored = this.getStoredSetting();
-    console.log('stored: ', stored);
+    console.log('[G-SETTING] prefer dark mode stored: ', stored);
     if (stored && stored.darkMode !== undefined) {
-      this.toggleDarkTheme(stored.darkMode, true);
+      this.toggleDarkTheme(stored.darkMode, false);
     } else {
-      this.toggleDarkTheme(this.prefersDark, true);
+      this.toggleDarkTheme(this.devicePrefersDark, true);
     }
 
     // Listen for changes to the prefers-color-scheme media query
@@ -46,9 +48,10 @@ export class GlobalSetting {
   private toggleDarkTheme(shouldBeDark: boolean, fromDevice: boolean = false) {
     document.body.classList.toggle('dark', shouldBeDark);
     document.body.classList.toggle('light', !shouldBeDark);
+    console.log('[G-SETTING] setting body class: ', document.body.classList.value);
 
     if (fromDevice) {
-      this.prefersDark = shouldBeDark;
+      this.devicePrefersDark = shouldBeDark;
     } else {
       this.storeSetting(shouldBeDark);
     }
@@ -88,7 +91,7 @@ export class GlobalSetting {
   }
 
   public isPreferDarkTheme() {
-    return this.prefersDark;
+    return this.devicePrefersDark;
   }
 
   public onDarkThemeChange(callback: Function) {

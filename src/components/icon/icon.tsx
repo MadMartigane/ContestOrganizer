@@ -58,7 +58,9 @@ export class MadIcon {
 
   // TODO: transition ionic => spectrum
   private setClassColor() {
-    if (this.danger) {
+    if (this.primary) {
+      this.classColor = 'primary';
+    } else if (this.danger) {
       this.classColor = 'danger';
     } else if (this.dark) {
       this.classColor = 'dark';
@@ -75,7 +77,7 @@ export class MadIcon {
     } else if (this.warning) {
       this.classColor = 'warning';
     } else {
-      this.classColor = 'primary';
+      this.classColor = '';
     }
   }
 

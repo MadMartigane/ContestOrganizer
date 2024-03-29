@@ -21,6 +21,8 @@ export class PageHome {
 
     this.initialDarkModeActivated = this.globalSetting.isDarkThemeActive();
     this.isDarkModeActive = this.globalSetting.isDarkThemeActive();
+    console.log('[PageHome] initialDarkModeActivated: ', this.initialDarkModeActivated);
+    console.log('[PageHome] isDarkModeActive: ', this.isDarkModeActive);
   }
 
   onDarkModeChange() {

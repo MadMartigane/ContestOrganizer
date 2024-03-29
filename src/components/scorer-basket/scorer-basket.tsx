@@ -71,49 +71,49 @@ export class MadScorerBasket {
               <ion-row>
                 <ion-col>
                   <ion-button
-                    color={this.minusMode ? 'tertiary' : 'warning'}
+                    color={this.minusMode ? 'medium' : 'secondary'}
                     onClick={() => {
                       this.onIncrementNumber(1);
                     }}
                     size="default"
                   >
-                    <mad-icon slot="icon-only" m primary name={this.minusMode ? 'math-minus' : 'math-plus'}></mad-icon>
-                    <span>1</span>
+                    <mad-icon slot="icon-only" m light name={this.minusMode ? 'math-minus' : 'math-plus'}></mad-icon>
+                    <ion-text color="light">1</ion-text>
                   </ion-button>
                 </ion-col>
                 <ion-col>
                   <ion-button
-                    color={this.minusMode ? 'tertiary' : 'warning'}
+                    color={this.minusMode ? 'medium' : 'secondary'}
                     onClick={() => {
                       this.onIncrementNumber(2);
                     }}
                     size="default"
                   >
-                    <mad-icon slot="icon-only" m primary name={this.minusMode ? 'math-minus' : 'math-plus'}></mad-icon>
-                    <span>2</span>
+                    <mad-icon slot="icon-only" m light name={this.minusMode ? 'math-minus' : 'math-plus'}></mad-icon>
+                    <ion-text color="light">2</ion-text>
                   </ion-button>
                 </ion-col>
                 <ion-col>
                   <ion-button
-                    color={this.minusMode ? 'tertiary' : 'warning'}
+                    color={this.minusMode ? 'medium' : 'secondary'}
                     onClick={() => {
                       this.onIncrementNumber(3);
                     }}
                     size="default"
                   >
-                    <mad-icon slot="icon-only" m primary name={this.minusMode ? 'math-minus' : 'math-plus'}></mad-icon>
-                    <span>3</span>
+                    <mad-icon slot="icon-only" m light name={this.minusMode ? 'math-minus' : 'math-plus'}></mad-icon>
+                    <ion-text color="light">3</ion-text>
                   </ion-button>
                 </ion-col>
                 <ion-col>
                   <ion-button
-                    color={this.minusMode ? 'secondary' : 'primary'}
+                    color="primary"
                     onClick={() => {
                       this.switchMode();
                     }}
                     size="default"
                   >
-                    <mad-icon slot="icon-only" l light name={this.minusMode ? 'swap' : 'swap-vertical'}></mad-icon>
+                    <mad-icon slot="icon-only" l name={this.minusMode ? 'swap' : 'swap-vertical'}></mad-icon>
                   </ion-button>
                 </ion-col>
               </ion-row>
