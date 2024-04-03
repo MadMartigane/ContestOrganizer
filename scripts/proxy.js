@@ -10,10 +10,10 @@ const DEFAULT_DEV_HOST = 'localhost';
 const REQUEST_API_PATTERN = /\/api\//;
 
 const API_OPTIONS = {
- hostname: 'marius.click',
- protocol: 'https:',
+  hostname: 'marius.click',
+  protocol: 'https:',
   port: 443,
-  path: '/contest2',
+  path: '/contest-preprod',
 };
 
 function requestListener(clientReq, clientRes, stencilProxy) {
@@ -36,8 +36,8 @@ function requestListener(clientReq, clientRes, stencilProxy) {
   options.path += clientReq.url;
 
   const proxy = https.request(options, function (res) {
-   clientRes.writeHead(res.statusCode, res.headers);
-   res.pipe(clientRes, {
+    clientRes.writeHead(res.statusCode, res.headers);
+    res.pipe(clientRes, {
       end: true,
     });
   });
@@ -100,4 +100,3 @@ async function main(proxyHost, proxyPort, defaultDevHost, defaultDevPort) {
 }
 
 main(DEFAULT_PROXY_HOST, DEFAULT_PROXY_PORT, DEFAULT_DEV_HOST, DEFAULT_DEV_PORT);
-
