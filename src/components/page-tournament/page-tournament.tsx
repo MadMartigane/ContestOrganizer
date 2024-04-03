@@ -210,7 +210,7 @@ export class PageTournament {
 
     return (
       <ion-button expand="full" color="primary" class="ion-margin-vertical" onClick={() => this.goRanking()}>
-        <mad-icon name="reorder" xl light></mad-icon>
+        <mad-icon name="reorder" xl></mad-icon>
         <ion-text class="ion-margin">Classement !</ion-text>
       </ion-button>
     );

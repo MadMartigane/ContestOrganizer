@@ -348,7 +348,6 @@ export class PageMatch {
 
                             {this.tournament?.type === TournamentType.RUGBY && (
                               <mad-input-number
-                                color="primary"
                                 label="🏉"
                                 class="ion-margin"
                                 readonly={match.status !== MatchStatus.DOING}
@@ -362,7 +361,6 @@ export class PageMatch {
                           <ion-col size="6">
                             {(this.tournament?.type === TournamentType.NBA || this.tournament?.type === TournamentType.BASKET) && (
                               <mad-scorer-basket
-                                color="primary"
                                 label="🏀"
                                 class="ion-margin"
                                 readonly={match.status !== MatchStatus.DOING}
@@ -374,7 +372,6 @@ export class PageMatch {
 
                             {this.tournament?.type === TournamentType.FOOT && (
                               <mad-input-number
-                                color="primary"
                                 label="⚽️"
                                 class="ion-margin"
                                 readonly={match.status !== MatchStatus.DOING}
@@ -386,7 +383,6 @@ export class PageMatch {
 
                             {this.tournament?.type === TournamentType.NFL && (
                               <mad-input-number
-                                color="primary"
                                 label="🏈"
                                 class="ion-margin"
                                 readonly={match.status !== MatchStatus.DOING}
@@ -398,7 +394,6 @@ export class PageMatch {
 
                             {this.tournament?.type === TournamentType.RUGBY && (
                               <mad-input-number
-                                color="primary"
                                 label="🏉"
                                 class="ion-margin"
                                 readonly={match.status !== MatchStatus.DOING}
