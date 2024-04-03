@@ -36,7 +36,7 @@ export class PageHome {
         <ion-header>
           <ion-toolbar color="primary">
             <ion-title>Accueil</ion-title>
-            <sp-theme scale="large" color={this.isDarkModeActive ? 'light' : 'dark'}>
+            <sp-theme scale="large" color="light">
               <sp-switch
                 ref={(el: Switch) => (this.darkModeSwitch = el as Switch)}
                 checked={this.initialDarkModeActivated}

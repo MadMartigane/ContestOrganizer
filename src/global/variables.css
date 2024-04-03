@@ -153,3 +153,32 @@ body.light {
   --ion-color-light-shade: #d4dcd1;
   --ion-color-light-tint: #f2fbf0;
 }
+
+/* TRANSITION IOCIN TO SPECTRUM HELPER */
+.primary {
+  color: var(--ion-color-primary);
+}
+.secondary {
+  color: var(--ion-color-secondary);
+}
+.tertiary {
+  color: var(--ion-color-tertiary);
+}
+.success {
+  color: var(--ion-color-success);
+}
+.warning {
+  color: var(--ion-color-warning);
+}
+.danger {
+  color: var(--ion-color-danger);
+}
+.medium {
+  color: var(--ion-color-medium);
+}
+.light {
+  color: var(--ion-color-light);
+}
+.dark {
+  color: var(--ion-color-dark);
+}

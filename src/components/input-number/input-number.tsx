@@ -1,6 +1,9 @@
 import { InputChangeEventDetail } from '@ionic/core';
 import { Component, Event, EventEmitter, Host, Prop, h, State, Watch } from '@stencil/core';
 import uuid from '../../modules/uuid/uuid';
+import setting, { GlobalSetting } from '../../modules/global-setting/global-setting';
+
+import { NumberField } from '@spectrum-web-components/number-field';
 
 @Component({
   tag: 'mad-input-number',
@@ -8,11 +11,11 @@ import uuid from '../../modules/uuid/uuid';
   shadow: false,
 })
 export class MadInputNumber {
-  private argColor: string;
-  private itemId: string;
-  private innerStep: number;
+  private readonly globalSetting: GlobalSetting;
 
-  @Prop() color: string;
+  private itemId: string;
+  private numberField: NumberField;
+
   @Prop() placeholder: string;
   @Prop() label?: string;
   @Prop() min?: number;
@@ -22,14 +25,21 @@ export class MadInputNumber {
   @Prop() readonly?: boolean;
 
   @State() private number: number;
+  @State() private isDarkThemeActive: boolean;
 
   @Event() madNumberChange: EventEmitter<InputChangeEventDetail>;
 
   constructor() {
-    this.argColor = this.color || 'primary';
+    this.globalSetting = setting;
+    this.isDarkThemeActive = this.globalSetting.isDarkThemeActive();
+    console.log('constructor isDarkThemeActive: ', this.isDarkThemeActive);
+
     this.number = this.value || this.min || 0;
     this.itemId = `mad_input_number_${uuid.new()}`;
-    this.innerStep = this.step || 1;
+
+    this.globalSetting.onDarkThemeChange((state: boolean) => {
+      this.onDarkThemeChange(state);
+    });
   }
 
   @Watch('value')
@@ -37,67 +47,47 @@ export class MadInputNumber {
     this.number = this.value || 0;
   }
 
-  private onIncrementNumber() {
-    if (this.max !== undefined && this.number >= this.max) {
-      this.number = this.max;
-      return;
-    }
-
-    this.number += this.innerStep;
+  private onNumberChange() {
+    this.number = this.numberField.value;
     this.madNumberChange.emit({ value: String(this.number) });
   }
 
-  private onDecrementNumber() {
-    if (this.min !== undefined && this.number <= this.min) {
-      this.number = this.min;
-      return;
-    }
-
-    this.number -= this.innerStep;
-    this.madNumberChange.emit({ value: String(this.number) });
+  private onDarkThemeChange(state: boolean): void {
+    this.isDarkThemeActive = state;
+    console.log('onDarkThemeChange isDarkThemeActive: ', this.isDarkThemeActive);
   }
 
-  render() {
+  private renderEditingState() {
+    return (
+      <span class="container-s">
+        <sp-field-label for={this.itemId}>{this.label}</sp-field-label>
+        <sp-number-field
+          autofocus
+          id={this.itemId}
+          label={this.label}
+          value={this.number}
+          min={this.min}
+          max={this.max}
+          step={this.step}
+          size="l"
+          readonly={Boolean(this.readonly)}
+          ref={(node: NumberField) => {
+            this.numberField = node;
+          }}
+          onChange={() => {
+            this.onNumberChange();
+          }}
+        ></sp-number-field>
+      </span>
+    );
+  }
+
+  public render() {
     return (
       <Host>
-        <span
-          id={this.itemId}
-          class={{
-            pointer: !this.readonly,
-          }}
-        >
-          {this.label ? <span>{this.label}: </span> : null}
-          {this.value !== undefined ? <span class={this.argColor}>{this.number}</span> : <span class="placeholder">{this.placeholder}</span>}
-        </span>
-        {this.readonly ? null : (
-          <ion-popover mode="ios" size="auto" alignment="center" animated arrow trigger={this.itemId} trigger-action="click">
-            <ion-content class="ion-padding">
-              <div class="box">
-                <ion-button
-                  color="warning"
-                  onClick={() => {
-                    this.onDecrementNumber();
-                  }}
-                  size="small"
-                >
-                  <mad-icon slot="icon-only" l primary name="math-minus"></mad-icon>
-                </ion-button>
-                <ion-chip outline color={this.color}>
-                  {this.number}
-                </ion-chip>
-                <ion-button
-                  color="warning"
-                  onClick={() => {
-                    this.onIncrementNumber();
-                  }}
-                  size="small"
-                >
-                  <mad-icon slot="icon-only" l primary name="math-plus"></mad-icon>
-                </ion-button>
-              </div>
-            </ion-content>
-          </ion-popover>
-        )}
+        <sp-theme scale="large" color={this.isDarkThemeActive ? 'dark' : 'light'}>
+          {this.renderEditingState()}
+        </sp-theme>
       </Host>
     );
   }

@@ -1,14 +1,24 @@
 import '@ionic/core';
 
 /* ########### SPECTRUM IMPORT ############### */
+
+import '@spectrum-web-components/action-button/sp-action-button.js';
+
 import '@spectrum-web-components/button/sp-button.js';
 import '@spectrum-web-components/button/sp-clear-button.js';
 import '@spectrum-web-components/button/sp-close-button.js';
+
+import '@spectrum-web-components/button-group/sp-button-group.js';
+
+import '@spectrum-web-components/field-label/sp-field-label.js';
+
+import '@spectrum-web-components/number-field/sp-number-field.js';
 
 import '@spectrum-web-components/switch/sp-switch.js';
 
 import '@spectrum-web-components/theme/sp-theme.js';
 import '@spectrum-web-components/theme/src/themes.js';
+
 /* ########### END OF SPECTRUM IMPORT ############### */
 
 import setting from '../modules/global-setting/global-setting';

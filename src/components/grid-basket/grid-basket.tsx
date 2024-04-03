@@ -2,7 +2,6 @@ import { Component, Event, EventEmitter, h, Host, Prop, State } from '@stencil/c
 import { Tournament, TournamentUpdateEvent } from '../../modules/tournaments/tournaments.types';
 import tournaments from '../../modules/tournaments/tournaments';
 import Basket from '../../modules/data-basket/data-basket';
-import { BasketGridConfConstants } from '../../modules/data-basket/data-basket.d';
 import { GridTeamOnUpdateDetail } from '../../modules/grid-common/grid-common.types';
 
 @Component({
@@ -11,7 +10,6 @@ import { GridTeamOnUpdateDetail } from '../../modules/grid-common/grid-common.ty
   shadow: false,
 })
 export class GridBasket {
-  private readonly conf: BasketGridConfConstants;
   private readonly tournaments: typeof tournaments;
 
   @State() private tournament: Tournament | null;
@@ -23,14 +21,6 @@ export class GridBasket {
   constructor() {
     this.tournament = null;
     this.tournamentId = null;
-
-    this.conf = {
-      concededPointsMin: 0,
-      scoredPointsMin: 0,
-      looseGamesMin: 0,
-      winGamesMin: 0,
-      winGamesPercentMin: 0,
-    };
 
     this.tournaments = tournaments;
 
@@ -162,19 +152,19 @@ export class GridBasket {
           <ion-label color="dark">{(gridData?.winGames || 0) + (gridData?.looseGames || 0)}</ion-label>
         </ion-col>
         <ion-col>
-          <mad-input-number readonly value={gridData?.winGames} color="success" min={this.conf.winGamesMin} placeholder="0"></mad-input-number>
+          <span class="success">{gridData?.winGames}</span>
         </ion-col>
         <ion-col>
-          <mad-input-number readonly value={gridData?.looseGames} color="secondary" min={this.conf.looseGamesMin} placeholder="0"></mad-input-number>
+          <span class="secondary">{gridData?.looseGames}</span>
         </ion-col>
         <ion-col>
-          <mad-input-number readonly value={gridData?.winGamesPercent} color="dark" min={this.conf.winGamesPercentMin} placeholder="0"></mad-input-number>
+          <span class="dark">{gridData?.winGamesPercent}</span>
         </ion-col>
         <ion-col>
-          <mad-input-number readonly value={gridData?.scoredPoints} color="success" min={this.conf.scoredPointsMin} placeholder="0"></mad-input-number>
+          <span class="success">{gridData?.scoredPoints}</span>
         </ion-col>
         <ion-col>
-          <mad-input-number readonly value={gridData?.concededPoints} color="secondary" min={this.conf.scoredPointsMin} placeholder="0"></mad-input-number>
+          <span class="secondary">{gridData?.concededPoints}</span>
         </ion-col>
       </ion-row>
     ));

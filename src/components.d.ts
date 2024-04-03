@@ -50,7 +50,6 @@ export namespace Components {
         "xxs"?: boolean;
     }
     interface MadInputNumber {
-        "color": string;
         "label"?: string;
         "max"?: number;
         "min"?: number;
@@ -331,7 +330,6 @@ declare namespace LocalJSX {
         "xxs"?: boolean;
     }
     interface MadInputNumber {
-        "color"?: string;
         "label"?: string;
         "max"?: number;
         "min"?: number;

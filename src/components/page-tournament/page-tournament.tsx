@@ -330,13 +330,11 @@ export class PageTournament {
                       value={this.teamNumber}
                       label={`Nombre d’équipes (min:${this.conf.teamNumberMin}, max:${this.conf.teamNumberMax})`}
                       onMadNumberChange={(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamNumberChange(ev.detail)}
-                      color="dark"
                       min={this.conf.teamNumberMin}
                       max={this.conf.teamNumberMax}
                       step={this.conf.teamNumberStep}
                       placeholder={String(this.conf.teamNumberDefault)}
-                    ></mad-input-number>{' '}
-                    <mad-icon name="pen" xs secondary></mad-icon>
+                    ></mad-input-number>
                   </ion-col>
                 </ion-row>
               </ion-grid>
