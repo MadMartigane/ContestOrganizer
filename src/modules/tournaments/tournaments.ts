@@ -9,7 +9,7 @@ import { ProcedureContentStoredTournaments, ProcedureData } from '../procedure/p
 import { Procedure } from '../procedure/procedure';
 
 class Tournaments {
-  private readonly CACHE_KEY: typeof CACHE_KEY;
+  private readonly CACHE_KEY: string;
   private readonly uuid: typeof uuid;
   private readonly callbackCollector: Array<Function>;
   private readonly httpRequest: HttpRequest;
@@ -22,20 +22,46 @@ class Tournaments {
   }
 
   constructor() {
-    this.CACHE_KEY = CACHE_KEY;
     this.uuid = uuid;
     this.callbackCollector = [];
     this.httpRequest = new HttpRequest();
 
     this.tournaments = [];
 
+    this.CACHE_KEY = this.buildCacheKey();
+
     this.isBusy = this.restore().finally(() => {
       this.isBusy = null;
     });
   }
 
+  private buildCacheKey(): string {
+    const pathName = window.location.pathname.replace(/\//g, '_');
+    return `${pathName}_${CACHE_KEY}`;
+  }
+
+  private getTournamentsCache(tryOldCach: boolean = false): string | null {
+    const tournamentsString = localStorage.getItem(tryOldCach ? CACHE_KEY : this.CACHE_KEY);
+
+    if (tournamentsString) {
+      if (Boolean(localStorage.getItem(CACHE_KEY))) {
+        // TODO: localStorage.removeItem(CACHE_KEY);
+        console.warn('//%cTODO:', 'color:yellow; padding:2px; background-color:blue;', ' DO NOT FORGET TO CLEAN THE OLD CACHE.');
+      }
+
+      localStorage.setItem(CACHE_KEY, tournamentsString);
+      return tournamentsString;
+    }
+
+    if (!tryOldCach) {
+      return this.getTournamentsCache(true);
+    }
+
+    return null;
+  }
+
   private async restore(): Promise<number> {
-    const tournamentsString = localStorage.getItem(this.CACHE_KEY);
+    const tournamentsString = this.getTournamentsCache();
     let localTournaments: { timestamp: number; tournaments: Array<Tournament> } | null = null;
 
     if (tournamentsString) {

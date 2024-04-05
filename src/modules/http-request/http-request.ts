@@ -22,7 +22,6 @@ export class HttpRequest {
     }
 
     const fullUrl = `${window.location.origin}${window.location.pathname}${url}`.replace(`/${url}`, url);
-    console.log('fullUrl: ', fullUrl);
     return fullUrl;
   }
 
