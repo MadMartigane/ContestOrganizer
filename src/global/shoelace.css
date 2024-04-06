@@ -1,0 +1,29 @@
+@import '~@shoelace-style/shoelace/dist/themes/light.css';
+
+.icon-xxs {
+  font-size: var(--sl-font-size-2x-small);
+}
+.icon-xs {
+  font-size: var(--sl-font-size-x-small);
+}
+.icon-s {
+  font-size: var(--sl-font-size-small);
+}
+.icon-m {
+  font-size: var(--sl-font-size-medium);
+}
+.icon-l {
+  font-size: var(--sl-font-size-large);
+}
+.icon-xl {
+  font-size: var(--sl-font-size-x-large);
+}
+.icon-xxl {
+  font-size: var(--sl-font-size-2x-large);
+}
+.icon-xxxl {
+  font-size: var(--sl-font-size-3x-large);
+}
+.icon-xxxxl {
+  font-size: var(--sl-font-size-4x-large);
+}

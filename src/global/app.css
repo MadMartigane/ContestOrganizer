@@ -49,6 +49,10 @@
 @import './spectrum.css';
 /* ####### END OF SPECTRUM CSS ########## */
 
+/* ####### SHOELACE CSS ########## */
+@import './shoelace.css';
+/* ####### END OF SHOELACE CSS ########## */
+
 /* CUSTOM STUFF */
 ion-input {
   --placeholder-opacity: 0.6;

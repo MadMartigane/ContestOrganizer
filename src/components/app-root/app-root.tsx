@@ -1,6 +1,4 @@
 import { Component, h, Host } from '@stencil/core';
-// import '@spectrum-web-components/top-nav/sp-top-nav.js';
-// import '@spectrum-web-components/top-nav/sp-top-nav-item.js';
 
 @Component({
   tag: 'app-root',
@@ -8,8 +6,6 @@ import { Component, h, Host } from '@stencil/core';
   shadow: false,
 })
 export class AppRoot {
-  private spectrum: boolean;
-
   constructor() {
     // Use matchMedia to check the user preference
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
@@ -18,8 +14,6 @@ export class AppRoot {
 
     // Listen for changes to the prefers-color-scheme media query
     prefersDark.addEventListener('change', mediaQuery => this.toggleDarkTheme(mediaQuery.matches));
-
-    this.spectrum = false;
   }
 
   // Add or remove the "dark" class on the document body
@@ -50,21 +44,7 @@ export class AppRoot {
     );
   }
 
-  private renderSpectrumApp() {
-    return (
-      <sp-top-nav>
-        <sp-top-nav-item href="#">Site Name</sp-top-nav-item>
-        <sp-top-nav-item href="#page-1" style="margin-inline-start: auto;">
-          Page 1
-        </sp-top-nav-item>
-        <sp-top-nav-item href="#page-2">Page 2</sp-top-nav-item>
-        <sp-top-nav-item href="#page-3">Page 3</sp-top-nav-item>
-        <sp-top-nav-item href="#page-4">Page with Really Long Name</sp-top-nav-item>
-      </sp-top-nav>
-    );
-  }
-
   render() {
-    return <Host>{this.spectrum ? this.renderSpectrumApp() : this.renderIonicApp()}</Host>;
+    return <Host>{this.renderIonicApp()}</Host>;
   }
 }

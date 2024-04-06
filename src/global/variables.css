@@ -154,7 +154,7 @@ body.light {
   --ion-color-light-tint: #f2fbf0;
 }
 
-/* TRANSITION IOCIN TO SPECTRUM HELPER */
+/* TRANSITION IONIC TO SPECTRUM HELPER */
 .primary {
   color: var(--ion-color-primary);
 }

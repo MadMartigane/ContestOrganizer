@@ -2,24 +2,23 @@ import '@ionic/core';
 
 /* ########### SPECTRUM IMPORT ############### */
 
-import '@spectrum-web-components/action-button/sp-action-button.js';
-
-import '@spectrum-web-components/button/sp-button.js';
-import '@spectrum-web-components/button/sp-clear-button.js';
-import '@spectrum-web-components/button/sp-close-button.js';
-
-import '@spectrum-web-components/button-group/sp-button-group.js';
-
 import '@spectrum-web-components/field-label/sp-field-label.js';
-
 import '@spectrum-web-components/number-field/sp-number-field.js';
-
-import '@spectrum-web-components/switch/sp-switch.js';
-
 import '@spectrum-web-components/theme/sp-theme.js';
 import '@spectrum-web-components/theme/src/themes.js';
 
 /* ########### END OF SPECTRUM IMPORT ############### */
+
+/* ########### SHOELACE IMPORT ############### */
+
+import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
+import '@shoelace-style/shoelace/dist/components/switch/switch.js';
+import '@shoelace-style/shoelace/dist/components/icon/icon.js';
+
+// Set the base path to the folder you copied Shoelace's assets to
+setBasePath('build/shoelace');
+
+/* ########### END OF SHOELACE IMPORT ############### */
 
 import setting from '../modules/global-setting/global-setting';
 
@@ -38,7 +37,8 @@ export default async () => {
   window.Ionic = {
     config: {
       rippleEffect: true,
-      mode: 'ios', // 'md',
+      // mode: 'ios',
+      mode: 'md',
     },
   };
 

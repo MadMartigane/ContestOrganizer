@@ -13,6 +13,7 @@ export const config: Config = {
       // comment the following line to disable service workers in production
       serviceWorker: null,
       baseUrl: '/',
+      copy: [{ src: '../node_modules/@shoelace-style/shoelace/dist/assets/', dest: 'build/shoelace/assets' }],
     },
   ],
 };

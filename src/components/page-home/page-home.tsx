@@ -1,7 +1,7 @@
 import { Component, Fragment, h, State } from '@stencil/core';
 import setting, { GlobalSetting } from '../../modules/global-setting/global-setting';
 
-import { Switch } from '@spectrum-web-components/switch';
+import SlSwitch from '@shoelace-style/shoelace/dist/components/switch/switch.js';
 
 @Component({
   tag: 'page-home',
@@ -11,7 +11,7 @@ import { Switch } from '@spectrum-web-components/switch';
 export class PageHome {
   private readonly globalSetting: GlobalSetting;
 
-  private darkModeSwitch: Switch;
+  private darkModeSwitch: SlSwitch;
   private initialDarkModeActivated: boolean;
 
   @State() isDarkModeActive: boolean;
@@ -21,13 +21,23 @@ export class PageHome {
 
     this.initialDarkModeActivated = this.globalSetting.isDarkThemeActive();
     this.isDarkModeActive = this.globalSetting.isDarkThemeActive();
-    console.log('[PageHome] initialDarkModeActivated: ', this.initialDarkModeActivated);
-    console.log('[PageHome] isDarkModeActive: ', this.isDarkModeActive);
   }
 
-  onDarkModeChange() {
+  private installEventHandler() {
+    if (this.darkModeSwitch) {
+      this.darkModeSwitch.addEventListener('sl-change', () => {
+        this.onDarkModeChange();
+      });
+    }
+  }
+
+  private onDarkModeChange() {
     this.globalSetting.setDarkTheme(this.darkModeSwitch.checked);
     this.isDarkModeActive = this.darkModeSwitch.checked;
+  }
+
+  public componentDidLoad() {
+    this.installEventHandler();
   }
 
   render() {
@@ -36,17 +46,9 @@ export class PageHome {
         <ion-header>
           <ion-toolbar color="primary">
             <ion-title>Accueil</ion-title>
-            <sp-theme scale="large" color="light">
-              <sp-switch
-                ref={(el: Switch) => (this.darkModeSwitch = el as Switch)}
-                checked={this.initialDarkModeActivated}
-                emphasized
-                size="l"
-                onchange={() => this.onDarkModeChange()}
-              >
-                {this.isDarkModeActive ? <mad-icon primary name="dark-mode"></mad-icon> : <mad-icon light name="dark-mode"></mad-icon>}
-              </sp-switch>
-            </sp-theme>
+            <sl-switch ref={(el: SlSwitch) => (this.darkModeSwitch = el)} checked={this.initialDarkModeActivated} size="large">
+              <sl-icon name="highlights"></sl-icon>
+            </sl-switch>
           </ion-toolbar>
         </ion-header>
 
