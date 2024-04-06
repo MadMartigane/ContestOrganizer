@@ -27,13 +27,30 @@ export class PageTournamentSelect {
     this.inputId = 'pnii_' + this.uuid.new();
 
     this.uiAddingTournament = false;
+
+    if (this.tournaments.isBusy) {
+      console.log('tournaments is busy.');
+      this.numberOfTournaments = 0;
+      console.log('seting numberOfTournaments: ', this.numberOfTournaments);
+      this.tournaments.isBusy.then(() => {
+        this.numberOfTournaments = this.tournaments.length;
+        console.log('AFTER BUSY seting numberOfTournaments: ', this.numberOfTournaments);
+      });
+    } else {
+      console.log('tournaments is not busy.');
+      this.numberOfTournaments = this.tournaments.length;
+      console.log('seting numberOfTournaments: ', this.numberOfTournaments);
+    }
+
     this.numberOfTournaments = this.tournaments.length;
 
     this.tournaments.onUpdate(() => {
       /* Force the UI to refresh, even if the numberOfTournaments have not changed */
       this.numberOfTournaments = 0;
+      console.log('#1 tournament onUpdate() nb: ', this.numberOfTournaments);
       setTimeout(() => {
         this.numberOfTournaments = this.tournaments.length;
+        console.log('#2 tournament onUpdate() nb: ', this.numberOfTournaments);
       });
     });
 
