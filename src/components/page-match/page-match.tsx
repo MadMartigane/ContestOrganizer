@@ -6,6 +6,7 @@ import Matchs, { Match, MatchTeamType, MatchStatus, Row } from '../../modules/ma
 import { Tournament, TournamentType } from '../../modules/tournaments/tournaments.types';
 import Utils from '../../modules/utils/utils';
 import { MadInputNumberCustomEvent } from '../../components';
+import uuid from '../../modules/uuid/uuid';
 
 type Config = {
   minGoal: number;
@@ -21,12 +22,14 @@ export class PageMatch {
   private readonly config: Config;
 
   @Prop() public tournamentId: number;
+
   @State() private tournament: Tournament | null;
   @State() private uiError: string | null;
   @State() private displayTeamSelector: boolean;
   @State() private teamToSelect: Row[] | null;
   @State() private matchNumber: number;
   @State() private currentMatch: Match | null;
+  @State() private refreshUIHook: number;
 
   constructor() {
     this.tournaments = tournaments;
@@ -39,6 +42,7 @@ export class PageMatch {
     };
 
     this.initTournaments();
+    this.refreshUI();
   }
 
   private async initTournaments(): Promise<number> {
@@ -82,6 +86,7 @@ export class PageMatch {
   private refreshUI() {
     // Change ref
     this.teamToSelect = this.teamToSelect?.map(row => row) || null;
+    this.refreshUIHook = uuid.new();
   }
 
   private resetRowStates() {
@@ -227,6 +232,26 @@ export class PageMatch {
     return logo;
   }
 
+  private renderActionButtons(match: Match) {
+    return (
+      <div>
+        <ion-button onClick={() => this.deleteMatch(match)} class="ion-margin-horizontal" color="warning" size="default">
+          <mad-icon slot="icon-only" name="trash" light l></mad-icon>
+        </ion-button>
+
+        {match.status === MatchStatus.DOING ? (
+          <ion-button onClick={() => this.stopMatch(match)} class="ion-margin-horizontal" color="secondary" size="default">
+            <mad-icon slot="icon-only" name="play-stop-o" light l></mad-icon>
+          </ion-button>
+        ) : (
+          <ion-button onClick={() => this.playMatch(match)} class="ion-margin-horizontal" color="secondary" size="default">
+            <mad-icon slot="icon-only" name="play-button-o" light l></mad-icon>
+          </ion-button>
+        )}
+      </div>
+    );
+  }
+
   render() {
     return (
       <Host>
@@ -312,7 +337,6 @@ export class PageMatch {
                           <ion-col size="6">
                             {(this.tournament?.type === TournamentType.NBA || this.tournament?.type === TournamentType.BASKET) && (
                               <mad-scorer-basket
-                                color="primary"
                                 label="🏀"
                                 class="ion-margin"
                                 readonly={match.status !== MatchStatus.DOING}
@@ -324,7 +348,6 @@ export class PageMatch {
 
                             {(this.tournament?.type === TournamentType.FOOT || !this.tournament?.type) && (
                               <mad-input-number
-                                color="primary"
                                 label="⚽️"
                                 class="ion-margin"
                                 readonly={match.status !== MatchStatus.DOING}
@@ -336,7 +359,6 @@ export class PageMatch {
 
                             {this.tournament?.type === TournamentType.NFL && (
                               <mad-input-number
-                                color="primary"
                                 label="🏈"
                                 class="ion-margin"
                                 readonly={match.status !== MatchStatus.DOING}
@@ -406,21 +428,7 @@ export class PageMatch {
                         </ion-row>
                       </ion-grid>
 
-                      <div>
-                        <ion-button onClick={() => this.deleteMatch(match)} class="ion-margin-horizontal" color="warning" size="default">
-                          <mad-icon slot="icon-only" name="trash" light l></mad-icon>
-                        </ion-button>
-
-                        {match.status === MatchStatus.DOING ? (
-                          <ion-button onClick={() => this.stopMatch(match)} class="ion-margin-horizontal" color="secondary" size="default">
-                            <mad-icon slot="icon-only" name="play-stop-o" light l></mad-icon>
-                          </ion-button>
-                        ) : (
-                          <ion-button onClick={() => this.playMatch(match)} class="ion-margin-horizontal" color="secondary" size="default">
-                            <mad-icon slot="icon-only" name="play-button-o" light l></mad-icon>
-                          </ion-button>
-                        )}
-                      </div>
+                      {this.refreshUIHook ? this.renderActionButtons(match) : null}
                     </div>
                   ))}
                 </div>
