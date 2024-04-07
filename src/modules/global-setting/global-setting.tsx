@@ -46,8 +46,14 @@ export class GlobalSetting {
 
   // Add or remove the "dark" class on the document body
   private toggleDarkTheme(shouldBeDark: boolean, fromDevice: boolean = false) {
+    // spectrum theme
     document.body.classList.toggle('dark', shouldBeDark);
     document.body.classList.toggle('light', !shouldBeDark);
+    console.log('[G-SETTING] setting body class: ', document.body.classList.value);
+
+    // shoelace theme
+    document.documentElement.classList.toggle('sl-theme-dark', shouldBeDark);
+    document.body.classList.toggle('sl-theme-light', !shouldBeDark);
     console.log('[G-SETTING] setting body class: ', document.body.classList.value);
 
     if (fromDevice) {

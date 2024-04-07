@@ -46,7 +46,7 @@
 /* ####### END OF CSS GG ######## */
 
 /* ####### SPECTRUM CSS ########## */
-@import './spectrum.css';
+/* @import './spectrum.css'; */
 /* ####### END OF SPECTRUM CSS ########## */
 
 /* ####### SHOELACE CSS ########## */
@@ -80,20 +80,4 @@ button.alert-button.alert-button-role-cancel {
   color: var(--ion-color-secondary-contrast);
 }
 
-.container-xs {
-  margin: var(--spectrum-edge-to-visual-only-100 / 2);
-}
-.container-s {
-  margin: var(--spectrum-edge-to-visual-only-75);
-}
-.container,
-.container-m {
-  margin: var(--spectrum-edge-to-visual-only-100);
-}
-.container-l {
-  margin: var(--spectrum-edge-to-visual-only-200);
-}
-.container-xl {
-  margin: var(--spectrum-edge-to-visual-only-300);
-}
 /* END OFF CUSTOM STUFF */

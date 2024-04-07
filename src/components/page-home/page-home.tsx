@@ -60,7 +60,7 @@ export class PageHome {
 
             <ion-card-content class="ion-text-center">
               <p>
-                Retrouve tous tes tournois via le menu tout en bas et clique sur <mad-icon name="trophy" s warning></mad-icon>
+                Retrouve tous tes tournois via le menu tout en bas et clique sur <sl-icon name="trophy" class="l warning"></sl-icon>
               </p>
               <p>
                 <ion-img src="assets/img/menu_trophy_marker.jpg" alt="Image du menu, avec marqueur sur bouton"></ion-img>

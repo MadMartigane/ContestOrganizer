@@ -31,11 +31,11 @@ export class AppTabs {
         </ion-tab>
         <ion-tab-bar slot="bottom">
           <ion-tab-button tab="tab-home">
-            <sl-icon name="house" class="icon-xl"></sl-icon>
+            <sl-icon name="house" class="xl light"></sl-icon>
             <ion-label color="dark">Home</ion-label>
           </ion-tab-button>
           <ion-tab-button tab="tab-tournament-select">
-            <sl-icon name="trophy" class="icon-xl"></sl-icon>
+            <sl-icon name="trophy" class="xl light"></sl-icon>
             <ion-badge color="warning">{this.numberOfTournaments}</ion-badge>
             <ion-label color="dark">Tournois</ion-label>
           </ion-tab-button>
