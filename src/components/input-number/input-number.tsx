@@ -1,7 +1,6 @@
 import { InputChangeEventDetail } from '@ionic/core';
 import { Component, Event, EventEmitter, Host, Prop, h, State, Watch } from '@stencil/core';
 import uuid from '../../modules/uuid/uuid';
-import setting, { GlobalSetting } from '../../modules/global-setting/global-setting';
 
 import SlInput from '@shoelace-style/shoelace/dist/components/input/input.component';
 
@@ -11,8 +10,6 @@ import SlInput from '@shoelace-style/shoelace/dist/components/input/input.compon
   shadow: false,
 })
 export class MadInputNumber {
-  private readonly globalSetting: GlobalSetting;
-
   private itemId: string;
   private domInput: SlInput;
 
@@ -25,25 +22,15 @@ export class MadInputNumber {
   @Prop() readonly?: boolean;
 
   @State() private number: number;
-  @State() private isDarkThemeActive: boolean;
 
   @Event() madNumberChange: EventEmitter<InputChangeEventDetail>;
 
   constructor() {
-    this.globalSetting = setting;
-    this.isDarkThemeActive = this.globalSetting.isDarkThemeActive();
-    console.log('constructor isDarkThemeActive: ', this.isDarkThemeActive);
-
     this.number = this.value || this.min || 0;
     this.itemId = `mad_input_number_${uuid.new()}`;
-
-    this.globalSetting.onDarkThemeChange((state: boolean) => {
-      this.onDarkThemeChange(state);
-    });
   }
 
   public componentDidLoad() {
-    console.log('onComponentDidLoad(), this.domInput: ', this.domInput);
     if (this.domInput) {
       this.domInput.addEventListener('sl-change', () => {
         console.log('on sl-change !!');
@@ -58,7 +45,6 @@ export class MadInputNumber {
   }
 
   private incrementNumber() {
-    console.log('increment !!!!!');
     let number = Number.isInteger(this.number) ? this.number : this.value || 0;
 
     number += this.step || 1;
@@ -73,7 +59,6 @@ export class MadInputNumber {
   }
 
   private decrementNumber() {
-    console.log('decrement !!!!!');
     let number = Number.isInteger(this.number) ? this.number : this.value || 0;
 
     number -= this.step || 1;
@@ -88,7 +73,6 @@ export class MadInputNumber {
   }
 
   private onNumberChange() {
-    console.log('onNumberChange() this.domInput.value', this.domInput.value);
     const oldValue: number = this.number;
 
     this.number = parseInt(this.domInput.value, 10);
@@ -100,11 +84,6 @@ export class MadInputNumber {
     }
 
     this.madNumberChange.emit({ value: String(this.number) });
-  }
-
-  private onDarkThemeChange(state: boolean): void {
-    this.isDarkThemeActive = state;
-    console.log('onDarkThemeChange isDarkThemeActive: ', this.isDarkThemeActive);
   }
 
   private renderEditingState() {
@@ -155,12 +134,6 @@ export class MadInputNumber {
   }
 
   public render() {
-    return (
-      <Host>
-        <sp-theme scale="large" color={this.isDarkThemeActive ? 'dark' : 'light'}>
-          {this.renderEditingState()}
-        </sp-theme>
-      </Host>
-    );
+    return <Host>{this.renderEditingState()}</Host>;
   }
 }

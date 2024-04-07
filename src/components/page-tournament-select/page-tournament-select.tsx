@@ -1,9 +1,11 @@
-import { Component, Fragment, h, State } from '@stencil/core';
+import { Component, h, Host, State } from '@stencil/core';
 import { Tournament, TournamentType, TournamentTypeLabel } from '../../modules/tournaments/tournaments.types';
 import tournaments from '../../modules/tournaments/tournaments';
 import uuid from '../../modules/uuid/uuid';
 import Utils from '../../modules/utils/utils';
-import { SelectCustomEvent } from '@ionic/core';
+import SlSelect from '@shoelace-style/shoelace/dist/components/select/select.component';
+import SlMenu from '@shoelace-style/shoelace/dist/components/menu/menu.component';
+import SlMenuItem from '@shoelace-style/shoelace/dist/components/menu-item/menu-item.component';
 
 @Component({
   tag: 'page-tournament-select',
@@ -14,8 +16,9 @@ export class PageTournamentSelect {
   private readonly tournaments: typeof tournaments;
   private readonly inputId: string;
   private readonly uuid: typeof uuid;
-  private readonly selectTournamentTypeId: number;
-  private currentTournamentTypeSelected: TournamentType | null;
+
+  private domSelect: SlSelect;
+  private domTournamentList: SlMenu;
 
   @State() private uiAddingTournament: boolean;
   @State() private numberOfTournaments: number;
@@ -29,17 +32,12 @@ export class PageTournamentSelect {
     this.uiAddingTournament = false;
 
     if (this.tournaments.isBusy) {
-      console.log('tournaments is busy.');
       this.numberOfTournaments = 0;
-      console.log('seting numberOfTournaments: ', this.numberOfTournaments);
       this.tournaments.isBusy.then(() => {
         this.numberOfTournaments = this.tournaments.length;
-        console.log('AFTER BUSY seting numberOfTournaments: ', this.numberOfTournaments);
       });
     } else {
-      console.log('tournaments is not busy.');
       this.numberOfTournaments = this.tournaments.length;
-      console.log('seting numberOfTournaments: ', this.numberOfTournaments);
     }
 
     this.numberOfTournaments = this.tournaments.length;
@@ -47,15 +45,30 @@ export class PageTournamentSelect {
     this.tournaments.onUpdate(() => {
       /* Force the UI to refresh, even if the numberOfTournaments have not changed */
       this.numberOfTournaments = 0;
-      console.log('#1 tournament onUpdate() nb: ', this.numberOfTournaments);
       setTimeout(() => {
         this.numberOfTournaments = this.tournaments.length;
-        console.log('#2 tournament onUpdate() nb: ', this.numberOfTournaments);
       });
     });
+  }
 
-    this.selectTournamentTypeId = uuid.new();
-    this.currentTournamentTypeSelected = null;
+  public componentDidRender() {
+    if (this.domTournamentList && !this.domTournamentList.dataset.madHandled) {
+      this.domTournamentList.addEventListener('sl-select', (ev: CustomEvent) => {
+        this.goPageTournament(ev);
+      });
+
+      this.domTournamentList.dataset.madHandled = 'true';
+    }
+  }
+
+  private goPageTournament(ev: CustomEvent) {
+    const detail = ev.detail as { item: SlMenuItem };
+    const tournamentId = detail.item.dataset.tournamentId;
+    if (!tournamentId) {
+      throw new Error('<page-tournament-select> Unable to navigate to tournament page, missing tournament id.');
+    }
+
+    window.location.hash = `#/tournament/${tournamentId}`;
   }
 
   private async confirmRemoveTournament(event: Event, id: number) {
@@ -87,17 +100,24 @@ export class PageTournamentSelect {
     });
   }
 
+  private gitTournamentTypeSelection(): TournamentType {
+    const selection = this.domSelect.value as TournamentType;
+    return selection || TournamentType.FOOT;
+  }
+
   private async addTournament() {
     const value = await this.getNewTournamentNameValue();
     if (!value) {
       return;
     }
 
+    const currentTournamentTypeSelected = this.gitTournamentTypeSelection();
+
     this.numberOfTournaments = await this.tournaments.add({
       name: value,
       grid: [],
       matchs: [],
-      type: this.currentTournamentTypeSelected || TournamentType.FOOT,
+      type: currentTournamentTypeSelected,
     });
 
     this.uiAddingTournament = false;
@@ -127,127 +147,138 @@ export class PageTournamentSelect {
 
   private displayUiAddingTournament() {
     this.uiAddingTournament = true;
-    this.currentTournamentTypeSelected = null;
     this.isNewTournamentNameReady = false;
 
     Utils.setFocus(`ion-input#${this.inputId}`);
-    setTimeout(() => {
-      this.watchSelectTournamentType();
-    }, 100);
   }
 
-  private watchSelectTournamentType() {
-    // TODO const select = document.querySelector(`ion-select#${this.selectTournamentTypeId}`);
-    const select = document.querySelector('ion-select');
+  private renderAddTournament() {
+    return (
+      <sl-card class="card-common">
+        <div slot="header" class="container">
+          <ion-label position="floating">Nom du tournois</ion-label>
+          <ion-input
+            color="dark"
+            placeholder="Ligue 1"
+            autofocus
+            inputmode="text"
+            name="tournoiNewName"
+            onKeyDown={(ev: KeyboardEvent) => this.onKeyPressNewName(ev)}
+            id={this.inputId}
+            type="text"
+          ></ion-input>
+        </div>
 
-    if (!select) {
-      return;
-    }
+        <div class="container">
+          <sl-select
+            label="Quel sport ? "
+            ref={(el: SlSelect) => {
+              this.domSelect = el;
+            }}
+            size="large"
+            help-text="(defaut: Foot ⚽️)"
+            placeholder="Basket, NBA, Foot, …"
+          >
+            <sl-option value={TournamentType.NBA}>{TournamentTypeLabel.NBA}</sl-option>
+            <sl-option value={TournamentType.RUGBY}>{TournamentTypeLabel.RUGBY}</sl-option>
+            <sl-option value={TournamentType.NFL}>{TournamentTypeLabel.NFL}</sl-option>
+            <sl-option value={TournamentType.BASKET}>{TournamentTypeLabel.BASKET}</sl-option>
+            <sl-option value={TournamentType.FOOT}>{TournamentTypeLabel.FOOT}</sl-option>
+          </sl-select>
+        </div>
 
-    select.addEventListener('ionChange', (e: SelectCustomEvent) => {
-      const value = e.detail.value;
-      this.currentTournamentTypeSelected = value;
-    });
+        <div slot="footer">
+          <sl-button
+            onclick={() => {
+              this.hideUiAddingTournament();
+            }}
+            size="large"
+            variant="neutral"
+          >
+            <sl-icon slot="prefix" name="dash-lg" class="xl"></sl-icon>
+            Annuler
+          </sl-button>
+
+          <sl-button onclick={() => this.addTournament()} size="large" variant="primary" disabled={!this.isNewTournamentNameReady}>
+            <sl-icon slot="prefix" name="plus-lg" class="xl"></sl-icon>
+            Ajouter
+          </sl-button>
+        </div>
+      </sl-card>
+    );
+  }
+
+  private renderNewTournamentButton() {
+    return (
+      <sl-card class="card-common">
+        <sl-button
+          variant="primary"
+          onclick={() => {
+            this.displayUiAddingTournament();
+          }}
+          size="large"
+        >
+          <sl-icon slot="prefix" name="plus-lg" class="xl"></sl-icon>
+          Nouveau tournoi
+        </sl-button>
+      </sl-card>
+    );
+  }
+
+  private renderTournamentList() {
+    return (
+      <sl-menu
+        ref={(el: SlMenu) => {
+          this.domTournamentList = el;
+        }}
+      >
+        {this.tournaments.map((tournament: Tournament) => (
+          <sl-menu-item data-tournament-id={tournament.id}>
+            <span slot="prefix">
+              <span class="container-s">
+                {tournament.name} - {this.tournaments.getTournamentTypeLabel(tournament.type)}
+              </span>
+              <sl-badge variant="neutral" pill>
+                {tournament.grid.length}
+              </sl-badge>
+            </span>
+
+            <span slot="suffix">
+              <sl-icon class="warning xl container-s" onclick={(ev: Event) => this.confirmRemoveTournament(ev, tournament.id)} name="trash3"></sl-icon>
+              <sl-icon class="neutral xl container-s" name="arrow-right-circle"></sl-icon>
+            </span>
+          </sl-menu-item>
+        ))}
+      </sl-menu>
+    );
+  }
+
+  private renderNoTournamentInfo() {
+    return (
+      <div class="ion-text-center">
+        <h1>
+          <mad-icon name="trophy" l secondary></mad-icon> Pas encore de tournois <mad-icon name="games" l secondary></mad-icon>
+        </h1>
+      </div>
+    );
   }
 
   render() {
     return (
-      <Fragment>
+      <Host>
         <ion-header>
           <ion-toolbar color="primary">
             <ion-title>Vos tournois</ion-title>
           </ion-toolbar>
         </ion-header>
         <ion-content class="ion-padding">
-          <ion-list>
-            {this.numberOfTournaments ? (
-              this.tournaments.map((tournament: Tournament) => (
-                <ion-item href={`/tournament/${tournament.id}`}>
-                  <ion-label slot="start">
-                    {tournament.name} - {this.tournaments.getTournamentTypeLabel(tournament.type)}
-                  </ion-label>
-                  <ion-label slot="end">
-                    <ion-badge slot="start" class="ion-margin-end" color="tertiary">
-                      {tournament.grid.length}
-                    </ion-badge>
-                    <mad-icon class="ion-margin-horizontal" onClick={(ev: Event) => this.confirmRemoveTournament(ev, tournament.id)} slot="end" name="trash" medium></mad-icon>
-                  </ion-label>
-                </ion-item>
-              ))
-            ) : (
-              <div class="ion-text-center">
-                <h1>
-                  <mad-icon name="trophy" l secondary></mad-icon> Pas encore de tournois <mad-icon name="games" l secondary></mad-icon>
-                </h1>
-              </div>
-            )}
-          </ion-list>
+          {this.numberOfTournaments ? this.renderTournamentList() : this.renderNoTournamentInfo()}
 
-          <ion-card>
-            <ion-card-header></ion-card-header>
-            <ion-card-content>
-              {this.uiAddingTournament ? (
-                <div>
-                  <ion-item>
-                    <ion-label position="floating">Nom du tournois</ion-label>
-                    <ion-input
-                      color="dark"
-                      placeholder="Ligue 1"
-                      autofocus
-                      inputmode="text"
-                      name="tournoiNewName"
-                      onKeyDown={(ev: KeyboardEvent) => this.onKeyPressNewName(ev)}
-                      id={this.inputId}
-                      type="text"
-                    ></ion-input>
-                  </ion-item>
+          <sl-divider></sl-divider>
 
-                  <ion-item>
-                    <ion-select id={`${this.selectTournamentTypeId}`} interface="action-sheet" placeholder="Quel sport ? (defaut: Foot ⚽️)">
-                      <ion-select-option value={TournamentType.NBA}>
-                        <ion-text color="dark">{TournamentTypeLabel.NBA}</ion-text>
-                      </ion-select-option>
-                      <ion-select-option value={TournamentType.RUGBY}>{TournamentTypeLabel.RUGBY}</ion-select-option>
-                      <ion-select-option value={TournamentType.NFL}>{TournamentTypeLabel.NFL}</ion-select-option>
-                      <ion-select-option value={TournamentType.BASKET}>{TournamentTypeLabel.BASKET}</ion-select-option>
-                      <ion-select-option value={TournamentType.FOOT}>{TournamentTypeLabel.FOOT}</ion-select-option>
-                    </ion-select>
-                  </ion-item>
-
-                  <ion-button onClick={() => this.addTournament()} expand="full" disabled={!this.isNewTournamentNameReady}>
-                    <mad-icon slot="start" name="math-plus" m dark></mad-icon>
-                    Ajouter
-                  </ion-button>
-
-                  <ion-button
-                    onClick={() => {
-                      this.hideUiAddingTournament();
-                    }}
-                    expand="full"
-                    color="secondary"
-                  >
-                    <mad-icon slot="start" name="math-minus" m dark></mad-icon>
-                    Annuler
-                  </ion-button>
-                </div>
-              ) : (
-                <div>
-                  <ion-button
-                    color="primary"
-                    onClick={() => {
-                      this.displayUiAddingTournament();
-                    }}
-                    expand="full"
-                  >
-                    <mad-icon slot="start" name="math-plus" m></mad-icon>
-                    Nouveau tournoi
-                  </ion-button>
-                </div>
-              )}
-            </ion-card-content>
-          </ion-card>
+          {this.uiAddingTournament ? this.renderAddTournament() : this.renderNewTournamentButton()}
         </ion-content>
-      </Fragment>
+      </Host>
     );
   }
 }

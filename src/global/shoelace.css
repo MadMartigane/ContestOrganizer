@@ -85,3 +85,9 @@ sl-icon.dark {
 .container-xxxxl {
   margin: var(--sl-spacing-4x-large);
 }
+
+sl-card.card-common [slot='footer'] {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
