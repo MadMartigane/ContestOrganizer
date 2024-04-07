@@ -12,8 +12,11 @@ import '@spectrum-web-components/theme/src/themes.js';
 /* ########### SHOELACE IMPORT ############### */
 
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
-import '@shoelace-style/shoelace/dist/components/switch/switch.js';
+
+// Components declarations
 import '@shoelace-style/shoelace/dist/components/icon/icon.js';
+import '@shoelace-style/shoelace/dist/components/input/input.js';
+import '@shoelace-style/shoelace/dist/components/switch/switch.js';
 
 // Set the base path to the folder you copied Shoelace's assets to
 setBasePath('build/shoelace');

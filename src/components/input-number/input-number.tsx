@@ -3,7 +3,7 @@ import { Component, Event, EventEmitter, Host, Prop, h, State, Watch } from '@st
 import uuid from '../../modules/uuid/uuid';
 import setting, { GlobalSetting } from '../../modules/global-setting/global-setting';
 
-import { NumberField } from '@spectrum-web-components/number-field';
+import SlInput from '@shoelace-style/shoelace/dist/components/input/input.component';
 
 @Component({
   tag: 'mad-input-number',
@@ -14,7 +14,7 @@ export class MadInputNumber {
   private readonly globalSetting: GlobalSetting;
 
   private itemId: string;
-  private numberField: NumberField;
+  private domInput: SlInput;
 
   @Prop() placeholder: string;
   @Prop() label?: string;
@@ -42,13 +42,33 @@ export class MadInputNumber {
     });
   }
 
+  public componentDidLoad() {
+    console.log('onComponentDidLoad(), this.input: ', this.domInput);
+    if (this.domInput) {
+      this.domInput.addEventListener('sl-change', () => {
+        console.log('on sl-change !!');
+        this.onNumberChange();
+      });
+    }
+  }
+
   @Watch('value')
   public onPropValueChange() {
     this.number = this.value || 0;
   }
 
   private onNumberChange() {
-    this.number = this.numberField.value;
+    console.log('onNumberChange() this.domInput.value', this.domInput.value);
+    const oldValue: number = this.number;
+
+    this.number = parseInt(this.domInput.value, 10);
+    if (isNaN(this.number)) {
+      console.warn('<mad-input-number> unable to parse input value as integer.');
+      this.number = oldValue;
+      this.domInput.value = String(oldValue);
+      return;
+    }
+
     this.madNumberChange.emit({ value: String(this.number) });
   }
 
@@ -60,24 +80,22 @@ export class MadInputNumber {
   private renderEditingState() {
     return (
       <span class="container-s">
-        <sp-field-label for={this.itemId}>{this.label}</sp-field-label>
-        <sp-number-field
+        <sl-input
           autofocus
+          type="number"
           id={this.itemId}
           label={this.label}
           value={this.number}
           min={this.min}
           max={this.max}
           step={this.step}
-          size="l"
           readonly={Boolean(this.readonly)}
-          ref={(node: NumberField) => {
-            this.numberField = node;
+          ref={(el: SlInput) => {
+            this.domInput = el;
           }}
-          onChange={() => {
-            this.onNumberChange();
-          }}
-        ></sp-number-field>
+          placeholder="Score"
+          size="large"
+        ></sl-input>
       </span>
     );
   }
