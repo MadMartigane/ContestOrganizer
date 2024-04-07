@@ -1,9 +1,6 @@
 /* These variables are generated from https://ionicframework.com/docs/theming/color-generator */
 /* Tool to get color palettes: https://coolors.co/palettes/trending */
 
-:root {
-}
-
 body.dark {
   /* Dark mode variables go here */
   --ion-background-color: #262626;
