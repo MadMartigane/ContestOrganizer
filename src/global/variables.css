@@ -151,31 +151,35 @@ body.light {
   --ion-color-light-tint: #f2fbf0;
 }
 
-/* TRANSITION IONIC TO SPECTRUM HELPER */
+/* TRANSITION IONIC TO SHOELACE HELPER */
 .primary {
-  color: var(--ion-color-primary);
+  color: var(--sl-color-primary-500);
 }
+.success {
+  color: var(--sl-color-success-500);
+}
+.warning {
+  color: var(--sl-color-warning-500);
+}
+.danger {
+  color: var(--sl-color-danger-500);
+}
+.neutral {
+  color: var(--sl-color-neutral-500);
+}
+.light {
+  color: var(--sl-color-neutral-900);
+}
+.dark {
+  color: var(--sl-color-neutral-50);
+}
+// NOT IN SHOELACE SCOPE
 .secondary {
   color: var(--ion-color-secondary);
 }
 .tertiary {
   color: var(--ion-color-tertiary);
 }
-.success {
-  color: var(--ion-color-success);
-}
-.warning {
-  color: var(--ion-color-warning);
-}
-.danger {
-  color: var(--ion-color-danger);
-}
 .medium {
   color: var(--ion-color-medium);
-}
-.light {
-  color: var(--ion-color-light);
-}
-.dark {
-  color: var(--ion-color-dark);
 }

@@ -141,12 +141,10 @@ export class PageTeamSelect {
               </ion-list>
 
               {this.searchValue?.length > 2 && !this.suggested.length ? (
-                <ion-item color="warning">
-                  <mad-icon name="smile-sad" primary l></mad-icon>
-                  <ion-label>
-                    <h2>Aucun résultat</h2>
-                  </ion-label>
-                </ion-item>
+                <sl-alert variant="warning" open>
+                  <sl-icon name="emoji-frown" class="xxl"></sl-icon>
+                  <span class="container l">Aucun résultat</span>
+                </sl-alert>
               ) : null}
             </ion-card-content>
           </ion-card>

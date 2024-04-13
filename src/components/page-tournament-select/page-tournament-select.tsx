@@ -255,9 +255,9 @@ export class PageTournamentSelect {
 
   private renderNoTournamentInfo() {
     return (
-      <div class="ion-text-center">
+      <div class="sl-text-center">
         <h1>
-          <mad-icon name="trophy" l secondary></mad-icon> Pas encore de tournois <mad-icon name="games" l secondary></mad-icon>
+          <sl-icon name="trophy" class="xl warning"></sl-icon> Pas encore de tournois <sl-icon name="dribbble" class="xl success"></sl-icon>
         </h1>
       </div>
     );
