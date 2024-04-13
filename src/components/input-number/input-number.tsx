@@ -113,6 +113,7 @@ export class MadInputNumber {
               onclick={() => {
                 this.decrementNumber();
               }}
+              disabled={Boolean(this.readonly)}
               size="large"
               pill
             >
@@ -122,6 +123,7 @@ export class MadInputNumber {
               onclick={() => {
                 this.incrementNumber();
               }}
+              disabled={Boolean(this.readonly)}
               size="large"
               pill
             >

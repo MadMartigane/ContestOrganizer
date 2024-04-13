@@ -25,7 +25,7 @@ export class MadScorerBasket {
   @Event() madNumberChange: EventEmitter<InputChangeEventDetail>;
 
   constructor() {
-    this.argColor = this.color || 'primary';
+    this.argColor = this.color || 'dark';
     this.number = this.value || this.min || 0;
     this.itemId = `mad_scorer_basket_${uuid.new()}`;
     this.minusMode = false;
