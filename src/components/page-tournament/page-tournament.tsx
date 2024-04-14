@@ -181,6 +181,12 @@ export class PageTournament {
     this.updateTournament();
   }
 
+  private goMatch(tournamentId?: number) {
+    if (tournamentId) {
+      window.location.hash = `/match/${tournamentId}`;
+    }
+  }
+
   private renderGrid() {
     if (this.tournament?.type === TournamentType.NBA || this.tournament?.type === TournamentType.BASKET) {
       return (
@@ -209,32 +215,28 @@ export class PageTournament {
     }
 
     return (
-      <ion-button expand="full" color="primary" class="ion-margin-vertical" onClick={() => this.goRanking()}>
-        <mad-icon name="reorder" xl></mad-icon>
-        <ion-text class="ion-margin">Classement !</ion-text>
-      </ion-button>
+      <sl-button variant="primary" onclick={() => this.goRanking()} size="large">
+        <sl-icon name="sort-numeric-down" slot="prefix"></sl-icon>
+        <span slot="suffix">Classement !</span>
+      </sl-button>
     );
   }
 
   private renderFooterActions() {
     return (
-      <div>
+      <div class="cards">
         {this.renderSortingButton()}
 
-        <ion-button class="ion-margin-vertical" onClick={() => this.confirmResetGrid()} expand="full" color="medium" size="default">
-          <mad-icon name="trash" xl warning></mad-icon>
-          <ion-text class="ion-margin" color="warning">
-            Effacer
-          </ion-text>
-        </ion-button>
+        <sl-button onclick={() => this.confirmResetGrid()} variant="neutral" size="large">
+          <sl-icon name="trash" slot="prefix"></sl-icon>
+          <span slot="suffix">Effacer</span>
+        </sl-button>
 
-        <ion-button expand="full" color="secondary" class="ion-margin-vertical" href={`/match/${this.tournament?.id}`} key={this.tournament?.id}>
-          <mad-icon name="board" xl light></mad-icon>
-          <ion-text color="light" class="ion-margin">
-            Go Match
-          </ion-text>
-          <mad-icon name="arrow-right" xl light></mad-icon>
-        </ion-button>
+        <sl-button onclick={() => this.goMatch(this.tournament?.id)} size="large" variant="secondary">
+          <sl-icon name="trophy" slot="prefix"></sl-icon>
+          <span>Go Match</span>
+          <sl-icon slot="suffix" name="forward"></sl-icon>
+        </sl-button>
       </div>
     );
   }

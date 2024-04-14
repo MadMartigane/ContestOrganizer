@@ -183,3 +183,15 @@ body.light {
 .medium {
   color: var(--ion-color-medium);
 }
+
+div.cards {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  gap: var(--sl-spacing-medium);
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+
+  & > * {
+    display: block;
+  }
+}
