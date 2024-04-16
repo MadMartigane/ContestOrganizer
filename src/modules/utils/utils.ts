@@ -20,7 +20,9 @@ export default class Utils {
     }
 
     if (typeof selector === 'object' && selector.focus) {
-      selector.focus();
+      setTimeout(() => {
+        selector.focus();
+      }, 200);
       return;
     }
 

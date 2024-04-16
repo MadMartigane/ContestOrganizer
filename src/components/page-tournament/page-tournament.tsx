@@ -155,11 +155,8 @@ export class PageTournament {
   }
 
   private installDomEditTournamentNameEventHandler() {
-    console.log('domDivTournamentName: ', this.domDivTournamentName);
     if (this.domDivTournamentName && !this.domDivTournamentName.dataset.madEventInstalled) {
-      console.log('install click event listener on domDivTournamentName…');
       this.domDivTournamentName.addEventListener('click', () => {
-        console.log('click on domDivTournamentName !! ');
         this.isEditTournamentName = true;
       });
       this.domDivTournamentName.dataset.madEventInstalled = 'true';
@@ -167,7 +164,6 @@ export class PageTournament {
   }
 
   private onTournamentNameChange(event: KeyboardEvent) {
-    console.log('event: ', event);
     if (event.key === 'Enter' || event.key === 'Escape') {
       this.editTournamentName();
       return;
@@ -198,13 +194,10 @@ export class PageTournament {
   }
 
   public componentDidUpdate() {
-    console.log('componentDidUpdate');
-    console.log('this.domDivTournamentName: ', this.domDivTournamentName);
     if (this.domDivTournamentName) {
       this.installDomEditTournamentNameEventHandler();
     }
 
-    console.log('this.domInputTournamentName: ', this.domInputTournamentName);
     if (this.domInputTournamentName) {
       Utils.setFocus(this.domInputTournamentName);
     }
