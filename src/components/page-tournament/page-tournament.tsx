@@ -6,6 +6,7 @@ import tournaments from '../../modules/tournaments/tournaments';
 import { Tournament, TournamentType } from '../../modules/tournaments/tournaments.types';
 import Utils from '../../modules/utils/utils';
 import { GenericTeam } from '../../components.d';
+import SlInput from '@shoelace-style/shoelace/dist/components/input/input.component';
 
 export interface PageConfConstants {
   teamNumberMax: number;
@@ -26,7 +27,9 @@ export interface PageConfConstants {
 export class PageTournament {
   private readonly tournaments: typeof tournaments;
   private readonly conf: PageConfConstants;
-  private readonly inputNameId: string;
+
+  private domInputTournamentName: SlInput;
+  private domDivTournamentName: HTMLElement;
 
   @Prop() public tournamentId: number;
 
@@ -50,7 +53,6 @@ export class PageTournament {
 
     this.uiError = null;
     this.isEditTournamentName = false;
-    this.inputNameId = 'page-tournament-input-name-id';
 
     this.initTournaments();
   }
@@ -74,12 +76,12 @@ export class PageTournament {
     return this.updateTournament();
   }
 
-  onTeamNumberChange(detail?: InputChangeEventDetail): void {
+  private onTeamNumberChange(detail?: InputChangeEventDetail): void {
     this.teamNumber = Number((detail && detail.value) || this.conf.teamNumberDefault);
     this.updateTournament();
   }
 
-  getVirginTeamRow(type: TournamentType): TeamRow {
+  private getVirginTeamRow(type: TournamentType): TeamRow {
     return new TeamRow({ type });
   }
 
@@ -152,14 +154,28 @@ export class PageTournament {
     }
   }
 
-  private onEditTournamentName() {
-    this.isEditTournamentName = true;
-    Utils.setFocus(`ion-input#${this.inputNameId}`);
+  private installDomEditTournamentNameEventHandler() {
+    console.log('domDivTournamentName: ', this.domDivTournamentName);
+    if (this.domDivTournamentName && !this.domDivTournamentName.dataset.madEventInstalled) {
+      console.log('install click event listener on domDivTournamentName…');
+      this.domDivTournamentName.addEventListener('click', () => {
+        console.log('click on domDivTournamentName !! ');
+        this.isEditTournamentName = true;
+      });
+      this.domDivTournamentName.dataset.madEventInstalled = 'true';
+    }
   }
 
   private onTournamentNameChange(event: KeyboardEvent) {
-    if (event.key === 'Enter') {
+    console.log('event: ', event);
+    if (event.key === 'Enter' || event.key === 'Escape') {
       this.editTournamentName();
+      return;
+    }
+
+    if (event.key === 'Escape') {
+      this.isEditTournamentName = false;
+      return;
     }
   }
 
@@ -168,13 +184,7 @@ export class PageTournament {
       return;
     }
 
-    const input = document.querySelector(`ion-input#${this.inputNameId}`) as HTMLInputElement;
-    if (!input) {
-      console.warn('<page-tournament/> Unable to get input tournament name value.');
-      return;
-    }
-
-    const newName = String(input.value).trim();
+    const newName = String(this.domInputTournamentName.value).trim();
     this.tournament.name = newName;
 
     this.isEditTournamentName = false;
@@ -184,6 +194,19 @@ export class PageTournament {
   private goMatch(tournamentId?: number) {
     if (tournamentId) {
       window.location.hash = `/match/${tournamentId}`;
+    }
+  }
+
+  public componentDidUpdate() {
+    console.log('componentDidUpdate');
+    console.log('this.domDivTournamentName: ', this.domDivTournamentName);
+    if (this.domDivTournamentName) {
+      this.installDomEditTournamentNameEventHandler();
+    }
+
+    console.log('this.domInputTournamentName: ', this.domInputTournamentName);
+    if (this.domInputTournamentName) {
+      Utils.setFocus(this.domInputTournamentName);
     }
   }
 
@@ -215,7 +238,7 @@ export class PageTournament {
     }
 
     return (
-      <sl-button variant="primary" onclick={() => this.goRanking()} size="large">
+      <sl-button variant="secondary" onclick={() => this.goRanking()} size="large">
         <sl-icon name="sort-numeric-down" slot="prefix"></sl-icon>
         <span slot="suffix">Classement !</span>
       </sl-button>
@@ -224,15 +247,15 @@ export class PageTournament {
 
   private renderFooterActions() {
     return (
-      <div class="cards">
-        {this.renderSortingButton()}
-
-        <sl-button onclick={() => this.confirmResetGrid()} variant="neutral" size="large">
+      <div class="grid-300">
+        <sl-button onclick={() => this.confirmResetGrid()} variant="warning" size="large">
           <sl-icon name="trash" slot="prefix"></sl-icon>
           <span slot="suffix">Effacer</span>
         </sl-button>
 
-        <sl-button onclick={() => this.goMatch(this.tournament?.id)} size="large" variant="secondary">
+        {this.renderSortingButton()}
+
+        <sl-button onclick={() => this.goMatch(this.tournament?.id)} size="large" variant="primary">
           <sl-icon name="trophy" slot="prefix"></sl-icon>
           <span>Go Match</span>
           <sl-icon slot="suffix" name="forward"></sl-icon>
@@ -259,70 +282,39 @@ export class PageTournament {
         <ion-content fullscreen class="ion-padding">
           {this.uiError ? (
             <div>
-              <ion-card color="danger">
-                <ion-card-header>
-                  <ion-card-title>
-                    <mad-icon name="debug" xxl light></mad-icon>
-                    <ion-text color="light" class="ion-margin">
-                      Erreur
-                    </ion-text>
-                  </ion-card-title>
-                </ion-card-header>
-
-                <ion-card-content>
-                  <ion-text color="warning">{this.uiError}</ion-text>
-                </ion-card-content>
-              </ion-card>
+              <sl-alert variant="danger" open>
+                <sl-icon slot="icon" name="bug" class="xxl"></sl-icon>
+                <h1>Erreur</h1>
+                <br />
+                <span class="container2">{this.uiError}</span>
+              </sl-alert>
             </div>
           ) : (
             <div>
               {this.isEditTournamentName ? (
-                <ion-grid class="grid-edit-tournament-center">
-                  <ion-row class="ion-align-items-end ion-justify-content-center">
-                    <ion-col size="2">
-                      <ion-button
-                        size="small"
-                        color="tertiary"
-                        onClick={() => {
-                          this.isEditTournamentName = false;
-                        }}
-                        fill="solid"
-                      >
-                        <mad-icon slot="icon-only" name="close-o" dark s></mad-icon>
-                      </ion-button>
-                    </ion-col>
-                    <ion-col size="8" size-md="6" size-lg="4">
-                      <ion-input
-                        id={this.inputNameId}
-                        color="dark"
-                        inputmode="text"
-                        autofocus
-                        name="tournamentName"
-                        value={this.tournament?.name}
-                        onKeyPress={(ev: KeyboardEvent) => this.onTournamentNameChange(ev)}
-                      />
-                    </ion-col>
-                    <ion-col size="2">
-                      <ion-button size="small" color="secondary" onClick={() => this.editTournamentName()} fill="solid">
-                        <mad-icon slot="icon-only" name="add" dark s></mad-icon>
-                      </ion-button>
-                    </ion-col>
-                  </ion-row>
-                </ion-grid>
+                <div class="grid-300">
+                  <sl-input
+                    ref={(el: SlInput) => {
+                      this.domInputTournamentName = el;
+                    }}
+                    autofocus
+                    name="tournamentName"
+                    value={this.tournament?.name}
+                    onkeydown={(ev: KeyboardEvent) => this.onTournamentNameChange(ev)}
+                    onblur={() => this.editTournamentName()}
+                  />
+                </div>
               ) : (
-                <ion-grid class="can-be-clicked grid-edit-tournament-center" onClick={() => this.onEditTournamentName()}>
-                  <ion-row class="ion-align-items-end ion-justify-content-center">
-                    <ion-col size="2">
-                      <mad-icon name="trophy" m secondary></mad-icon>
-                    </ion-col>
-                    <ion-col size="8" size-md="6" size-lg="4">
-                      <h2 class="ion-padding-horizontal">{this.tournament?.name}</h2>
-                    </ion-col>
-                    <ion-col size="2">
-                      <mad-icon name="pen" m secondary></mad-icon>
-                    </ion-col>
-                  </ion-row>
-                </ion-grid>
+                <div>
+                  <div
+                    class="grid-300"
+                    ref={(el: HTMLDivElement) => {
+                      this.domDivTournamentName = el as HTMLElement;
+                    }}
+                  >
+                    <h2 class="can-be-clicked text-align-center">{this.tournament?.name}</h2>
+                  </div>
+                </div>
               )}
 
               <ion-grid class="grid-edit-tournament-center">

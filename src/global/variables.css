@@ -184,7 +184,7 @@ body.light {
   color: var(--ion-color-medium);
 }
 
-div.cards {
+div.grid-300 {
   max-width: 1200px;
   margin: 0 auto;
   display: grid;
@@ -194,4 +194,18 @@ div.cards {
   & > * {
     display: block;
   }
+}
+
+.text-align-center {
+  text-align: center;
+}
+
+.can-be-clicked {
+  &:hover {
+    cursor: pointer;
+  }
+
+  border-color: var(--sl-color-blue-100);
+  border-style: dashed;
+  border-width: 0.5px;
 }

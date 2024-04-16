@@ -53,9 +53,6 @@
 ion-input {
   --placeholder-opacity: 0.6;
 }
-.can-be-clicked:hover {
-  cursor: pointer;
-}
 
 /* CONFIRM ALERT */
 .alert-head {
