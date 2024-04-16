@@ -27,6 +27,7 @@ export interface PageConfConstants {
 export class PageTournament {
   private readonly tournaments: typeof tournaments;
   private readonly conf: PageConfConstants;
+  private readonly basketGridCompliants: Array<TournamentType> = [TournamentType.NBA, TournamentType.BASKET, TournamentType.NFL, TournamentType.RUGBY];
 
   private domInputTournamentName: SlInput;
   private domDivTournamentName: HTMLElement;
@@ -204,10 +205,14 @@ export class PageTournament {
   }
 
   private renderGrid() {
-    if (this.tournament?.type === TournamentType.NBA || this.tournament?.type === TournamentType.BASKET) {
+    if (!this.tournament) {
+      return null;
+    }
+
+    if (this.basketGridCompliants.includes(this.tournament.type)) {
       return (
         <grid-basket
-          tournamentId={this.tournament?.id}
+          tournamentId={this.tournament.id}
           onGridTournamentChange={ev => {
             this.updateTournament(ev.detail.tournamentId);
           }}
@@ -217,7 +222,7 @@ export class PageTournament {
 
     return (
       <grid-default
-        tournamentId={this.tournament?.id}
+        tournamentId={this.tournament.id}
         onGridTournamentChange={ev => {
           this.updateTournament(ev.detail.tournamentId);
         }}
@@ -226,7 +231,11 @@ export class PageTournament {
   }
 
   private renderSortingButton() {
-    if (this.tournament?.type === TournamentType.NBA || this.tournament?.type === TournamentType.BASKET) {
+    if (!this.tournament) {
+      return null;
+    }
+
+    if (this.basketGridCompliants.includes(this.tournament.type)) {
       return null;
     }
 
