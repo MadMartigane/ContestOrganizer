@@ -67,56 +67,43 @@ export class GridBasket {
     return (
       <ion-row class="basket-grid-header ion-align-items-center">
         <ion-col size="1">
-          <mad-icon class="ion-hide-sm-down" name="format-line-height" dark></mad-icon>
-          <mad-icon class="ion-hide-sm-up" name="format-line-height" dark s></mad-icon>
+          <sl-icon name="sort-numeric-down" class="l"></sl-icon>
         </ion-col>
         <ion-col size="3">
-          <ion-label color="dark">
-            <ion-text class="ion-hide-sm-down">Équipes</ion-text>
-            <ion-text class="ion-hide-sm-up">Éq</ion-text>
-          </ion-label>
+          <span class="ion-hide-sm-down">Équipes</span>
+          <span class="ion-hide-sm-up">Éq</span>
         </ion-col>
         <ion-col>
-          <ion-label color="dark">
-            <ion-text class="ion-hide-sm-down">Joués</ion-text>
-            <ion-text class="ion-hide-sm-up">J</ion-text>
-          </ion-label>
+          <span class="ion-hide-sm-down">Joués</span>
+          <span class="ion-hide-sm-up">J</span>
         </ion-col>
         <ion-col>
-          <ion-label color="success">
-            <ion-text class="ion-hide-sm-down">Gagnés</ion-text>
-            <ion-text class="ion-hide-sm-up">G</ion-text>
-          </ion-label>
+          <span class="success ion-hide-sm-down">Gagnés</span>
+          <span class="success ion-hide-sm-up">G</span>
         </ion-col>
         <ion-col>
-          <ion-label color="secondary">
-            <ion-text class="ion-hide-sm-down">Perdus</ion-text>
-            <ion-text class="ion-hide-sm-up">P</ion-text>
-          </ion-label>
+          <span class="secondary ion-hide-sm-down">Perdus</span>
+          <span class="secondary ion-hide-sm-up">P</span>
         </ion-col>
         <ion-col>
-          <mad-icon class="ion-hide-sm-down" name="math-percent" dark></mad-icon>
-          <mad-icon class="ion-hide-sm-up" name="math-percent" dark s></mad-icon>
+          <sl-icon class="ion-hide-sm-down l" name="percent"></sl-icon>
+          <sl-icon class="ion-hide-sm-up m" name="percent"></sl-icon>
         </ion-col>
         <ion-col>
-          <ion-label color="success">
-            <ion-text class="ion-hide-md-down">Points </ion-text>
-            <ion-text class="ion-hide-lg-down">Marqués</ion-text>
-            <ion-text class="ion-hide-lg-up">
-              <mad-icon class="ion-hide-sm-down" name="math-plus" success></mad-icon>
-              <mad-icon class="ion-hide-sm-up" name="math-plus" success s></mad-icon>
-            </ion-text>
-          </ion-label>
+          <span class="ion-hide-md-down success">Points </span>
+          <span class="ion-hide-lg-down success">Marqués</span>
+          <span class="ion-hide-lg-up">
+            <sl-icon class="ion-hide-sm-down success l" name="plus-lg"></sl-icon>
+            <sl-icon class="ion-hide-sm-up success m" name="plus-lg"></sl-icon>
+          </span>
         </ion-col>
         <ion-col>
-          <ion-label color="secondary">
-            <ion-text class="ion-hide-md-down">Points </ion-text>
-            <ion-text class="ion-hide-lg-down">Encaissés</ion-text>
-            <ion-text class="ion-hide-lg-up">
-              <mad-icon class="ion-hide-sm-down" name="math-minus" secondary></mad-icon>
-              <mad-icon class="ion-hide-sm-up" name="math-minus" secondary s></mad-icon>
-            </ion-text>
-          </ion-label>
+          <span class="ion-hide-md-down secondary">Points </span>
+          <span class="ion-hide-lg-down secondary">Encaissés</span>
+          <span class="ion-hide-lg-up secondary">
+            <sl-icon class="ion-hide-sm-down l" name="dash-lg"></sl-icon>
+            <sl-icon class="ion-hide-sm-up m" name="dash-lg"></sl-icon>
+          </span>
         </ion-col>
       </ion-row>
     );
@@ -158,7 +145,7 @@ export class GridBasket {
           <span class="secondary">{gridData?.looseGames}</span>
         </ion-col>
         <ion-col>
-          <span class="dark">{gridData?.winGamesPercent}</span>
+          <span>{gridData?.winGamesPercent}</span>
         </ion-col>
         <ion-col>
           <span class="success">{gridData?.scoredPoints}</span>
