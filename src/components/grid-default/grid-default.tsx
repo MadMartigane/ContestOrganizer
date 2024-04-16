@@ -59,25 +59,25 @@ export class GridDefault {
         <ion-grid class="default-grid">
           <ion-row class="default-grid-header ion-align-items-center">
             <ion-col size="1">
-              <mad-icon class="ion-hide-sm-down" name="format-line-height"></mad-icon>
-              <mad-icon class="ion-hide-sm-up" name="format-line-height" s></mad-icon>
+              <sl-icon class="ion-hide-sm-down l" name="sort-numeric-down"></sl-icon>
+              <sl-icon class="ion-hide-sm-up m" name="sort-numeric-down"></sl-icon>
             </ion-col>
             <ion-col size="3">
               <span>Équipes</span>
             </ion-col>
             <ion-col>
-              <ion-text color="success">Points</ion-text>
+              <span class="success">Points</span>
+            </ion-col>
+            <ion-col class="secondary">
+              <span>Buts</span>
+              <sl-icon name="plus-lg" class="m"></sl-icon>
+            </ion-col>
+            <ion-col class="tertiary">
+              <span>Buts</span>
+              <sl-icon name="dash-lg" class="s"></sl-icon>
             </ion-col>
             <ion-col>
-              <ion-text color="secondary">Buts</ion-text>
-              <mad-icon name="math-plus" s secondary></mad-icon>
-            </ion-col>
-            <ion-col>
-              <ion-text color="tertiary">Buts</ion-text>
-              <mad-icon name="math-minus" xs tertiary></mad-icon>
-            </ion-col>
-            <ion-col>
-              <ion-text color="warning">Goal average</ion-text>
+              <span class="warning">Goal average</span>
             </ion-col>
           </ion-row>
 
