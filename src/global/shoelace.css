@@ -1,0 +1,115 @@
+@import '~@shoelace-style/shoelace/dist/themes/light.css';
+@import '~@shoelace-style/shoelace/dist/themes/dark.css';
+
+/* icon size */
+span.xxs,
+sl-spinner.xxs,
+sl-icon.xxs {
+  font-size: var(--sl-font-size-2x-small);
+}
+span.xs,
+sl-spinner.xs,
+sl-icon.xs {
+  font-size: var(--sl-font-size-x-small);
+}
+span.s,
+sl-spinner.s,
+sl-icon.s {
+  font-size: var(--sl-font-size-small);
+}
+span.m,
+sl-spinner.m,
+sl-icon.m {
+  font-size: var(--sl-font-size-medium);
+}
+span.l,
+sl-spinner.l,
+sl-icon.l {
+  font-size: var(--sl-font-size-large);
+}
+span.xl,
+sl-spinner.xl,
+sl-icon.xl {
+  font-size: var(--sl-font-size-x-large);
+}
+span.xxl,
+sl-spinner.xxl,
+sl-icon.xxl {
+  font-size: var(--sl-font-size-2x-large);
+}
+span.xxxl,
+sl-spinner.xxxl,
+sl-icon.xxxl {
+  font-size: var(--sl-font-size-3x-large);
+}
+span.xxxxl,
+sl-spinner.xxxxl,
+sl-icon.xxxxl {
+  font-size: var(--sl-font-size-4x-large);
+}
+
+/* icon color */
+sl-icon.primary {
+  color: var(--sl-color-primary-500);
+}
+sl-icon.success {
+  color: var(--sl-color-success-500);
+}
+sl-icon.warning {
+  color: var(--sl-color-warning-500);
+}
+sl-icon.danger {
+  color: var(--sl-color-danger-500);
+}
+sl-icon.neutral {
+  color: var(--sl-color-neutral-500);
+}
+sl-icon.light {
+  color: var(--sl-color-neutral-900);
+}
+sl-icon.dark {
+  color: var(--sl-color-neutral-50);
+}
+
+/* GLOBAL CONTAINER (shoelace token version) */
+.container-xxxs {
+  margin: var(--sl-spacing-3x-small);
+}
+.container-xxs {
+  margin: var(--sl-spacing-2x-small);
+}
+.container-xs {
+  margin: var(--sl-spacing-x-small);
+}
+.container-s {
+  margin: var(--sl-spacing-small);
+}
+.container,
+.container-m {
+  margin: var(--sl-spacing-medium);
+}
+.container-l {
+  margin: var(--sl-spacing-large);
+}
+.container-xl {
+  margin: var(--sl-spacing-x-large);
+}
+.container-xxl {
+  margin: var(--sl-spacing-2x-large);
+}
+.container-xxxl {
+  margin: var(--sl-spacing-3x-large);
+}
+.container-xxxxl {
+  margin: var(--sl-spacing-4x-large);
+}
+
+sl-card.card-common [slot='footer'] {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sl-text-center {
+  text-align: center !important;
+}

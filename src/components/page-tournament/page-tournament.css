@@ -1,6 +1,5 @@
-
 span.counter {
-  color: var(--ion-color-primary);
+  color: var(--ion-color-dark);
 }
 
 ion-grid.page-tournament-grid > ion-row > ion-col {
@@ -19,4 +18,3 @@ ion-grid.page-tournament-grid > ion-row {
 ion-grid.grid-edit-tournament-center > ion-row > ion-col {
   text-align: center;
 }
-

@@ -1,6 +1,7 @@
 import { InputChangeEventDetail } from '@ionic/core';
 import { Component, Event, EventEmitter, Host, Prop, h, State, Watch } from '@stencil/core';
 import uuid from '../../modules/uuid/uuid';
+import SlSwitch from '@shoelace-style/shoelace/dist/components/switch/switch.component';
 
 @Component({
   tag: 'mad-scorer-basket',
@@ -10,6 +11,7 @@ import uuid from '../../modules/uuid/uuid';
 export class MadScorerBasket {
   private argColor: string;
   private itemId: string;
+  private domPlusMinusSwitch: SlSwitch;
 
   @Prop() color: string;
   @Prop() placeholder: string;
@@ -25,7 +27,7 @@ export class MadScorerBasket {
   @Event() madNumberChange: EventEmitter<InputChangeEventDetail>;
 
   constructor() {
-    this.argColor = this.color || 'primary';
+    this.argColor = this.color || '';
     this.number = this.value || this.min || 0;
     this.itemId = `mad_scorer_basket_${uuid.new()}`;
     this.minusMode = false;
@@ -34,6 +36,14 @@ export class MadScorerBasket {
   @Watch('value')
   public onPropValueChange() {
     this.number = this.value || 0;
+  }
+
+  private installEventHandler() {
+    if (this.domPlusMinusSwitch) {
+      this.domPlusMinusSwitch.addEventListener('sl-change', () => {
+        this.switchMode();
+      });
+    }
   }
 
   private onIncrementNumber(i: number) {
@@ -58,6 +68,10 @@ export class MadScorerBasket {
     this.minusMode = !this.minusMode;
   }
 
+  public componentDidLoad() {
+    this.installEventHandler();
+  }
+
   render() {
     return (
       <Host>
@@ -70,51 +84,46 @@ export class MadScorerBasket {
             <ion-grid>
               <ion-row>
                 <ion-col>
-                  <ion-button
-                    color={this.minusMode ? 'tertiary' : 'warning'}
-                    onClick={() => {
+                  <sl-button
+                    variant={this.minusMode ? 'warning' : 'primary'}
+                    onclick={() => {
                       this.onIncrementNumber(1);
                     }}
-                    size="default"
+                    size="large"
                   >
-                    <ion-icon slot="icon-only" size="default" color="primary" name={this.minusMode ? 'remove-outline' : 'add-outline'}></ion-icon>
-                    <span>1</span>
-                  </ion-button>
+                    <sl-icon slot="prefix" name={this.minusMode ? 'dash-lg' : 'plus-lg'} class="xl"></sl-icon>
+                    <span slot="suffix">1</span>
+                  </sl-button>
                 </ion-col>
                 <ion-col>
-                  <ion-button
-                    color={this.minusMode ? 'tertiary' : 'warning'}
-                    onClick={() => {
+                  <sl-button
+                    variant={this.minusMode ? 'warning' : 'primary'}
+                    onclick={() => {
                       this.onIncrementNumber(2);
                     }}
-                    size="default"
+                    size="large"
                   >
-                    <ion-icon slot="icon-only" size="default" color="primary" name={this.minusMode ? 'remove-outline' : 'add-outline'}></ion-icon>
-                    <span>2</span>
-                  </ion-button>
+                    <sl-icon slot="prefix" name={this.minusMode ? 'dash-lg' : 'plus-lg'} class="xl"></sl-icon>
+                    <span slot="suffix">2</span>
+                  </sl-button>
                 </ion-col>
                 <ion-col>
-                  <ion-button
-                    color={this.minusMode ? 'tertiary' : 'warning'}
-                    onClick={() => {
+                  <sl-button
+                    variant={this.minusMode ? 'warning' : 'primary'}
+                    onclick={() => {
                       this.onIncrementNumber(3);
                     }}
-                    size="default"
+                    size="large"
                   >
-                    <ion-icon slot="icon-only" size="default" color="primary" name={this.minusMode ? 'remove-outline' : 'add-outline'}></ion-icon>
-                    <span>3</span>
-                  </ion-button>
+                    <sl-icon slot="prefix" name={this.minusMode ? 'dash-lg' : 'plus-lg'} class="xl"></sl-icon>
+                    <span slot="suffix">3</span>
+                  </sl-button>
                 </ion-col>
                 <ion-col>
-                  <ion-button
-                    color="primary"
-                    onClick={() => {
-                      this.switchMode();
-                    }}
-                    size="default"
-                  >
-                    <ion-icon slot="icon-only" size="default" color="light" name="repeat-outline"></ion-icon>
-                  </ion-button>
+                  <sl-spacer></sl-spacer>
+                  <sl-switch ref={(el: SlSwitch) => (this.domPlusMinusSwitch = el)} size="large" checked={!this.minusMode} help-text="Ajouter/Supprimer des points">
+                    <sl-icon name="plus-slash-minus" class="xl"></sl-icon>
+                  </sl-switch>
                 </ion-col>
               </ion-row>
             </ion-grid>

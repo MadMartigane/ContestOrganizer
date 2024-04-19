@@ -41,31 +41,36 @@
 
 @import './variables.css';
 
+/* ####### SHOELACE CSS ########## */
+@import './shoelace.css';
+/* ####### END OF SHOELACE CSS ########## */
+
 /* CUSTOM STUFF */
 ion-input {
   --placeholder-opacity: 0.6;
 }
-.can-be-clicked:hover {
-  cursor: pointer;
-}
 
 /* CONFIRM ALERT */
+.alert-head {
+  background-color: var(--sl-color-primary-100);
+}
 .alert-title.sc-ion-alert-ios {
-  font-size: xx-large;
+  font-size: var(--sl-font-size-3x-large);
 }
 .alert-message.sc-ion-alert-ios,
 .alert-input-group.sc-ion-alert-ios {
-  color: var(--ion-color-primary);
-  font-size: large;
+  background-color: var(--sl-color-primary-100);
+  color: var(--sl-color-primary-900);
+  font-size: var(--sl-font-size-x-large);
 }
 button.alert-button.alert-button-role-confirm {
-  background-color: var(--ion-color-warning);
-  color: var(--ion-color-warning-contrast);
+  background-color: var(--sl-color-warning-100);
+  color: var(--sl-color-warning-900);
 }
 
 button.alert-button.alert-button-role-cancel {
-  background-color: var(--ion-color-secondary);
-  color: var(--ion-color-secondary-contrast);
+  background-color: var(--sl-color-success-100);
+  color: var(--sl-color-success-900);
 }
 
 /* END OFF CUSTOM STUFF */

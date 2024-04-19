@@ -2,17 +2,17 @@ import { InputChangeEventDetail } from '@ionic/core';
 import { Component, Event, EventEmitter, Host, Prop, h, State, Watch } from '@stencil/core';
 import uuid from '../../modules/uuid/uuid';
 
+import SlInput from '@shoelace-style/shoelace/dist/components/input/input.component';
+
 @Component({
   tag: 'mad-input-number',
   styleUrl: './input-number.css',
   shadow: false,
 })
 export class MadInputNumber {
-  private argColor: string;
   private itemId: string;
-  private innerStep: number;
+  private domInput: SlInput;
 
-  @Prop() color: string;
   @Prop() placeholder: string;
   @Prop() label?: string;
   @Prop() min?: number;
@@ -26,10 +26,17 @@ export class MadInputNumber {
   @Event() madNumberChange: EventEmitter<InputChangeEventDetail>;
 
   constructor() {
-    this.argColor = this.color || 'primary';
     this.number = this.value || this.min || 0;
     this.itemId = `mad_input_number_${uuid.new()}`;
-    this.innerStep = this.step || 1;
+  }
+
+  public componentDidLoad() {
+    if (this.domInput) {
+      this.domInput.addEventListener('sl-change', () => {
+        console.log('on sl-change !!');
+        this.onNumberChange();
+      });
+    }
   }
 
   @Watch('value')
@@ -37,68 +44,98 @@ export class MadInputNumber {
     this.number = this.value || 0;
   }
 
-  private onIncrementNumber() {
-    if (this.max !== undefined && this.number >= this.max) {
-      this.number = this.max;
+  private incrementNumber() {
+    let number = Number.isInteger(this.number) ? this.number : this.value || 0;
+
+    number += this.step || 1;
+
+    if (this.max && number > this.max) {
+      number = this.max;
+    } else if (this.domInput) {
+      this.domInput.value = String(number);
+    }
+
+    this.onNumberChange();
+  }
+
+  private decrementNumber() {
+    let number = Number.isInteger(this.number) ? this.number : this.value || 0;
+
+    number -= this.step || 1;
+
+    if (this.min && number < this.min) {
+      number = this.min;
+    } else if (this.domInput) {
+      this.domInput.value = String(number);
+    }
+
+    this.onNumberChange();
+  }
+
+  private onNumberChange() {
+    const oldValue: number = this.number;
+
+    this.number = parseInt(this.domInput.value, 10);
+    if (isNaN(this.number)) {
+      console.warn('<mad-input-number> unable to parse input value as integer.');
+      this.number = oldValue;
+      this.domInput.value = String(oldValue);
       return;
     }
 
-    this.number += this.innerStep;
     this.madNumberChange.emit({ value: String(this.number) });
   }
 
-  private onDecrementNumber() {
-    if (this.min !== undefined && this.number <= this.min) {
-      this.number = this.min;
-      return;
-    }
-
-    this.number -= this.innerStep;
-    this.madNumberChange.emit({ value: String(this.number) });
-  }
-
-  render() {
+  private renderEditingState() {
     return (
-      <Host>
-        <span
-          id={this.itemId}
-          class={{
-            pointer: !this.readonly,
-          }}
-        >
-          {this.label ? <span>{this.label}: </span> : null}
-          {this.value !== undefined ? <span class={this.argColor}>{this.number}</span> : <span class="placeholder">{this.placeholder}</span>}
+      <span class="container-xl">
+        <span class="container-xl">
+          <sl-input
+            autofocus
+            type="number"
+            id={this.itemId}
+            label={this.label}
+            value={this.number}
+            min={this.min}
+            max={this.max}
+            step={this.step}
+            readonly={Boolean(this.readonly)}
+            ref={(el: SlInput) => {
+              this.domInput = el;
+            }}
+            placeholder="Score"
+            size="large"
+          ></sl-input>
         </span>
-        {this.readonly ? null : (
-          <ion-popover mode="ios" size="auto" alignment="center" animated arrow trigger={this.itemId} trigger-action="click">
-            <ion-content class="ion-padding">
-              <div class="box">
-                <ion-button
-                  color="warning"
-                  onClick={() => {
-                    this.onDecrementNumber();
-                  }}
-                  size="small"
-                >
-                  <ion-icon slot="icon-only" size="large" color="primary" name="remove-outline"></ion-icon>
-                </ion-button>
-                <ion-chip outline color={this.color}>
-                  {this.number}
-                </ion-chip>
-                <ion-button
-                  color="warning"
-                  onClick={() => {
-                    this.onIncrementNumber();
-                  }}
-                  size="small"
-                >
-                  <ion-icon slot="icon-only" size="large" color="primary" name="add-outline"></ion-icon>
-                </ion-button>
-              </div>
-            </ion-content>
-          </ion-popover>
-        )}
-      </Host>
+        <span class="container-xl">
+          <sl-button-group label="Plus/minus action buttons">
+            <sl-button
+              onclick={() => {
+                this.decrementNumber();
+              }}
+              disabled={Boolean(this.readonly)}
+              size="large"
+              pill
+            >
+              <sl-icon class="warning" name="dash-lg"></sl-icon>
+            </sl-button>
+            <sl-button
+              onclick={() => {
+                this.incrementNumber();
+              }}
+              disabled={Boolean(this.readonly)}
+              size="large"
+              pill
+            >
+              <sl-icon class="primary" name="plus-lg"></sl-icon>
+            </sl-button>
+          </sl-button-group>
+        </span>
+      </span>
     );
+  }
+
+  public render() {
+    return <Host>{this.renderEditingState()}</Host>;
   }
 }

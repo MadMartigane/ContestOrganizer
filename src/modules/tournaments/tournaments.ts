@@ -9,33 +9,60 @@ import { ProcedureContentStoredTournaments, ProcedureData } from '../procedure/p
 import { Procedure } from '../procedure/procedure';
 
 class Tournaments {
-  private readonly CACHE_KEY: typeof CACHE_KEY;
+  private readonly CACHE_KEY: string;
   private readonly uuid: typeof uuid;
   private readonly callbackCollector: Array<Function>;
   private readonly httpRequest: HttpRequest;
 
   private tournaments: Array<Tournament>;
-  private isBusy: Promise<unknown> | null;
+
+  public isBusy: Promise<unknown> | null;
 
   public get length() {
     return this.tournaments.length;
   }
 
   constructor() {
-    this.CACHE_KEY = CACHE_KEY;
     this.uuid = uuid;
     this.callbackCollector = [];
     this.httpRequest = new HttpRequest();
 
     this.tournaments = [];
 
+    this.CACHE_KEY = this.buildCacheKey();
+
     this.isBusy = this.restore().finally(() => {
       this.isBusy = null;
     });
   }
 
+  private buildCacheKey(): string {
+    const pathName = window.location.pathname.replace(/\//g, '_');
+    return `${pathName}_${CACHE_KEY}`;
+  }
+
+  private getTournamentsCache(tryOldCach: boolean = false): string | null {
+    const tournamentsString = localStorage.getItem(tryOldCach ? CACHE_KEY : this.CACHE_KEY);
+
+    if (tournamentsString) {
+      if (Boolean(localStorage.getItem(CACHE_KEY))) {
+        // TODO: localStorage.removeItem(CACHE_KEY);
+        console.warn('//%cTODO:', 'color:yellow; padding:2px; background-color:blue;', ' DO NOT FORGET TO CLEAN THE OLD CACHE.');
+      }
+
+      localStorage.setItem(CACHE_KEY, tournamentsString);
+      return tournamentsString;
+    }
+
+    if (!tryOldCach) {
+      return this.getTournamentsCache(true);
+    }
+
+    return null;
+  }
+
   private async restore(): Promise<number> {
-    const tournamentsString = localStorage.getItem(this.CACHE_KEY);
+    const tournamentsString = this.getTournamentsCache();
     let localTournaments: { timestamp: number; tournaments: Array<Tournament> } | null = null;
 
     if (tournamentsString) {
@@ -47,7 +74,8 @@ class Tournaments {
       }
     }
 
-    let backendTournaments = null as ProcedureContentStoredTournaments | null;
+    let backendTournaments: ProcedureContentStoredTournaments | null = null;
+
     try {
       backendTournaments = await this.getBackendTournaments();
     } catch (e) {
@@ -55,15 +83,22 @@ class Tournaments {
     }
 
     let mergedTournaments: Array<Tournament>;
+
+    console.log('local storage time (%s): ', (localTournaments?.timestamp || 0) - (backendTournaments?.timestamp || 0), new Date(localTournaments?.timestamp || 0));
+    console.log('backend storage time (%s): ', (backendTournaments?.timestamp || 0) - (localTournaments?.timestamp || 0), new Date(backendTournaments?.timestamp || 0));
+
     if (backendTournaments && !localTournaments) {
       mergedTournaments = backendTournaments.tournaments;
-    } else if (backendTournaments) {
+    } else if (backendTournaments && localTournaments) {
       let recentTournaments: Array<Tournament>;
       let oldestTournaments: Array<Tournament>;
-      if (localTournaments?.timestamp || 0 > backendTournaments?.timestamp) {
+
+      if ((localTournaments?.timestamp || 0) >= (backendTournaments?.timestamp || 0)) {
+        console.log('local is more recent than backend.');
         recentTournaments = localTournaments?.tournaments || [];
         oldestTournaments = backendTournaments?.tournaments;
       } else {
+        console.log('backend is more recent than local.');
         recentTournaments = backendTournaments.tournaments;
         oldestTournaments = localTournaments?.tournaments || [];
       }
@@ -90,32 +125,49 @@ class Tournaments {
     return await this.store();
   }
 
-  private mergeTournaments(primary: Array<Tournament>, secondary: Array<Tournament>): Array<Tournament> {
-    if (!primary || !primary.length) {
-      return secondary && secondary.length ? secondary : [];
+  private mergeTournaments(primaries: Array<Tournament>, secondaries: Array<Tournament>): Array<Tournament> {
+    console.log('mergin both local and backend');
+    if (!primaries || !primaries.length) {
+      return secondaries && secondaries.length ? secondaries : [];
     }
 
-    const merged = [...primary] as Array<Tournament>;
-    secondary.forEach(tournamentTwo => {
-      const tournamentOne = merged.find(candidate => candidate.id === tournamentTwo.id);
-      if (!tournamentOne) {
-        // That mean the tournament has been deleted in the most recent (primary) tournament list
+    const merged: Tournament[] = [];
+
+    primaries.forEach(primary => {
+      console.group('==== tournament %s ========', primary.name);
+      const secondary = secondaries.find(candidate => candidate.id === primary.id);
+      console.log('found in the old record: ', Boolean(secondary));
+      if (!secondary) {
+        // That mean the tournament doesn't exist in the oldest record. We have to keep it.
+        console.log('No secondary, merge the new record and next.');
+        console.groupEnd();
+        if (!primary.timestamp) {
+          primary.timestamp = Date.now();
+          console.log('setting new timestamp.');
+        }
+
+        merged.push(primary);
         return;
       }
 
-      if (!tournamentOne.timestamp) {
-        tournamentOne.timestamp = Date.now();
-      }
-      if (!tournamentTwo.timestamp) {
-        tournamentTwo.timestamp = Date.now();
-      }
+      if ((primary?.timestamp || 0) >= (secondary?.timestamp || 0)) {
+        console.log('merge the primary record and next.');
+        if (!primary.timestamp) {
+          primary.timestamp = Date.now();
+          console.log('setting new timestamp.');
+        }
 
-      if (tournamentOne.timestamp < tournamentTwo.timestamp) {
-        tournamentOne.name = tournamentTwo.name;
-        tournamentOne.type = tournamentTwo.type;
-        tournamentOne.grid = tournamentTwo.grid;
-        tournamentOne.matchs = tournamentTwo.matchs;
+        merged.push(primary);
+      } else {
+        if (!secondary.timestamp) {
+          secondary.timestamp = Date.now();
+          console.log('setting new timestamp.');
+        }
+
+        console.log('merge the secondary record and next.');
+        merged.push(secondary);
       }
+      console.groupEnd();
     });
 
     return merged;
@@ -146,18 +198,33 @@ class Tournaments {
     }
   }
 
-  private async store(): Promise<number> {
-    const content = { timestamp: Date.now(), tournaments: this.tournaments };
+  private getLastTimeStampInTournaments(): number {
+    let lastTimeStamp = 0;
+    this.tournaments.forEach((currentTournament: Tournament) => {
+      if (!currentTournament.timestamp) {
+        currentTournament.timestamp = 0;
+      }
+
+      lastTimeStamp = currentTournament.timestamp > lastTimeStamp ? currentTournament.timestamp : lastTimeStamp;
+    });
+
+    return lastTimeStamp;
+  }
+
+  private async store(realLastTimeStamp?: number): Promise<number> {
+    const lastTimeStamp = realLastTimeStamp || this.getLastTimeStampInTournaments();
+    const content = { timestamp: lastTimeStamp, tournaments: this.tournaments };
 
     localStorage.setItem(this.CACHE_KEY, JSON.stringify(content));
 
-    this.throwOnUpdate();
-
     try {
-      await this.storeBackendTournaments(content);
+      this.storeBackendTournaments(content);
     } catch (e) {
-      console.warn('[Tournaments] Unable to save the tournaments on the backend: ', e);
+      // TODO: send global error event.
+      console.error('[Tournaments] Unable to save the tournaments on the backend: ', e);
     }
+
+    this.throwOnUpdate();
 
     return this.tournaments.length;
   }
@@ -242,7 +309,7 @@ class Tournaments {
     const promise = this.isBusy || Promise.resolve();
     return promise.then(() => {
       this.tournaments = this.tournaments.filter(t => t.id !== id);
-      return this.store();
+      return this.store(Date.now());
     });
   }
 
@@ -257,6 +324,7 @@ class Tournaments {
         grid,
         matchs,
         type,
+        timestamp: Date.now(),
       });
 
       return this.store();
@@ -284,7 +352,13 @@ class Tournaments {
         return this.tournaments.length;
       }
 
-      this.updateScores(tournament);
+      if (tournament.type !== TournamentType.NBA && tournament.type !== TournamentType.BASKET) {
+        this.updateScores(tournament);
+      } else {
+        this.resetScores(tournament);
+      }
+
+      tournament.timestamp = Date.now();
       this.tournaments[i] = tournament;
       return this.store();
     });

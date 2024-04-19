@@ -6,6 +6,7 @@ import Matchs, { Match, MatchTeamType, MatchStatus, Row } from '../../modules/ma
 import { Tournament, TournamentType } from '../../modules/tournaments/tournaments.types';
 import Utils from '../../modules/utils/utils';
 import { MadInputNumberCustomEvent } from '../../components';
+import uuid from '../../modules/uuid/uuid';
 
 type Config = {
   minGoal: number;
@@ -21,12 +22,14 @@ export class PageMatch {
   private readonly config: Config;
 
   @Prop() public tournamentId: number;
+
   @State() private tournament: Tournament | null;
   @State() private uiError: string | null;
   @State() private displayTeamSelector: boolean;
   @State() private teamToSelect: Row[] | null;
   @State() private matchNumber: number;
   @State() private currentMatch: Match | null;
+  @State() private refreshUIHook: number;
 
   constructor() {
     this.tournaments = tournaments;
@@ -39,6 +42,7 @@ export class PageMatch {
     };
 
     this.initTournaments();
+    this.refreshUI();
   }
 
   private async initTournaments(): Promise<number> {
@@ -82,6 +86,7 @@ export class PageMatch {
   private refreshUI() {
     // Change ref
     this.teamToSelect = this.teamToSelect?.map(row => row) || null;
+    this.refreshUIHook = uuid.new();
   }
 
   private resetRowStates() {
@@ -227,6 +232,26 @@ export class PageMatch {
     return logo;
   }
 
+  private renderActionButtons(match: Match) {
+    return (
+      <div>
+        <ion-button onClick={() => this.deleteMatch(match)} class="ion-margin-horizontal" color="warning" size="default">
+          <sl-icon slot="icon-only" name="trash" class="xl"></sl-icon>
+        </ion-button>
+
+        {match.status === MatchStatus.DOING ? (
+          <ion-button onClick={() => this.stopMatch(match)} class="ion-margin-horizontal" color="secondary" size="default">
+            <sl-icon slot="icon-only" name="stop-circle" class="xl"></sl-icon>
+          </ion-button>
+        ) : (
+          <ion-button onClick={() => this.playMatch(match)} class="ion-margin-horizontal" color="secondary" size="default">
+            <sl-icon slot="icon-only" name="play-circle" class="xl"></sl-icon>
+          </ion-button>
+        )}
+      </div>
+    );
+  }
+
   render() {
     return (
       <Host>
@@ -236,9 +261,7 @@ export class PageMatch {
               <ion-back-button text="Retour" defaultHref={`/tournament/${this.tournament?.id}`}></ion-back-button>
             </ion-buttons>
             <ion-title>
-              <ion-text color="light" class="ion-margin">
-                {this.getTypeLogo()}
-              </ion-text>
+              <span class="light container">{this.getTypeLogo()}</span>
             </ion-title>
           </ion-toolbar>
         </ion-header>
@@ -248,16 +271,14 @@ export class PageMatch {
               <ion-card color="danger">
                 <ion-card-header>
                   <ion-card-title>
-                    <ion-icon name="skull-outline" size="default" color="light"></ion-icon>
-                    <ion-text color="light" class="ion-margin">
-                      Erreur
-                    </ion-text>
+                    <sl-icon name="bug" class="xxxxl light"></sl-icon>
+                    <span class="light container-xl">Erreur</span>
                   </ion-card-title>
                 </ion-card-header>
 
                 <ion-card-content>
-                  <ion-text>🚧</ion-text>
-                  <ion-text color="warning">{this.uiError}</ion-text>
+                  <sl-icon name="cone-striped" class="xl warning"></sl-icon>
+                  <span class="container">{this.uiError}</span>
                 </ion-card-content>
               </ion-card>
             </div>
@@ -271,15 +292,13 @@ export class PageMatch {
                   <ion-grid class="page-match-grid">
                     <ion-row class="page-match-grid-header ion-align-items-center">
                       <ion-col size="5">
-                        <ion-label color="primary">Locaux</ion-label>
+                        <span>Locaux</span>
                       </ion-col>
                       <ion-col size="2">
-                        <ion-label color="primary">
-                          <ion-icon name="medal-outline"></ion-icon>
-                        </ion-label>
+                        <sl-icon class="xxl" name="trophy"></sl-icon>
                       </ion-col>
                       <ion-col size="5">
-                        <ion-label color="primary">Visiteurs</ion-label>
+                        <span>Visiteurs</span>
                       </ion-col>
                     </ion-row>
                   </ion-grid>
@@ -288,22 +307,22 @@ export class PageMatch {
                     <div class="light-border ion-padding-vertical ion-margin-vertical">
                       <div>
                         {match.status === MatchStatus.PENDING && (
-                          <ion-chip color="tertiary">
-                            Match programmé
-                            <ion-icon name="calendar-number-outline"></ion-icon>
-                          </ion-chip>
+                          <sl-tag variant="primary">
+                            <span class="container">Match programmé</span>
+                            <sl-icon name="calendar-check" class="primary xl"></sl-icon>
+                          </sl-tag>
                         )}
                         {match.status === MatchStatus.DOING && (
-                          <ion-chip color="success">
-                            Match en cours
-                            <ion-spinner class="ion-margin-horizontal2" name="lines-sharp-small"></ion-spinner>
-                          </ion-chip>
+                          <sl-tag variant="success">
+                            <span class="container">Match en cours</span>
+                            <sl-spinner class="xl"></sl-spinner>
+                          </sl-tag>
                         )}
                         {match.status === MatchStatus.DONE && (
-                          <ion-chip color="danger">
-                            Match terminé
-                            <ion-icon name="checkmark-circle-outline"></ion-icon>
-                          </ion-chip>
+                          <sl-tag variant="warning">
+                            <span class="container">Match terminé</span>
+                            <sl-icon name="check2-square" class="warning xl"></sl-icon>
+                          </sl-tag>
                         )}
                       </div>
 
@@ -314,7 +333,6 @@ export class PageMatch {
                           <ion-col size="6">
                             {(this.tournament?.type === TournamentType.NBA || this.tournament?.type === TournamentType.BASKET) && (
                               <mad-scorer-basket
-                                color="primary"
                                 label="🏀"
                                 class="ion-margin"
                                 readonly={match.status !== MatchStatus.DOING}
@@ -326,7 +344,6 @@ export class PageMatch {
 
                             {(this.tournament?.type === TournamentType.FOOT || !this.tournament?.type) && (
                               <mad-input-number
-                                color="primary"
                                 label="⚽️"
                                 class="ion-margin"
                                 readonly={match.status !== MatchStatus.DOING}
@@ -338,7 +355,6 @@ export class PageMatch {
 
                             {this.tournament?.type === TournamentType.NFL && (
                               <mad-input-number
-                                color="primary"
                                 label="🏈"
                                 class="ion-margin"
                                 readonly={match.status !== MatchStatus.DOING}
@@ -350,7 +366,6 @@ export class PageMatch {
 
                             {this.tournament?.type === TournamentType.RUGBY && (
                               <mad-input-number
-                                color="primary"
                                 label="🏉"
                                 class="ion-margin"
                                 readonly={match.status !== MatchStatus.DOING}
@@ -364,7 +379,6 @@ export class PageMatch {
                           <ion-col size="6">
                             {(this.tournament?.type === TournamentType.NBA || this.tournament?.type === TournamentType.BASKET) && (
                               <mad-scorer-basket
-                                color="primary"
                                 label="🏀"
                                 class="ion-margin"
                                 readonly={match.status !== MatchStatus.DOING}
@@ -376,7 +390,6 @@ export class PageMatch {
 
                             {this.tournament?.type === TournamentType.FOOT && (
                               <mad-input-number
-                                color="primary"
                                 label="⚽️"
                                 class="ion-margin"
                                 readonly={match.status !== MatchStatus.DOING}
@@ -388,7 +401,6 @@ export class PageMatch {
 
                             {this.tournament?.type === TournamentType.NFL && (
                               <mad-input-number
-                                color="primary"
                                 label="🏈"
                                 class="ion-margin"
                                 readonly={match.status !== MatchStatus.DOING}
@@ -400,7 +412,6 @@ export class PageMatch {
 
                             {this.tournament?.type === TournamentType.RUGBY && (
                               <mad-input-number
-                                color="primary"
                                 label="🏉"
                                 class="ion-margin"
                                 readonly={match.status !== MatchStatus.DOING}
@@ -413,21 +424,7 @@ export class PageMatch {
                         </ion-row>
                       </ion-grid>
 
-                      <div>
-                        <ion-button onClick={() => this.deleteMatch(match)} class="ion-margin-horizontal" color="warning" size="default">
-                          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-                        </ion-button>
-
-                        {match.status === MatchStatus.DOING ? (
-                          <ion-button onClick={() => this.stopMatch(match)} class="ion-margin-horizontal" color="secondary" size="default">
-                            <ion-icon slot="icon-only" name="stop-outline"></ion-icon>
-                          </ion-button>
-                        ) : (
-                          <ion-button onClick={() => this.playMatch(match)} class="ion-margin-horizontal" color="secondary" size="default">
-                            <ion-icon slot="icon-only" name="play-outline"></ion-icon>
-                          </ion-button>
-                        )}
-                      </div>
+                      {this.refreshUIHook ? this.renderActionButtons(match) : null}
                     </div>
                   ))}
                 </div>
@@ -436,7 +433,7 @@ export class PageMatch {
                   {this.displayTeamSelector ? null : (
                     <div class="ion-text-center ion-justify-content-center">
                       <h2>
-                        <ion-text color="warning"> Aucun match en cours </ion-text>
+                        <span class="warning"> Aucun match en cours </span>
                       </h2>
                     </div>
                   )}
@@ -454,44 +451,38 @@ export class PageMatch {
                   <ion-grid class="page-match-grid">
                     <ion-row class="page-match-grid-header ion-align-items-center">
                       <ion-col size="2">
-                        <ion-label color="primary">
-                          <ion-icon name="checkbox-outline"></ion-icon>
-                        </ion-label>
+                        <sl-icon name="list-check" class="xl"></sl-icon>
                       </ion-col>
                       <ion-col>
-                        <ion-label color="primary">Équipes</ion-label>
+                        <span>Équipes</span>
                       </ion-col>
                       <ion-col>
-                        <ion-text class="ion-hide-lg-down">Matchs </ion-text>
-                        <ion-text class="ion-hide-md-down">Total </ion-text>
-                        <ion-text class="ion-hide-lg-up">
-                          <ion-icon name="checkmark-done-circle-outline"></ion-icon>
-                        </ion-text>
+                        <span class="container-s">
+                          <sl-icon name="stack-overflow"></sl-icon>
+                        </span>
+                        <span class="ion-hide-lg-down">Matchs </span>
+                        <span class="ion-hide-md-down">Total </span>
                       </ion-col>
                       <ion-col>
-                        <ion-text class="ion-hide-lg-down">Matchs </ion-text>
-                        <ion-text class="ion-hide-md-down">Joués </ion-text>
-                        <ion-text class="ion-hide-lg-up">
-                          <ion-icon name="checkmark-circle-outline"></ion-icon>
-                        </ion-text>
+                        <span class="container-s">
+                          <sl-icon name="check2-square"></sl-icon>
+                        </span>
+                        <span class="ion-hide-lg-down">Matchs </span>
+                        <span class="ion-hide-md-down">Joués </span>
                       </ion-col>
                       <ion-col>
-                        <ion-text class="ion-hide-lg-down">Matchs </ion-text>
-                        <ion-text class="ion-hide-md-down">Programmés </ion-text>
-                        <ion-text class="ion-hide-lg-up">
-                          <ion-icon name="calendar-number-outline"></ion-icon>
-                        </ion-text>
+                        <span class="container-s">
+                          <sl-icon name="calendar-check"></sl-icon>
+                        </span>
+                        <span class="ion-hide-lg-down">Matchs </span>
+                        <span class="ion-hide-md-down">Programmés </span>
                       </ion-col>
                     </ion-row>
 
                     {this.teamToSelect?.map(row => (
                       <ion-row onClick={() => this.onTeamSelected(row)} class="ion-align-items-center clickable">
                         <ion-col size="2">
-                          {row.selected ? (
-                            <ion-icon color="success" size="large" name="checkbox-outline"></ion-icon>
-                          ) : (
-                            <ion-icon color="secondary" size="large" name="square-outline"></ion-icon>
-                          )}
+                          {row.selected ? <sl-icon name="check-square" class="success xl"></sl-icon> : <sl-icon name="square" class="success xl"></sl-icon>}
                         </ion-col>
                         <ion-col>
                           <mad-team-tile team={row.team.team}></mad-team-tile>
@@ -507,8 +498,8 @@ export class PageMatch {
                     <ion-row>
                       <ion-col size="6">
                         <ion-button expand="full" color="secondary" class="ion-margin-vertical" onClick={() => this.cancelSelection()}>
-                          <ion-icon name="ban-outline" size-xs="normal" size="large"></ion-icon>
-                          <ion-text class="ion-margin">Annuler</ion-text>
+                          <sl-icon name="ban" class="xxl"></sl-icon>
+                          <span class="container">Annuler</span>
                         </ion-button>
                       </ion-col>
                       <ion-col size="6">
@@ -519,8 +510,8 @@ export class PageMatch {
                           disabled={Boolean(this.currentMatch && (!this.currentMatch.visitorId || !this.currentMatch.hostId))}
                           onClick={() => this.goValidateSelection()}
                         >
-                          <ion-icon name="rocket-outline" size-xs="normal" size="large"></ion-icon>
-                          <ion-text class="ion-margin">Valider</ion-text>
+                          <span class="container">Valider</span>
+                          <sl-icon name="arrow-right" class="xxl"></sl-icon>
                         </ion-button>
                       </ion-col>
                     </ion-row>
@@ -529,8 +520,8 @@ export class PageMatch {
               ) : (
                 <div>
                   <ion-button expand="full" color="secondary" class="ion-margin-vertical" onClick={() => this.goMatch()}>
-                    <ion-icon name="add-outline" size-xs="normal" size="large"></ion-icon>
-                    <ion-text class="ion-margin">Nouveau match</ion-text>
+                    <sl-icon name="plus-lg" class="xxl"></sl-icon>
+                    <span class="container">Nouveau match</span>
                   </ion-button>
                 </div>
               )}

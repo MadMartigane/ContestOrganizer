@@ -9,11 +9,24 @@ export default class Utils {
     });
   }
 
-  public static setFocus(selector: string): void {
-    setTimeout(() => {
-      // @ts-ignore
-      document.querySelector(selector)?.setFocus();
-    }, 400);
+  public static setFocus(selector: string | HTMLElement): void {
+    console.log('typeof selector: ', typeof selector);
+    if (typeof selector === 'string') {
+      setTimeout(() => {
+        // @ts-ignore
+        document.querySelector(selector)?.setFocus();
+      }, 400);
+      return;
+    }
+
+    if (typeof selector === 'object' && selector.focus) {
+      setTimeout(() => {
+        selector.focus();
+      }, 200);
+      return;
+    }
+
+    console.warn('[Utils.setFocus()] Unable to set the focus on: ', selector);
   }
 
   public static async confirmChoice(message = 'Es-tu sûre ?', cancel = 'Non', confirm = 'Oui'): Promise<boolean> {

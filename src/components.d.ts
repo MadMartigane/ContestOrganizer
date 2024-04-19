@@ -31,7 +31,6 @@ export namespace Components {
         "tournamentId": number | null;
     }
     interface MadInputNumber {
-        "color": string;
         "label"?: string;
         "max"?: number;
         "min"?: number;
@@ -286,7 +285,6 @@ declare namespace LocalJSX {
         "tournamentId"?: number | null;
     }
     interface MadInputNumber {
-        "color"?: string;
         "label"?: string;
         "max"?: number;
         "min"?: number;
