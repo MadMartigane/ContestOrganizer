@@ -22,8 +22,6 @@ export { PageTeamSelectEventDatail } from "./components/page-team-select/page-te
 export namespace Components {
     interface AppRoot {
     }
-    interface AppTabs {
-    }
     interface GridBasket {
         "tournamentId": number | null;
     }
@@ -109,12 +107,6 @@ declare global {
     var HTMLAppRootElement: {
         prototype: HTMLAppRootElement;
         new (): HTMLAppRootElement;
-    };
-    interface HTMLAppTabsElement extends Components.AppTabs, HTMLStencilElement {
-    }
-    var HTMLAppTabsElement: {
-        prototype: HTMLAppTabsElement;
-        new (): HTMLAppTabsElement;
     };
     interface HTMLGridBasketElementEventMap {
         "gridTournamentChange": TournamentUpdateEvent;
@@ -256,7 +248,6 @@ declare global {
     };
     interface HTMLElementTagNameMap {
         "app-root": HTMLAppRootElement;
-        "app-tabs": HTMLAppTabsElement;
         "grid-basket": HTMLGridBasketElement;
         "grid-default": HTMLGridDefaultElement;
         "mad-input-number": HTMLMadInputNumberElement;
@@ -273,8 +264,6 @@ declare global {
 }
 declare namespace LocalJSX {
     interface AppRoot {
-    }
-    interface AppTabs {
     }
     interface GridBasket {
         "onGridTournamentChange"?: (event: GridBasketCustomEvent<TournamentUpdateEvent>) => void;
@@ -338,7 +327,6 @@ declare namespace LocalJSX {
     }
     interface IntrinsicElements {
         "app-root": AppRoot;
-        "app-tabs": AppTabs;
         "grid-basket": GridBasket;
         "grid-default": GridDefault;
         "mad-input-number": MadInputNumber;
@@ -358,7 +346,6 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "app-root": LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
-            "app-tabs": LocalJSX.AppTabs & JSXBase.HTMLAttributes<HTMLAppTabsElement>;
             "grid-basket": LocalJSX.GridBasket & JSXBase.HTMLAttributes<HTMLGridBasketElement>;
             "grid-default": LocalJSX.GridDefault & JSXBase.HTMLAttributes<HTMLGridDefaultElement>;
             "mad-input-number": LocalJSX.MadInputNumber & JSXBase.HTMLAttributes<HTMLMadInputNumberElement>;

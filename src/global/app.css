@@ -38,7 +38,7 @@
   More info about color theming using Ionic:
   https://ionicframework.com/docs/theming/color-generator
 */
-
+@import './ionic.css';
 @import './variables.css';
 
 /* ####### SHOELACE CSS ########## */

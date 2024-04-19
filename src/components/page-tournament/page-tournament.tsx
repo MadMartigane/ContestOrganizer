@@ -269,18 +269,26 @@ export class PageTournament {
   render() {
     return (
       <Host>
-        <ion-header>
-          <ion-toolbar color="primary">
-            <ion-buttons slot="start">
-              <ion-back-button text="Retour" defaultHref="/app/tournaments"></ion-back-button>
-            </ion-buttons>
+        <sl-breadcrumb>
+          <sl-breadcrumb-item href="#/home">
+            <sl-icon name="house" class="xl"></sl-icon>
+          </sl-breadcrumb-item>
+          <sl-breadcrumb-item href="#/tournaments">
+            <sl-icon name="trophy" class="xl"></sl-icon>
+          </sl-breadcrumb-item>
+          <sl-breadcrumb-item>
+            <sl-icon name="card-list" class="xl"></sl-icon>
+          </sl-breadcrumb-item>
+        </sl-breadcrumb>
+        <div>
+          <ion-toolbar2 color="primary">
             <ion-title>
               <ion-text color="light" class="ion-margin">
                 {this.tournament?.name ? '🏆' : '404'}
               </ion-text>
             </ion-title>
-          </ion-toolbar>
-        </ion-header>
+          </ion-toolbar2>
+        </div>
         <ion-content fullscreen class="ion-padding">
           {this.uiError ? (
             <div>

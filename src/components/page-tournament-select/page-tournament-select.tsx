@@ -266,11 +266,15 @@ export class PageTournamentSelect {
   render() {
     return (
       <Host>
-        <ion-header>
-          <ion-toolbar color="primary">
-            <ion-title>Vos tournois</ion-title>
-          </ion-toolbar>
-        </ion-header>
+        <sl-breadcrumb>
+          <sl-breadcrumb-item href="#/home">
+            <sl-icon name="house" class="xl"></sl-icon>
+          </sl-breadcrumb-item>
+          <sl-breadcrumb-item>
+            <sl-icon name="trophy" class="xl"></sl-icon>
+          </sl-breadcrumb-item>
+        </sl-breadcrumb>
+
         <ion-content class="ion-padding">
           {this.numberOfTournaments ? this.renderTournamentList() : this.renderNoTournamentInfo()}
 

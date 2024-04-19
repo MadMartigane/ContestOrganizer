@@ -113,3 +113,14 @@ sl-card.card-common [slot='footer'] {
 .sl-text-center {
   text-align: center !important;
 }
+
+sl-breadcrumb {
+  background-color: var(--sl-color-primary-950);
+  padding: var(--sl-spacing-x-small);
+  z-index: var(--sl-z-index-tooltip);
+}
+
+div.page-content {
+  margin: var(--sl-spacing-2x-large);
+  color: var(--sl-color-neutral-900);
+}
