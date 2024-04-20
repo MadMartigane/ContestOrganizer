@@ -208,18 +208,18 @@ export class PageMatch {
   private renderActionButtons(match: Match) {
     return (
       <div>
-        <ion-button onClick={() => this.deleteMatch(match)} class="ion-margin-horizontal" color="warning" size="default">
-          <sl-icon slot="icon-only" name="trash" class="xl"></sl-icon>
-        </ion-button>
+        <sl-button onclick={() => this.deleteMatch(match)} variant="warning" size="large" class="container">
+          <sl-icon name="trash"></sl-icon>
+        </sl-button>
 
         {match.status === MatchStatus.DOING ? (
-          <ion-button onClick={() => this.stopMatch(match)} class="ion-margin-horizontal" color="secondary" size="default">
-            <sl-icon slot="icon-only" name="stop-circle" class="xl"></sl-icon>
-          </ion-button>
+          <sl-button onclick={() => this.stopMatch(match)} variant="primary" size="large" class="container">
+            <sl-icon name="stop-circle"></sl-icon>
+          </sl-button>
         ) : (
-          <ion-button onClick={() => this.playMatch(match)} class="ion-margin-horizontal" color="secondary" size="default">
-            <sl-icon slot="icon-only" name="play-circle" class="xl"></sl-icon>
-          </ion-button>
+          <sl-button onClick={() => this.playMatch(match)} variant="primary" size="large" class="container">
+            <sl-icon name="play-circle"></sl-icon>
+          </sl-button>
         )}
       </div>
     );
@@ -472,35 +472,32 @@ export class PageMatch {
                     ))}
                   </ion-grid>
 
-                  <ion-grid>
-                    <ion-row>
-                      <ion-col size="6">
-                        <ion-button expand="full" color="secondary" class="ion-margin-vertical" onClick={() => this.cancelSelection()}>
-                          <sl-icon name="ban" class="xxl"></sl-icon>
-                          <span class="container">Annuler</span>
-                        </ion-button>
-                      </ion-col>
-                      <ion-col size="6">
-                        <ion-button
-                          expand="full"
-                          color="secondary"
-                          class="ion-margin-vertical"
-                          disabled={Boolean(this.currentMatch && (!this.currentMatch.visitorId || !this.currentMatch.hostId))}
-                          onClick={() => this.goValidateSelection()}
-                        >
-                          <span class="container">Valider</span>
-                          <sl-icon name="arrow-right" class="xxl"></sl-icon>
-                        </ion-button>
-                      </ion-col>
-                    </ion-row>
-                  </ion-grid>
+                  <div class="container-xxxl">
+                    <div class="grid-300">
+                      <sl-button variant="warning" onclick={() => this.cancelSelection()} size="large">
+                        <sl-icon slot="prefix" name="ban"></sl-icon>
+                        <span slot="suffix">Annuler</span>
+                      </sl-button>
+                      <sl-button
+                        variant="primary"
+                        disabled={Boolean(this.currentMatch && (!this.currentMatch.visitorId || !this.currentMatch.hostId))}
+                        onclick={() => this.goValidateSelection()}
+                        size="large"
+                      >
+                        <span slot="prefix">Valider</span>
+                        <sl-icon slot="suffix" name="arrow-right"></sl-icon>
+                      </sl-button>
+                    </div>
+                  </div>
                 </div>
               ) : (
-                <div>
-                  <ion-button expand="full" color="secondary" class="ion-margin-vertical" onClick={() => this.goMatch()}>
-                    <sl-icon name="plus-lg" class="xxl"></sl-icon>
-                    <span class="container">Nouveau match</span>
-                  </ion-button>
+                <div class="container-xxxl">
+                  <div class="grid-300">
+                    <sl-button variant="primary" size="large" onclick={() => this.goMatch()}>
+                      <sl-icon name="plus-lg" slot="prefix"></sl-icon>
+                      <span slot="suffix">Nouveau match</span>
+                    </sl-button>
+                  </div>
                 </div>
               )}
             </div>
