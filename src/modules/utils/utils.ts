@@ -58,4 +58,13 @@ export default class Utils {
     Utils.unmount(alert);
     return false;
   }
+
+  public static scrollIntoView(selector: string) {
+    setTimeout(() => {
+      const list: Element | null = window.document.querySelector(selector);
+      if (list) {
+        list.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 500);
+  }
 }

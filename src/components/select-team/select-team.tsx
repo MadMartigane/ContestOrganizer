@@ -98,6 +98,12 @@ export class MadSelectTeam {
         this.suggested = this.teams.filter(team => pattern.test(team.name));
         break;
     }
+
+    this.scrollOnSearchResult();
+  }
+
+  private scrollOnSearchResult() {
+    Utils.scrollIntoView('ion-searchbar');
   }
 
   private onPageTeamNewSelection(team: GenericTeam) {
@@ -111,8 +117,6 @@ export class MadSelectTeam {
   }
 
   private openDrawer(): void {
-    // @ts-ignore
-    // TODO: this.domDrawer.style['--size'] = '40rem';
     this.domDrawer.show();
   }
 
