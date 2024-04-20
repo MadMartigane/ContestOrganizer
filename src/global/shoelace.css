@@ -124,7 +124,7 @@ sl-card.card-common [slot='footer'] {
 sl-breadcrumb {
   position: fixed;
   top: 0;
-  width: 98%;
+  width: 99%;
   background-color: var(--sl-color-primary-100);
   padding: var(--sl-spacing-2x-small);
   margin-bottom: var(--sl-spacing-3x-large);

@@ -288,7 +288,7 @@ export class PageTournament {
                 <sl-icon slot="icon" name="bug" class="xxl"></sl-icon>
                 <h1>Erreur</h1>
                 <br />
-                <span class="container2">{this.uiError}</span>
+                <span>{this.uiError}</span>
               </sl-alert>
             </div>
           ) : (

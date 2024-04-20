@@ -56,6 +56,14 @@ export class Router {
   public get(idx: number): string | null {
     return this.route.split('/').at(idx) || null;
   }
+
+  public goTo(hash: string): void {
+    window.location.hash = hash.replace(/^#/, '');
+  }
+
+  public goBack(): void {
+    window.history.back();
+  }
 }
 
 const router = new Router();
