@@ -10,7 +10,6 @@ export default class Utils {
   }
 
   public static setFocus(selector: string | HTMLElement): void {
-    console.log('typeof selector: ', typeof selector);
     if (typeof selector === 'string') {
       setTimeout(() => {
         // @ts-ignore

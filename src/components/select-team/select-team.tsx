@@ -18,6 +18,7 @@ export class MadSelectTeam {
 
   private argColor: string;
   private domDrawer: SlDrawer;
+  private domDivBody?: HTMLDivElement;
   private teams: Array<GenericTeam>;
   private searchValue: string;
   private minNumberSearchLetter: number;
@@ -110,7 +111,6 @@ export class MadSelectTeam {
   }
 
   private openDrawer(): void {
-    console.log('this.domDrawer: ', this.domDrawer);
     // @ts-ignore
     // TODO: this.domDrawer.style['--size'] = '40rem';
     this.domDrawer.show();
@@ -118,6 +118,22 @@ export class MadSelectTeam {
 
   private closeDrawer(): void {
     this.domDrawer.hide();
+  }
+
+  public componentDidLoad() {
+    if (this.domDivBody) {
+      this.domDivBody.addEventListener('click', (ev: Event) => {
+        ev.stopPropagation();
+        this.openDrawer();
+      });
+    }
+
+    if (this.domDrawer) {
+      this.domDrawer.addEventListener('sl-initial-focus', (ev: Event) => {
+        ev.stopPropagation();
+        Utils.setFocus('ion-searchbar');
+      });
+    }
   }
 
   private renderTeamSelection() {
@@ -166,9 +182,6 @@ export class MadSelectTeam {
   render() {
     return (
       <Host
-        onclick={() => {
-          this.openDrawer();
-        }}
         class={{
           pointer: true,
         }}
@@ -177,6 +190,7 @@ export class MadSelectTeam {
           ref={(el: SlDrawer) => {
             this.domDrawer = el;
           }}
+          no-header
           placement="start"
         >
           <h1 class="container-l">Sélection de l’équipe</h1>
@@ -193,7 +207,11 @@ export class MadSelectTeam {
             </sl-button>
           </div>
         </sl-drawer>
-        <div>
+        <div
+          ref={el => {
+            this.domDivBody = el;
+          }}
+        >
           {this.label ? <span>{this.label}</span> : null}
           {this.team?.id ? <mad-team-tile color={this.argColor} team={this.team}></mad-team-tile> : <span class="placeholder">{this.placeholder}</span>}
         </div>
