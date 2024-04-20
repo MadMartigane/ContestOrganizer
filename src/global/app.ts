@@ -36,19 +36,6 @@ import setting from '../modules/global-setting/global-setting';
  * is wrapped in the function() that is exported.
  */
 
-declare global {
-  interface Window {
-    Ionic: any;
-  }
-}
 export default async () => {
-  window.Ionic = {
-    config: {
-      rippleEffect: true,
-      mode: 'ios',
-      // mode: 'md',
-    },
-  };
-
   setting.init();
 };

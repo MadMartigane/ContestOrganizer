@@ -41,6 +41,10 @@ export namespace Components {
         "hostPending": Promise<TeamRow | null>;
         "visitorPending": Promise<TeamRow | null>;
     }
+    interface MadRoute {
+        "component": string;
+        "url": string;
+    }
     interface MadScorerBasket {
         "color": string;
         "label"?: string;
@@ -165,6 +169,12 @@ declare global {
         prototype: HTMLMadMatchTileElement;
         new (): HTMLMadMatchTileElement;
     };
+    interface HTMLMadRouteElement extends Components.MadRoute, HTMLStencilElement {
+    }
+    var HTMLMadRouteElement: {
+        prototype: HTMLMadRouteElement;
+        new (): HTMLMadRouteElement;
+    };
     interface HTMLMadScorerBasketElementEventMap {
         "madNumberChange": InputChangeEventDetail;
     }
@@ -252,6 +262,7 @@ declare global {
         "grid-default": HTMLGridDefaultElement;
         "mad-input-number": HTMLMadInputNumberElement;
         "mad-match-tile": HTMLMadMatchTileElement;
+        "mad-route": HTMLMadRouteElement;
         "mad-scorer-basket": HTMLMadScorerBasketElement;
         "mad-select-team": HTMLMadSelectTeamElement;
         "mad-team-tile": HTMLMadTeamTileElement;
@@ -286,6 +297,10 @@ declare namespace LocalJSX {
     interface MadMatchTile {
         "hostPending"?: Promise<TeamRow | null>;
         "visitorPending"?: Promise<TeamRow | null>;
+    }
+    interface MadRoute {
+        "component"?: string;
+        "url"?: string;
     }
     interface MadScorerBasket {
         "color"?: string;
@@ -331,6 +346,7 @@ declare namespace LocalJSX {
         "grid-default": GridDefault;
         "mad-input-number": MadInputNumber;
         "mad-match-tile": MadMatchTile;
+        "mad-route": MadRoute;
         "mad-scorer-basket": MadScorerBasket;
         "mad-select-team": MadSelectTeam;
         "mad-team-tile": MadTeamTile;
@@ -350,6 +366,7 @@ declare module "@stencil/core" {
             "grid-default": LocalJSX.GridDefault & JSXBase.HTMLAttributes<HTMLGridDefaultElement>;
             "mad-input-number": LocalJSX.MadInputNumber & JSXBase.HTMLAttributes<HTMLMadInputNumberElement>;
             "mad-match-tile": LocalJSX.MadMatchTile & JSXBase.HTMLAttributes<HTMLMadMatchTileElement>;
+            "mad-route": LocalJSX.MadRoute & JSXBase.HTMLAttributes<HTMLMadRouteElement>;
             "mad-scorer-basket": LocalJSX.MadScorerBasket & JSXBase.HTMLAttributes<HTMLMadScorerBasketElement>;
             "mad-select-team": LocalJSX.MadSelectTeam & JSXBase.HTMLAttributes<HTMLMadSelectTeamElement>;
             "mad-team-tile": LocalJSX.MadTeamTile & JSXBase.HTMLAttributes<HTMLMadTeamTileElement>;

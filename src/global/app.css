@@ -7,70 +7,12 @@
 
   Any global CSS variables should also be applied here.
 */
-
-/*
-  The imports below are needed to include our light dom css for global styles such as fonts and colors.
-  You can comment out any of these imports if you do not need that css. For example, if you have your own
-  global font family css then you can comment out the typography.css import.
-*/
-
-/** Core CSS required for ionic components to work property */
-@import '~@ionic/core/css/core.css';
-
-/** Basic CSS for apps built with Ionic */
-@import '~@ionic/core/css/normalize.css';
-@import '~@ionic/core/css/structure.css';
-@import '~@ionic/core/css/typography.css';
-
-/** Optional CSS utils that can be commented out */
-@import '~@ionic/core/css/padding.css';
-@import '~@ionic/core/css/float-elements.css';
-@import '~@ionic/core/css/text-alignment.css';
-@import '~@ionic/core/css/text-transformation.css';
-@import '~@ionic/core/css/flex-utils.css';
-@import '~@ionic/core/css/display.css';
-
-/*
-  The CSS Variables below can be used to theme your app.
-  For more info on CSS variables check out:
-  https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_variables
-
-  More info about color theming using Ionic:
-  https://ionicframework.com/docs/theming/color-generator
-*/
-@import './ionic.css';
+/* ####### GENERIC CSS ######### */
 @import './variables.css';
+
+/* ######## IONIC INTEGRATION ######### */
+@import './ionic.css';
 
 /* ####### SHOELACE CSS ########## */
 @import './shoelace.css';
 /* ####### END OF SHOELACE CSS ########## */
-
-/* CUSTOM STUFF */
-ion-input {
-  --placeholder-opacity: 0.6;
-}
-
-/* CONFIRM ALERT */
-.alert-head {
-  background-color: var(--sl-color-primary-100);
-}
-.alert-title.sc-ion-alert-ios {
-  font-size: var(--sl-font-size-3x-large);
-}
-.alert-message.sc-ion-alert-ios,
-.alert-input-group.sc-ion-alert-ios {
-  background-color: var(--sl-color-primary-100);
-  color: var(--sl-color-primary-900);
-  font-size: var(--sl-font-size-x-large);
-}
-button.alert-button.alert-button-role-confirm {
-  background-color: var(--sl-color-warning-100);
-  color: var(--sl-color-warning-900);
-}
-
-button.alert-button.alert-button-role-cancel {
-  background-color: var(--sl-color-success-100);
-  color: var(--sl-color-success-900);
-}
-
-/* END OFF CUSTOM STUFF */

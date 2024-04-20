@@ -243,7 +243,7 @@ export class PageMatch {
           </sl-breadcrumb-item>
         </sl-breadcrumb>
 
-        <ion-content fullscreen class="ion-padding">
+        <div class="page-content">
           {this.uiError ? (
             <div>
               <ion-card color="danger">
@@ -505,7 +505,7 @@ export class PageMatch {
               )}
             </div>
           )}
-        </ion-content>
+        </div>
       </Host>
     );
   }

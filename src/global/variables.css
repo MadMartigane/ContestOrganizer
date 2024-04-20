@@ -1,34 +1,5 @@
-/* TRANSITION IONIC TO SHOELACE HELPER */
-.primary {
-  color: var(--sl-color-primary-500);
-}
-.success {
-  color: var(--sl-color-success-500);
-}
-.warning {
-  color: var(--sl-color-warning-500);
-}
-.danger {
-  color: var(--sl-color-danger-500);
-}
-.neutral {
-  color: var(--sl-color-neutral-500);
-}
-.light {
-  color: var(--sl-color-neutral-900);
-}
-.dark {
-  color: var(--sl-color-neutral-50);
-}
-// NOT IN SHOELACE SCOPE
-.secondary {
-  color: var(--ion-color-secondary);
-}
-.tertiary {
-  color: var(--ion-color-tertiary);
-}
-.medium {
-  color: var(--ion-color-medium);
+html {
+  font-family: var(--sl-font-sans);
 }
 
 div.grid-300 {

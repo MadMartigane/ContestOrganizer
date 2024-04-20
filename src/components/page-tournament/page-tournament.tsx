@@ -280,16 +280,8 @@ export class PageTournament {
             <sl-icon name="card-list" class="xl"></sl-icon>
           </sl-breadcrumb-item>
         </sl-breadcrumb>
-        <div>
-          <ion-toolbar2 color="primary">
-            <ion-title>
-              <ion-text color="light" class="ion-margin">
-                {this.tournament?.name ? '🏆' : '404'}
-              </ion-text>
-            </ion-title>
-          </ion-toolbar2>
-        </div>
-        <ion-content fullscreen class="ion-padding">
+
+        <div class="page-content">
           {this.uiError ? (
             <div>
               <sl-alert variant="danger" open>
@@ -355,7 +347,7 @@ export class PageTournament {
               )}
             </div>
           )}
-        </ion-content>
+        </div>
       </Host>
     );
   }

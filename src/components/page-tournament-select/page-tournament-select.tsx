@@ -275,13 +275,13 @@ export class PageTournamentSelect {
           </sl-breadcrumb-item>
         </sl-breadcrumb>
 
-        <ion-content class="ion-padding">
+        <div class="page-content">
           {this.numberOfTournaments ? this.renderTournamentList() : this.renderNoTournamentInfo()}
 
           <sl-divider></sl-divider>
 
           {this.uiAddingTournament ? this.renderAddTournament() : this.renderNewTournamentButton()}
-        </ion-content>
+        </div>
       </Host>
     );
   }
