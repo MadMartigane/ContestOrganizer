@@ -27,3 +27,7 @@ div.grid-300 {
   border-style: dashed;
   border-width: 0.5px;
 }
+
+div.footer {
+  margin: var(--sl-spacing-3x-large) 0px;
+}

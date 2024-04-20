@@ -472,7 +472,7 @@ export class PageMatch {
                     ))}
                   </ion-grid>
 
-                  <div class="container-xxxl">
+                  <div class="footer">
                     <div class="grid-300">
                       <sl-button variant="warning" onclick={() => this.cancelSelection()} size="large">
                         <sl-icon slot="prefix" name="ban"></sl-icon>
@@ -491,7 +491,7 @@ export class PageMatch {
                   </div>
                 </div>
               ) : (
-                <div class="container-xxxl">
+                <div class="footer">
                   <div class="grid-300">
                     <sl-button variant="primary" size="large" onclick={() => this.goMatch()}>
                       <sl-icon name="plus-lg" slot="prefix"></sl-icon>
