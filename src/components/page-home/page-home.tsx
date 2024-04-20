@@ -1,4 +1,4 @@
-import { Component, Fragment, h, State } from '@stencil/core';
+import { Component, Host, h, State } from '@stencil/core';
 import setting, { GlobalSetting } from '../../modules/global-setting/global-setting';
 
 import SlSwitch from '@shoelace-style/shoelace/dist/components/switch/switch.js';
@@ -42,33 +42,30 @@ export class PageHome {
 
   render() {
     return (
-      <Fragment>
-        <ion-header>
-          <ion-toolbar color="primary">
-            <ion-title>Accueil</ion-title>
-            <sl-switch ref={(el: SlSwitch) => (this.darkModeSwitch = el)} checked={this.initialDarkModeActivated} size="large">
-              <sl-icon name="highlights"></sl-icon>
-            </sl-switch>
-          </ion-toolbar>
-        </ion-header>
+      <Host>
+        <sl-breadcrumb>
+          <sl-breadcrumb-item>
+            <sl-icon name="house" class="xl"></sl-icon>
+          </sl-breadcrumb-item>
+        </sl-breadcrumb>
 
-        <ion-content class="ion-padding">
-          <ion-card color="light">
-            <ion-card-header class="ion-text-center">
-              <ion-card-title color="primary">Bienvenue !</ion-card-title>
-            </ion-card-header>
+        <div class="page-content">
+          <h1>Configuration</h1>
+          <sl-switch ref={(el: SlSwitch) => (this.darkModeSwitch = el)} checked={this.initialDarkModeActivated} size="large">
+            <span class="container">Mode sombre</span>
+            <sl-icon name="highlights"></sl-icon>
+          </sl-switch>
 
-            <ion-card-content class="ion-text-center">
-              <p>
-                Retrouve tous tes tournois via le menu tout en bas et clique sur <sl-icon name="trophy" class="l warning"></sl-icon>
-              </p>
-              <p>
-                <ion-img src="assets/img/menu_trophy_marker.jpg" alt="Image du menu, avec marqueur sur bouton"></ion-img>
-              </p>
-            </ion-card-content>
-          </ion-card>
-        </ion-content>
-      </Fragment>
+          <div class="container-xl">
+            <div class="grid-300">
+              <sl-button variant="primary" href="#/tournaments" size="large">
+                <sl-icon name="trophy" slot="prefix"></sl-icon>
+                <span slot="suffix">Tournois</span>
+              </sl-button>
+            </div>
+          </div>
+        </div>
+      </Host>
     );
   }
 }

@@ -17,20 +17,17 @@ export class GlobalSetting {
   }
 
   init() {
-    console.log('[G-SETTING] init().');
     if (this.alreadyInit) {
       return;
     }
 
     // Use matchMedia to check the user preference
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-    console.log('[G-SETTING] device prefer dark mode: ', prefersDark.matches);
     if (prefersDark) {
       this.devicePrefersDark = prefersDark.matches;
     }
 
     const stored = this.getStoredSetting();
-    console.log('[G-SETTING] prefer dark mode stored: ', stored);
     if (stored && stored.darkMode !== undefined) {
       this.toggleDarkTheme(stored.darkMode, false);
     } else {
@@ -46,15 +43,9 @@ export class GlobalSetting {
 
   // Add or remove the "dark" class on the document body
   private toggleDarkTheme(shouldBeDark: boolean, fromDevice: boolean = false) {
-    // spectrum theme
-    document.body.classList.toggle('dark', shouldBeDark);
-    document.body.classList.toggle('light', !shouldBeDark);
-    console.log('[G-SETTING] setting body class: ', document.body.classList.value);
-
     // shoelace theme
     document.documentElement.classList.toggle('sl-theme-dark', shouldBeDark);
     document.body.classList.toggle('sl-theme-light', !shouldBeDark);
-    console.log('[G-SETTING] setting body class: ', document.body.classList.value);
 
     if (fromDevice) {
       this.devicePrefersDark = shouldBeDark;

@@ -6,29 +6,15 @@ import { Component, h, Host } from '@stencil/core';
   shadow: false,
 })
 export class AppRoot {
-  private renderIonicApp() {
-    return (
-      <ion-app>
-        <ion-router useHash={true}>
-          <ion-route-redirect from="/" to="/app/home"></ion-route-redirect>
-          <ion-route url="/app" component="app-tabs">
-            <ion-route url="/home" component="tab-home">
-              <ion-route component="page-home"></ion-route>
-            </ion-route>
-            <ion-route url="/tournaments" component="tab-tournament-select">
-              <ion-route component="page-tournament-select"></ion-route>
-            </ion-route>
-          </ion-route>
-          <ion-route url="/team-select/:teamId/:teamType" component="page-team-select"></ion-route>
-          <ion-route url="/tournament/:tournamentId" component="page-tournament"></ion-route>
-          <ion-route url="/match/:tournamentId" component="page-match"></ion-route>
-        </ion-router>
-        <ion-nav></ion-nav>
-      </ion-app>
-    );
-  }
-
   render() {
-    return <Host>{this.renderIonicApp()}</Host>;
+    return (
+      <Host>
+        <mad-route url="/home" component="page-home"></mad-route>
+        <mad-route url="/tournaments" component="page-tournament-select"></mad-route>
+        <mad-route url="/team-select/:teamId/:teamType" component="page-team-select"></mad-route>
+        <mad-route url="/tournament/:tournamentId" component="page-tournament"></mad-route>
+        <mad-route url="/match/:tournamentId" component="page-match"></mad-route>
+      </Host>
+    );
   }
 }

@@ -205,33 +205,6 @@ export class PageMatch {
     this.refreshUI();
   }
 
-  private getTypeLogo(): string {
-    if (!this.tournament) {
-      return '404';
-    }
-
-    let logo;
-    switch (this.tournament.type) {
-      case TournamentType.NBA:
-        logo = '🏀';
-        break;
-      case TournamentType.BASKET:
-        logo = '🏀';
-        break;
-      case TournamentType.NFL:
-        logo = '🏈';
-        break;
-      case TournamentType.RUGBY:
-        logo = '🏉';
-        break;
-      default:
-        logo = '⚽️';
-        break;
-    }
-
-    return logo;
-  }
-
   private renderActionButtons(match: Match) {
     return (
       <div>
@@ -255,17 +228,22 @@ export class PageMatch {
   render() {
     return (
       <Host>
-        <ion-header>
-          <ion-toolbar color="primary">
-            <ion-buttons slot="start">
-              <ion-back-button text="Retour" defaultHref={`/tournament/${this.tournament?.id}`}></ion-back-button>
-            </ion-buttons>
-            <ion-title>
-              <span class="light container">{this.getTypeLogo()}</span>
-            </ion-title>
-          </ion-toolbar>
-        </ion-header>
-        <ion-content fullscreen class="ion-padding">
+        <sl-breadcrumb>
+          <sl-breadcrumb-item href="#/home">
+            <sl-icon name="house" class="xl"></sl-icon>
+          </sl-breadcrumb-item>
+          <sl-breadcrumb-item href="#/tournaments">
+            <sl-icon name="trophy" class="xl"></sl-icon>
+          </sl-breadcrumb-item>
+          <sl-breadcrumb-item href={`#/tournament/${this.tournament?.id}`}>
+            <sl-icon name="card-list" class="xl"></sl-icon>
+          </sl-breadcrumb-item>
+          <sl-breadcrumb-item>
+            <sl-icon name="controller" class="xl"></sl-icon>
+          </sl-breadcrumb-item>
+        </sl-breadcrumb>
+
+        <div class="page-content">
           {this.uiError ? (
             <div>
               <ion-card color="danger">
@@ -527,7 +505,7 @@ export class PageMatch {
               )}
             </div>
           )}
-        </ion-content>
+        </div>
       </Host>
     );
   }

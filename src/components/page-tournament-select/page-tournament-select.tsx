@@ -266,18 +266,22 @@ export class PageTournamentSelect {
   render() {
     return (
       <Host>
-        <ion-header>
-          <ion-toolbar color="primary">
-            <ion-title>Vos tournois</ion-title>
-          </ion-toolbar>
-        </ion-header>
-        <ion-content class="ion-padding">
+        <sl-breadcrumb>
+          <sl-breadcrumb-item href="#/home">
+            <sl-icon name="house" class="xl"></sl-icon>
+          </sl-breadcrumb-item>
+          <sl-breadcrumb-item>
+            <sl-icon name="trophy" class="xl"></sl-icon>
+          </sl-breadcrumb-item>
+        </sl-breadcrumb>
+
+        <div class="page-content">
           {this.numberOfTournaments ? this.renderTournamentList() : this.renderNoTournamentInfo()}
 
           <sl-divider></sl-divider>
 
           {this.uiAddingTournament ? this.renderAddTournament() : this.renderNewTournamentButton()}
-        </ion-content>
+        </div>
       </Host>
     );
   }
