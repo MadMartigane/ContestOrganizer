@@ -10,7 +10,6 @@ export default class Utils {
   }
 
   public static setFocus(selector: string | HTMLElement): void {
-    console.log('typeof selector: ', typeof selector);
     if (typeof selector === 'string') {
       setTimeout(() => {
         // @ts-ignore
@@ -58,5 +57,14 @@ export default class Utils {
 
     Utils.unmount(alert);
     return false;
+  }
+
+  public static scrollIntoView(selector: string) {
+    setTimeout(() => {
+      const list: Element | null = window.document.querySelector(selector);
+      if (list) {
+        list.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 500);
   }
 }

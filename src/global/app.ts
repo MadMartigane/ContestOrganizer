@@ -7,10 +7,13 @@ import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.j
 // Components declarations
 import '@shoelace-style/shoelace/dist/components/alert/alert.js';
 import '@shoelace-style/shoelace/dist/components/badge/badge.js';
+import '@shoelace-style/shoelace/dist/components/breadcrumb/breadcrumb.js';
+import '@shoelace-style/shoelace/dist/components/breadcrumb-item/breadcrumb-item.js';
 import '@shoelace-style/shoelace/dist/components/button/button.js';
 import '@shoelace-style/shoelace/dist/components/button-group/button-group.js';
 import '@shoelace-style/shoelace/dist/components/card/card.js';
 import '@shoelace-style/shoelace/dist/components/divider/divider.js';
+import '@shoelace-style/shoelace/dist/components/drawer/drawer.js';
 import '@shoelace-style/shoelace/dist/components/icon/icon.js';
 import '@shoelace-style/shoelace/dist/components/input/input.js';
 import '@shoelace-style/shoelace/dist/components/menu/menu.js';
@@ -34,19 +37,6 @@ import setting from '../modules/global-setting/global-setting';
  * is wrapped in the function() that is exported.
  */
 
-declare global {
-  interface Window {
-    Ionic: any;
-  }
-}
 export default async () => {
-  window.Ionic = {
-    config: {
-      rippleEffect: true,
-      mode: 'ios',
-      // mode: 'md',
-    },
-  };
-
   setting.init();
 };

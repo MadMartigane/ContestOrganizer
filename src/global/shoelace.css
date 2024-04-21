@@ -49,26 +49,33 @@ sl-icon.xxxxl {
 }
 
 /* icon color */
-sl-icon.primary {
+/* TRANSITION IONIC TO SHOELACE HELPER */
+.primary {
   color: var(--sl-color-primary-500);
 }
-sl-icon.success {
+.success {
   color: var(--sl-color-success-500);
 }
-sl-icon.warning {
+.warning {
   color: var(--sl-color-warning-500);
 }
-sl-icon.danger {
+.danger {
   color: var(--sl-color-danger-500);
 }
-sl-icon.neutral {
+.neutral {
   color: var(--sl-color-neutral-500);
 }
-sl-icon.light {
+.light {
   color: var(--sl-color-neutral-900);
 }
-sl-icon.dark {
+.dark {
   color: var(--sl-color-neutral-50);
+}
+.secondary {
+  color: var(--sl-color-teal-500);
+}
+.tertiary {
+  color: var(--sl-color-violet-500);
 }
 
 /* GLOBAL CONTAINER (shoelace token version) */
@@ -112,4 +119,31 @@ sl-card.card-common [slot='footer'] {
 
 .sl-text-center {
   text-align: center !important;
+}
+
+sl-breadcrumb {
+  position: fixed;
+  top: 0;
+  width: 99%;
+  background-color: var(--sl-color-primary-100);
+  padding: var(--sl-spacing-2x-small);
+  margin-bottom: var(--sl-spacing-3x-large);
+  z-index: var(--sl-z-index-tooltip);
+  box-shadow: var(--sl-shadow-medium);
+  -webkit-box-shadow: var(--sl-shadow-medium);
+  -moz-box-shadow: var(--sl-shadow-medium);
+  border-radius: var(--sl-border-radius-small);
+}
+
+div.page-content {
+  margin: var(--sl-spacing-3x-large) var(--sl-spacing-2x-small);
+  padding: var(--sl-spacing-medium);
+  color: var(--sl-color-neutral-900);
+  background-color: var(--sl-color-neutral-50);
+  text-align: center;
+  border-color: var(--sl-color-neutral-100);
+  border-radius: var(--sl-border-radius-large);
+  box-shadow: var(--sl-shadow-medium);
+  -webkit-box-shadow: var(--sl-shadow-medium);
+  -moz-box-shadow: var(--sl-shadow-medium);
 }

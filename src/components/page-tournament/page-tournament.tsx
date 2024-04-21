@@ -269,26 +269,26 @@ export class PageTournament {
   render() {
     return (
       <Host>
-        <ion-header>
-          <ion-toolbar color="primary">
-            <ion-buttons slot="start">
-              <ion-back-button text="Retour" defaultHref="/app/tournaments"></ion-back-button>
-            </ion-buttons>
-            <ion-title>
-              <ion-text color="light" class="ion-margin">
-                {this.tournament?.name ? '🏆' : '404'}
-              </ion-text>
-            </ion-title>
-          </ion-toolbar>
-        </ion-header>
-        <ion-content fullscreen class="ion-padding">
+        <sl-breadcrumb>
+          <sl-breadcrumb-item href="#/home">
+            <sl-icon name="house" class="xl"></sl-icon>
+          </sl-breadcrumb-item>
+          <sl-breadcrumb-item href="#/tournaments">
+            <sl-icon name="trophy" class="xl"></sl-icon>
+          </sl-breadcrumb-item>
+          <sl-breadcrumb-item>
+            <sl-icon name="card-list" class="xl"></sl-icon>
+          </sl-breadcrumb-item>
+        </sl-breadcrumb>
+
+        <div class="page-content">
           {this.uiError ? (
             <div>
               <sl-alert variant="danger" open>
                 <sl-icon slot="icon" name="bug" class="xxl"></sl-icon>
                 <h1>Erreur</h1>
                 <br />
-                <span class="container2">{this.uiError}</span>
+                <span>{this.uiError}</span>
               </sl-alert>
             </div>
           ) : (
@@ -347,7 +347,7 @@ export class PageTournament {
               )}
             </div>
           )}
-        </ion-content>
+        </div>
       </Host>
     );
   }

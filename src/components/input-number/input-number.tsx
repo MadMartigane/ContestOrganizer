@@ -33,7 +33,6 @@ export class MadInputNumber {
   public componentDidLoad() {
     if (this.domInput) {
       this.domInput.addEventListener('sl-change', () => {
-        console.log('on sl-change !!');
         this.onNumberChange();
       });
     }

@@ -10,19 +10,15 @@ import { InputChangeEventDetail } from "@ionic/core";
 import { TeamRow } from "./modules/team-row/team-row";
 import { GenericTeam } from "./modules/team-row/team-row.d";
 import { GridTeamOnUpdateDetail } from "./modules/grid-common/grid-common.types";
-import { GenericTeam as GenericTeam1, TournamentType as TournamentType1 } from "./components.d";
-import { PageTeamSelectEventDatail } from "./components/page-team-select/page-team-select.d";
+import { GenericTeam as GenericTeam1 } from "./components.d";
 export { TournamentType, TournamentUpdateEvent } from "./modules/tournaments/tournaments.types";
 export { InputChangeEventDetail } from "@ionic/core";
 export { TeamRow } from "./modules/team-row/team-row";
 export { GenericTeam } from "./modules/team-row/team-row.d";
 export { GridTeamOnUpdateDetail } from "./modules/grid-common/grid-common.types";
-export { GenericTeam as GenericTeam1, TournamentType as TournamentType1 } from "./components.d";
-export { PageTeamSelectEventDatail } from "./components/page-team-select/page-team-select.d";
+export { GenericTeam as GenericTeam1 } from "./components.d";
 export namespace Components {
     interface AppRoot {
-    }
-    interface AppTabs {
     }
     interface GridBasket {
         "tournamentId": number | null;
@@ -42,6 +38,10 @@ export namespace Components {
     interface MadMatchTile {
         "hostPending": Promise<TeamRow | null>;
         "visitorPending": Promise<TeamRow | null>;
+    }
+    interface MadRoute {
+        "component": string;
+        "url": string;
     }
     interface MadScorerBasket {
         "color": string;
@@ -69,10 +69,6 @@ export namespace Components {
     interface PageMatch {
         "tournamentId": number;
     }
-    interface PageTeamSelect {
-        "teamId": string;
-        "teamType": TournamentType1;
-    }
     interface PageTournament {
         "tournamentId": number;
     }
@@ -99,22 +95,12 @@ export interface MadSelectTeamCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLMadSelectTeamElement;
 }
-export interface PageTeamSelectCustomEvent<T> extends CustomEvent<T> {
-    detail: T;
-    target: HTMLPageTeamSelectElement;
-}
 declare global {
     interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {
     }
     var HTMLAppRootElement: {
         prototype: HTMLAppRootElement;
         new (): HTMLAppRootElement;
-    };
-    interface HTMLAppTabsElement extends Components.AppTabs, HTMLStencilElement {
-    }
-    var HTMLAppTabsElement: {
-        prototype: HTMLAppTabsElement;
-        new (): HTMLAppTabsElement;
     };
     interface HTMLGridBasketElementEventMap {
         "gridTournamentChange": TournamentUpdateEvent;
@@ -173,6 +159,12 @@ declare global {
         prototype: HTMLMadMatchTileElement;
         new (): HTMLMadMatchTileElement;
     };
+    interface HTMLMadRouteElement extends Components.MadRoute, HTMLStencilElement {
+    }
+    var HTMLMadRouteElement: {
+        prototype: HTMLMadRouteElement;
+        new (): HTMLMadRouteElement;
+    };
     interface HTMLMadScorerBasketElementEventMap {
         "madNumberChange": InputChangeEventDetail;
     }
@@ -225,23 +217,6 @@ declare global {
         prototype: HTMLPageMatchElement;
         new (): HTMLPageMatchElement;
     };
-    interface HTMLPageTeamSelectElementEventMap {
-        "pageTeamNewSelection": PageTeamSelectEventDatail;
-    }
-    interface HTMLPageTeamSelectElement extends Components.PageTeamSelect, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLPageTeamSelectElementEventMap>(type: K, listener: (this: HTMLPageTeamSelectElement, ev: PageTeamSelectCustomEvent<HTMLPageTeamSelectElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLPageTeamSelectElementEventMap>(type: K, listener: (this: HTMLPageTeamSelectElement, ev: PageTeamSelectCustomEvent<HTMLPageTeamSelectElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
-    }
-    var HTMLPageTeamSelectElement: {
-        prototype: HTMLPageTeamSelectElement;
-        new (): HTMLPageTeamSelectElement;
-    };
     interface HTMLPageTournamentElement extends Components.PageTournament, HTMLStencilElement {
     }
     var HTMLPageTournamentElement: {
@@ -256,25 +231,22 @@ declare global {
     };
     interface HTMLElementTagNameMap {
         "app-root": HTMLAppRootElement;
-        "app-tabs": HTMLAppTabsElement;
         "grid-basket": HTMLGridBasketElement;
         "grid-default": HTMLGridDefaultElement;
         "mad-input-number": HTMLMadInputNumberElement;
         "mad-match-tile": HTMLMadMatchTileElement;
+        "mad-route": HTMLMadRouteElement;
         "mad-scorer-basket": HTMLMadScorerBasketElement;
         "mad-select-team": HTMLMadSelectTeamElement;
         "mad-team-tile": HTMLMadTeamTileElement;
         "page-home": HTMLPageHomeElement;
         "page-match": HTMLPageMatchElement;
-        "page-team-select": HTMLPageTeamSelectElement;
         "page-tournament": HTMLPageTournamentElement;
         "page-tournament-select": HTMLPageTournamentSelectElement;
     }
 }
 declare namespace LocalJSX {
     interface AppRoot {
-    }
-    interface AppTabs {
     }
     interface GridBasket {
         "onGridTournamentChange"?: (event: GridBasketCustomEvent<TournamentUpdateEvent>) => void;
@@ -297,6 +269,10 @@ declare namespace LocalJSX {
     interface MadMatchTile {
         "hostPending"?: Promise<TeamRow | null>;
         "visitorPending"?: Promise<TeamRow | null>;
+    }
+    interface MadRoute {
+        "component"?: string;
+        "url"?: string;
     }
     interface MadScorerBasket {
         "color"?: string;
@@ -326,11 +302,6 @@ declare namespace LocalJSX {
     interface PageMatch {
         "tournamentId"?: number;
     }
-    interface PageTeamSelect {
-        "onPageTeamNewSelection"?: (event: PageTeamSelectCustomEvent<PageTeamSelectEventDatail>) => void;
-        "teamId"?: string;
-        "teamType"?: TournamentType1;
-    }
     interface PageTournament {
         "tournamentId"?: number;
     }
@@ -338,17 +309,16 @@ declare namespace LocalJSX {
     }
     interface IntrinsicElements {
         "app-root": AppRoot;
-        "app-tabs": AppTabs;
         "grid-basket": GridBasket;
         "grid-default": GridDefault;
         "mad-input-number": MadInputNumber;
         "mad-match-tile": MadMatchTile;
+        "mad-route": MadRoute;
         "mad-scorer-basket": MadScorerBasket;
         "mad-select-team": MadSelectTeam;
         "mad-team-tile": MadTeamTile;
         "page-home": PageHome;
         "page-match": PageMatch;
-        "page-team-select": PageTeamSelect;
         "page-tournament": PageTournament;
         "page-tournament-select": PageTournamentSelect;
     }
@@ -358,17 +328,16 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "app-root": LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
-            "app-tabs": LocalJSX.AppTabs & JSXBase.HTMLAttributes<HTMLAppTabsElement>;
             "grid-basket": LocalJSX.GridBasket & JSXBase.HTMLAttributes<HTMLGridBasketElement>;
             "grid-default": LocalJSX.GridDefault & JSXBase.HTMLAttributes<HTMLGridDefaultElement>;
             "mad-input-number": LocalJSX.MadInputNumber & JSXBase.HTMLAttributes<HTMLMadInputNumberElement>;
             "mad-match-tile": LocalJSX.MadMatchTile & JSXBase.HTMLAttributes<HTMLMadMatchTileElement>;
+            "mad-route": LocalJSX.MadRoute & JSXBase.HTMLAttributes<HTMLMadRouteElement>;
             "mad-scorer-basket": LocalJSX.MadScorerBasket & JSXBase.HTMLAttributes<HTMLMadScorerBasketElement>;
             "mad-select-team": LocalJSX.MadSelectTeam & JSXBase.HTMLAttributes<HTMLMadSelectTeamElement>;
             "mad-team-tile": LocalJSX.MadTeamTile & JSXBase.HTMLAttributes<HTMLMadTeamTileElement>;
             "page-home": LocalJSX.PageHome & JSXBase.HTMLAttributes<HTMLPageHomeElement>;
             "page-match": LocalJSX.PageMatch & JSXBase.HTMLAttributes<HTMLPageMatchElement>;
-            "page-team-select": LocalJSX.PageTeamSelect & JSXBase.HTMLAttributes<HTMLPageTeamSelectElement>;
             "page-tournament": LocalJSX.PageTournament & JSXBase.HTMLAttributes<HTMLPageTournamentElement>;
             "page-tournament-select": LocalJSX.PageTournamentSelect & JSXBase.HTMLAttributes<HTMLPageTournamentSelectElement>;
         }
