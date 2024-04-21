@@ -130,7 +130,6 @@ class Tournaments {
     const merged: Tournament[] = [];
 
     primaries.forEach(primary => {
-      console.group('==== tournament %s ========', primary.name);
       const secondary = secondaries.find(candidate => candidate.id === primary.id);
       if (!secondary) {
         // That mean the tournament doesn't exist in the oldest record. We have to keep it.
@@ -156,7 +155,6 @@ class Tournaments {
 
         merged.push(secondary);
       }
-      console.groupEnd();
     });
 
     return merged;
