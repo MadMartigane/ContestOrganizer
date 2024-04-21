@@ -45,10 +45,12 @@ class Tournaments {
     const tournamentsString = localStorage.getItem(tryOldCach ? CACHE_KEY : this.CACHE_KEY);
 
     if (tournamentsString) {
+      // TODO:REMOVE THIS CHECK
       if (Boolean(localStorage.getItem(CACHE_KEY))) {
-        // TODO: localStorage.removeItem(CACHE_KEY);
+        localStorage.removeItem(CACHE_KEY);
         console.warn('//%cTODO:', 'color:yellow; padding:2px; background-color:blue;', ' DO NOT FORGET TO CLEAN THE OLD CACHE.');
       }
+      // TODO:END OF REMOVE THIS CHECK
 
       localStorage.setItem(CACHE_KEY, tournamentsString);
       return tournamentsString;
@@ -84,9 +86,6 @@ class Tournaments {
 
     let mergedTournaments: Array<Tournament>;
 
-    console.log('local storage time (%s): ', (localTournaments?.timestamp || 0) - (backendTournaments?.timestamp || 0), new Date(localTournaments?.timestamp || 0));
-    console.log('backend storage time (%s): ', (backendTournaments?.timestamp || 0) - (localTournaments?.timestamp || 0), new Date(backendTournaments?.timestamp || 0));
-
     if (backendTournaments && !localTournaments) {
       mergedTournaments = backendTournaments.tournaments;
     } else if (backendTournaments && localTournaments) {
@@ -94,11 +93,9 @@ class Tournaments {
       let oldestTournaments: Array<Tournament>;
 
       if ((localTournaments?.timestamp || 0) >= (backendTournaments?.timestamp || 0)) {
-        console.log('local is more recent than backend.');
         recentTournaments = localTournaments?.tournaments || [];
         oldestTournaments = backendTournaments?.tournaments;
       } else {
-        console.log('backend is more recent than local.');
         recentTournaments = backendTournaments.tournaments;
         oldestTournaments = localTournaments?.tournaments || [];
       }
@@ -126,7 +123,6 @@ class Tournaments {
   }
 
   private mergeTournaments(primaries: Array<Tournament>, secondaries: Array<Tournament>): Array<Tournament> {
-    console.log('mergin both local and backend');
     if (!primaries || !primaries.length) {
       return secondaries && secondaries.length ? secondaries : [];
     }
@@ -136,14 +132,11 @@ class Tournaments {
     primaries.forEach(primary => {
       console.group('==== tournament %s ========', primary.name);
       const secondary = secondaries.find(candidate => candidate.id === primary.id);
-      console.log('found in the old record: ', Boolean(secondary));
       if (!secondary) {
         // That mean the tournament doesn't exist in the oldest record. We have to keep it.
-        console.log('No secondary, merge the new record and next.');
         console.groupEnd();
         if (!primary.timestamp) {
           primary.timestamp = Date.now();
-          console.log('setting new timestamp.');
         }
 
         merged.push(primary);
@@ -151,20 +144,16 @@ class Tournaments {
       }
 
       if ((primary?.timestamp || 0) >= (secondary?.timestamp || 0)) {
-        console.log('merge the primary record and next.');
         if (!primary.timestamp) {
           primary.timestamp = Date.now();
-          console.log('setting new timestamp.');
         }
 
         merged.push(primary);
       } else {
         if (!secondary.timestamp) {
           secondary.timestamp = Date.now();
-          console.log('setting new timestamp.');
         }
 
-        console.log('merge the secondary record and next.');
         merged.push(secondary);
       }
       console.groupEnd();

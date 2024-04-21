@@ -1,4 +1,5 @@
 import { Component, h, Host } from '@stencil/core';
+import router, { Router } from '../../modules/router';
 
 @Component({
   tag: 'app-root',
@@ -6,6 +7,15 @@ import { Component, h, Host } from '@stencil/core';
   shadow: false,
 })
 export class AppRoot {
+  private readonly router: Router = router;
+
+  constructor() {
+    this.router.setRedirection({
+      from: '/app/:anything',
+      to: '/home',
+    });
+  }
+
   render() {
     return (
       <Host>

@@ -21,12 +21,11 @@ export class MadRoute {
   @State() private match: boolean;
 
   constructor() {
-    console.log('mad-router constructor.');
     this.fragments = this.getFragments();
-    console.log('mad-router this.fragments: ', this.fragments);
 
     this.installEventLister();
     this.getMatchAndArguments();
+    this.router.registerUrl(this.url);
   }
 
   private getFragments(): Array<Fragment> | null {
@@ -54,7 +53,6 @@ export class MadRoute {
     this.match = this.router.match(this.url);
     this.arguments = '';
 
-    console.log('URL %s match %s: ', this.url, this.router.route, this.match);
     if (!this.match) {
       return;
     }
@@ -63,8 +61,6 @@ export class MadRoute {
       const value = this.router.get(fragment.idx);
       this.arguments += `${this.fragmentNameToDomArgument(fragment.name)}="${value}" `;
     });
-
-    console.log('this.arguments: ', this.arguments);
   }
 
   private installEventLister() {
