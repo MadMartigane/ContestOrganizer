@@ -6,9 +6,12 @@ export class Router {
   private readonly registeredUrl: Array<string> = [];
 
   private checkingUrlTimeoutId: number | null = null;
+  private defaultUrl: string | null;
 
   constructor() {
     this.attachEventListners();
+
+    this.checkDeadRoute();
   }
 
   get path() {
@@ -23,6 +26,24 @@ export class Router {
     window.addEventListener('hashchange', () => {
       this.update();
     });
+  }
+
+  private checkDeadRoute(): void {
+    window.setTimeout(() => {
+      if (this.route === '' && !this.registeredUrl.includes(this.route)) {
+        if (this.defaultUrl) {
+          this.goTo(this.defaultUrl);
+          return;
+        }
+
+        if (this.registeredUrl.length > 0) {
+          this.goTo(this.registeredUrl.at(0) || '');
+          return;
+        }
+
+        // TODO: warning
+      }
+    }, 500);
   }
 
   private update(): void {
@@ -52,6 +73,17 @@ export class Router {
     }
 
     //TODO: 404
+  }
+
+  private scheduleCheckOfRegisteredAndRedirectionUrl(): void {
+    if (this.checkingUrlTimeoutId) {
+      window.clearTimeout(this.checkingUrlTimeoutId);
+    }
+
+    this.checkingUrlTimeoutId = window.setTimeout((): void => {
+      this.checkRegisteredAndRedirectionUrl();
+      this.checkingUrlTimeoutId = null;
+    }, 100);
   }
 
   public onUpdate(callbak: () => void) {
@@ -110,15 +142,8 @@ export class Router {
     this.scheduleCheckOfRegisteredAndRedirectionUrl();
   }
 
-  public scheduleCheckOfRegisteredAndRedirectionUrl(): void {
-    if (this.checkingUrlTimeoutId) {
-      window.clearTimeout(this.checkingUrlTimeoutId);
-    }
-
-    this.checkingUrlTimeoutId = window.setTimeout((): void => {
-      this.checkRegisteredAndRedirectionUrl();
-      this.checkingUrlTimeoutId = null;
-    }, 100);
+  setDefaultUrl(url: string): void {
+    this.defaultUrl = url;
   }
 }
 

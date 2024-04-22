@@ -14,6 +14,8 @@ export class AppRoot {
       from: '/app/:anything',
       to: '/home',
     });
+
+    this.router.setDefaultUrl('/home');
   }
 
   render() {
