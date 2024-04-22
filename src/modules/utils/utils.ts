@@ -1,3 +1,5 @@
+const debounceCollector: { [index: string]: number } = {};
+
 export default class Utils {
   public static unmount(child: HTMLElement, parent?: HTMLElement) {
     if (!parent) {
@@ -12,9 +14,11 @@ export default class Utils {
   public static setFocus(selector: string | HTMLElement): void {
     if (typeof selector === 'string') {
       setTimeout(() => {
-        // @ts-ignore
-        document.querySelector(selector)?.setFocus();
-      }, 400);
+        const element: HTMLElement | null = document.querySelector(selector);
+        if (element && element.focus) {
+          element.focus();
+        }
+      }, 300);
       return;
     }
 
@@ -66,5 +70,16 @@ export default class Utils {
         list.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }, 500);
+  }
+
+  public static debounce(name: string, callback: Function): void {
+    if (debounceCollector[name]) {
+      window.clearTimeout(debounceCollector[name]);
+    }
+
+    debounceCollector[name] = window.setTimeout(() => {
+      callback();
+      delete debounceCollector[name];
+    }, 300);
   }
 }
