@@ -6,6 +6,9 @@ import SlDrawer from '@shoelace-style/shoelace/dist/components/drawer/drawer';
 import apiFutDB from '../../modules/futbd/futdb';
 import apiSports from '../../modules/api-sports/api-sports';
 import Utils from '../../modules/utils/utils';
+import SlInput from '@shoelace-style/shoelace/dist/components/input/input.component';
+import SlMenu from '@shoelace-style/shoelace/dist/components/menu/menu.component';
+import SlMenuItem from '@shoelace-style/shoelace/dist/components/menu-item/menu-item.component';
 
 @Component({
   tag: 'mad-select-team',
@@ -19,6 +22,8 @@ export class MadSelectTeam {
   private argColor: string;
   private domDrawer: SlDrawer;
   private domDivBody?: HTMLDivElement;
+  private domInputSearch?: SlInput;
+  private domSearchResultList?: SlMenu;
   private teams: Array<GenericTeam>;
   private searchValue: string;
   private minNumberSearchLetter: number;
@@ -77,9 +82,8 @@ export class MadSelectTeam {
     }
   }
 
-  private async onSearchChange(ev: CustomEvent): Promise<void> {
-    this.searchValue = ev.detail.value;
-
+  private async onSearchChange(value: string): Promise<void> {
+    this.searchValue = value;
     if (this.searchValue.length < this.minNumberSearchLetter) {
       this.suggested = [];
       return;
@@ -116,12 +120,40 @@ export class MadSelectTeam {
     this.closeDrawer();
   }
 
+  private onTeamRadioChange(ev: CustomEvent): void {
+    ev.stopPropagation();
+
+    const detail = ev.detail as { item: SlMenuItem };
+    const teamId = detail.item.dataset.teamId;
+
+    const team: GenericTeam | undefined = this.suggested.find(candidate => candidate.id === Number(teamId));
+    if (team) {
+      this.onTeamSelected(team);
+    }
+
+    // TODO: warn
+  }
+
   private openDrawer(): void {
     this.domDrawer.show();
+    if (this.domInputSearch) {
+      Utils.setFocus(this.domInputSearch);
+    }
   }
 
   private closeDrawer(): void {
     this.domDrawer.hide();
+  }
+
+  public componentDidRender() {
+    if (this.domSearchResultList && !this.domSearchResultList.dataset.madHandled) {
+      this.domSearchResultList.addEventListener('sl-select', (ev: CustomEvent) => {
+        ev.stopPropagation();
+        this.onTeamRadioChange(ev);
+      });
+
+      this.domSearchResultList.dataset.madHandled = 'true';
+    }
   }
 
   public componentDidLoad() {
@@ -132,45 +164,63 @@ export class MadSelectTeam {
       });
     }
 
-    if (this.domDrawer) {
-      this.domDrawer.addEventListener('sl-initial-focus', (ev: Event) => {
+    if (this.domInputSearch) {
+      this.domInputSearch.addEventListener('sl-input', (ev: CustomEvent) => {
         ev.stopPropagation();
-        Utils.setFocus('ion-searchbar');
+        Utils.debounce('select-team-input-search', () => {
+          this.onSearchChange(this.domInputSearch?.value || '');
+        });
       });
     }
   }
 
+  private renderTeamResultList() {
+    return (
+      <sl-menu
+        ref={(el: SlMenu) => {
+          this.domSearchResultList = el;
+        }}
+      >
+        {this.suggested.map((team: GenericTeam) => (
+          <div>
+            <sl-menu-item data-team-id={team.id}>
+              <mad-team-tile team={team}></mad-team-tile>
+
+              <span slot="suffix">
+                <sl-icon class="neutral xl container-s" name="arrow-right-circle"></sl-icon>
+              </span>
+            </sl-menu-item>
+          </div>
+        ))}
+      </sl-menu>
+    );
+  }
+
   private renderTeamSelection() {
     return (
-      <div class="page-content">
+      <div class="footer">
         {this.isLoading ? <ion-progress-bar type="indeterminate" color="secondary"></ion-progress-bar> : null}
-        <ion-card>
-          <ion-card-header>
-            <h1>{this.isLoading ? 'Changement des équipes…' : `Recherche ton équipe. (${this.minNumberSearchLetter} lettres min)`}</h1>
-          </ion-card-header>
-          <ion-card-content>
-            <ion-searchbar
-              id="page-team-select-search"
-              debounce={400}
-              inputmode="search"
-              enterkeyhint="search"
-              disabled={this.isLoading}
-              autocapitalize="off"
-              animated
-              onIonInput={(ev: CustomEvent) => this.onSearchChange(ev)}
-              placeholder="Recherche"
-            ></ion-searchbar>
+        <sl-card>
+          <div slot="header">
+            <h3>{this.isLoading ? 'Changement des équipes…' : `Recherche ton équipe. (${this.minNumberSearchLetter} lettres min)`}</h3>
+          </div>
+          <div>
+            <div class="container">
+              <sl-input
+                ref={(el: SlInput) => {
+                  this.domInputSearch = el;
+                }}
+                type="text"
+                disabled={this.isLoading}
+                placeholder="nom de d’équipe"
+                autofocus
+                size="medium"
+              >
+                <sl-icon name="search" slot="prefix"></sl-icon>
+              </sl-input>
+            </div>
 
-            <ion-list>
-              <ion-radio-group value="selectedTeam">
-                {this.suggested.map(team => (
-                  <ion-item onClick={() => this.onTeamSelected(team)}>
-                    <mad-team-tile team={team}></mad-team-tile>
-                    <ion-radio slot="end" value={team.id}></ion-radio>
-                  </ion-item>
-                ))}
-              </ion-radio-group>
-            </ion-list>
+            {this.suggested.length ? this.renderTeamResultList() : null}
 
             {this.searchValue?.length > 2 && !this.suggested.length ? (
               <sl-alert variant="warning" open>
@@ -178,8 +228,8 @@ export class MadSelectTeam {
                 <span class="container l">Aucun résultat</span>
               </sl-alert>
             ) : null}
-          </ion-card-content>
-        </ion-card>
+          </div>
+        </sl-card>
       </div>
     );
   }
@@ -197,7 +247,6 @@ export class MadSelectTeam {
           no-header
           placement="start"
         >
-          <h1 class="container-l">Sélection de l’équipe</h1>
           {this.renderTeamSelection()}
 
           <div slot="footer" class="grid-300">

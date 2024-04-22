@@ -147,3 +147,13 @@ div.page-content {
   -webkit-box-shadow: var(--sl-shadow-medium);
   -moz-box-shadow: var(--sl-shadow-medium);
 }
+
+sl-menu {
+  border: none;
+}
+
+sl-menu-item {
+  border: var(--border-width) solid;
+  border-color: var(--sl-color-neutral-200);
+  border-radius: var(--sl-border-radius-small);
+}

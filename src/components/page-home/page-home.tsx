@@ -56,7 +56,7 @@ export class PageHome {
             <sl-icon name="highlights"></sl-icon>
           </sl-switch>
 
-          <div class="container-xl">
+          <div class="footer">
             <div class="grid-300">
               <sl-button variant="primary" href="#/tournaments" size="large">
                 <sl-icon name="trophy" slot="prefix"></sl-icon>
