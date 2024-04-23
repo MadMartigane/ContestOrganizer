@@ -7,6 +7,7 @@ export class Router {
 
   private checkingUrlTimeoutId: number | null = null;
   private defaultUrl: string | null;
+  private notFoundUrl: string | null;
 
   constructor() {
     this.attachEventListners();
@@ -72,7 +73,12 @@ export class Router {
       return;
     }
 
-    //TODO: 404
+    if (this.notFoundUrl) {
+      this.goTo(this.notFoundUrl);
+      return;
+    }
+
+    // TODO: WARNING
   }
 
   private scheduleCheckOfRegisteredAndRedirectionUrl(): void {
@@ -142,8 +148,12 @@ export class Router {
     this.scheduleCheckOfRegisteredAndRedirectionUrl();
   }
 
-  setDefaultUrl(url: string): void {
+  public setDefaultUrl(url: string): void {
     this.defaultUrl = url;
+  }
+
+  public setNotFoundUrl(url: string): void {
+    this.notFoundUrl = url;
   }
 }
 

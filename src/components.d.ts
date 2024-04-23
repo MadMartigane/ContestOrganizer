@@ -64,6 +64,8 @@ export namespace Components {
         "reverse": Boolean | null;
         "team": GenericTeam1 | null;
     }
+    interface Page404 {
+    }
     interface PageHome {
     }
     interface PageMatch {
@@ -205,6 +207,12 @@ declare global {
         prototype: HTMLMadTeamTileElement;
         new (): HTMLMadTeamTileElement;
     };
+    interface HTMLPage404Element extends Components.Page404, HTMLStencilElement {
+    }
+    var HTMLPage404Element: {
+        prototype: HTMLPage404Element;
+        new (): HTMLPage404Element;
+    };
     interface HTMLPageHomeElement extends Components.PageHome, HTMLStencilElement {
     }
     var HTMLPageHomeElement: {
@@ -239,6 +247,7 @@ declare global {
         "mad-scorer-basket": HTMLMadScorerBasketElement;
         "mad-select-team": HTMLMadSelectTeamElement;
         "mad-team-tile": HTMLMadTeamTileElement;
+        "page-404": HTMLPage404Element;
         "page-home": HTMLPageHomeElement;
         "page-match": HTMLPageMatchElement;
         "page-tournament": HTMLPageTournamentElement;
@@ -297,6 +306,8 @@ declare namespace LocalJSX {
         "reverse"?: Boolean | null;
         "team"?: GenericTeam1 | null;
     }
+    interface Page404 {
+    }
     interface PageHome {
     }
     interface PageMatch {
@@ -317,6 +328,7 @@ declare namespace LocalJSX {
         "mad-scorer-basket": MadScorerBasket;
         "mad-select-team": MadSelectTeam;
         "mad-team-tile": MadTeamTile;
+        "page-404": Page404;
         "page-home": PageHome;
         "page-match": PageMatch;
         "page-tournament": PageTournament;
@@ -336,6 +348,7 @@ declare module "@stencil/core" {
             "mad-scorer-basket": LocalJSX.MadScorerBasket & JSXBase.HTMLAttributes<HTMLMadScorerBasketElement>;
             "mad-select-team": LocalJSX.MadSelectTeam & JSXBase.HTMLAttributes<HTMLMadSelectTeamElement>;
             "mad-team-tile": LocalJSX.MadTeamTile & JSXBase.HTMLAttributes<HTMLMadTeamTileElement>;
+            "page-404": LocalJSX.Page404 & JSXBase.HTMLAttributes<HTMLPage404Element>;
             "page-home": LocalJSX.PageHome & JSXBase.HTMLAttributes<HTMLPageHomeElement>;
             "page-match": LocalJSX.PageMatch & JSXBase.HTMLAttributes<HTMLPageMatchElement>;
             "page-tournament": LocalJSX.PageTournament & JSXBase.HTMLAttributes<HTMLPageTournamentElement>;

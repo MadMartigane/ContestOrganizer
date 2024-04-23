@@ -16,6 +16,7 @@ export class AppRoot {
     });
 
     this.router.setDefaultUrl('/home');
+    this.router.setNotFoundUrl('/404');
   }
 
   render() {
@@ -26,6 +27,7 @@ export class AppRoot {
         <mad-route url="/team-select/:teamId/:teamType" component="page-team-select"></mad-route>
         <mad-route url="/tournament/:tournamentId" component="page-tournament"></mad-route>
         <mad-route url="/match/:tournamentId" component="page-match"></mad-route>
+        <mad-route url="/404" component="page-404"></mad-route>
       </Host>
     );
   }

@@ -157,3 +157,8 @@ sl-menu-item {
   border-color: var(--sl-color-neutral-200);
   border-radius: var(--sl-border-radius-small);
 }
+
+sl-carousel {
+  margin: var(--sl-spacing-4x-large) auto;
+  max-width: 600px;
+}
