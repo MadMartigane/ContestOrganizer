@@ -24,7 +24,7 @@ export class PageHome {
   }
 
   private displayNextImg() {
-    if (this.currentImgIdx < this.imgList.length) {
+    if (this.currentImgIdx < this.imgList.length - 1) {
       this.currentImgIdx++;
     } else {
       this.currentImgIdx = 0;
