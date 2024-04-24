@@ -7,14 +7,13 @@ import { Component, Host, h } from '@stencil/core';
 })
 export class PageHome {
   private readonly imgList: Array<{ src: string; width: number }> = [
-    { width: 300, src: '/assets/img/undraw_greek_freak.svg' },
-    { width: 300, src: '/assets/img/undraw_goal.svg' },
-    { width: 100, src: '/assets/img/undraw_basketball.svg' },
-    { width: 300, src: '/assets/img/undraw_home_run.svg' },
-    { width: 200, src: '/assets/img/undraw_junior_soccer.svg' },
+    { width: 300, src: 'assets/img/undraw_greek_freak.svg' },
+    { width: 300, src: 'assets/img/undraw_goal.svg' },
+    { width: 100, src: 'assets/img/undraw_basketball.svg' },
+    { width: 300, src: 'assets/img/undraw_home_run.svg' },
+    { width: 200, src: 'assets/img/undraw_junior_soccer.svg' },
   ];
 
-  private currentImgIdx: number = 0;
   private domImg: HTMLImageElement | null;
 
   constructor() {
@@ -24,15 +23,11 @@ export class PageHome {
   }
 
   private displayNextImg() {
-    if (this.currentImgIdx < this.imgList.length) {
-      this.currentImgIdx++;
-    } else {
-      this.currentImgIdx = 0;
-    }
+    const idx = Math.floor(Math.random() * this.imgList.length);
 
     if (this.domImg) {
-      this.domImg.src = this.imgList[this.currentImgIdx].src;
-      this.domImg.width = this.imgList[this.currentImgIdx].width;
+      this.domImg.src = this.imgList[idx].src;
+      this.domImg.width = this.imgList[idx].width;
     }
   }
 
@@ -56,7 +51,7 @@ export class PageHome {
               height="150"
               width="300"
               slot="image"
-              src="/assets/img/undraw_greek_freak.svg"
+              src="assets/img/undraw_greek_freak.svg"
               alt="Greek freak basketball"
             />
           </div>
