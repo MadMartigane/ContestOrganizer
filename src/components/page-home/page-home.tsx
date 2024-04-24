@@ -1,7 +1,4 @@
-import { Component, Host, h, State } from '@stencil/core';
-import setting, { GlobalSetting } from '../../modules/global-setting/global-setting';
-
-import SlSwitch from '@shoelace-style/shoelace/dist/components/switch/switch.js';
+import { Component, Host, h } from '@stencil/core';
 
 @Component({
   tag: 'page-home',
@@ -9,35 +6,34 @@ import SlSwitch from '@shoelace-style/shoelace/dist/components/switch/switch.js'
   shadow: false,
 })
 export class PageHome {
-  private readonly globalSetting: GlobalSetting;
+  private readonly imgList: Array<{ src: string; width: number }> = [
+    { width: 300, src: '/assets/img/undraw_greek_freak.svg' },
+    { width: 300, src: '/assets/img/undraw_goal.svg' },
+    { width: 100, src: '/assets/img/undraw_basketball.svg' },
+    { width: 300, src: '/assets/img/undraw_home_run.svg' },
+    { width: 200, src: '/assets/img/undraw_junior_soccer.svg' },
+  ];
 
-  private darkModeSwitch: SlSwitch;
-  private initialDarkModeActivated: boolean;
-
-  @State() isDarkModeActive: boolean;
+  private currentImgIdx: number = 0;
+  private domImg: HTMLImageElement | null;
 
   constructor() {
-    this.globalSetting = setting;
-
-    this.initialDarkModeActivated = this.globalSetting.isDarkThemeActive();
-    this.isDarkModeActive = this.globalSetting.isDarkThemeActive();
+    window.setInterval(() => {
+      this.displayNextImg();
+    }, 5000);
   }
 
-  private installEventHandler() {
-    if (this.darkModeSwitch) {
-      this.darkModeSwitch.addEventListener('sl-change', () => {
-        this.onDarkModeChange();
-      });
+  private displayNextImg() {
+    if (this.currentImgIdx < this.imgList.length) {
+      this.currentImgIdx++;
+    } else {
+      this.currentImgIdx = 0;
     }
-  }
 
-  private onDarkModeChange() {
-    this.globalSetting.setDarkTheme(this.darkModeSwitch.checked);
-    this.isDarkModeActive = this.darkModeSwitch.checked;
-  }
-
-  public componentDidLoad() {
-    this.installEventHandler();
+    if (this.domImg) {
+      this.domImg.src = this.imgList[this.currentImgIdx].src;
+      this.domImg.width = this.imgList[this.currentImgIdx].width;
+    }
   }
 
   render() {
@@ -50,14 +46,28 @@ export class PageHome {
         </sl-breadcrumb>
 
         <div class="page-content">
-          <h1>Configuration</h1>
-          <sl-switch ref={(el: SlSwitch) => (this.darkModeSwitch = el)} checked={this.initialDarkModeActivated} size="large">
-            <span class="container">Mode sombre</span>
-            <sl-icon name="highlights"></sl-icon>
-          </sl-switch>
+          <h1 class="container-xxxxl">Contest Tournament</h1>
+
+          <div>
+            <img
+              ref={el => {
+                this.domImg = el || null;
+              }}
+              height="150"
+              width="300"
+              slot="image"
+              src="/assets/img/undraw_greek_freak.svg"
+              alt="Greek freak basketball"
+            />
+          </div>
 
           <div class="footer">
             <div class="grid-300">
+              <sl-button variant="primary" href="#/config" size="large">
+                <sl-icon name="gear" slot="prefix"></sl-icon>
+                <span slot="suffix">Configuration</span>
+              </sl-button>
+
               <sl-button variant="primary" href="#/tournaments" size="large">
                 <sl-icon name="trophy" slot="prefix"></sl-icon>
                 <span slot="suffix">Tournois</span>

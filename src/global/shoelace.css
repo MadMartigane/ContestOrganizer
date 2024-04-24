@@ -111,10 +111,14 @@ sl-icon.xxxxl {
   margin: var(--sl-spacing-4x-large);
 }
 
-sl-card.card-common [slot='footer'] {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+sl-card {
+  max-width: 600px;
+
+  &.card-common [slot='footer'] {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 }
 
 .sl-text-center {

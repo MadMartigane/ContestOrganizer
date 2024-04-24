@@ -28,6 +28,7 @@ export class AppRoot {
         <mad-route url="/tournament/:tournamentId" component="page-tournament"></mad-route>
         <mad-route url="/match/:tournamentId" component="page-match"></mad-route>
         <mad-route url="/404" component="page-404"></mad-route>
+        <mad-route url="/config" component="page-config"></mad-route>
       </Host>
     );
   }
