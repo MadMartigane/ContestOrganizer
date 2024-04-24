@@ -14,7 +14,6 @@ export class PageHome {
     { width: 200, src: 'assets/img/undraw_junior_soccer.svg' },
   ];
 
-  private currentImgIdx: number = 0;
   private domImg: HTMLImageElement | null;
 
   constructor() {
@@ -24,15 +23,11 @@ export class PageHome {
   }
 
   private displayNextImg() {
-    if (this.currentImgIdx < this.imgList.length - 1) {
-      this.currentImgIdx++;
-    } else {
-      this.currentImgIdx = 0;
-    }
+    const idx = Math.floor(Math.random() * this.imgList.length);
 
     if (this.domImg) {
-      this.domImg.src = this.imgList[this.currentImgIdx].src;
-      this.domImg.width = this.imgList[this.currentImgIdx].width;
+      this.domImg.src = this.imgList[idx].src;
+      this.domImg.width = this.imgList[idx].width;
     }
   }
 
