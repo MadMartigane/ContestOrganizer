@@ -12,7 +12,7 @@ export class Router {
   constructor() {
     this.attachEventListners();
 
-    this.checkDeadRoute();
+    this.scheduleCheckOfRegisteredAndRedirectionUrl();
   }
 
   get path() {
@@ -30,21 +30,24 @@ export class Router {
   }
 
   private checkDeadRoute(): void {
-    window.setTimeout(() => {
-      if (this.route === '' && !this.registeredUrl.includes(this.route)) {
-        if (this.defaultUrl) {
-          this.goTo(this.defaultUrl);
-          return;
-        }
-
-        if (this.registeredUrl.length > 0) {
-          this.goTo(this.registeredUrl.at(0) || '');
-          return;
-        }
-
-        // TODO: warning
+    if (['', '/'].includes(this.route)) {
+      if (this.defaultUrl) {
+        this.goTo(this.defaultUrl);
+        return;
       }
-    }, 500);
+
+      if (this.registeredUrl.length > 0) {
+        this.goTo(this.registeredUrl.at(0) || '');
+        return;
+      }
+    }
+
+    if (this.notFoundUrl) {
+      this.goTo(this.notFoundUrl);
+      return;
+    }
+
+    // TODO: WARNING
   }
 
   private update(): void {
@@ -73,12 +76,7 @@ export class Router {
       return;
     }
 
-    if (this.notFoundUrl) {
-      this.goTo(this.notFoundUrl);
-      return;
-    }
-
-    // TODO: WARNING
+    this.checkDeadRoute();
   }
 
   private scheduleCheckOfRegisteredAndRedirectionUrl(): void {
