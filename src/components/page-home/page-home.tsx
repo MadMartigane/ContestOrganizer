@@ -7,11 +7,11 @@ import { Component, Host, h } from '@stencil/core';
 })
 export class PageHome {
   private readonly imgList: Array<{ src: string; width: number }> = [
-    { width: 300, src: '/assets/img/undraw_greek_freak.svg' },
-    { width: 300, src: '/assets/img/undraw_goal.svg' },
-    { width: 100, src: '/assets/img/undraw_basketball.svg' },
-    { width: 300, src: '/assets/img/undraw_home_run.svg' },
-    { width: 200, src: '/assets/img/undraw_junior_soccer.svg' },
+    { width: 300, src: 'assets/img/undraw_greek_freak.svg' },
+    { width: 300, src: 'assets/img/undraw_goal.svg' },
+    { width: 100, src: 'assets/img/undraw_basketball.svg' },
+    { width: 300, src: 'assets/img/undraw_home_run.svg' },
+    { width: 200, src: 'assets/img/undraw_junior_soccer.svg' },
   ];
 
   private currentImgIdx: number = 0;
@@ -56,7 +56,7 @@ export class PageHome {
               height="150"
               width="300"
               slot="image"
-              src="/assets/img/undraw_greek_freak.svg"
+              src="assets/img/undraw_greek_freak.svg"
               alt="Greek freak basketball"
             />
           </div>
