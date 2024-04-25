@@ -1,7 +1,6 @@
-import { InputChangeEventDetail } from '@ionic/core';
 import { Component, Event, EventEmitter, Host, Prop, h, State, Watch } from '@stencil/core';
-import uuid from '../../modules/uuid/uuid';
 import SlSwitch from '@shoelace-style/shoelace/dist/components/switch/switch.component';
+import Utils from '../../modules/utils/utils';
 
 @Component({
   tag: 'mad-scorer-basket',
@@ -10,7 +9,6 @@ import SlSwitch from '@shoelace-style/shoelace/dist/components/switch/switch.com
 })
 export class MadScorerBasket {
   private argColor: string;
-  private itemId: string;
   private domPlusMinusSwitch: SlSwitch;
 
   @Prop() color: string;
@@ -24,26 +22,17 @@ export class MadScorerBasket {
   @State() private number: number;
   @State() private minusMode: boolean;
 
-  @Event() madNumberChange: EventEmitter<InputChangeEventDetail>;
+  @Event() madNumberChange: EventEmitter<{ value: string }>;
 
   constructor() {
     this.argColor = this.color || '';
     this.number = this.value || this.min || 0;
-    this.itemId = `mad_scorer_basket_${uuid.new()}`;
     this.minusMode = false;
   }
 
   @Watch('value')
   public onPropValueChange() {
     this.number = this.value || 0;
-  }
-
-  private installEventHandler() {
-    if (this.domPlusMinusSwitch) {
-      this.domPlusMinusSwitch.addEventListener('sl-change', () => {
-        this.switchMode();
-      });
-    }
   }
 
   private onIncrementNumber(i: number) {
@@ -68,14 +57,16 @@ export class MadScorerBasket {
     this.minusMode = !this.minusMode;
   }
 
-  public componentDidLoad() {
-    this.installEventHandler();
+  public componentDidRender() {
+    Utils.installEventHandler(this.domPlusMinusSwitch, 'sl-change', () => {
+      this.switchMode();
+    });
   }
 
   render() {
     return (
       <Host>
-        <div id={this.itemId}>
+        <div>
           {this.label ? <span>{this.label}: </span> : null}
           {this.value !== undefined ? <span class={this.argColor}>{this.number}</span> : <span class="placeholder">{this.placeholder}</span>}
         </div>

@@ -170,7 +170,7 @@ declare global {
         new (): HTMLMadRouteElement;
     };
     interface HTMLMadScorerBasketElementEventMap {
-        "madNumberChange": InputChangeEventDetail;
+        "madNumberChange": { value: string };
     }
     interface HTMLMadScorerBasketElement extends Components.MadScorerBasket, HTMLStencilElement {
         addEventListener<K extends keyof HTMLMadScorerBasketElementEventMap>(type: K, listener: (this: HTMLMadScorerBasketElement, ev: MadScorerBasketCustomEvent<HTMLMadScorerBasketElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -297,7 +297,7 @@ declare namespace LocalJSX {
         "label"?: string;
         "max"?: number;
         "min"?: number;
-        "onMadNumberChange"?: (event: MadScorerBasketCustomEvent<InputChangeEventDetail>) => void;
+        "onMadNumberChange"?: (event: MadScorerBasketCustomEvent<{ value: string }>) => void;
         "placeholder"?: string;
         "readonly"?: boolean;
         "value"?: number;
