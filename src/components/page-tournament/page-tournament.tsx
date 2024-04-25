@@ -300,6 +300,8 @@ export class PageTournament {
                       this.domInputTournamentName = el;
                     }}
                     autofocus
+                    type="text"
+                    autocomplete="off"
                     name="tournamentName"
                     value={this.tournament?.name}
                     onkeydown={(ev: KeyboardEvent) => this.onTournamentNameChange(ev)}

@@ -91,6 +91,8 @@ export class MadInputNumber {
         <span class="container-xl">
           <sl-input
             autofocus
+            no-spin-buttons
+            autocomplete="off"
             type="number"
             id={this.itemId}
             label={this.label}
