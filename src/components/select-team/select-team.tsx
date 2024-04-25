@@ -211,6 +211,7 @@ export class MadSelectTeam {
                   this.domInputSearch = el;
                 }}
                 type="text"
+                autocomplete="off"
                 disabled={this.isLoading}
                 placeholder="nom de d’équipe"
                 autofocus
