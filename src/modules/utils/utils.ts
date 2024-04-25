@@ -82,4 +82,15 @@ export default class Utils {
       delete debounceCollector[name];
     }, 300);
   }
+
+  public static installEventHandler(domElement: HTMLElement | null | undefined, eventName: string, callback: (ev?: CustomEvent) => void) {
+    if (!domElement || domElement.dataset.madHook === 'true') {
+      return;
+    }
+
+    domElement.addEventListener(eventName, (event: CustomEvent) => {
+      callback(event);
+    });
+    domElement.dataset.madHook = 'true';
+  }
 }
