@@ -52,6 +52,14 @@ export namespace Components {
         "readonly"?: boolean;
         "value"?: number;
     }
+    interface MadScorerRugby {
+        "label"?: string;
+        "max"?: number;
+        "min"?: number;
+        "placeholder": string;
+        "readonly"?: boolean;
+        "value"?: number;
+    }
     interface MadSelectTeam {
         "color": string;
         "label": string;
@@ -94,6 +102,10 @@ export interface MadInputNumberCustomEvent<T> extends CustomEvent<T> {
 export interface MadScorerBasketCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLMadScorerBasketElement;
+}
+export interface MadScorerRugbyCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLMadScorerRugbyElement;
 }
 export interface MadSelectTeamCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -186,6 +198,23 @@ declare global {
         prototype: HTMLMadScorerBasketElement;
         new (): HTMLMadScorerBasketElement;
     };
+    interface HTMLMadScorerRugbyElementEventMap {
+        "madNumberChange": { value: string };
+    }
+    interface HTMLMadScorerRugbyElement extends Components.MadScorerRugby, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLMadScorerRugbyElementEventMap>(type: K, listener: (this: HTMLMadScorerRugbyElement, ev: MadScorerRugbyCustomEvent<HTMLMadScorerRugbyElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLMadScorerRugbyElementEventMap>(type: K, listener: (this: HTMLMadScorerRugbyElement, ev: MadScorerRugbyCustomEvent<HTMLMadScorerRugbyElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLMadScorerRugbyElement: {
+        prototype: HTMLMadScorerRugbyElement;
+        new (): HTMLMadScorerRugbyElement;
+    };
     interface HTMLMadSelectTeamElementEventMap {
         "madSelectChange": GridTeamOnUpdateDetail;
     }
@@ -253,6 +282,7 @@ declare global {
         "mad-match-tile": HTMLMadMatchTileElement;
         "mad-route": HTMLMadRouteElement;
         "mad-scorer-basket": HTMLMadScorerBasketElement;
+        "mad-scorer-rugby": HTMLMadScorerRugbyElement;
         "mad-select-team": HTMLMadSelectTeamElement;
         "mad-team-tile": HTMLMadTeamTileElement;
         "page-404": HTMLPage404Element;
@@ -302,6 +332,15 @@ declare namespace LocalJSX {
         "readonly"?: boolean;
         "value"?: number;
     }
+    interface MadScorerRugby {
+        "label"?: string;
+        "max"?: number;
+        "min"?: number;
+        "onMadNumberChange"?: (event: MadScorerRugbyCustomEvent<{ value: string }>) => void;
+        "placeholder"?: string;
+        "readonly"?: boolean;
+        "value"?: number;
+    }
     interface MadSelectTeam {
         "color"?: string;
         "label"?: string;
@@ -337,6 +376,7 @@ declare namespace LocalJSX {
         "mad-match-tile": MadMatchTile;
         "mad-route": MadRoute;
         "mad-scorer-basket": MadScorerBasket;
+        "mad-scorer-rugby": MadScorerRugby;
         "mad-select-team": MadSelectTeam;
         "mad-team-tile": MadTeamTile;
         "page-404": Page404;
@@ -358,6 +398,7 @@ declare module "@stencil/core" {
             "mad-match-tile": LocalJSX.MadMatchTile & JSXBase.HTMLAttributes<HTMLMadMatchTileElement>;
             "mad-route": LocalJSX.MadRoute & JSXBase.HTMLAttributes<HTMLMadRouteElement>;
             "mad-scorer-basket": LocalJSX.MadScorerBasket & JSXBase.HTMLAttributes<HTMLMadScorerBasketElement>;
+            "mad-scorer-rugby": LocalJSX.MadScorerRugby & JSXBase.HTMLAttributes<HTMLMadScorerRugbyElement>;
             "mad-select-team": LocalJSX.MadSelectTeam & JSXBase.HTMLAttributes<HTMLMadSelectTeamElement>;
             "mad-team-tile": LocalJSX.MadTeamTile & JSXBase.HTMLAttributes<HTMLMadTeamTileElement>;
             "page-404": LocalJSX.Page404 & JSXBase.HTMLAttributes<HTMLPage404Element>;
