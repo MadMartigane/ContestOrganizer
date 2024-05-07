@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .flex-center {
+    @apply flex w-full justify-center items-center;
+  }
+}
+
+h1 {
+  @apply text-2xl my-6;
+}
+h2 {
+  @apply text-xl my-6;
+}
+
+table {
+  @apply border border-collapse align-middle items-center text-center w-full lg:w-fit;
+  border-color: var(--sl-color-primary-800);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+th {
+  @apply min-w-10;
+}
+td {
+  @apply border min-w-10;
+}

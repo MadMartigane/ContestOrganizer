@@ -155,15 +155,6 @@ export class PageTournament {
     }
   }
 
-  private installDomEditTournamentNameEventHandler() {
-    if (this.domDivTournamentName && !this.domDivTournamentName.dataset.madEventInstalled) {
-      this.domDivTournamentName.addEventListener('click', () => {
-        this.isEditTournamentName = true;
-      });
-      this.domDivTournamentName.dataset.madEventInstalled = 'true';
-    }
-  }
-
   private onTournamentNameChange(event: KeyboardEvent) {
     if (event.key === 'Enter' || event.key === 'Escape') {
       this.editTournamentName();
@@ -195,9 +186,9 @@ export class PageTournament {
   }
 
   public componentDidUpdate() {
-    if (this.domDivTournamentName) {
-      this.installDomEditTournamentNameEventHandler();
-    }
+    Utils.installEventHandler(this.domDivTournamentName, 'click', () => {
+      this.isEditTournamentName = true;
+    });
 
     if (this.domInputTournamentName) {
       Utils.setFocus(this.domInputTournamentName);
@@ -316,30 +307,26 @@ export class PageTournament {
                       this.domDivTournamentName = el as HTMLElement;
                     }}
                   >
-                    <h2 class="can-be-clicked text-align-center">{this.tournament?.name}</h2>
+                    <h1 class="can-be-clicked text-center">{this.tournament?.name}</h1>
                   </div>
                 </div>
               )}
 
-              <ion-grid class="grid-edit-tournament-center">
-                <ion-row class="ion-align-items-end ion-justify-content-center">
-                  <ion-col size="10" size-sm="8" size-md="6" size-lg="4" class="ion-padding-vertical">
-                    <mad-input-number
-                      value={this.teamNumber}
-                      label={`Nombre d’équipes (min:${this.conf.teamNumberMin}, max:${this.conf.teamNumberMax})`}
-                      onMadNumberChange={(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamNumberChange(ev.detail)}
-                      min={this.conf.teamNumberMin}
-                      max={this.conf.teamNumberMax}
-                      step={this.conf.teamNumberStep}
-                      placeholder={String(this.conf.teamNumberDefault)}
-                    ></mad-input-number>
-                  </ion-col>
-                </ion-row>
-              </ion-grid>
+              <div class="grid grid-cols-1 text-center items-center">
+                <mad-input-number
+                  value={this.teamNumber}
+                  label={`Nombre d’équipes (min:${this.conf.teamNumberMin}, max:${this.conf.teamNumberMax})`}
+                  onMadNumberChange={(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamNumberChange(ev.detail)}
+                  min={this.conf.teamNumberMin}
+                  max={this.conf.teamNumberMax}
+                  step={this.conf.teamNumberStep}
+                  placeholder={String(this.conf.teamNumberDefault)}
+                ></mad-input-number>
+              </div>
 
               {this.teamNumber > 0 ? (
                 <div>
-                  {this.renderGrid()}
+                  <div class="w-fill overflow-x-auto">{this.renderGrid()}</div>
                   {this.renderFooterActions()}
                 </div>
               ) : (

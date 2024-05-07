@@ -51,6 +51,7 @@ export class PageConfig {
 
         <div class="page-content">
           <h1>Configuration</h1>
+
           <sl-switch ref={(el: SlSwitch) => (this.darkModeSwitch = el)} checked={this.initialDarkModeActivated} size="large">
             <span class="container">Mode sombre</span>
             <sl-icon name="highlights"></sl-icon>
