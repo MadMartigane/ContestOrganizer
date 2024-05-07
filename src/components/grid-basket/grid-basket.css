@@ -1,12 +1,1 @@
-ion-grid.basket-grid > ion-row > ion-col {
-  text-align: center;
-}
 
-ion-grid.basket-grid > ion-row.basket-grid-header {
-  border: solid 1px var(--ion-color-light);
-  background-color: var(--ion-color-light);
-}
-
-ion-grid.basket-grid > ion-row {
-  border: solid 1px var(--ion-color-light);
-}

@@ -11,8 +11,13 @@
 @import './variables.css';
 
 /* ######## IONIC INTEGRATION ######### */
+/*
 @import './ionic.css';
-
+*/
 /* ####### SHOELACE CSS ########## */
 @import './shoelace.css';
 /* ####### END OF SHOELACE CSS ########## */
+
+/* ####### TAILWIND CSS ########## */
+@import './tailwind.css';
+/* ####### END OF TAILWIND CSS ########## */

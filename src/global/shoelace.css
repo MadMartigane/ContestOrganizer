@@ -1,7 +1,6 @@
 @import '~@shoelace-style/shoelace/dist/themes/light.css';
 @import '~@shoelace-style/shoelace/dist/themes/dark.css';
 
-/* icon size */
 span.xxs,
 sl-spinner.xxs,
 sl-icon.xxs {
@@ -48,34 +47,96 @@ sl-icon.xxxxl {
   font-size: var(--sl-font-size-4x-large);
 }
 
-/* icon color */
-/* TRANSITION IONIC TO SHOELACE HELPER */
-.primary {
-  color: var(--sl-color-primary-500);
+thead.primary,
+th.primary,
+td.primary,
+div.primary {
+  background-color: var(--sl-color-primary-600);
+  color: var(--sl-color-neutral-100);
 }
-.success {
-  color: var(--sl-color-success-500);
+thead.success,
+th.success,
+td.success,
+div.success {
+  background-color: var(--sl-color-success-600);
+  color: var(--sl-color-neutral-100);
 }
-.warning {
-  color: var(--sl-color-warning-500);
+thead.warning,
+th.warning,
+td.warning,
+div.warning {
+  background-color: var(--sl-color-warning-600);
+  color: var(--sl-color-neutral-100);
 }
-.danger {
-  color: var(--sl-color-danger-500);
+thead.danger,
+th.danger,
+td.danger,
+div.danger {
+  background-color: var(--sl-color-danger-600);
+  color: var(--sl-color-neutral-100);
 }
-.neutral {
-  color: var(--sl-color-neutral-500);
-}
-.light {
-  color: var(--sl-color-neutral-900);
-}
-.dark {
+thead.neutral,
+th.neutral,
+td.neutral,
+div.neutral {
+  background-color: var(--sl-color-neutral-600);
   color: var(--sl-color-neutral-50);
 }
-.secondary {
-  color: var(--sl-color-teal-500);
+thead.light,
+th.light,
+td.light,
+div.light {
+  background-color: var(--sl-color-neutral-50);
+  color: var(--sl-color-neutral-900);
 }
-.tertiary {
-  color: var(--sl-color-violet-500);
+thead.dark,
+th.dark,
+td.dark,
+div.dark {
+  background-color: var(--sl-color-primary-950);
+  color: var(--sl-color-neutral-100);
+}
+thead.secondary,
+th.secondary,
+td.secondary,
+div.secondary {
+  background-color: var(--sl-color-teal-600);
+  color: var(--sl-color-neutral-100);
+}
+thead.tertiary,
+th.tertiary,
+td.tertiary,
+div.tertiary {
+  background-color: var(--sl-color-violet-600);
+  color: var(--sl-color-neutral-100);
+}
+
+span.primary {
+  color: var(--sl-color-primary-600);
+}
+span.success {
+  color: var(--sl-color-success-600);
+}
+span.warning {
+  color: var(--sl-color-warning-600);
+}
+span.danger {
+  color: var(--sl-color-danger-600);
+}
+span.neutral {
+  color: var(--sl-color-neutral-600);
+}
+span.light {
+  color: var(--sl-color-neutral-100);
+}
+span.dark {
+  color: var(--sl-color-neutral-900);
+}
+span.secondary {
+  color: var(--sl-color-teal-600);
+}
+span.tertiary {
+  color: var(--sl-color-violet-600);
 }
 
 /* GLOBAL CONTAINER (shoelace token version) */
@@ -137,19 +198,6 @@ sl-breadcrumb {
   -webkit-box-shadow: var(--sl-shadow-medium);
   -moz-box-shadow: var(--sl-shadow-medium);
   border-radius: var(--sl-border-radius-small);
-}
-
-div.page-content {
-  margin: var(--sl-spacing-3x-large) var(--sl-spacing-2x-small);
-  padding: var(--sl-spacing-medium);
-  color: var(--sl-color-neutral-900);
-  background-color: var(--sl-color-neutral-50);
-  text-align: center;
-  border-color: var(--sl-color-neutral-100);
-  border-radius: var(--sl-border-radius-large);
-  box-shadow: var(--sl-shadow-medium);
-  -webkit-box-shadow: var(--sl-shadow-medium);
-  -moz-box-shadow: var(--sl-shadow-medium);
 }
 
 sl-menu {
