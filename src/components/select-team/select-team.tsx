@@ -225,7 +225,7 @@ export class MadSelectTeam {
 
             {this.searchValue?.length > 2 && !this.suggested.length ? (
               <sl-alert variant="warning" open>
-                <sl-icon name="emoji-frown" class="xxl"></sl-icon>
+                <sl-icon name="emoji-frown" class="2xl"></sl-icon>
                 <span class="container l">Aucun résultat</span>
               </sl-alert>
             ) : null}

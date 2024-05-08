@@ -276,7 +276,7 @@ export class PageTournament {
           {this.uiError ? (
             <div>
               <sl-alert variant="danger" open>
-                <sl-icon slot="icon" name="bug" class="xxl"></sl-icon>
+                <sl-icon slot="icon" name="bug" class="2xl"></sl-icon>
                 <h1>Erreur</h1>
                 <br />
                 <span>{this.uiError}</span>

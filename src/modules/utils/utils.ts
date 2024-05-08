@@ -1,3 +1,6 @@
+import SlButton from '@shoelace-style/shoelace/dist/components/button/button.component';
+import SlDialog from '@shoelace-style/shoelace/dist/components/dialog/dialog.component';
+
 const debounceCollector: { [index: string]: number } = {};
 
 export default class Utils {
@@ -33,34 +36,61 @@ export default class Utils {
   }
 
   public static async confirmChoice(message = 'Es-tu sûre ?', cancel = 'Non', confirm = 'Oui'): Promise<boolean> {
-    const alert = document.createElement('ion-alert');
-    alert.header = '🚨';
-    alert.message = message;
-    alert.keyboardClose = true;
-    alert.cssClass = 'confirm-alert';
-    alert.buttons = [
-      {
-        text: cancel,
-        role: 'cancel',
-      },
-      {
-        text: confirm,
-        role: 'confirm',
-      },
-    ];
+    let resolve: (value: boolean) => void | null;
+    const promise: Promise<boolean> = new Promise(res => {
+      resolve = res;
+    });
 
-    // No need to remove the child, <ion-alert> already do it.
-    document.body.appendChild(alert);
-    await alert.present();
+    const dialog: SlDialog = document.createElement('sl-dialog');
+    const paramElement: HTMLParagraphElement = document.createElement('p');
+    paramElement.innerText = message;
+    dialog.append(paramElement);
 
-    const { role } = await alert.onDidDismiss();
-    if (role === 'confirm') {
-      Utils.unmount(alert);
-      return true;
-    }
+    const titleElement: HTMLSpanElement = document.createElement('span');
+    titleElement.innerText = '🚨';
+    titleElement.classList.add('3xl');
+    titleElement.slot = 'label';
+    dialog.append(titleElement);
 
-    Utils.unmount(alert);
-    return false;
+    const cancelButton: SlButton = document.createElement('sl-button');
+    const confirmButton: SlButton = document.createElement('sl-button');
+
+    cancelButton.innerText = cancel;
+    cancelButton.variant = 'warning';
+    cancelButton.slot = 'footer';
+    cancelButton.size = 'large';
+
+    confirmButton.innerText = confirm;
+    confirmButton.variant = 'primary';
+    confirmButton.slot = 'footer';
+    confirmButton.size = 'large';
+
+    dialog.append(cancelButton);
+    dialog.append(confirmButton);
+
+    document.body.appendChild(dialog);
+    dialog.show();
+
+    cancelButton.addEventListener('click', () => {
+      dialog.hide();
+      Utils.unmount(dialog);
+      resolve(false);
+    });
+
+    confirmButton.addEventListener('click', () => {
+      dialog.hide();
+      Utils.unmount(dialog);
+      resolve(true);
+    });
+
+    // Prevent the dialog from closing when the user clicks on the overlay
+    dialog.addEventListener('sl-request-close', (event: CustomEvent) => {
+      if (event.detail.source === 'overlay') {
+        event.preventDefault();
+      }
+    });
+
+    return promise;
   }
 
   public static scrollIntoView(selector: string) {
