@@ -249,7 +249,7 @@ export class PageMatch {
               <ion-card color="danger">
                 <ion-card-header>
                   <ion-card-title>
-                    <sl-icon name="bug" class="xxxxl light"></sl-icon>
+                    <sl-icon name="bug" class="4xl light"></sl-icon>
                     <span class="light container-xl">Erreur</span>
                   </ion-card-title>
                 </ion-card-header>
@@ -270,7 +270,7 @@ export class PageMatch {
                   <div class="grid grid-cols-5 page-match-grid-header ion-align-items-center">
                     <div class="col-span-2">Locaux</div>
                     <div>
-                      <sl-icon class="xxl" name="trophy"></sl-icon>
+                      <sl-icon class="2xl" name="trophy"></sl-icon>
                     </div>
                     <div class="col-span-2">Visiteurs</div>
                   </div>
