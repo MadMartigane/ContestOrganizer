@@ -16,15 +16,16 @@ h2 {
 }
 
 table {
-  @apply border border-collapse align-middle items-center text-center w-full lg:w-fit;
-  border-color: var(--sl-color-primary-800);
+  @apply border-collapse align-middle items-center text-center w-full lg:w-fit;
   margin-left: auto;
   margin-right: auto;
 }
 
 th {
-  @apply min-w-10;
+  @apply border min-w-10;
+  border-color: var(--sl-color-neutral-300);
 }
 td {
   @apply border min-w-10;
+  border-color: var(--sl-color-neutral-200);
 }

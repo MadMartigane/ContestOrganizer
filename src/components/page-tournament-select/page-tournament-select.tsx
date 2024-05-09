@@ -155,11 +155,11 @@ export class PageTournamentSelect {
   private renderAddTournament() {
     return (
       <sl-card class="card-common">
-        <div slot="header" class="container">
+        <div slot="header">
           <ion-label position="floating">Nom du tournois</ion-label>
           <ion-input
             color="dark"
-            placeholder="Ligue 1"
+            placeholder="Playoff"
             autofocus
             inputmode="text"
             name="tournoiNewName"
@@ -169,7 +169,7 @@ export class PageTournamentSelect {
           ></ion-input>
         </div>
 
-        <div class="container">
+        <div>
           <sl-select
             label="Quel sport ? "
             ref={(el: SlSelect) => {
@@ -195,12 +195,12 @@ export class PageTournamentSelect {
             size="large"
             variant="neutral"
           >
-            <sl-icon slot="prefix" name="dash-lg" class="xl"></sl-icon>
+            <sl-icon slot="prefix" name="dash-lg" class="class-2xl"></sl-icon>
             Annuler
           </sl-button>
 
           <sl-button onclick={() => this.addTournament()} size="large" variant="primary" disabled={!this.isNewTournamentNameReady}>
-            <sl-icon slot="prefix" name="plus-lg" class="xl"></sl-icon>
+            <sl-icon slot="prefix" name="plus-lg" class="class-2xl"></sl-icon>
             Ajouter
           </sl-button>
         </div>
@@ -218,7 +218,7 @@ export class PageTournamentSelect {
           }}
           size="large"
         >
-          <sl-icon slot="prefix" name="plus-lg" class="xl"></sl-icon>
+          <sl-icon slot="prefix" name="plus-lg" class="class-2xl"></sl-icon>
           Nouveau tournoi
         </sl-button>
       </sl-card>
@@ -244,8 +244,8 @@ export class PageTournamentSelect {
             </span>
 
             <span slot="suffix">
-              <sl-icon class="warning xl container-s" onclick={(ev: Event) => this.confirmRemoveTournament(ev, tournament.id)} name="trash3"></sl-icon>
-              <sl-icon class="neutral xl container-s" name="arrow-right-circle"></sl-icon>
+              <sl-icon class="text-warning text-2xl container-s" onclick={(ev: Event) => this.confirmRemoveTournament(ev, tournament.id)} name="trash3"></sl-icon>
+              <sl-icon class="text-neutral text-2xl container-s" name="arrow-right-circle"></sl-icon>
             </span>
           </sl-menu-item>
         ))}
@@ -257,7 +257,7 @@ export class PageTournamentSelect {
     return (
       <div class="sl-text-center">
         <h1>
-          <sl-icon name="trophy" class="xl warning"></sl-icon> Pas encore de tournois <sl-icon name="dribbble" class="xl success"></sl-icon>
+          <sl-icon name="trophy" class="text-3xl text-warning"></sl-icon> Pas encore de tournois <sl-icon name="dribbble" class="text-2xl text-success"></sl-icon>
         </h1>
       </div>
     );
@@ -268,10 +268,10 @@ export class PageTournamentSelect {
       <Host>
         <sl-breadcrumb>
           <sl-breadcrumb-item href="#/home">
-            <sl-icon name="house" class="xl"></sl-icon>
+            <sl-icon name="house" class="text-2xl"></sl-icon>
           </sl-breadcrumb-item>
           <sl-breadcrumb-item>
-            <sl-icon name="trophy" class="xl"></sl-icon>
+            <sl-icon name="trophy" class="text-2xl"></sl-icon>
           </sl-breadcrumb-item>
         </sl-breadcrumb>
 

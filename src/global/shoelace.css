@@ -1,55 +1,10 @@
 @import '~@shoelace-style/shoelace/dist/themes/light.css';
 @import '~@shoelace-style/shoelace/dist/themes/dark.css';
 
-span.2xs,
-sl-spinner.2xs,
-sl-icon.2xs {
-  font-size: var(--sl-font-size-2x-small);
-}
-span.xs,
-sl-spinner.xs,
-sl-icon.xs {
-  font-size: var(--sl-font-size-x-small);
-}
-span.s,
-sl-spinner.s,
-sl-icon.s {
-  font-size: var(--sl-font-size-small);
-}
-span.m,
-sl-spinner.m,
-sl-icon.m {
-  font-size: var(--sl-font-size-medium);
-}
-span.l,
-sl-spinner.l,
-sl-icon.l {
-  font-size: var(--sl-font-size-large);
-}
-span.xl,
-sl-spinner.xl,
-sl-icon.xl {
-  font-size: var(--sl-font-size-x-large);
-}
-span.2xl,
-sl-spinner.2xl,
-sl-icon.2xl {
-  font-size: var(--sl-font-size-2x-large);
-}
-span.3xl,
-sl-spinner.3xl,
-sl-icon.3xl {
-  font-size: var(--sl-font-size-3x-large);
-}
-span.4xl,
-sl-spinner.4xl,
-sl-icon.4xl {
-  font-size: var(--sl-font-size-4x-large);
-}
-
 thead.primary,
 th.primary,
 td.primary,
+.block-primary,
 div.primary {
   background-color: var(--sl-color-primary-600);
   color: var(--sl-color-neutral-100);
@@ -107,45 +62,36 @@ thead.tertiary,
 th.tertiary,
 td.tertiary,
 div.tertiary {
-  background-color: var(--sl-color-violet-600);
+  background-color: var(--sl-color-yellow-600);
   color: var(--sl-color-neutral-100);
 }
 
-sl-icon.primary,
-span.primary {
+.text-primary {
   color: var(--sl-color-primary-600);
 }
-sl-icon.success,
-span.success {
+.text-success {
   color: var(--sl-color-success-600);
 }
-sl-icon.warning,
-span.warning {
+.text-warning {
   color: var(--sl-color-warning-600);
 }
-sl-icon.danger,
-span.danger {
+.text-danger {
   color: var(--sl-color-danger-600);
 }
-sl-icon.neutral,
-span.neutral {
+.text-neutral {
   color: var(--sl-color-neutral-600);
 }
-sl-icon.light,
-span.light {
+.text-light {
   color: var(--sl-color-neutral-100);
 }
-sl-icon.dark,
-span.dark {
+.text-dark {
   color: var(--sl-color-neutral-900);
 }
-sl-icon.secondary,
-span.secondary {
+.text-secondary {
   color: var(--sl-color-teal-600);
 }
-sl-icon.tertiary,
-span.tertiary {
-  color: var(--sl-color-violet-600);
+.text-tertiary {
+  color: var(--sl-color-yellow-600);
 }
 
 /* GLOBAL CONTAINER (shoelace token version) */

@@ -262,26 +262,19 @@ export class PageTournament {
       <Host>
         <sl-breadcrumb>
           <sl-breadcrumb-item href="#/home">
-            <sl-icon name="house" class="xl"></sl-icon>
+            <sl-icon name="house" class="text-2xl"></sl-icon>
           </sl-breadcrumb-item>
           <sl-breadcrumb-item href="#/tournaments">
-            <sl-icon name="trophy" class="xl"></sl-icon>
+            <sl-icon name="trophy" class="text-2xl"></sl-icon>
           </sl-breadcrumb-item>
           <sl-breadcrumb-item>
-            <sl-icon name="card-list" class="xl"></sl-icon>
+            <sl-icon name="card-list" class="text-2xl"></sl-icon>
           </sl-breadcrumb-item>
         </sl-breadcrumb>
 
         <div class="page-content">
           {this.uiError ? (
-            <div>
-              <sl-alert variant="danger" open>
-                <sl-icon slot="icon" name="bug" class="2xl"></sl-icon>
-                <h1>Erreur</h1>
-                <br />
-                <span>{this.uiError}</span>
-              </sl-alert>
-            </div>
+            <error-message message={this.uiError}></error-message>
           ) : (
             <div>
               {this.isEditTournamentName ? (

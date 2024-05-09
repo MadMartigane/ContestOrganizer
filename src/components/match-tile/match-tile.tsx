@@ -35,10 +35,10 @@ export class MadMatchTile {
   render() {
     return (
       <Host>
-        <div class="grid grid-cols-5 gap-2 content-center items-center">
-          <div class="col-span-2">{this.host ? <mad-team-tile reverse={true} team={this.host?.team}></mad-team-tile> : <span>chargement…</span>}</div>
+        <div class="grid grid-cols-5 gap-2 content-center items-center min-h-36 border rounded my-4 border-sky">
+          <div class="col-span-2 text-end">{this.host ? <mad-team-tile reverse={true} team={this.host?.team}></mad-team-tile> : <span>Sélection…</span>}</div>
           <div>VS</div>
-          <div class="col-span-2">{this.visitor ? <mad-team-tile team={this.visitor?.team}></mad-team-tile> : <span>chargement…</span>}</div>
+          <div class="col-span-2 text-start">{this.visitor ? <mad-team-tile team={this.visitor?.team}></mad-team-tile> : <span>Sélection…</span>}</div>
         </div>
       </Host>
     );

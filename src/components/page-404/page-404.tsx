@@ -11,9 +11,9 @@ export class Page404 {
       <Host>
         <sl-breadcrumb>
           <sl-breadcrumb-item>
-            <sl-icon name="4-circle" class="xl"></sl-icon>
-            <sl-icon name="0-circle" class="xl"></sl-icon>
-            <sl-icon name="4-circle" class="xl"></sl-icon>
+            <sl-icon name="4-circle" class="text-2xl"></sl-icon>
+            <sl-icon name="0-circle" class="text-2xl"></sl-icon>
+            <sl-icon name="4-circle" class="text-2xl"></sl-icon>
           </sl-breadcrumb-item>
         </sl-breadcrumb>
 
