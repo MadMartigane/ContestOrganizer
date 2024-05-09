@@ -3,7 +3,7 @@ html {
 }
 
 div.grid-300 {
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
   display: grid;
   gap: var(--sl-spacing-medium);
@@ -12,10 +12,6 @@ div.grid-300 {
   & > * {
     display: block;
   }
-}
-
-.text-align-center {
-  text-align: center;
 }
 
 .can-be-clicked {
@@ -44,4 +40,8 @@ div.page-content {
 
 div.footer {
   margin: var(--sl-spacing-3x-large) 0px;
+}
+
+.border-sky {
+  border-color: var(--sl-color-sky-200);
 }

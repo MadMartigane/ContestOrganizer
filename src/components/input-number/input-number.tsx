@@ -118,7 +118,7 @@ export class MadInputNumber {
               size="large"
               pill
             >
-              <sl-icon class="warning" name="dash-lg"></sl-icon>
+              <sl-icon class="text-warning" name="dash-lg"></sl-icon>
             </sl-button>
             <sl-button
               onclick={() => {
@@ -128,7 +128,7 @@ export class MadInputNumber {
               size="large"
               pill
             >
-              <sl-icon class="primary" name="plus-lg"></sl-icon>
+              <sl-icon class="text-primary" name="plus-lg"></sl-icon>
             </sl-button>
           </sl-button-group>
         </span>

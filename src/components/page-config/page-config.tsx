@@ -45,7 +45,7 @@ export class PageConfig {
       <Host>
         <sl-breadcrumb>
           <sl-breadcrumb-item>
-            <sl-icon name="gear" class="xl"></sl-icon>
+            <sl-icon name="gear" class="text-2xl"></sl-icon>
           </sl-breadcrumb-item>
         </sl-breadcrumb>
 

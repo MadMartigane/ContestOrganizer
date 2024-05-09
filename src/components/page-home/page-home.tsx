@@ -36,7 +36,7 @@ export class PageHome {
       <Host>
         <sl-breadcrumb>
           <sl-breadcrumb-item>
-            <sl-icon name="house" class="xl"></sl-icon>
+            <sl-icon name="house" class="text-2xl"></sl-icon>
           </sl-breadcrumb-item>
         </sl-breadcrumb>
 

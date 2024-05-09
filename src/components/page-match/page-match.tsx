@@ -207,7 +207,7 @@ export class PageMatch {
 
   private renderActionButtons(match: Match) {
     return (
-      <div class="columns-2 gap-8 content-center">
+      <div class="columns-2 gap-8 content-center py-4">
         <sl-button onclick={() => this.deleteMatch(match)} variant="warning" size="large" class="w-full">
           <sl-icon name="trash"></sl-icon>
         </sl-button>
@@ -230,36 +230,22 @@ export class PageMatch {
       <Host>
         <sl-breadcrumb>
           <sl-breadcrumb-item href="#/home">
-            <sl-icon name="house" class="xl"></sl-icon>
+            <sl-icon name="house" class="text-2xl"></sl-icon>
           </sl-breadcrumb-item>
           <sl-breadcrumb-item href="#/tournaments">
-            <sl-icon name="trophy" class="xl"></sl-icon>
+            <sl-icon name="trophy" class="text-2xl"></sl-icon>
           </sl-breadcrumb-item>
           <sl-breadcrumb-item href={`#/tournament/${this.tournament?.id}`}>
-            <sl-icon name="card-list" class="xl"></sl-icon>
+            <sl-icon name="card-list" class="text-2xl"></sl-icon>
           </sl-breadcrumb-item>
           <sl-breadcrumb-item>
-            <sl-icon name="controller" class="xl"></sl-icon>
+            <sl-icon name="controller" class="text-2xl"></sl-icon>
           </sl-breadcrumb-item>
         </sl-breadcrumb>
 
         <div class="page-content">
           {this.uiError ? (
-            <div>
-              <ion-card color="danger">
-                <ion-card-header>
-                  <ion-card-title>
-                    <sl-icon name="bug" class="4xl light"></sl-icon>
-                    <span class="light container-xl">Erreur</span>
-                  </ion-card-title>
-                </ion-card-header>
-
-                <ion-card-content>
-                  <sl-icon name="cone-striped" class="xl warning"></sl-icon>
-                  <span class="container">{this.uiError}</span>
-                </ion-card-content>
-              </ion-card>
-            </div>
+            <error-message message={this.uiError}></error-message>
           ) : (
             <div>
               <h1>{this.tournament?.name}</h1>
@@ -267,33 +253,33 @@ export class PageMatch {
 
               {this.matchNumber > 0 && !this.displayTeamSelector ? (
                 <div class="grid grid-cols-1 gap-4 page-match-grid">
-                  <div class="grid grid-cols-5 page-match-grid-header ion-align-items-center">
+                  <div class="grid grid-cols-5 block-primary py-2 items-center">
                     <div class="col-span-2">Locaux</div>
                     <div>
-                      <sl-icon class="2xl" name="trophy"></sl-icon>
+                      <sl-icon class="text-3xl text-tertiary" name="trophy"></sl-icon>
                     </div>
                     <div class="col-span-2">Visiteurs</div>
                   </div>
 
                   {this.tournament?.matchs.map(match => (
-                    <div class="light-border">
+                    <div class="py-4 px-1 border-sky border rounded border-solid">
                       <div>
                         {match.status === MatchStatus.PENDING && (
                           <sl-tag variant="primary">
                             <span class="container">Match programmé</span>
-                            <sl-icon name="calendar-check" class="primary xl"></sl-icon>
+                            <sl-icon name="calendar-check" class="text-primary text-3xl"></sl-icon>
                           </sl-tag>
                         )}
                         {match.status === MatchStatus.DOING && (
                           <sl-tag variant="success">
                             <span class="container">Match en cours</span>
-                            <sl-spinner class="xl"></sl-spinner>
+                            <sl-spinner class="text-2xl"></sl-spinner>
                           </sl-tag>
                         )}
                         {match.status === MatchStatus.DONE && (
                           <sl-tag variant="warning">
                             <span class="container">Match terminé</span>
-                            <sl-icon name="check2-square" class="warning xl"></sl-icon>
+                            <sl-icon name="check2-square" class="text-warning text-3xl"></sl-icon>
                           </sl-tag>
                         )}
                       </div>
@@ -395,7 +381,7 @@ export class PageMatch {
                   {this.displayTeamSelector ? null : (
                     <div class="ion-text-center ion-justify-content-center">
                       <h2>
-                        <span class="warning"> Aucun match en cours </span>
+                        <span class="text-warning"> Aucun match en cours </span>
                       </h2>
                     </div>
                   )}
@@ -410,51 +396,46 @@ export class PageMatch {
                     visitorPending={this.getTeam(this.currentMatch?.visitorId || null)}
                   ></mad-match-tile>
 
-                  <ion-grid class="page-match-grid">
-                    <ion-row class="page-match-grid-header ion-align-items-center">
-                      <ion-col size="2">
-                        <sl-icon name="list-check" class="xl"></sl-icon>
-                      </ion-col>
-                      <ion-col>
-                        <span>Équipes</span>
-                      </ion-col>
-                      <ion-col>
-                        <span class="container-s">
-                          <sl-icon name="stack-overflow"></sl-icon>
-                        </span>
-                        <span class="ion-hide-lg-down">Matchs </span>
-                        <span class="ion-hide-md-down">Total </span>
-                      </ion-col>
-                      <ion-col>
-                        <span class="container-s">
-                          <sl-icon name="check2-square"></sl-icon>
-                        </span>
-                        <span class="ion-hide-lg-down">Matchs </span>
-                        <span class="ion-hide-md-down">Joués </span>
-                      </ion-col>
-                      <ion-col>
-                        <span class="container-s">
-                          <sl-icon name="calendar-check"></sl-icon>
-                        </span>
-                        <span class="ion-hide-lg-down">Matchs </span>
-                        <span class="ion-hide-md-down">Programmés </span>
-                      </ion-col>
-                    </ion-row>
+                  <div class="w-fill overflow-x-auto">
+                    <table class="table-auto">
+                      <thead class="primary">
+                        <tr>
+                          <th>
+                            <sl-icon name="list-check" class="text-2xl"></sl-icon>
+                          </th>
+                          <th>
+                            <span>Équipes</span>
+                          </th>
+                          <th>
+                            <span>Matchs </span>
+                            <span>Total </span>
+                          </th>
+                          <th>
+                            <span>Matchs </span>
+                            <span>Joués </span>
+                          </th>
+                          <th>
+                            <span>Matchs </span>
+                            <span>Programmés </span>
+                          </th>
+                        </tr>
+                      </thead>
 
-                    {this.teamToSelect?.map(row => (
-                      <ion-row onClick={() => this.onTeamSelected(row)} class="ion-align-items-center clickable">
-                        <ion-col size="2">
-                          {row.selected ? <sl-icon name="check-square" class="success xl"></sl-icon> : <sl-icon name="square" class="success xl"></sl-icon>}
-                        </ion-col>
-                        <ion-col>
-                          <mad-team-tile team={row.team.team}></mad-team-tile>
-                        </ion-col>
-                        <ion-col>{row.totalMatchs}</ion-col>
-                        <ion-col>{row.doneMatchs}</ion-col>
-                        <ion-col>{row.scheduledMatchs}</ion-col>
-                      </ion-row>
-                    ))}
-                  </ion-grid>
+                      {this.teamToSelect?.map(row => (
+                        <tr onClick={() => this.onTeamSelected(row)} class="items-center cursor-pointer">
+                          <td>
+                            {row.selected ? <sl-icon name="check-square" class="text-success text-2xl"></sl-icon> : <sl-icon name="square" class="text-success text-2xl"></sl-icon>}
+                          </td>
+                          <td>
+                            <mad-team-tile team={row.team.team}></mad-team-tile>
+                          </td>
+                          <td>{row.totalMatchs}</td>
+                          <td>{row.doneMatchs}</td>
+                          <td>{row.scheduledMatchs}</td>
+                        </tr>
+                      ))}
+                    </table>
+                  </div>
 
                   <div class="footer">
                     <div class="grid-300">
