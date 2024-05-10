@@ -15,7 +15,7 @@ export class MadInputNumber {
 
   @Prop() placeholder: string;
   @Prop() label?: string;
-  @Prop() min?: number;
+  @Prop() min?: number | null = 0;
   @Prop() max?: number;
   @Prop() step?: number;
   @Prop() value?: number;
@@ -50,7 +50,9 @@ export class MadInputNumber {
 
     if (this.max && number > this.max) {
       number = this.max;
-    } else if (this.domInput) {
+    }
+
+    if (this.domInput) {
       this.domInput.value = String(number);
     }
 
@@ -62,9 +64,11 @@ export class MadInputNumber {
 
     number -= this.step || 1;
 
-    if (this.min && number < this.min) {
+    if (this.min !== undefined && this.min !== null && number < this.min) {
       number = this.min;
-    } else if (this.domInput) {
+    }
+
+    if (this.domInput) {
       this.domInput.value = String(number);
     }
 
