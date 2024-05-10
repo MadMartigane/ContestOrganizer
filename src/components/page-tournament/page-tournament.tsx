@@ -1,7 +1,5 @@
-import { InputChangeEventDetail } from '@ionic/core';
-import { Component, h, Host, Listen, Prop, State } from '@stencil/core';
+import { Component, h, Host, Prop, State } from '@stencil/core';
 import { TeamRow } from '../../modules/team-row/team-row';
-import { MadInputNumberCustomEvent } from '../../components';
 import tournaments from '../../modules/tournaments/tournaments';
 import { Tournament, TournamentType } from '../../modules/tournaments/tournaments.types';
 import Utils from '../../modules/utils/utils';
@@ -58,13 +56,6 @@ export class PageTournament {
     this.initTournaments();
   }
 
-  @Listen('ionRouteDidChange', {
-    target: 'window',
-  })
-  routerGoesHere() {
-    this.updateTournament();
-  }
-
   private async initTournaments(): Promise<number> {
     this.tournament = await this.tournaments.get(this.tournamentId);
 
@@ -77,7 +68,7 @@ export class PageTournament {
     return this.updateTournament();
   }
 
-  private onTeamNumberChange(detail?: InputChangeEventDetail): void {
+  private onTeamNumberChange(detail?: { value: string }): void {
     this.teamNumber = Number((detail && detail.value) || this.conf.teamNumberDefault);
     this.updateTournament();
   }
@@ -118,7 +109,7 @@ export class PageTournament {
     this.updateTournament();
   }
 
-  onTeamChange(detail: InputChangeEventDetail, team: TeamRow, key: string): void {
+  onTeamChange(detail: { value: string }, team: TeamRow, key: string): void {
     team.set(key, String(detail.value));
     team.goalAverage = team.scoredGoals - team.concededGoals;
 
@@ -309,7 +300,7 @@ export class PageTournament {
                 <mad-input-number
                   value={this.teamNumber}
                   label={`Nombre d’équipes (min:${this.conf.teamNumberMin}, max:${this.conf.teamNumberMax})`}
-                  onMadNumberChange={(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamNumberChange(ev.detail)}
+                  onMadNumberChange={(ev: CustomEvent) => this.onTeamNumberChange(ev.detail)}
                   min={this.conf.teamNumberMin}
                   max={this.conf.teamNumberMax}
                   step={this.conf.teamNumberStep}
