@@ -330,7 +330,6 @@ export class PageMatch {
                         {(this.tournament?.type === TournamentType.NBA || this.tournament?.type === TournamentType.BASKET) && (
                           <mad-scorer-basket
                             label="🏀"
-                            class="ion-margin"
                             readonly={match.status !== MatchStatus.DOING}
                             onMadNumberChange={(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamScores(match, MatchTeamType.VISITOR, ev.detail)}
                             min={this.config.minGoal}
@@ -341,7 +340,6 @@ export class PageMatch {
                         {this.tournament?.type === TournamentType.FOOT && (
                           <mad-input-number
                             label="⚽️"
-                            class="ion-margin"
                             readonly={match.status !== MatchStatus.DOING}
                             onMadNumberChange={(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamScores(match, MatchTeamType.VISITOR, ev.detail)}
                             min={this.config.minGoal}
@@ -352,7 +350,6 @@ export class PageMatch {
                         {this.tournament?.type === TournamentType.NFL && (
                           <mad-scorer-rugby
                             label="🏈"
-                            class="ion-margin"
                             readonly={match.status !== MatchStatus.DOING}
                             onMadNumberChange={(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamScores(match, MatchTeamType.VISITOR, ev.detail)}
                             min={this.config.minGoal}
@@ -363,7 +360,6 @@ export class PageMatch {
                         {this.tournament?.type === TournamentType.RUGBY && (
                           <mad-scorer-rugby
                             label="🏉"
-                            class="ion-margin"
                             readonly={match.status !== MatchStatus.DOING}
                             onMadNumberChange={(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamScores(match, MatchTeamType.VISITOR, ev.detail)}
                             min={this.config.minGoal}
@@ -379,11 +375,9 @@ export class PageMatch {
               ) : (
                 <div>
                   {this.displayTeamSelector ? null : (
-                    <div class="ion-text-center ion-justify-content-center">
-                      <h2>
-                        <span class="text-warning"> Aucun match en cours </span>
-                      </h2>
-                    </div>
+                    <h2>
+                      <span class="text-warning"> Aucun match en cours </span>
+                    </h2>
                   )}
                 </div>
               )}
