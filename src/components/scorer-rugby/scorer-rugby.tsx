@@ -8,11 +8,8 @@ import Utils from '../../modules/utils/utils';
   shadow: false,
 })
 export class MadScorerBasket {
-  private argColor: string;
   private domPlusMinusSwitch: SlSwitch;
 
-  @Prop() placeholder: string;
-  @Prop() label?: string;
   @Prop() min?: number;
   @Prop() max?: number;
   @Prop() value?: number;
@@ -64,10 +61,6 @@ export class MadScorerBasket {
   render() {
     return (
       <Host>
-        <h1>
-          {this.label ? <span>{this.label}: </span> : null}
-          {this.value !== undefined ? <span class={this.argColor}>{this.number}</span> : <span class="placeholder">{this.placeholder}</span>}
-        </h1>
         {this.readonly ? null : (
           <div class="grid grid-rows-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 my-4">
             <sl-button
