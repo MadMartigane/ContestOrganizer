@@ -69,53 +69,40 @@ export class MadScorerBasket {
           {this.value !== undefined ? <span class={this.argColor}>{this.number}</span> : <span class="placeholder">{this.placeholder}</span>}
         </h1>
         {this.readonly ? null : (
-          <div>
-            <ion-grid>
-              <ion-row>
-                <ion-col>
-                  <sl-button
-                    variant={this.minusMode ? 'warning' : 'primary'}
-                    onclick={() => {
-                      this.onIncrementNumber(2);
-                    }}
-                    size="large"
-                  >
-                    <sl-icon slot="prefix" name={this.minusMode ? 'dash-lg' : 'plus-lg'} class="xl"></sl-icon>
-                    <span slot="suffix">2</span>
-                  </sl-button>
-                </ion-col>
-                <ion-col>
-                  <sl-button
-                    variant={this.minusMode ? 'warning' : 'primary'}
-                    onclick={() => {
-                      this.onIncrementNumber(3);
-                    }}
-                    size="large"
-                  >
-                    <sl-icon slot="prefix" name={this.minusMode ? 'dash-lg' : 'plus-lg'} class="xl"></sl-icon>
-                    <span slot="suffix">3</span>
-                  </sl-button>
-                </ion-col>
-                <ion-col>
-                  <sl-button
-                    variant={this.minusMode ? 'warning' : 'primary'}
-                    onclick={() => {
-                      this.onIncrementNumber(5);
-                    }}
-                    size="large"
-                  >
-                    <sl-icon slot="prefix" name={this.minusMode ? 'dash-lg' : 'plus-lg'} class="xl"></sl-icon>
-                    <span slot="suffix">5</span>
-                  </sl-button>
-                </ion-col>
-                <ion-col>
-                  <sl-spacer></sl-spacer>
-                  <sl-switch ref={(el: SlSwitch) => (this.domPlusMinusSwitch = el)} size="large" checked={!this.minusMode} help-text="Ajouter/Supprimer des points">
-                    <sl-icon name="plus-slash-minus" class="xl"></sl-icon>
-                  </sl-switch>
-                </ion-col>
-              </ion-row>
-            </ion-grid>
+          <div class="grid grid-rows-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 my-4">
+            <sl-button
+              variant={this.minusMode ? 'warning' : 'primary'}
+              onclick={() => {
+                this.onIncrementNumber(2);
+              }}
+              size="large"
+            >
+              <sl-icon slot="prefix" name={this.minusMode ? 'dash-lg' : 'plus-lg'} class="xl"></sl-icon>
+              <span slot="suffix">2</span>
+            </sl-button>
+            <sl-button
+              variant={this.minusMode ? 'warning' : 'primary'}
+              onclick={() => {
+                this.onIncrementNumber(3);
+              }}
+              size="large"
+            >
+              <sl-icon slot="prefix" name={this.minusMode ? 'dash-lg' : 'plus-lg'} class="xl"></sl-icon>
+              <span slot="suffix">3</span>
+            </sl-button>
+            <sl-button
+              variant={this.minusMode ? 'warning' : 'primary'}
+              onclick={() => {
+                this.onIncrementNumber(5);
+              }}
+              size="large"
+            >
+              <sl-icon slot="prefix" name={this.minusMode ? 'dash-lg' : 'plus-lg'} class="xl"></sl-icon>
+              <span slot="suffix">5</span>
+            </sl-button>
+            <sl-switch ref={(el: SlSwitch) => (this.domPlusMinusSwitch = el)} size="large" checked={!this.minusMode} help-text="Ajouter/Supprimer des points">
+              <sl-icon name="plus-slash-minus" class="xl"></sl-icon>
+            </sl-switch>
           </div>
         )}
       </Host>
