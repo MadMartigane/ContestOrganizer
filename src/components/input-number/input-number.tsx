@@ -1,4 +1,3 @@
-import { InputChangeEventDetail } from '@ionic/core';
 import { Component, Event, EventEmitter, Host, Prop, h, State, Watch } from '@stencil/core';
 import uuid from '../../modules/uuid/uuid';
 
@@ -23,7 +22,7 @@ export class MadInputNumber {
 
   @State() private number: number;
 
-  @Event() madNumberChange: EventEmitter<InputChangeEventDetail>;
+  @Event() madNumberChange: EventEmitter<{ value: string }>;
 
   constructor() {
     this.number = this.value || this.min || 0;

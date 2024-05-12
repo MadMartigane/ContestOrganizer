@@ -390,7 +390,7 @@ export class PageMatch {
 
                   <div class="w-fill overflow-x-auto">
                     <table class="table-auto">
-                      <thead class="primary">
+                      <thead class="block-primary">
                         <tr>
                           <th>
                             <sl-icon name="list-check" class="text-2xl"></sl-icon>

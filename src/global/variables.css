@@ -4,7 +4,8 @@ html {
 
 div.grid-300 {
   max-width: 1280px;
-  margin: 0 auto;
+  margin-left: auto;
+  margin-right: auto;
   display: grid;
   gap: var(--sl-spacing-medium);
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));

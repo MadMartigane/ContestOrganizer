@@ -6,13 +6,11 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { TournamentType, TournamentUpdateEvent } from "./modules/tournaments/tournaments.types";
-import { InputChangeEventDetail } from "@ionic/core";
 import { TeamRow } from "./modules/team-row/team-row";
 import { GenericTeam } from "./modules/team-row/team-row.d";
 import { GridTeamOnUpdateDetail } from "./modules/grid-common/grid-common.types";
 import { GenericTeam as GenericTeam1 } from "./components.d";
 export { TournamentType, TournamentUpdateEvent } from "./modules/tournaments/tournaments.types";
-export { InputChangeEventDetail } from "@ionic/core";
 export { TeamRow } from "./modules/team-row/team-row";
 export { GenericTeam } from "./modules/team-row/team-row.d";
 export { GridTeamOnUpdateDetail } from "./modules/grid-common/grid-common.types";
@@ -171,7 +169,7 @@ declare global {
         new (): HTMLGridDefaultElement;
     };
     interface HTMLMadInputNumberElementEventMap {
-        "madNumberChange": InputChangeEventDetail;
+        "madNumberChange": { value: string };
     }
     interface HTMLMadInputNumberElement extends Components.MadInputNumber, HTMLStencilElement {
         addEventListener<K extends keyof HTMLMadInputNumberElementEventMap>(type: K, listener: (this: HTMLMadInputNumberElement, ev: MadInputNumberCustomEvent<HTMLMadInputNumberElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -349,7 +347,7 @@ declare namespace LocalJSX {
         "label"?: string;
         "max"?: number;
         "min"?: number | null;
-        "onMadNumberChange"?: (event: MadInputNumberCustomEvent<InputChangeEventDetail>) => void;
+        "onMadNumberChange"?: (event: MadInputNumberCustomEvent<{ value: string }>) => void;
         "placeholder"?: string;
         "readonly"?: boolean;
         "step"?: number;

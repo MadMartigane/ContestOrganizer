@@ -65,39 +65,41 @@ export class GridBasket {
 
   private renderGridHeader() {
     return (
-      <thead class="neutral align-middle">
+      <thead class="block-primary align-middle">
         <th>
-          <sl-icon name="sort-numeric-down" class="l"></sl-icon>
+          <sl-icon name="sort-numeric-down" class="text-2xl"></sl-icon>
         </th>
         <th>
           <span>Équipes</span>
         </th>
         <th>
-          <sl-icon class="l" name="percent"></sl-icon>
+          <span class="block text-xl">
+            <sl-icon name="percent"></sl-icon>
+          </span>
         </th>
         <th>
           <span class="block md:hidden">J</span>
           <span class="hidden md:block">Joués</span>
         </th>
         <th>
-          <span class="block md:hidden success">G</span>
-          <span class="hidden md:block success">Gagnés</span>
+          <span class="block md:hidden text-success">G</span>
+          <span class="hidden md:block text-success">Gagnés</span>
         </th>
         <th>
-          <span class="block md:hidden secondary">P</span>
-          <span class="hidden md:block secondary">Perdus</span>
+          <span class="block md:hidden text-warning">P</span>
+          <span class="hidden md:block text-warning">Perdus</span>
         </th>
         <th>
-          <span class="block md:hidden success">
-            <sl-icon class="l" name="plus-lg"></sl-icon>
+          <span class="block md:hidden text-success text-xl">
+            <sl-icon name="plus-lg"></sl-icon>
           </span>
-          <span class="hidden md:block success">Marqués</span>
+          <span class="hidden md:block text-success">Marqués</span>
         </th>
         <th>
-          <span class="block md:hidden warning">
-            <sl-icon class="l" name="dash-lg"></sl-icon>
+          <span class="block md:hidden text-warning text-xl">
+            <sl-icon name="dash-lg"></sl-icon>
           </span>
-          <span class="hidden md:block warning">Encaissés</span>
+          <span class="hidden md:block text-warning">Encaissés</span>
         </th>
       </thead>
     );
@@ -130,22 +132,22 @@ export class GridBasket {
           ></mad-select-team>
         </td>
         <td>
-          <span>{gridData?.winGamesPercent}</span>
+          <span class="text-primary">{gridData?.winGamesPercent}</span>
         </td>
         <td>
-          <span class="dark">{(gridData?.winGames || 0) + (gridData?.looseGames || 0)}</span>
+          <span>{(gridData?.winGames || 0) + (gridData?.looseGames || 0)}</span>
         </td>
         <td>
-          <span class="success">{gridData?.winGames}</span>
+          <span class="text-success">{gridData?.winGames}</span>
         </td>
         <td>
-          <span class="secondary">{gridData?.looseGames}</span>
+          <span class="text-warning">{gridData?.looseGames}</span>
         </td>
         <td>
-          <span class="success">{gridData?.scoredPoints}</span>
+          <span class="text-success">{gridData?.scoredPoints}</span>
         </td>
         <td>
-          <span class="warning">{gridData?.concededPoints}</span>
+          <span class="text-warning">{gridData?.concededPoints}</span>
         </td>
       </tr>
     ));
@@ -155,6 +157,22 @@ export class GridBasket {
     return (
       <Host>
         <table class="my-6">
+          <caption class="caption-bottom md:hidden">
+            <div class="text-neutral text-xs text-left text-wrap">
+              <span class="text-primary mx-1">
+                <sl-icon name="percent"></sl-icon>: pourcentage de match gagnés.
+              </span>
+              <span class="mx-1">J: total de match joués</span>
+              <span class="text-success mx-1">G: match gagnés</span>
+              <span class="text-warning mx-1">P: match perdus</span>
+              <span class="text-success mx-1">
+                <sl-icon name="plus-lg"></sl-icon>: points marqués
+              </span>
+              <span class="text-warning mx-1">
+                <sl-icon name="dash-lg"></sl-icon>: points encaissés
+              </span>
+            </div>
+          </caption>
           {this.renderGridHeader()}
 
           {this.tournament && this.renderGridBody()}
