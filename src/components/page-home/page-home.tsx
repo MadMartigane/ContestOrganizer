@@ -36,21 +36,20 @@ export class PageHome {
       <Host>
         <sl-breadcrumb>
           <sl-breadcrumb-item>
-            <sl-icon name="house" class="xl"></sl-icon>
+            <sl-icon name="house" class="text-2xl"></sl-icon>
           </sl-breadcrumb-item>
         </sl-breadcrumb>
 
         <div class="page-content">
-          <h1 class="container-xxxxl">Contest Tournament</h1>
+          <h1>Contest Tournament</h1>
 
-          <div>
+          <div class="flex-center">
             <img
               ref={el => {
                 this.domImg = el || null;
               }}
-              height="150"
+              class="h-64"
               width="300"
-              slot="image"
               src="assets/img/undraw_greek_freak.svg"
               alt="Greek freak basketball"
             />

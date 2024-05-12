@@ -1,7 +1,5 @@
-import { InputChangeEventDetail } from '@ionic/core';
-import { Component, h, Host, Listen, Prop, State } from '@stencil/core';
+import { Component, h, Host, Prop, State } from '@stencil/core';
 import { TeamRow } from '../../modules/team-row/team-row';
-import { MadInputNumberCustomEvent } from '../../components';
 import tournaments from '../../modules/tournaments/tournaments';
 import { Tournament, TournamentType } from '../../modules/tournaments/tournaments.types';
 import Utils from '../../modules/utils/utils';
@@ -58,13 +56,6 @@ export class PageTournament {
     this.initTournaments();
   }
 
-  @Listen('ionRouteDidChange', {
-    target: 'window',
-  })
-  routerGoesHere() {
-    this.updateTournament();
-  }
-
   private async initTournaments(): Promise<number> {
     this.tournament = await this.tournaments.get(this.tournamentId);
 
@@ -77,7 +68,7 @@ export class PageTournament {
     return this.updateTournament();
   }
 
-  private onTeamNumberChange(detail?: InputChangeEventDetail): void {
+  private onTeamNumberChange(detail?: { value: string }): void {
     this.teamNumber = Number((detail && detail.value) || this.conf.teamNumberDefault);
     this.updateTournament();
   }
@@ -118,7 +109,7 @@ export class PageTournament {
     this.updateTournament();
   }
 
-  onTeamChange(detail: InputChangeEventDetail, team: TeamRow, key: string): void {
+  onTeamChange(detail: { value: string }, team: TeamRow, key: string): void {
     team.set(key, String(detail.value));
     team.goalAverage = team.scoredGoals - team.concededGoals;
 
@@ -155,15 +146,6 @@ export class PageTournament {
     }
   }
 
-  private installDomEditTournamentNameEventHandler() {
-    if (this.domDivTournamentName && !this.domDivTournamentName.dataset.madEventInstalled) {
-      this.domDivTournamentName.addEventListener('click', () => {
-        this.isEditTournamentName = true;
-      });
-      this.domDivTournamentName.dataset.madEventInstalled = 'true';
-    }
-  }
-
   private onTournamentNameChange(event: KeyboardEvent) {
     if (event.key === 'Enter' || event.key === 'Escape') {
       this.editTournamentName();
@@ -195,9 +177,9 @@ export class PageTournament {
   }
 
   public componentDidUpdate() {
-    if (this.domDivTournamentName) {
-      this.installDomEditTournamentNameEventHandler();
-    }
+    Utils.installEventHandler(this.domDivTournamentName, 'click', () => {
+      this.isEditTournamentName = true;
+    });
 
     if (this.domInputTournamentName) {
       Utils.setFocus(this.domInputTournamentName);
@@ -249,7 +231,7 @@ export class PageTournament {
 
   private renderFooterActions() {
     return (
-      <div class="grid-300">
+      <div class="grid-300 my-4">
         <sl-button onclick={() => this.confirmResetGrid()} variant="warning" size="large">
           <sl-icon name="trash" slot="prefix"></sl-icon>
           <span slot="suffix">Effacer</span>
@@ -271,30 +253,23 @@ export class PageTournament {
       <Host>
         <sl-breadcrumb>
           <sl-breadcrumb-item href="#/home">
-            <sl-icon name="house" class="xl"></sl-icon>
+            <sl-icon name="house" class="text-2xl"></sl-icon>
           </sl-breadcrumb-item>
           <sl-breadcrumb-item href="#/tournaments">
-            <sl-icon name="trophy" class="xl"></sl-icon>
+            <sl-icon name="trophy" class="text-2xl"></sl-icon>
           </sl-breadcrumb-item>
           <sl-breadcrumb-item>
-            <sl-icon name="card-list" class="xl"></sl-icon>
+            <sl-icon name="card-list" class="text-2xl"></sl-icon>
           </sl-breadcrumb-item>
         </sl-breadcrumb>
 
         <div class="page-content">
           {this.uiError ? (
-            <div>
-              <sl-alert variant="danger" open>
-                <sl-icon slot="icon" name="bug" class="xxl"></sl-icon>
-                <h1>Erreur</h1>
-                <br />
-                <span>{this.uiError}</span>
-              </sl-alert>
-            </div>
+            <error-message message={this.uiError}></error-message>
           ) : (
             <div>
               {this.isEditTournamentName ? (
-                <div class="grid-300">
+                <div class="grid grid-cols-1 text-center items-center my-4">
                   <sl-input
                     ref={(el: SlInput) => {
                       this.domInputTournamentName = el;
@@ -311,35 +286,31 @@ export class PageTournament {
               ) : (
                 <div>
                   <div
-                    class="grid-300"
+                    class="grid grid-cols-1 text-center items-center"
                     ref={(el: HTMLDivElement) => {
                       this.domDivTournamentName = el as HTMLElement;
                     }}
                   >
-                    <h2 class="can-be-clicked text-align-center">{this.tournament?.name}</h2>
+                    <h1 class="can-be-clicked text-center">{this.tournament?.name}</h1>
                   </div>
                 </div>
               )}
 
-              <ion-grid class="grid-edit-tournament-center">
-                <ion-row class="ion-align-items-end ion-justify-content-center">
-                  <ion-col size="10" size-sm="8" size-md="6" size-lg="4" class="ion-padding-vertical">
-                    <mad-input-number
-                      value={this.teamNumber}
-                      label={`Nombre d’équipes (min:${this.conf.teamNumberMin}, max:${this.conf.teamNumberMax})`}
-                      onMadNumberChange={(ev: MadInputNumberCustomEvent<InputChangeEventDetail>) => this.onTeamNumberChange(ev.detail)}
-                      min={this.conf.teamNumberMin}
-                      max={this.conf.teamNumberMax}
-                      step={this.conf.teamNumberStep}
-                      placeholder={String(this.conf.teamNumberDefault)}
-                    ></mad-input-number>
-                  </ion-col>
-                </ion-row>
-              </ion-grid>
+              <div class="grid grid-cols-1 text-center items-center my-4">
+                <mad-input-number
+                  value={this.teamNumber}
+                  label={`Nombre d’équipes (min:${this.conf.teamNumberMin}, max:${this.conf.teamNumberMax})`}
+                  onMadNumberChange={(ev: CustomEvent) => this.onTeamNumberChange(ev.detail)}
+                  min={this.conf.teamNumberMin}
+                  max={this.conf.teamNumberMax}
+                  step={this.conf.teamNumberStep}
+                  placeholder={String(this.conf.teamNumberDefault)}
+                ></mad-input-number>
+              </div>
 
               {this.teamNumber > 0 ? (
                 <div>
-                  {this.renderGrid()}
+                  <div class="w-fill overflow-x-auto">{this.renderGrid()}</div>
                   {this.renderFooterActions()}
                 </div>
               ) : (

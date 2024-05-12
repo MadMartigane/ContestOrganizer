@@ -1,5 +1,3 @@
-import '@ionic/core';
-
 /* ########### SHOELACE IMPORT ############### */
 
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
@@ -14,6 +12,7 @@ import '@shoelace-style/shoelace/dist/components/button-group/button-group.js';
 import '@shoelace-style/shoelace/dist/components/card/card.js';
 import '@shoelace-style/shoelace/dist/components/carousel/carousel.js';
 import '@shoelace-style/shoelace/dist/components/carousel-item/carousel-item.js';
+import '@shoelace-style/shoelace/dist/components/dialog/dialog.js';
 import '@shoelace-style/shoelace/dist/components/divider/divider.js';
 import '@shoelace-style/shoelace/dist/components/drawer/drawer.js';
 import '@shoelace-style/shoelace/dist/components/icon/icon.js';

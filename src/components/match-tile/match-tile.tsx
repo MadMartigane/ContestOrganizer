@@ -7,11 +7,15 @@ import { TeamRow } from '../../modules/team-row/team-row';
   shadow: false,
 })
 export class MadMatchTile {
+  private refreshUIHook: number = 1;
+
   @State() host: TeamRow | null;
   @State() visitor: TeamRow | null;
 
   @Prop() hostPending: Promise<TeamRow | null>;
   @Prop() visitorPending: Promise<TeamRow | null>;
+  @Prop() hostScore?: number | null = null;
+  @Prop() visitorScore?: number | null = null;
 
   @Watch('hostPending')
   private hostPendingChange() {
@@ -27,6 +31,14 @@ export class MadMatchTile {
     });
   }
 
+  @Watch('hostScore')
+  @Watch('visitorScore')
+  public onUpadateScore() {
+    this.refreshUIHook++;
+    console.log('%s hostScore: ', this.refreshUIHook, this.hostScore);
+    console.log('%s visitorScore: ', this.refreshUIHook, this.visitorScore);
+  }
+
   constructor() {
     this.hostPendingChange();
     this.visitorPendingChange();
@@ -35,13 +47,17 @@ export class MadMatchTile {
   render() {
     return (
       <Host>
-        <ion-row class="ion-align-items-center">
-          <ion-col size="5">{this.host ? <mad-team-tile reverse={true} team={this.host?.team}></mad-team-tile> : <span>chargement…</span>}</ion-col>
-          <ion-col size="2">
-            <p> VS </p>
-          </ion-col>
-          <ion-col size="5">{this.visitor ? <mad-team-tile team={this.visitor?.team}></mad-team-tile> : <span>chargement…</span>}</ion-col>
-        </ion-row>
+        <div class="grid grid-cols-11 gap-1 content-center items-center min-h-36 border rounded my-4 border-sky">
+          <div class={this.hostScore === null ? 'col-span-5 text-end' : 'col-span-3 text-end'}>
+            {this.host ? <mad-team-tile reverse={true} team={this.host?.team}></mad-team-tile> : <span>Sélection…</span>}
+          </div>
+          {this.hostScore !== null ? <div class="col-span-2 text-4xl">{this.refreshUIHook && this.hostScore}</div> : null}
+          <div class="text-xs">VS</div>
+          {this.visitorScore !== null ? <div class="col-span-2 text-4xl">{this.refreshUIHook && this.visitorScore}</div> : null}
+          <div class={this.visitorScore === null ? 'col-span-5 text-start' : 'col-span-3 text-start'}>
+            {this.visitor ? <mad-team-tile team={this.visitor?.team}></mad-team-tile> : <span>Sélection…</span>}
+          </div>
+        </div>
       </Host>
     );
   }

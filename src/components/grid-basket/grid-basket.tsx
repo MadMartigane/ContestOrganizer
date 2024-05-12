@@ -65,47 +65,43 @@ export class GridBasket {
 
   private renderGridHeader() {
     return (
-      <ion-row class="basket-grid-header ion-align-items-center">
-        <ion-col size="1">
-          <sl-icon name="sort-numeric-down" class="l"></sl-icon>
-        </ion-col>
-        <ion-col size="3">
-          <span class="ion-hide-sm-down">Équipes</span>
-          <span class="ion-hide-sm-up">Éq</span>
-        </ion-col>
-        <ion-col>
-          <span class="ion-hide-sm-down">Joués</span>
-          <span class="ion-hide-sm-up">J</span>
-        </ion-col>
-        <ion-col>
-          <span class="success ion-hide-sm-down">Gagnés</span>
-          <span class="success ion-hide-sm-up">G</span>
-        </ion-col>
-        <ion-col>
-          <span class="secondary ion-hide-sm-down">Perdus</span>
-          <span class="secondary ion-hide-sm-up">P</span>
-        </ion-col>
-        <ion-col>
-          <sl-icon class="ion-hide-sm-down l" name="percent"></sl-icon>
-          <sl-icon class="ion-hide-sm-up m" name="percent"></sl-icon>
-        </ion-col>
-        <ion-col>
-          <span class="ion-hide-md-down success">Points </span>
-          <span class="ion-hide-lg-down success">Marqués</span>
-          <span class="ion-hide-lg-up">
-            <sl-icon class="ion-hide-sm-down success l" name="plus-lg"></sl-icon>
-            <sl-icon class="ion-hide-sm-up success m" name="plus-lg"></sl-icon>
+      <thead class="block-primary align-middle">
+        <th>
+          <sl-icon name="sort-numeric-down" class="text-2xl"></sl-icon>
+        </th>
+        <th>
+          <span>Équipes</span>
+        </th>
+        <th>
+          <span class="block text-xl">
+            <sl-icon name="percent"></sl-icon>
           </span>
-        </ion-col>
-        <ion-col>
-          <span class="ion-hide-md-down secondary">Points </span>
-          <span class="ion-hide-lg-down secondary">Encaissés</span>
-          <span class="ion-hide-lg-up secondary">
-            <sl-icon class="ion-hide-sm-down l" name="dash-lg"></sl-icon>
-            <sl-icon class="ion-hide-sm-up m" name="dash-lg"></sl-icon>
+        </th>
+        <th>
+          <span class="block md:hidden">J</span>
+          <span class="hidden md:block">Joués</span>
+        </th>
+        <th>
+          <span class="block md:hidden text-success">G</span>
+          <span class="hidden md:block text-success">Gagnés</span>
+        </th>
+        <th>
+          <span class="block md:hidden text-warning">P</span>
+          <span class="hidden md:block text-warning">Perdus</span>
+        </th>
+        <th>
+          <span class="block md:hidden text-success text-xl">
+            <sl-icon name="plus-lg"></sl-icon>
           </span>
-        </ion-col>
-      </ion-row>
+          <span class="hidden md:block text-success">Marqués</span>
+        </th>
+        <th>
+          <span class="block md:hidden text-warning text-xl">
+            <sl-icon name="dash-lg"></sl-icon>
+          </span>
+          <span class="hidden md:block text-warning">Encaissés</span>
+        </th>
+      </thead>
     );
   }
 
@@ -118,14 +114,14 @@ export class GridBasket {
     }
 
     return gridDatas.map(gridData => (
-      <ion-row class="ion-align-items-center">
-        <ion-col size="1">
+      <tr class="">
+        <td>
           <span class="counter">
             {counter > 8 ? null : '0'}
             {++counter}
           </span>
-        </ion-col>
-        <ion-col size="3">
+        </td>
+        <td>
           <mad-select-team
             value={gridData?.team}
             color="dark"
@@ -134,36 +130,53 @@ export class GridBasket {
             onMadSelectChange={(ev: CustomEvent<GridTeamOnUpdateDetail>) => this.onTeamTeamChange(ev.detail)}
             placeholder="Équipe vide"
           ></mad-select-team>
-        </ion-col>
-        <ion-col>
-          <ion-label color="dark">{(gridData?.winGames || 0) + (gridData?.looseGames || 0)}</ion-label>
-        </ion-col>
-        <ion-col>
-          <span class="success">{gridData?.winGames}</span>
-        </ion-col>
-        <ion-col>
-          <span class="secondary">{gridData?.looseGames}</span>
-        </ion-col>
-        <ion-col>
-          <span>{gridData?.winGamesPercent}</span>
-        </ion-col>
-        <ion-col>
-          <span class="success">{gridData?.scoredPoints}</span>
-        </ion-col>
-        <ion-col>
-          <span class="secondary">{gridData?.concededPoints}</span>
-        </ion-col>
-      </ion-row>
+        </td>
+        <td>
+          <span class="text-primary">{gridData?.winGamesPercent}</span>
+        </td>
+        <td>
+          <span>{(gridData?.winGames || 0) + (gridData?.looseGames || 0)}</span>
+        </td>
+        <td>
+          <span class="text-success">{gridData?.winGames}</span>
+        </td>
+        <td>
+          <span class="text-warning">{gridData?.looseGames}</span>
+        </td>
+        <td>
+          <span class="text-success">{gridData?.scoredPoints}</span>
+        </td>
+        <td>
+          <span class="text-warning">{gridData?.concededPoints}</span>
+        </td>
+      </tr>
     ));
   }
 
   render() {
     return (
       <Host>
-        <ion-grid class="basket-grid">
+        <table class="my-6">
+          <caption class="caption-bottom md:hidden">
+            <div class="text-neutral text-xs text-left text-wrap">
+              <span class="text-primary mx-1">
+                <sl-icon name="percent"></sl-icon>: pourcentage de match gagnés.
+              </span>
+              <span class="mx-1">J: total de match joués</span>
+              <span class="text-success mx-1">G: match gagnés</span>
+              <span class="text-warning mx-1">P: match perdus</span>
+              <span class="text-success mx-1">
+                <sl-icon name="plus-lg"></sl-icon>: points marqués
+              </span>
+              <span class="text-warning mx-1">
+                <sl-icon name="dash-lg"></sl-icon>: points encaissés
+              </span>
+            </div>
+          </caption>
           {this.renderGridHeader()}
+
           {this.tournament && this.renderGridBody()}
-        </ion-grid>
+        </table>
       </Host>
     );
   }

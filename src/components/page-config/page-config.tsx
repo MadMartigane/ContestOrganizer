@@ -45,12 +45,13 @@ export class PageConfig {
       <Host>
         <sl-breadcrumb>
           <sl-breadcrumb-item>
-            <sl-icon name="gear" class="xl"></sl-icon>
+            <sl-icon name="gear" class="text-2xl"></sl-icon>
           </sl-breadcrumb-item>
         </sl-breadcrumb>
 
         <div class="page-content">
           <h1>Configuration</h1>
+
           <sl-switch ref={(el: SlSwitch) => (this.darkModeSwitch = el)} checked={this.initialDarkModeActivated} size="large">
             <span class="container">Mode sombre</span>
             <sl-icon name="highlights"></sl-icon>

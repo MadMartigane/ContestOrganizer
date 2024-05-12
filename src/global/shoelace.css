@@ -1,81 +1,70 @@
 @import '~@shoelace-style/shoelace/dist/themes/light.css';
 @import '~@shoelace-style/shoelace/dist/themes/dark.css';
 
-/* icon size */
-span.xxs,
-sl-spinner.xxs,
-sl-icon.xxs {
-  font-size: var(--sl-font-size-2x-small);
+.block-primary {
+  background-color: var(--sl-color-primary-600);
+  color: var(--sl-color-neutral-100);
 }
-span.xs,
-sl-spinner.xs,
-sl-icon.xs {
-  font-size: var(--sl-font-size-x-small);
+.block-success {
+  background-color: var(--sl-color-success-600);
+  color: var(--sl-color-neutral-100);
 }
-span.s,
-sl-spinner.s,
-sl-icon.s {
-  font-size: var(--sl-font-size-small);
+.warning,
+div.block-warning {
+  background-color: var(--sl-color-warning-600);
+  color: var(--sl-color-neutral-100);
 }
-span.m,
-sl-spinner.m,
-sl-icon.m {
-  font-size: var(--sl-font-size-medium);
+.block-danger {
+  background-color: var(--sl-color-danger-600);
+  color: var(--sl-color-neutral-100);
 }
-span.l,
-sl-spinner.l,
-sl-icon.l {
-  font-size: var(--sl-font-size-large);
-}
-span.xl,
-sl-spinner.xl,
-sl-icon.xl {
-  font-size: var(--sl-font-size-x-large);
-}
-span.xxl,
-sl-spinner.xxl,
-sl-icon.xxl {
-  font-size: var(--sl-font-size-2x-large);
-}
-span.xxxl,
-sl-spinner.xxxl,
-sl-icon.xxxl {
-  font-size: var(--sl-font-size-3x-large);
-}
-span.xxxxl,
-sl-spinner.xxxxl,
-sl-icon.xxxxl {
-  font-size: var(--sl-font-size-4x-large);
-}
-
-/* icon color */
-/* TRANSITION IONIC TO SHOELACE HELPER */
-.primary {
-  color: var(--sl-color-primary-500);
-}
-.success {
-  color: var(--sl-color-success-500);
-}
-.warning {
-  color: var(--sl-color-warning-500);
-}
-.danger {
-  color: var(--sl-color-danger-500);
-}
-.neutral {
-  color: var(--sl-color-neutral-500);
-}
-.light {
-  color: var(--sl-color-neutral-900);
-}
-.dark {
+.block-neutral {
+  background-color: var(--sl-color-neutral-600);
   color: var(--sl-color-neutral-50);
 }
-.secondary {
-  color: var(--sl-color-teal-500);
+.block-light {
+  background-color: var(--sl-color-neutral-50);
+  color: var(--sl-color-neutral-900);
 }
-.tertiary {
-  color: var(--sl-color-violet-500);
+.block-dark {
+  background-color: var(--sl-color-primary-950);
+  color: var(--sl-color-neutral-100);
+}
+.block-secondary {
+  background-color: var(--sl-color-teal-600);
+  color: var(--sl-color-neutral-100);
+}
+.block-tertiary {
+  background-color: var(--sl-color-purple-600);
+  color: var(--sl-color-neutral-100);
+}
+
+.text-primary {
+  color: var(--sl-color-primary-600);
+}
+.text-success {
+  color: var(--sl-color-success-600);
+}
+.text-warning {
+  color: var(--sl-color-warning-600);
+}
+.text-danger {
+  color: var(--sl-color-danger-600);
+}
+.text-neutral {
+  color: var(--sl-color-neutral-600);
+}
+.text-light {
+  color: var(--sl-color-neutral-100);
+}
+.text-dark {
+  color: var(--sl-color-neutral-900);
+}
+.text-secondary {
+  color: var(--sl-color-teal-600);
+}
+.text-tertiary {
+  color: var(--sl-color-purple-600);
 }
 
 /* GLOBAL CONTAINER (shoelace token version) */
@@ -101,13 +90,13 @@ sl-icon.xxxxl {
 .container-xl {
   margin: var(--sl-spacing-x-large);
 }
-.container-xxl {
+.container-2xl {
   margin: var(--sl-spacing-2x-large);
 }
-.container-xxxl {
+.container-3xl {
   margin: var(--sl-spacing-3x-large);
 }
-.container-xxxxl {
+.container-4xl {
   margin: var(--sl-spacing-4x-large);
 }
 
@@ -139,19 +128,6 @@ sl-breadcrumb {
   border-radius: var(--sl-border-radius-small);
 }
 
-div.page-content {
-  margin: var(--sl-spacing-3x-large) var(--sl-spacing-2x-small);
-  padding: var(--sl-spacing-medium);
-  color: var(--sl-color-neutral-900);
-  background-color: var(--sl-color-neutral-50);
-  text-align: center;
-  border-color: var(--sl-color-neutral-100);
-  border-radius: var(--sl-border-radius-large);
-  box-shadow: var(--sl-shadow-medium);
-  -webkit-box-shadow: var(--sl-shadow-medium);
-  -moz-box-shadow: var(--sl-shadow-medium);
-}
-
 sl-menu {
   border: none;
 }
@@ -165,4 +141,11 @@ sl-menu-item {
 sl-carousel {
   margin: var(--sl-spacing-4x-large) auto;
   max-width: 600px;
+}
+
+sl-dialog {
+  --sl-panel-background-color: var(--sl-color-primary-100);
+
+  color: var(--sl-color-yellow-600);
+  font-size: var(--sl-font-size-large);
 }

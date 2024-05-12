@@ -3,8 +3,8 @@ import SlSwitch from '@shoelace-style/shoelace/dist/components/switch/switch.com
 import Utils from '../../modules/utils/utils';
 
 @Component({
-  tag: 'mad-scorer-basket',
-  styleUrl: './scorer-basket.css',
+  tag: 'mad-scorer-rugby',
+  styleUrl: './scorer-rugby.css',
   shadow: false,
 })
 export class MadScorerBasket {
@@ -66,16 +66,6 @@ export class MadScorerBasket {
             <sl-button
               variant={this.minusMode ? 'warning' : 'primary'}
               onclick={() => {
-                this.onIncrementNumber(1);
-              }}
-              size="large"
-            >
-              <sl-icon slot="prefix" name={this.minusMode ? 'dash-lg' : 'plus-lg'} class="xl"></sl-icon>
-              <span slot="suffix">1</span>
-            </sl-button>
-            <sl-button
-              variant={this.minusMode ? 'warning' : 'primary'}
-              onclick={() => {
                 this.onIncrementNumber(2);
               }}
               size="large"
@@ -92,6 +82,16 @@ export class MadScorerBasket {
             >
               <sl-icon slot="prefix" name={this.minusMode ? 'dash-lg' : 'plus-lg'} class="xl"></sl-icon>
               <span slot="suffix">3</span>
+            </sl-button>
+            <sl-button
+              variant={this.minusMode ? 'warning' : 'primary'}
+              onclick={() => {
+                this.onIncrementNumber(5);
+              }}
+              size="large"
+            >
+              <sl-icon slot="prefix" name={this.minusMode ? 'dash-lg' : 'plus-lg'} class="xl"></sl-icon>
+              <span slot="suffix">5</span>
             </sl-button>
             <sl-switch ref={(el: SlSwitch) => (this.domPlusMinusSwitch = el)} size="large" checked={!this.minusMode} help-text="Ajouter/Supprimer des points">
               <sl-icon name="plus-slash-minus" class="xl"></sl-icon>

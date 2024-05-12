@@ -1,12 +1,13 @@
-import { Config } from '@stencil/core';
-
 // https://stenciljs.com/docs/config
+import { Config } from '@stencil/core';
+import tailwind, { tailwindHMR } from 'stencil-tailwind-plugin';
 
 export const config: Config = {
   globalStyle: 'src/global/app.css',
   globalScript: 'src/global/app.ts',
   taskQueue: 'async',
   sourceMap: false,
+  plugins: [tailwind(), tailwindHMR()],
   outputTargets: [
     {
       type: 'www',

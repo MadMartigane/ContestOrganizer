@@ -1,11 +1,11 @@
 import { Component, h, Host, State } from '@stencil/core';
 import { Tournament, TournamentType, TournamentTypeLabel } from '../../modules/tournaments/tournaments.types';
 import tournaments from '../../modules/tournaments/tournaments';
-import uuid from '../../modules/uuid/uuid';
 import Utils from '../../modules/utils/utils';
 import SlSelect from '@shoelace-style/shoelace/dist/components/select/select.component';
 import SlMenu from '@shoelace-style/shoelace/dist/components/menu/menu.component';
 import SlMenuItem from '@shoelace-style/shoelace/dist/components/menu-item/menu-item.component';
+import SlInput from '@shoelace-style/shoelace/dist/components/input/input.component';
 
 @Component({
   tag: 'page-tournament-select',
@@ -14,11 +14,11 @@ import SlMenuItem from '@shoelace-style/shoelace/dist/components/menu-item/menu-
 })
 export class PageTournamentSelect {
   private readonly tournaments: typeof tournaments;
-  private readonly inputId: string;
-  private readonly uuid: typeof uuid;
 
   private domSelect: SlSelect;
   private domTournamentList: SlMenu;
+  private domTournamentName: SlInput;
+  private uiAddingTournamentJustOpened: boolean = false;
 
   @State() private uiAddingTournament: boolean;
   @State() private numberOfTournaments: number;
@@ -26,8 +26,6 @@ export class PageTournamentSelect {
 
   constructor() {
     this.tournaments = tournaments;
-    this.uuid = uuid;
-    this.inputId = 'pnii_' + this.uuid.new();
 
     this.uiAddingTournament = false;
 
@@ -52,12 +50,13 @@ export class PageTournamentSelect {
   }
 
   public componentDidRender() {
-    if (this.domTournamentList && !this.domTournamentList.dataset.madHandled) {
-      this.domTournamentList.addEventListener('sl-select', (ev: CustomEvent) => {
-        this.goPageTournament(ev);
-      });
+    Utils.installEventHandler(this.domTournamentList, 'sl-select', (ev: CustomEvent) => {
+      this.goPageTournament(ev);
+    });
 
-      this.domTournamentList.dataset.madHandled = 'true';
+    if (this.uiAddingTournamentJustOpened) {
+      Utils.setFocus(this.domTournamentName);
+      this.uiAddingTournamentJustOpened = false;
     }
   }
 
@@ -86,18 +85,8 @@ export class PageTournamentSelect {
     this.numberOfTournaments = await this.tournaments.remove(id);
   }
 
-  private async getNewTournamentNameValue(): Promise<string | null> {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const input = document.querySelector(`ion-input#${this.inputId}`) as HTMLInputElement;
-        if (!input) {
-          console.warn('<page-tournament-select/> Unable to get input value.');
-          reject(null);
-        }
-
-        resolve(input.value || null);
-      });
-    });
+  private getNewTournamentNameValue(): string | null {
+    return this.domTournamentName.value;
   }
 
   private gitTournamentTypeSelection(): TournamentType {
@@ -106,7 +95,7 @@ export class PageTournamentSelect {
   }
 
   private async addTournament() {
-    const value = await this.getNewTournamentNameValue();
+    const value = this.getNewTournamentNameValue();
     if (!value) {
       return;
     }
@@ -124,7 +113,7 @@ export class PageTournamentSelect {
   }
 
   private async onKeyPressNewName(event: KeyboardEvent) {
-    const value = await this.getNewTournamentNameValue();
+    const value = this.getNewTournamentNameValue();
     if (!value) {
       return;
     }
@@ -139,6 +128,10 @@ export class PageTournamentSelect {
     if (event.key === 'Enter') {
       this.addTournament();
     }
+
+    if (event.key === 'ArrowDown') {
+      Utils.setFocus(this.domSelect);
+    }
   }
 
   private hideUiAddingTournament() {
@@ -149,27 +142,27 @@ export class PageTournamentSelect {
     this.uiAddingTournament = true;
     this.isNewTournamentNameReady = false;
 
-    Utils.setFocus(`ion-input#${this.inputId}`);
+    this.uiAddingTournamentJustOpened = true;
   }
 
   private renderAddTournament() {
     return (
       <sl-card class="card-common">
-        <div slot="header" class="container">
-          <ion-label position="floating">Nom du tournois</ion-label>
-          <ion-input
-            color="dark"
-            placeholder="Ligue 1"
-            autofocus
-            inputmode="text"
-            name="tournoiNewName"
-            onKeyDown={(ev: KeyboardEvent) => this.onKeyPressNewName(ev)}
-            id={this.inputId}
-            type="text"
-          ></ion-input>
-        </div>
+        <sl-input
+          size="large"
+          class="my-4"
+          label="Nom du tournois"
+          placeholder="Playoff"
+          autofocus
+          minLength="2"
+          name="tournoiNewName"
+          onKeyDown={(ev: KeyboardEvent) => this.onKeyPressNewName(ev)}
+          ref={(el: SlInput) => {
+            this.domTournamentName = el;
+          }}
+        ></sl-input>
 
-        <div class="container">
+        <div>
           <sl-select
             label="Quel sport ? "
             ref={(el: SlSelect) => {
@@ -193,14 +186,14 @@ export class PageTournamentSelect {
               this.hideUiAddingTournament();
             }}
             size="large"
-            variant="neutral"
+            variant="warning"
           >
-            <sl-icon slot="prefix" name="dash-lg" class="xl"></sl-icon>
+            <sl-icon slot="prefix" name="dash-lg" class="class-2xl"></sl-icon>
             Annuler
           </sl-button>
 
           <sl-button onclick={() => this.addTournament()} size="large" variant="primary" disabled={!this.isNewTournamentNameReady}>
-            <sl-icon slot="prefix" name="plus-lg" class="xl"></sl-icon>
+            <sl-icon slot="prefix" name="plus-lg" class="class-2xl"></sl-icon>
             Ajouter
           </sl-button>
         </div>
@@ -218,7 +211,7 @@ export class PageTournamentSelect {
           }}
           size="large"
         >
-          <sl-icon slot="prefix" name="plus-lg" class="xl"></sl-icon>
+          <sl-icon slot="prefix" name="plus-lg" class="class-2xl"></sl-icon>
           Nouveau tournoi
         </sl-button>
       </sl-card>
@@ -244,8 +237,8 @@ export class PageTournamentSelect {
             </span>
 
             <span slot="suffix">
-              <sl-icon class="warning xl container-s" onclick={(ev: Event) => this.confirmRemoveTournament(ev, tournament.id)} name="trash3"></sl-icon>
-              <sl-icon class="neutral xl container-s" name="arrow-right-circle"></sl-icon>
+              <sl-icon class="text-warning text-2xl container-s" onclick={(ev: Event) => this.confirmRemoveTournament(ev, tournament.id)} name="trash3"></sl-icon>
+              <sl-icon class="text-neutral text-2xl container-s" name="arrow-right-circle"></sl-icon>
             </span>
           </sl-menu-item>
         ))}
@@ -257,7 +250,7 @@ export class PageTournamentSelect {
     return (
       <div class="sl-text-center">
         <h1>
-          <sl-icon name="trophy" class="xl warning"></sl-icon> Pas encore de tournois <sl-icon name="dribbble" class="xl success"></sl-icon>
+          <sl-icon name="trophy" class="text-3xl text-warning"></sl-icon> Pas encore de tournois <sl-icon name="dribbble" class="text-2xl text-success"></sl-icon>
         </h1>
       </div>
     );
@@ -268,10 +261,10 @@ export class PageTournamentSelect {
       <Host>
         <sl-breadcrumb>
           <sl-breadcrumb-item href="#/home">
-            <sl-icon name="house" class="xl"></sl-icon>
+            <sl-icon name="house" class="text-2xl"></sl-icon>
           </sl-breadcrumb-item>
           <sl-breadcrumb-item>
-            <sl-icon name="trophy" class="xl"></sl-icon>
+            <sl-icon name="trophy" class="text-2xl"></sl-icon>
           </sl-breadcrumb-item>
         </sl-breadcrumb>
 

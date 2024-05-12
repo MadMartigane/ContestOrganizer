@@ -6,19 +6,21 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { TournamentType, TournamentUpdateEvent } from "./modules/tournaments/tournaments.types";
-import { InputChangeEventDetail } from "@ionic/core";
 import { TeamRow } from "./modules/team-row/team-row";
 import { GenericTeam } from "./modules/team-row/team-row.d";
 import { GridTeamOnUpdateDetail } from "./modules/grid-common/grid-common.types";
 import { GenericTeam as GenericTeam1 } from "./components.d";
 export { TournamentType, TournamentUpdateEvent } from "./modules/tournaments/tournaments.types";
-export { InputChangeEventDetail } from "@ionic/core";
 export { TeamRow } from "./modules/team-row/team-row";
 export { GenericTeam } from "./modules/team-row/team-row.d";
 export { GridTeamOnUpdateDetail } from "./modules/grid-common/grid-common.types";
 export { GenericTeam as GenericTeam1 } from "./components.d";
 export namespace Components {
     interface AppRoot {
+    }
+    interface ErrorMessage {
+        "goHomeButton": boolean;
+        "message": string;
     }
     interface GridBasket {
         "tournamentId": number | null;
@@ -29,7 +31,7 @@ export namespace Components {
     interface MadInputNumber {
         "label"?: string;
         "max"?: number;
-        "min"?: number;
+        "min"?: number | null;
         "placeholder": string;
         "readonly"?: boolean;
         "step"?: number;
@@ -37,18 +39,30 @@ export namespace Components {
     }
     interface MadMatchTile {
         "hostPending": Promise<TeamRow | null>;
+        "hostScore"?: number | null;
         "visitorPending": Promise<TeamRow | null>;
+        "visitorScore"?: number | null;
     }
     interface MadRoute {
         "component": string;
         "url": string;
     }
     interface MadScorerBasket {
-        "color": string;
-        "label"?: string;
         "max"?: number;
         "min"?: number;
-        "placeholder": string;
+        "readonly"?: boolean;
+        "value"?: number;
+    }
+    interface MadScorerCommon {
+        "max"?: number;
+        "min"?: number | null;
+        "readonly"?: boolean;
+        "step"?: number;
+        "value"?: number;
+    }
+    interface MadScorerRugby {
+        "max"?: number;
+        "min"?: number;
         "readonly"?: boolean;
         "value"?: number;
     }
@@ -95,6 +109,14 @@ export interface MadScorerBasketCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLMadScorerBasketElement;
 }
+export interface MadScorerCommonCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLMadScorerCommonElement;
+}
+export interface MadScorerRugbyCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLMadScorerRugbyElement;
+}
 export interface MadSelectTeamCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLMadSelectTeamElement;
@@ -105,6 +127,12 @@ declare global {
     var HTMLAppRootElement: {
         prototype: HTMLAppRootElement;
         new (): HTMLAppRootElement;
+    };
+    interface HTMLErrorMessageElement extends Components.ErrorMessage, HTMLStencilElement {
+    }
+    var HTMLErrorMessageElement: {
+        prototype: HTMLErrorMessageElement;
+        new (): HTMLErrorMessageElement;
     };
     interface HTMLGridBasketElementEventMap {
         "gridTournamentChange": TournamentUpdateEvent;
@@ -141,7 +169,7 @@ declare global {
         new (): HTMLGridDefaultElement;
     };
     interface HTMLMadInputNumberElementEventMap {
-        "madNumberChange": InputChangeEventDetail;
+        "madNumberChange": { value: string };
     }
     interface HTMLMadInputNumberElement extends Components.MadInputNumber, HTMLStencilElement {
         addEventListener<K extends keyof HTMLMadInputNumberElementEventMap>(type: K, listener: (this: HTMLMadInputNumberElement, ev: MadInputNumberCustomEvent<HTMLMadInputNumberElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -185,6 +213,40 @@ declare global {
     var HTMLMadScorerBasketElement: {
         prototype: HTMLMadScorerBasketElement;
         new (): HTMLMadScorerBasketElement;
+    };
+    interface HTMLMadScorerCommonElementEventMap {
+        "madNumberChange": { value: string };
+    }
+    interface HTMLMadScorerCommonElement extends Components.MadScorerCommon, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLMadScorerCommonElementEventMap>(type: K, listener: (this: HTMLMadScorerCommonElement, ev: MadScorerCommonCustomEvent<HTMLMadScorerCommonElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLMadScorerCommonElementEventMap>(type: K, listener: (this: HTMLMadScorerCommonElement, ev: MadScorerCommonCustomEvent<HTMLMadScorerCommonElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLMadScorerCommonElement: {
+        prototype: HTMLMadScorerCommonElement;
+        new (): HTMLMadScorerCommonElement;
+    };
+    interface HTMLMadScorerRugbyElementEventMap {
+        "madNumberChange": { value: string };
+    }
+    interface HTMLMadScorerRugbyElement extends Components.MadScorerRugby, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLMadScorerRugbyElementEventMap>(type: K, listener: (this: HTMLMadScorerRugbyElement, ev: MadScorerRugbyCustomEvent<HTMLMadScorerRugbyElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLMadScorerRugbyElementEventMap>(type: K, listener: (this: HTMLMadScorerRugbyElement, ev: MadScorerRugbyCustomEvent<HTMLMadScorerRugbyElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLMadScorerRugbyElement: {
+        prototype: HTMLMadScorerRugbyElement;
+        new (): HTMLMadScorerRugbyElement;
     };
     interface HTMLMadSelectTeamElementEventMap {
         "madSelectChange": GridTeamOnUpdateDetail;
@@ -247,12 +309,15 @@ declare global {
     };
     interface HTMLElementTagNameMap {
         "app-root": HTMLAppRootElement;
+        "error-message": HTMLErrorMessageElement;
         "grid-basket": HTMLGridBasketElement;
         "grid-default": HTMLGridDefaultElement;
         "mad-input-number": HTMLMadInputNumberElement;
         "mad-match-tile": HTMLMadMatchTileElement;
         "mad-route": HTMLMadRouteElement;
         "mad-scorer-basket": HTMLMadScorerBasketElement;
+        "mad-scorer-common": HTMLMadScorerCommonElement;
+        "mad-scorer-rugby": HTMLMadScorerRugbyElement;
         "mad-select-team": HTMLMadSelectTeamElement;
         "mad-team-tile": HTMLMadTeamTileElement;
         "page-404": HTMLPage404Element;
@@ -266,6 +331,10 @@ declare global {
 declare namespace LocalJSX {
     interface AppRoot {
     }
+    interface ErrorMessage {
+        "goHomeButton"?: boolean;
+        "message"?: string;
+    }
     interface GridBasket {
         "onGridTournamentChange"?: (event: GridBasketCustomEvent<TournamentUpdateEvent>) => void;
         "tournamentId"?: number | null;
@@ -277,8 +346,8 @@ declare namespace LocalJSX {
     interface MadInputNumber {
         "label"?: string;
         "max"?: number;
-        "min"?: number;
-        "onMadNumberChange"?: (event: MadInputNumberCustomEvent<InputChangeEventDetail>) => void;
+        "min"?: number | null;
+        "onMadNumberChange"?: (event: MadInputNumberCustomEvent<{ value: string }>) => void;
         "placeholder"?: string;
         "readonly"?: boolean;
         "step"?: number;
@@ -286,19 +355,33 @@ declare namespace LocalJSX {
     }
     interface MadMatchTile {
         "hostPending"?: Promise<TeamRow | null>;
+        "hostScore"?: number | null;
         "visitorPending"?: Promise<TeamRow | null>;
+        "visitorScore"?: number | null;
     }
     interface MadRoute {
         "component"?: string;
         "url"?: string;
     }
     interface MadScorerBasket {
-        "color"?: string;
-        "label"?: string;
         "max"?: number;
         "min"?: number;
         "onMadNumberChange"?: (event: MadScorerBasketCustomEvent<{ value: string }>) => void;
-        "placeholder"?: string;
+        "readonly"?: boolean;
+        "value"?: number;
+    }
+    interface MadScorerCommon {
+        "max"?: number;
+        "min"?: number | null;
+        "onMadNumberChange"?: (event: MadScorerCommonCustomEvent<{ value: string }>) => void;
+        "readonly"?: boolean;
+        "step"?: number;
+        "value"?: number;
+    }
+    interface MadScorerRugby {
+        "max"?: number;
+        "min"?: number;
+        "onMadNumberChange"?: (event: MadScorerRugbyCustomEvent<{ value: string }>) => void;
         "readonly"?: boolean;
         "value"?: number;
     }
@@ -331,12 +414,15 @@ declare namespace LocalJSX {
     }
     interface IntrinsicElements {
         "app-root": AppRoot;
+        "error-message": ErrorMessage;
         "grid-basket": GridBasket;
         "grid-default": GridDefault;
         "mad-input-number": MadInputNumber;
         "mad-match-tile": MadMatchTile;
         "mad-route": MadRoute;
         "mad-scorer-basket": MadScorerBasket;
+        "mad-scorer-common": MadScorerCommon;
+        "mad-scorer-rugby": MadScorerRugby;
         "mad-select-team": MadSelectTeam;
         "mad-team-tile": MadTeamTile;
         "page-404": Page404;
@@ -352,12 +438,15 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "app-root": LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
+            "error-message": LocalJSX.ErrorMessage & JSXBase.HTMLAttributes<HTMLErrorMessageElement>;
             "grid-basket": LocalJSX.GridBasket & JSXBase.HTMLAttributes<HTMLGridBasketElement>;
             "grid-default": LocalJSX.GridDefault & JSXBase.HTMLAttributes<HTMLGridDefaultElement>;
             "mad-input-number": LocalJSX.MadInputNumber & JSXBase.HTMLAttributes<HTMLMadInputNumberElement>;
             "mad-match-tile": LocalJSX.MadMatchTile & JSXBase.HTMLAttributes<HTMLMadMatchTileElement>;
             "mad-route": LocalJSX.MadRoute & JSXBase.HTMLAttributes<HTMLMadRouteElement>;
             "mad-scorer-basket": LocalJSX.MadScorerBasket & JSXBase.HTMLAttributes<HTMLMadScorerBasketElement>;
+            "mad-scorer-common": LocalJSX.MadScorerCommon & JSXBase.HTMLAttributes<HTMLMadScorerCommonElement>;
+            "mad-scorer-rugby": LocalJSX.MadScorerRugby & JSXBase.HTMLAttributes<HTMLMadScorerRugbyElement>;
             "mad-select-team": LocalJSX.MadSelectTeam & JSXBase.HTMLAttributes<HTMLMadSelectTeamElement>;
             "mad-team-tile": LocalJSX.MadTeamTile & JSXBase.HTMLAttributes<HTMLMadTeamTileElement>;
             "page-404": LocalJSX.Page404 & JSXBase.HTMLAttributes<HTMLPage404Element>;
