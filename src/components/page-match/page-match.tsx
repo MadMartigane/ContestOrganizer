@@ -2,7 +2,7 @@ import { Component, h, Host, Prop, State } from '@stencil/core';
 import { TeamRow } from '../../modules/team-row/team-row';
 import tournaments from '../../modules/tournaments/tournaments';
 import Matchs, { Match, MatchTeamType, MatchStatus, Row } from '../../modules/matchs/matchs';
-import { Tournament, TournamentType } from '../../modules/tournaments/tournaments.types';
+import { Tournament, TournamentType, TournamentTypeLabel } from '../../modules/tournaments/tournaments.types';
 import Utils from '../../modules/utils/utils';
 import uuid from '../../modules/uuid/uuid';
 
@@ -251,11 +251,15 @@ export class PageMatch {
               <h2>Match(s)</h2>
 
               {this.matchNumber > 0 && !this.displayTeamSelector ? (
-                <div class="grid grid-cols-1 gap-4 page-match-grid">
+                <div class="grid grid-cols-1 gap-4">
                   <div class="grid grid-cols-5 block-primary py-2 items-center">
                     <div class="col-span-2">Locaux</div>
-                    <div>
-                      <sl-icon class="text-3xl text-tertiary" name="trophy"></sl-icon>
+                    <div class="text-2xl">
+                      {this.tournament?.type === TournamentType.NBA ? TournamentTypeLabel.NBA : null}
+                      {this.tournament?.type === TournamentType.NFL ? TournamentTypeLabel.NFL : null}
+                      {this.tournament?.type === TournamentType.FOOT ? TournamentTypeLabel.FOOT : null}
+                      {this.tournament?.type === TournamentType.RUGBY ? TournamentTypeLabel.RUGBY : null}
+                      {this.tournament?.type === TournamentType.BASKET ? TournamentTypeLabel.BASKET : null}
                     </div>
                     <div class="col-span-2">Visiteurs</div>
                   </div>

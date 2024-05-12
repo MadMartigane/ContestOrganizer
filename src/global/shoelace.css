@@ -117,15 +117,14 @@ sl-card {
 sl-breadcrumb {
   position: fixed;
   top: 0;
-  width: 99%;
+  width: 100%;
   background-color: var(--sl-color-primary-100);
-  padding: var(--sl-spacing-2x-small);
-  margin-bottom: var(--sl-spacing-3x-large);
+  padding: var(--sl-spacing-x-small);
   z-index: var(--sl-z-index-tooltip);
-  box-shadow: var(--sl-shadow-medium);
-  -webkit-box-shadow: var(--sl-shadow-medium);
-  -moz-box-shadow: var(--sl-shadow-medium);
-  border-radius: var(--sl-border-radius-small);
+  -webkit-box-shadow: 0 2px hsla(240, 4%, 46%, 0.12);
+  -moz-box-shadow: 0 2px hsla(240, 4%, 46%, 0.12);
+  -moz-box-shadow: 0px var(--sl-shadow-x-large) var(--sl-color-neutral-900);
+  border-radius: 0;
 }
 
 sl-menu {
