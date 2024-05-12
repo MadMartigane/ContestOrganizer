@@ -46,7 +46,6 @@
     "generate": "stencil generate"
   },
   "devDependencies": {
-    "@ionic/core": "^7.2.2",
     "@shoelace-style/shoelace": "^2.15.0",
     "@stencil/core": "^4.0.3",
     "@types/jest": "^29.5.3",

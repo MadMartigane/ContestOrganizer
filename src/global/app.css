@@ -9,11 +9,8 @@
 */
 /* ####### GENERIC CSS ######### */
 @import './variables.css';
+/* ####### END OF GENERIC CSS ######### */
 
-/* ######## IONIC INTEGRATION ######### */
-/*
-@import './ionic.css';
-*/
 /* ####### SHOELACE CSS ########## */
 @import './shoelace.css';
 /* ####### END OF SHOELACE CSS ########## */
