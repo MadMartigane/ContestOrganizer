@@ -231,7 +231,7 @@ export class PageTournament {
 
   private renderFooterActions() {
     return (
-      <div class="grid-300">
+      <div class="grid-300 my-4">
         <sl-button onclick={() => this.confirmResetGrid()} variant="warning" size="large">
           <sl-icon name="trash" slot="prefix"></sl-icon>
           <span slot="suffix">Effacer</span>
@@ -269,7 +269,7 @@ export class PageTournament {
           ) : (
             <div>
               {this.isEditTournamentName ? (
-                <div class="grid-300">
+                <div class="grid grid-cols-1 text-center items-center my-4">
                   <sl-input
                     ref={(el: SlInput) => {
                       this.domInputTournamentName = el;
@@ -286,7 +286,7 @@ export class PageTournament {
               ) : (
                 <div>
                   <div
-                    class="grid-300"
+                    class="grid grid-cols-1 text-center items-center"
                     ref={(el: HTMLDivElement) => {
                       this.domDivTournamentName = el as HTMLElement;
                     }}
@@ -296,7 +296,7 @@ export class PageTournament {
                 </div>
               )}
 
-              <div class="grid grid-cols-1 text-center items-center">
+              <div class="grid grid-cols-1 text-center items-center my-4">
                 <mad-input-number
                   value={this.teamNumber}
                   label={`Nombre d’équipes (min:${this.conf.teamNumberMin}, max:${this.conf.teamNumberMax})`}

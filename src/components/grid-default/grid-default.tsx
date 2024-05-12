@@ -56,40 +56,39 @@ export class GridDefault {
   render() {
     return (
       <Host>
-        <ion-grid class="default-grid">
-          <ion-row class="default-grid-header ion-align-items-center">
-            <ion-col size="1">
-              <sl-icon class="ion-hide-sm-down l" name="sort-numeric-down"></sl-icon>
-              <sl-icon class="ion-hide-sm-up m" name="sort-numeric-down"></sl-icon>
-            </ion-col>
-            <ion-col size="3">
+        <table class="table-auto">
+          <thead class="block-primary align-middle">
+            <th>
+              <sl-icon class="text-2xl" name="sort-numeric-down"></sl-icon>
+            </th>
+            <th>
               <span>Équipes</span>
-            </ion-col>
-            <ion-col>
-              <span class="success">Points</span>
-            </ion-col>
-            <ion-col class="secondary">
-              <span>Buts</span>
-              <sl-icon name="plus-lg" class="m"></sl-icon>
-            </ion-col>
-            <ion-col class="tertiary">
-              <span>Buts</span>
-              <sl-icon name="dash-lg" class="s"></sl-icon>
-            </ion-col>
-            <ion-col>
-              <span class="warning">Goal average</span>
-            </ion-col>
-          </ion-row>
+            </th>
+            <th>
+              <span>Points</span>
+            </th>
+            <th>
+              <span class="text-success">Buts</span>
+              <sl-icon name="plus-lg" class="text-2xl text-secondary"></sl-icon>
+            </th>
+            <th>
+              <span class="text-warning">Buts</span>
+              <sl-icon name="dash-lg" class="text-2xl text-tertiary"></sl-icon>
+            </th>
+            <th>
+              <span>Goal average</span>
+            </th>
+          </thead>
 
           {this.tournament?.grid.map(gridRow => (
-            <ion-row class="ion-align-items-center">
-              <ion-col size="1">
+            <tr class="">
+              <td>
                 <span class="counter">
                   {this.counter > 8 ? null : '0'}
                   {++this.counter}
                 </span>
-              </ion-col>
-              <ion-col size="3">
+              </td>
+              <td>
                 <mad-select-team
                   value={gridRow.team}
                   color="primary"
@@ -98,22 +97,22 @@ export class GridDefault {
                   onMadSelectChange={(ev: CustomEvent<GridTeamOnUpdateDetail>) => this.onTeamTeamChange(ev.detail)}
                   placeholder="Équipe vide"
                 ></mad-select-team>
-              </ion-col>
-              <ion-col>
-                <span class="success">{gridRow.points}</span>
-              </ion-col>
-              <ion-col>
-                <span class="secondary">{gridRow.scoredGoals}</span>
-              </ion-col>
-              <ion-col>
-                <span class="tertiary">{gridRow.concededGoals}</span>
-              </ion-col>
-              <ion-col>
-                <span class="warning">{gridRow.goalAverage}</span>
-              </ion-col>
-            </ion-row>
+              </td>
+              <td>
+                <span class="text-primary">{gridRow.points}</span>
+              </td>
+              <td>
+                <span class="text-success">{gridRow.scoredGoals}</span>
+              </td>
+              <td>
+                <span class="text-warning">{gridRow.concededGoals}</span>
+              </td>
+              <td>
+                <span class="text-primary">{gridRow.goalAverage}</span>
+              </td>
+            </tr>
           ))}
-        </ion-grid>
+        </table>
       </Host>
     );
   }

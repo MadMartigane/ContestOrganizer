@@ -19,7 +19,6 @@ export class MadSelectTeam {
   private readonly apiFutDB = apiFutDB;
   private readonly apiSports = apiSports;
 
-  private argColor: string;
   private domDrawer: SlDrawer;
   private domDivBody?: HTMLDivElement;
   private domInputSearch?: SlInput;
@@ -47,7 +46,6 @@ export class MadSelectTeam {
   }
 
   constructor() {
-    this.argColor = this.color || 'primary';
     this.team = this.value;
 
     this.teams = [];
@@ -205,7 +203,7 @@ export class MadSelectTeam {
             <h3>{this.isLoading ? 'Changement des équipes…' : `Recherche ton équipe. (${this.minNumberSearchLetter} lettres min)`}</h3>
           </div>
           <div>
-            <div class="container">
+            <div class="my-4">
               <sl-input
                 ref={(el: SlInput) => {
                   this.domInputSearch = el;
@@ -225,8 +223,8 @@ export class MadSelectTeam {
 
             {this.searchValue?.length > 2 && !this.suggested.length ? (
               <sl-alert variant="warning" open>
-                <sl-icon name="emoji-frown" class="2xl"></sl-icon>
-                <span class="container l">Aucun résultat</span>
+                <sl-icon name="emoji-frown" slot="icon" class="text-6xl text-warning"></sl-icon>
+                <span class="mx-2 text-2xl">Aucun résultat</span>
               </sl-alert>
             ) : null}
           </div>
@@ -238,7 +236,7 @@ export class MadSelectTeam {
     return (
       <Host
         class={{
-          pointer: true,
+          'cursor-pointer': true,
         }}
       >
         <sl-drawer
@@ -267,7 +265,7 @@ export class MadSelectTeam {
           }}
         >
           {this.label ? <span>{this.label}</span> : null}
-          {this.team?.id ? <mad-team-tile color={this.argColor} team={this.team}></mad-team-tile> : <span class="placeholder">{this.placeholder}</span>}
+          {this.team?.id ? <mad-team-tile team={this.team}></mad-team-tile> : <span class="text-neutral text-sm">{this.placeholder}</span>}
         </div>
       </Host>
     );

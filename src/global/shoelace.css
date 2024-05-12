@@ -1,68 +1,41 @@
 @import '~@shoelace-style/shoelace/dist/themes/light.css';
 @import '~@shoelace-style/shoelace/dist/themes/dark.css';
 
-thead.primary,
-th.primary,
-td.primary,
-.block-primary,
-div.primary {
+.block-primary {
   background-color: var(--sl-color-primary-600);
   color: var(--sl-color-neutral-100);
 }
-thead.success,
-th.success,
-td.success,
-div.success {
+.block-success {
   background-color: var(--sl-color-success-600);
   color: var(--sl-color-neutral-100);
 }
-thead.warning,
-th.warning,
-td.warning,
-div.warning {
+.warning,
+div.block-warning {
   background-color: var(--sl-color-warning-600);
   color: var(--sl-color-neutral-100);
 }
-thead.danger,
-th.danger,
-td.danger,
-div.danger {
+.block-danger {
   background-color: var(--sl-color-danger-600);
   color: var(--sl-color-neutral-100);
 }
-thead.neutral,
-th.neutral,
-td.neutral,
-div.neutral {
+.block-neutral {
   background-color: var(--sl-color-neutral-600);
   color: var(--sl-color-neutral-50);
 }
-thead.light,
-th.light,
-td.light,
-div.light {
+.block-light {
   background-color: var(--sl-color-neutral-50);
   color: var(--sl-color-neutral-900);
 }
-thead.dark,
-th.dark,
-td.dark,
-div.dark {
+.block-dark {
   background-color: var(--sl-color-primary-950);
   color: var(--sl-color-neutral-100);
 }
-thead.secondary,
-th.secondary,
-td.secondary,
-div.secondary {
+.block-secondary {
   background-color: var(--sl-color-teal-600);
   color: var(--sl-color-neutral-100);
 }
-thead.tertiary,
-th.tertiary,
-td.tertiary,
-div.tertiary {
-  background-color: var(--sl-color-yellow-600);
+.block-tertiary {
+  background-color: var(--sl-color-purple-600);
   color: var(--sl-color-neutral-100);
 }
 
@@ -91,7 +64,7 @@ div.tertiary {
   color: var(--sl-color-teal-600);
 }
 .text-tertiary {
-  color: var(--sl-color-yellow-600);
+  color: var(--sl-color-purple-600);
 }
 
 /* GLOBAL CONTAINER (shoelace token version) */
