@@ -54,7 +54,7 @@ export class MadMatchTile {
           {this.hostScore !== null ? <div class="col-span-2 text-4xl">{this.refreshUIHook && this.hostScore}</div> : null}
           <div class="text-xs">VS</div>
           {this.visitorScore !== null ? <div class="col-span-2 text-4xl">{this.refreshUIHook && this.visitorScore}</div> : null}
-          <div class={this.visitorScore === null ? 'col-span-5 text-start' : 'col-span3 text-start'}>
+          <div class={this.visitorScore === null ? 'col-span-5 text-start' : 'col-span-3 text-start'}>
             {this.visitor ? <mad-team-tile team={this.visitor?.team}></mad-team-tile> : <span>Sélection…</span>}
           </div>
         </div>

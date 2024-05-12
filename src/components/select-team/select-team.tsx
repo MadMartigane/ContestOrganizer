@@ -59,7 +59,6 @@ export class MadSelectTeam {
       case TournamentType.RUGBY:
         this.minNumberSearchLetter = 3;
         this.isLoading = false;
-        Utils.setFocus('ion-searchbar#page-team-select-search');
         break;
       default:
         this.minNumberSearchLetter = 2;
@@ -74,7 +73,6 @@ export class MadSelectTeam {
           })
           .finally(() => {
             this.isLoading = false;
-            Utils.setFocus('ion-searchbar#page-team-select-search');
           });
         break;
     }
@@ -105,7 +103,7 @@ export class MadSelectTeam {
   }
 
   private scrollOnSearchResult() {
-    Utils.scrollIntoView('ion-searchbar');
+    Utils.scrollIntoView(this.domSearchResultList || '');
   }
 
   private onPageTeamNewSelection(team: GenericTeam) {
@@ -144,32 +142,22 @@ export class MadSelectTeam {
   }
 
   public componentDidRender() {
-    if (this.domSearchResultList && !this.domSearchResultList.dataset.madHandled) {
-      this.domSearchResultList.addEventListener('sl-select', (ev: CustomEvent) => {
-        ev.stopPropagation();
-        this.onTeamRadioChange(ev);
-      });
+    Utils.installEventHandler(this.domSearchResultList, 'sl-select', (ev: CustomEvent) => {
+      ev.stopPropagation();
+      this.onTeamRadioChange(ev);
+    });
 
-      this.domSearchResultList.dataset.madHandled = 'true';
-    }
-  }
+    Utils.installEventHandler(this.domDivBody, 'click', (ev: CustomEvent) => {
+      ev.stopPropagation();
+      this.openDrawer();
+    });
 
-  public componentDidLoad() {
-    if (this.domDivBody) {
-      this.domDivBody.addEventListener('click', (ev: Event) => {
-        ev.stopPropagation();
-        this.openDrawer();
+    Utils.installEventHandler(this.domInputSearch, 'sl-input', (ev: CustomEvent) => {
+      ev.stopPropagation();
+      Utils.debounce('select-team-input-search', () => {
+        this.onSearchChange(this.domInputSearch?.value || '');
       });
-    }
-
-    if (this.domInputSearch) {
-      this.domInputSearch.addEventListener('sl-input', (ev: CustomEvent) => {
-        ev.stopPropagation();
-        Utils.debounce('select-team-input-search', () => {
-          this.onSearchChange(this.domInputSearch?.value || '');
-        });
-      });
-    }
+    });
   }
 
   private renderTeamResultList() {
@@ -180,15 +168,13 @@ export class MadSelectTeam {
         }}
       >
         {this.suggested.map((team: GenericTeam) => (
-          <div>
-            <sl-menu-item data-team-id={team.id}>
-              <mad-team-tile team={team}></mad-team-tile>
+          <sl-menu-item data-team-id={team.id}>
+            <mad-team-tile team={team}></mad-team-tile>
 
-              <span slot="suffix">
-                <sl-icon class="neutral xl container-s" name="arrow-right-circle"></sl-icon>
-              </span>
-            </sl-menu-item>
-          </div>
+            <span slot="suffix">
+              <sl-icon class="text-neutral text-4xl" name="arrow-right-circle"></sl-icon>
+            </span>
+          </sl-menu-item>
         ))}
       </sl-menu>
     );
@@ -197,7 +183,7 @@ export class MadSelectTeam {
   private renderTeamSelection() {
     return (
       <div class="footer">
-        {this.isLoading ? <ion-progress-bar type="indeterminate" color="secondary"></ion-progress-bar> : null}
+        {this.isLoading ? <sl-progress-bar indeterminate></sl-progress-bar> : null}
         <sl-card>
           <div slot="header">
             <h3>{this.isLoading ? 'Changement des équipes…' : `Recherche ton équipe. (${this.minNumberSearchLetter} lettres min)`}</h3>
