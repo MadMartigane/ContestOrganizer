@@ -93,13 +93,29 @@ export default class Utils {
     return promise;
   }
 
-  public static scrollIntoView(selector: string) {
+  public static scrollIntoView(selector: string | HTMLElement): void {
+    if (!selector) {
+      console.warn('[Utils.scrollIntoView()] selector is empty, aborting.');
+      return;
+    }
+
+    if (typeof selector === 'string') {
+      setTimeout(() => {
+        const element: Element | null = window.document.querySelector(selector);
+        if (!element) {
+          console.warn('[Utils.scrollIntoView()] dom element "%s" not found, aborting.', selector);
+          return;
+        }
+
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 300);
+      return;
+    }
+
     setTimeout(() => {
-      const list: Element | null = window.document.querySelector(selector);
-      if (list) {
-        list.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 500);
+      selector.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+    return;
   }
 
   public static debounce(name: string, callback: Function): void {

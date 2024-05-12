@@ -45,22 +45,19 @@ export class MadTeamTile {
   render() {
     return (
       <Host>
-        <ion-grid class="grid-team-tile">
-          <ion-row class="ion-align-items-center">
-            <ion-col size="12" size-md="6" push-md={this.reverse ? '6' : null}>
-              {this.team && this.imgSrc ? (
-                <ion-thumbnail class={this.reverse ? 'ion-float-end' : 'ion-float-start'}>
-                  <img alt={`${this.team?.name} club logo`} src={this.imgSrc} />
-                </ion-thumbnail>
-              ) : (
-                <span></span>
-              )}
-            </ion-col>
-            <ion-col size="12" size-md="6" pull-md={this.reverse ? '6' : null} color="dark" class={this.reverse ? 'ion-text-end' : 'ion-text-start'}>
-              {this.team ? <span class="grid-team-text">{this.team?.name}</span> : <span>⏳</span>}
-            </ion-col>
-          </ion-row>
-        </ion-grid>
+        <div class="w-full">
+          {this.team && this.imgSrc ? (
+            <div class={this.reverse ? 'w-full md:w-1/2 min-h-8' : 'w-full md:w-1/2 min-h-8'}>
+              <img class={this.reverse ? 'w-16 float-right' : 'w-16 float-left'} alt={`${this.team?.name} club logo`} src={this.imgSrc} />
+            </div>
+          ) : null}
+
+          <div class={this.reverse ? 'w-full md:w-1/2 float-right md:float-none min-h-8' : 'w-full md:w-1/2 float-left md:float-none min-h-8'}>
+            <div class={this.reverse ? 'w-full text-right my-1 float-right' : 'w-full text-left float-left my-1'}>
+              {this.team ? <span class="text-balance">{this.team?.name}</span> : <span>⏳</span>}
+            </div>
+          </div>
+        </div>
       </Host>
     );
   }
