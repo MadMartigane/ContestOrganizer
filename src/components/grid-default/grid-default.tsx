@@ -69,11 +69,11 @@ export class GridDefault {
             </th>
             <th>
               <span class="text-success">Buts</span>
-              <sl-icon name="plus-lg" class="text-2xl text-secondary"></sl-icon>
+              <sl-icon name="plus-lg" class="text-2xl text-success"></sl-icon>
             </th>
             <th>
               <span class="text-warning">Buts</span>
-              <sl-icon name="dash-lg" class="text-2xl text-tertiary"></sl-icon>
+              <sl-icon name="dash-lg" class="text-2xl text-warning"></sl-icon>
             </th>
             <th>
               <span>Goal average</span>

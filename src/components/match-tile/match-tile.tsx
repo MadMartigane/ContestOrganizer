@@ -47,7 +47,7 @@ export class MadMatchTile {
   render() {
     return (
       <Host>
-        <div class="grid grid-cols-11 gap-1 content-center items-center min-h-36 border rounded my-4 border-sky">
+        <div class="grid grid-cols-11 gap-1 content-center items-center min-h-36 my-4">
           <div class={this.hostScore === null ? 'col-span-5 text-end' : 'col-span-3 text-end'}>
             {this.host ? <mad-team-tile reverse={true} team={this.host?.team}></mad-team-tile> : <span>Sélection…</span>}
           </div>
