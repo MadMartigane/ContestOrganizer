@@ -19,6 +19,9 @@ export namespace Components {
     interface AppRoot {
     }
     interface ErrorMessage {
+        /**
+          * @default true
+         */
         "goHomeButton": boolean;
         "message": string;
     }
@@ -31,6 +34,9 @@ export namespace Components {
     interface MadInputNumber {
         "label"?: string;
         "max"?: number;
+        /**
+          * @default 0
+         */
         "min"?: number | null;
         "placeholder": string;
         "readonly"?: boolean;
@@ -39,8 +45,14 @@ export namespace Components {
     }
     interface MadMatchTile {
         "hostPending": Promise<TeamRow | null>;
+        /**
+          * @default null
+         */
         "hostScore"?: number | null;
         "visitorPending": Promise<TeamRow | null>;
+        /**
+          * @default null
+         */
         "visitorScore"?: number | null;
     }
     interface MadRoute {
@@ -55,7 +67,13 @@ export namespace Components {
     }
     interface MadScorerCommon {
         "max"?: number;
+        /**
+          * @default 0
+         */
         "min"?: number | null;
+        /**
+          * @default false
+         */
         "readonly"?: boolean;
         "step"?: number;
         "value"?: number;
@@ -332,6 +350,9 @@ declare namespace LocalJSX {
     interface AppRoot {
     }
     interface ErrorMessage {
+        /**
+          * @default true
+         */
         "goHomeButton"?: boolean;
         "message"?: string;
     }
@@ -346,6 +367,9 @@ declare namespace LocalJSX {
     interface MadInputNumber {
         "label"?: string;
         "max"?: number;
+        /**
+          * @default 0
+         */
         "min"?: number | null;
         "onMadNumberChange"?: (event: MadInputNumberCustomEvent<{ value: string }>) => void;
         "placeholder"?: string;
@@ -355,8 +379,14 @@ declare namespace LocalJSX {
     }
     interface MadMatchTile {
         "hostPending"?: Promise<TeamRow | null>;
+        /**
+          * @default null
+         */
         "hostScore"?: number | null;
         "visitorPending"?: Promise<TeamRow | null>;
+        /**
+          * @default null
+         */
         "visitorScore"?: number | null;
     }
     interface MadRoute {
@@ -372,8 +402,14 @@ declare namespace LocalJSX {
     }
     interface MadScorerCommon {
         "max"?: number;
+        /**
+          * @default 0
+         */
         "min"?: number | null;
         "onMadNumberChange"?: (event: MadScorerCommonCustomEvent<{ value: string }>) => void;
+        /**
+          * @default false
+         */
         "readonly"?: boolean;
         "step"?: number;
         "value"?: number;
