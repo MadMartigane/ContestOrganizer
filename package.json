@@ -19,7 +19,7 @@
     "pre-prod": "npm run build && npm run pre-prod-only",
     "pre-prod-only": "npm run pre-prod-backup-api && npm run build && npm run pre-prod-clean && npm run pre-prod-push && npm run pre-prod-update-paths && npm run pre-prod-restore-api",
     "pre-prod-backup-api": "cp -r /var/www/marius.click/html/contest-preprod/api ~/backup/contest-api-pre-prod/",
-    "pre-prod-restore-api": "cp -r ~/backup/contest-api-pre-prod/api /var/www/marius.click/html/contest-preprod/ && npm run pre-prod-api-group && npm run pre-prod-api-rights-grw",
+    "pre-prod-restore-api": "cp -r ~/backup/contest-api-pre-prod/api /var/www/marius.click/html/contest-preprod/ && cp -r ~/backup/contest-api-pre-prod/data/* /var/www/marius.click/html/contest-preprod/api/data/ && npm run pre-prod-api-group && npm run pre-prod-api-rights-grw",
     "pre-prod-setSrcBasePath": "sed -i 's/src=\"/src=\"\\/contest-preprod/g' /var/www/marius.click/html/contest-preprod/index.html",
     "pre-prod-setHrefBasePath": "sed -i 's/href=\"/href=\"\\/contest-preprod/g' /var/www/marius.click/html/contest-preprod/index.html",
     "pre-prod-update-paths": "npm run pre-prod-setSrcBasePath && npm run pre-prod-setHrefBasePath",
