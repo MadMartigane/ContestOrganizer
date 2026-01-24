@@ -1,4 +1,4 @@
-import { Component, h, Host, Prop, State } from '@stencil/core';
+import { Component, Element, h, Host, Prop, State } from '@stencil/core';
 import { TeamRow } from '../../modules/team-row/team-row';
 import tournaments from '../../modules/tournaments/tournaments';
 import Matchs, { Match, MatchTeamType, MatchStatus, Row } from '../../modules/matchs/matchs';
@@ -10,6 +10,11 @@ type Config = {
   minGoal: number;
 };
 
+type ScrollConfig = {
+  matchThreshold: number;
+  scrollDelay: number;
+};
+
 @Component({
   tag: 'page-match',
   styleUrl: 'page-match.css',
@@ -18,8 +23,11 @@ type Config = {
 export class PageMatch {
   private readonly tournaments: typeof tournaments;
   private readonly config: Config;
+  private readonly SCROLL_CONFIG: ScrollConfig;
 
   @Prop() public tournamentId: number;
+
+  @Element() host: HTMLElement;
 
   @State() private tournament: Tournament | null;
   @State() private uiError: string | null;
@@ -28,6 +36,7 @@ export class PageMatch {
   @State() private matchNumber: number;
   @State() private currentMatch: Match | null;
   @State() private refreshUIHook: number;
+  @State() private matchRefs: HTMLElement[] = [];
 
   constructor() {
     this.tournaments = tournaments;
@@ -39,8 +48,62 @@ export class PageMatch {
       minGoal: 0,
     };
 
+    this.SCROLL_CONFIG = {
+      matchThreshold: 10,
+      scrollDelay: 1000,
+    };
+
     this.initTournaments();
     this.refreshUI();
+  }
+
+  get targetMatchIndex(): number | null {
+
+
+    if (!this.tournament?.matchs || this.tournament.matchs.length <= this.SCROLL_CONFIG.matchThreshold) {
+      return null;
+    }
+    const doingIndex = this.tournament.matchs.findIndex(match => match.status === MatchStatus.DOING);
+    if (doingIndex !== -1) {
+
+      return doingIndex;
+    }
+
+    return this.tournament.matchs.length - 1;
+  }
+
+  private autoScrollToMatch(retryCount = 0): void {
+    const targetIndex = this.targetMatchIndex;
+    if (targetIndex === null) {
+
+      return;
+    }
+
+    if (!this.matchRefs[targetIndex]) {
+      if (retryCount < 10) {
+
+        requestAnimationFrame(() => this.autoScrollToMatch(retryCount + 1));
+        return;
+      }
+
+      return;
+    }
+
+
+    setTimeout(() => {
+      this.matchRefs[targetIndex].scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+    }, this.SCROLL_CONFIG.scrollDelay);
+  }
+
+  componentDidLoad() {
+
+
+
+
+
   }
 
   private async initTournaments(): Promise<number> {
@@ -52,6 +115,8 @@ export class PageMatch {
     }
 
     this.matchNumber = this.tournament.matchs.length;
+
+    this.autoScrollToMatch();
     return this.updateTournament();
   }
 
@@ -264,8 +329,8 @@ export class PageMatch {
                     <div class="col-span-2">Visiteurs</div>
                   </div>
 
-                  {this.tournament?.matchs.map(match => (
-                    <div class="py-4 px-1 border-sky border rounded border-solid">
+                  {this.tournament?.matchs.map((match, index) => (
+                    <div class="py-4 px-1 border-sky border rounded border-solid" ref={(el) => { if (el) this.matchRefs[index] = el; }}>
                       <div>
                         {match.status === MatchStatus.PENDING && (
                           <sl-tag variant="primary">
