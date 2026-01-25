@@ -1,0 +1,43 @@
+.rank-badge {
+  position: absolute;
+  top: -14px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #1a1a1a;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  z-index: 100;
+}
+
+.rank-badge.rank-1 {
+  background: linear-gradient(to bottom, #FFD700, #B8860B);
+  border: 1.5px solid #FFFACD;
+}
+
+.rank-badge.rank-2 {
+  background: linear-gradient(to bottom, #E8E8E8, #A0A0A0);
+  border: 1.5px solid #FFFFFF;
+}
+
+.rank-badge.rank-3 {
+  background: linear-gradient(to bottom, #CD7F32, #8B4513);
+  border: 1.5px solid #FFFACD;
+}
+
+.rank-badge.rank-other {
+  background: linear-gradient(to bottom, #e0f2fe, #7dd3fc);
+  border: 1.5px solid #FFFFFF;
+}
+
+.rank-badge-left {
+  left: -14px;
+}
+
+.rank-badge-right {
+  right: -14px;
+}

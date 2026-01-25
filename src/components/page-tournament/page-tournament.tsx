@@ -1,6 +1,6 @@
 import { Component, h, Host, Prop, State } from '@stencil/core';
 import { TeamRow } from '../../modules/team-row/team-row';
-import tournaments from '../../modules/tournaments/tournaments';
+import tournaments, { Tournaments } from '../../modules/tournaments/tournaments';
 import { Tournament, TournamentType } from '../../modules/tournaments/tournaments.types';
 import Utils from '../../modules/utils/utils';
 import { GenericTeam } from '../../components.d';
@@ -121,9 +121,7 @@ export class PageTournament {
       return;
     }
 
-    const gridClone = this.tournament.grid.map(team => team) as Array<TeamRow>;
-    gridClone.sort((a: TeamRow, b: TeamRow) => b.goalAverage - a.goalAverage);
-    this.tournament.grid = gridClone.sort((a: TeamRow, b: TeamRow) => b.points - a.points);
+    this.tournament.grid = Tournaments.sortGrid(this.tournament.grid);
 
     this.updateTournament();
   }

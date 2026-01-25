@@ -1,6 +1,6 @@
 import { Component, Element, h, Host, Prop, State } from '@stencil/core';
 import { TeamRow } from '../../modules/team-row/team-row';
-import tournaments from '../../modules/tournaments/tournaments';
+import tournaments, { Tournaments } from '../../modules/tournaments/tournaments';
 import Matchs, { Match, MatchTeamType, MatchStatus, Row } from '../../modules/matchs/matchs';
 import { Tournament, TournamentType, TournamentTypeLabel } from '../../modules/tournaments/tournaments.types';
 import Utils from '../../modules/utils/utils';
@@ -290,6 +290,10 @@ export class PageMatch {
   }
 
   render() {
+    const sortedGrid = this.tournament ? Tournaments.sortGrid(this.tournament.grid) : [];
+    const rankMap = new Map<number, number>();
+    sortedGrid.forEach((team, index) => rankMap.set(team.id, index + 1));
+
     return (
       <Host>
         <sl-breadcrumb>
@@ -329,37 +333,43 @@ export class PageMatch {
                     <div class="col-span-2">Visiteurs</div>
                   </div>
 
-                  {this.tournament?.matchs.map((match, index) => (
-                    <div class="py-4 px-1 border-sky border rounded border-solid" ref={(el) => { if (el) this.matchRefs[index] = el; }}>
-                      <div>
-                        {match.status === MatchStatus.PENDING && (
-                          <sl-tag variant="primary">
-                            <span class="container">Match programmé</span>
-                            <sl-icon name="calendar-check" class="text-primary text-3xl"></sl-icon>
-                          </sl-tag>
-                        )}
-                        {match.status === MatchStatus.DOING && (
-                          <sl-tag variant="success">
-                            <span class="container">Match en cours</span>
-                            <sl-spinner class="text-2xl"></sl-spinner>
-                          </sl-tag>
-                        )}
-                        {match.status === MatchStatus.DONE && (
-                          <sl-tag variant="warning">
-                            <span class="container">Match terminé</span>
-                            <sl-icon name="check2-square" class="text-warning text-3xl"></sl-icon>
-                          </sl-tag>
-                        )}
-                      </div>
+                  {this.tournament?.matchs.map((match, index) => {
+                    const hostRank = match.hostId ? rankMap.get(match.hostId) : undefined;
+                    const visitorRank = match.visitorId ? rankMap.get(match.visitorId) : undefined;
 
-                      {this.refreshUIHook ? (
-                        <mad-match-tile
-                          hostPending={this.getTeam(match.hostId)}
-                          visitorPending={this.getTeam(match.visitorId)}
-                          hostScore={match.goals.host}
-                          visitorScore={match.goals.visitor}
-                        ></mad-match-tile>
-                      ) : null}
+                    return (
+                      <div class="py-4 px-1 border-sky border rounded border-solid" ref={(el) => { if (el) this.matchRefs[index] = el; }}>
+                        <div>
+                          {match.status === MatchStatus.PENDING && (
+                            <sl-tag variant="primary">
+                              <span class="container">Match programmé</span>
+                              <sl-icon name="calendar-check" class="text-primary text-3xl"></sl-icon>
+                            </sl-tag>
+                          )}
+                          {match.status === MatchStatus.DOING && (
+                            <sl-tag variant="success">
+                              <span class="container">Match en cours</span>
+                              <sl-spinner class="text-2xl"></sl-spinner>
+                            </sl-tag>
+                          )}
+                          {match.status === MatchStatus.DONE && (
+                            <sl-tag variant="warning">
+                              <span class="container">Match terminé</span>
+                              <sl-icon name="check2-square" class="text-warning text-3xl"></sl-icon>
+                            </sl-tag>
+                          )}
+                        </div>
+
+                        {this.refreshUIHook ? (
+                          <mad-match-tile
+                            hostPending={this.getTeam(match.hostId)}
+                            visitorPending={this.getTeam(match.visitorId)}
+                            hostScore={match.goals.host}
+                            visitorScore={match.goals.visitor}
+                            hostRank={hostRank}
+                            visitorRank={visitorRank}
+                          ></mad-match-tile>
+                        ) : null}
 
                       <div class="grid grid-cols-2 gap-4">
                         {(this.tournament?.type === TournamentType.NBA || this.tournament?.type === TournamentType.BASKET) && (
@@ -435,9 +445,10 @@ export class PageMatch {
                         )}
                       </div>
 
-                      {this.refreshUIHook ? this.renderActionButtons(match) : null}
-                    </div>
-                  ))}
+                        {this.refreshUIHook ? this.renderActionButtons(match) : null}
+                      </div>
+                    );
+                  })}
                 </div>
               ) : (
                 <div>
