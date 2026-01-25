@@ -5,5 +5,5 @@ export default {
     extend: {},
   },
   plugins: [],
-  content: ['./src/components/**/*.{html,js,tsx}'],
+  content: ["./src/components/**/*.{html,js,tsx}"],
 };
