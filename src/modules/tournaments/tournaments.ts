@@ -8,7 +8,7 @@ import { HttpRequest } from '../http-request/http-request';
 import { ProcedureContentStoredTournaments, ProcedureData } from '../procedure/procedure.types';
 import { Procedure } from '../procedure/procedure';
 
-class Tournaments {
+export class Tournaments {
   private readonly CACHE_KEY: string;
   private readonly uuid: typeof uuid;
   private readonly callbackCollector: Array<Function>;
@@ -381,6 +381,15 @@ class Tournaments {
     }
 
     return label;
+  }
+
+  public static sortGrid(grid: TeamRow[]): TeamRow[] {
+    return [...grid].sort((a, b) => {
+      if (a.points !== b.points) {
+        return b.points - a.points;
+      }
+      return b.goalAverage - a.goalAverage;
+    });
   }
 }
 

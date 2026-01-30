@@ -45,11 +45,13 @@ export namespace Components {
     }
     interface MadMatchTile {
         "hostPending": Promise<TeamRow | null>;
+        "hostRank"?: number;
         /**
           * @default null
          */
         "hostScore"?: number | null;
         "visitorPending": Promise<TeamRow | null>;
+        "visitorRank"?: number;
         /**
           * @default null
          */
@@ -93,6 +95,7 @@ export namespace Components {
         "value": GenericTeam;
     }
     interface MadTeamTile {
+        "rank"?: number;
         "reverse": Boolean | null;
         "team": GenericTeam1 | null;
     }
@@ -379,11 +382,13 @@ declare namespace LocalJSX {
     }
     interface MadMatchTile {
         "hostPending"?: Promise<TeamRow | null>;
+        "hostRank"?: number;
         /**
           * @default null
          */
         "hostScore"?: number | null;
         "visitorPending"?: Promise<TeamRow | null>;
+        "visitorRank"?: number;
         /**
           * @default null
          */
@@ -431,6 +436,7 @@ declare namespace LocalJSX {
         "value"?: GenericTeam;
     }
     interface MadTeamTile {
+        "rank"?: number;
         "reverse"?: Boolean | null;
         "team"?: GenericTeam1 | null;
     }

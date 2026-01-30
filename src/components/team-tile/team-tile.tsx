@@ -14,6 +14,7 @@ export class MadTeamTile {
 
   @Prop() team: GenericTeam | null;
   @Prop() reverse: Boolean | null;
+  @Prop() rank?: number;
 
   constructor() {
     this.apiFutDB = apiFutDB;
@@ -44,7 +45,8 @@ export class MadTeamTile {
 
   render() {
     return (
-      <Host>
+      <Host class="relative">
+        {this.rank && <div class={`rank-badge rank-${this.rank <= 3 ? this.rank : 'other'} ${this.reverse ? 'rank-badge-left' : 'rank-badge-right'}`}>{this.rank}</div>}
         <div class="w-full">
           {this.team && this.imgSrc ? (
             <div class={this.reverse ? 'w-full md:w-1/2 min-h-8' : 'w-full md:w-1/2 min-h-8'}>

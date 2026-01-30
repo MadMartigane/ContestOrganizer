@@ -40,12 +40,17 @@
     "restore-api-files": "cp -r /var/www/marius.click/html/contest2/api /var/www/marius.click/html/contest/",
     "restore-api-group": "chown -R debian:www-data /var/www/marius.click/html/contest/api/data",
     "restore-api-rights-grw": "chmod -R g+rw /var/www/marius.click/html/contest/api/data/*",
-    "restore-api": "npm run restore-api-files && npm run restore-api-group && npm run restore-api-rights-grw",
+    "restore-api": "npm run restore-api-files && cp -r ~/backup/contest-data/* /var/www/marius.click/html/contest/api/data/ && npm run restore-api-group && npm run restore-api-rights-grw",
     "proxy": "node ./scripts/proxy.js",
     "clean-build": "rm -rf www/build/svg",
-    "generate": "stencil generate"
+    "generate": "stencil generate",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "biome:check": "biome check .",
+    "biome:format": "biome format --write ."
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.3.12",
     "@shoelace-style/shoelace": "^2.20.1",
     "@stencil/core": "^4.41.3",
     "@types/jest": "^29.5.14",
@@ -54,7 +59,8 @@
     "jest-cli": "^29.7.0",
     "puppeteer": "^24.1.1",
     "stencil-tailwind-plugin": "^1.8.0",
-    "tailwindcss": "^3.4.17"
+    "tailwindcss": "^3.4.17",
+    "ultracite": "^7.0.12"
   },
   "engines": {
     "node": ">= 18.x",
