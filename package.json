@@ -40,7 +40,7 @@
     "restore-api-files": "cp -r /var/www/marius.click/html/contest2/api /var/www/marius.click/html/contest/",
     "restore-api-group": "chown -R debian:www-data /var/www/marius.click/html/contest/api/data",
     "restore-api-rights-grw": "chmod -R g+rw /var/www/marius.click/html/contest/api/data/*",
-    "restore-api": "npm run restore-api-files && npm run restore-api-group && npm run restore-api-rights-grw",
+    "restore-api": "npm run restore-api-files && cp -r ~/backup/contest-data/* /var/www/marius.click/html/contest/api/data/ && npm run restore-api-group && npm run restore-api-rights-grw",
     "proxy": "node ./scripts/proxy.js",
     "clean-build": "rm -rf www/build/svg",
     "generate": "stencil generate",
