@@ -1,19 +1,31 @@
-import TeamRow from '../team-row/team-row';
-import { Tournament } from '../tournaments/tournaments.types';
-import { MatchStatus } from '../matchs/matchs.d';
-import { BasketGridData } from './data-basket.d';
+import { MatchStatus } from "../matchs/matchs.d";
+import type TeamRow from "../team-row/team-row";
+import type { Tournament } from "../tournaments/tournaments.types";
+import type { BasketGridData } from "./data-basket.d";
 
 export default class Basket {
   public static data(tournament: Tournament) {
-    const basketData = tournament.grid.map(teamRow => {
-      return this.getOneTeamData(tournament, teamRow);
+    const basketData = tournament.grid.map((teamRow) => {
+      return Basket.getOneTeamData(tournament, teamRow);
     });
 
-    basketData.sort((teamA, teamB) => (teamA?.concededPoints || 0) - (teamB?.concededPoints || 0));
-    basketData.sort((teamA, teamB) => (teamB?.scoredPoints || 0) - (teamA?.scoredPoints || 0));
-    basketData.sort((teamA, teamB) => (teamA?.looseGames || 0) - (teamB?.looseGames || 0));
-    basketData.sort((teamA, teamB) => (teamB?.winGames || 0) - (teamA?.winGames || 0));
-    basketData.sort((teamA, teamB) => (teamB?.winGamesPercent || 0) - (teamA?.winGamesPercent || 0));
+    basketData.sort(
+      (teamA, teamB) =>
+        (teamA?.concededPoints || 0) - (teamB?.concededPoints || 0),
+    );
+    basketData.sort(
+      (teamA, teamB) => (teamB?.scoredPoints || 0) - (teamA?.scoredPoints || 0),
+    );
+    basketData.sort(
+      (teamA, teamB) => (teamA?.looseGames || 0) - (teamB?.looseGames || 0),
+    );
+    basketData.sort(
+      (teamA, teamB) => (teamB?.winGames || 0) - (teamA?.winGames || 0),
+    );
+    basketData.sort(
+      (teamA, teamB) =>
+        (teamB?.winGamesPercent || 0) - (teamA?.winGamesPercent || 0),
+    );
 
     return basketData;
   }
@@ -31,7 +43,7 @@ export default class Basket {
       winGamesPercent: 0,
     } as BasketGridData;
 
-    tournament.matchs.forEach(match => {
+    tournament.matchs.forEach((match) => {
       if (match.status !== MatchStatus.DONE) {
         return;
       }
@@ -44,15 +56,21 @@ export default class Basket {
         gridData.scoredPoints += match.goals.host;
         gridData.concededPoints += match.goals.visitor;
 
-        match.goals.host > match.goals.visitor ? gridData.winGames++ : gridData.looseGames++;
+        match.goals.host > match.goals.visitor
+          ? gridData.winGames++
+          : gridData.looseGames++;
       } else {
         gridData.scoredPoints += match.goals.visitor;
         gridData.concededPoints += match.goals.host;
 
-        match.goals.host > match.goals.visitor ? gridData.looseGames++ : gridData.winGames++;
+        match.goals.host > match.goals.visitor
+          ? gridData.looseGames++
+          : gridData.winGames++;
       }
 
-      gridData.winGamesPercent = Math.round((gridData.winGames / (gridData.winGames + gridData.looseGames)) * 100);
+      gridData.winGamesPercent = Math.round(
+        (gridData.winGames / (gridData.winGames + gridData.looseGames)) * 100,
+      );
     });
 
     return gridData;
