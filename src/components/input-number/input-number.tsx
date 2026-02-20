@@ -17,7 +17,7 @@ import uuid from "../../modules/uuid/uuid";
   shadow: false,
 })
 export class MadInputNumber {
-  private itemId: string;
+  private readonly itemId: string;
   private domInput: SlInput;
 
   @Prop() placeholder: string;
@@ -37,7 +37,7 @@ export class MadInputNumber {
     this.itemId = `mad_input_number_${uuid.new()}`;
   }
 
-  public componentDidLoad() {
+  componentDidLoad() {
     if (this.domInput) {
       this.domInput.addEventListener("sl-change", () => {
         this.onNumberChange();
@@ -46,7 +46,7 @@ export class MadInputNumber {
   }
 
   @Watch("value")
-  public onPropValueChange() {
+  onPropValueChange() {
     this.number = this.value || 0;
   }
 
@@ -86,7 +86,7 @@ export class MadInputNumber {
     const oldValue: number = this.number;
 
     this.number = Number.parseInt(this.domInput.value, 10);
-    if (isNaN(this.number)) {
+    if (Number.isNaN(this.number)) {
       console.warn(
         "<mad-input-number> unable to parse input value as integer."
       );
@@ -149,7 +149,7 @@ export class MadInputNumber {
     );
   }
 
-  public render() {
+  render() {
     return <Host>{this.renderEditingState()}</Host>;
   }
 }
