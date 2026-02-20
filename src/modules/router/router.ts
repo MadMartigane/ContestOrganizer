@@ -20,24 +20,24 @@ export class Router {
   }
 
   get route() {
-    return window.location.hash.replace(/^#/, '');
+    return window.location.hash.replace(/^#/, "");
   }
 
   private attachEventListners() {
-    window.addEventListener('hashchange', () => {
+    window.addEventListener("hashchange", () => {
       this.update();
     });
   }
 
   private checkDeadRoute(): void {
-    if (['', '/'].includes(this.route)) {
+    if (["", "/"].includes(this.route)) {
       if (this.defaultUrl) {
         this.goTo(this.defaultUrl);
         return;
       }
 
       if (this.registeredUrl.length > 0) {
-        this.goTo(this.registeredUrl.at(0) || '');
+        this.goTo(this.registeredUrl.at(0) || "");
         return;
       }
     }
@@ -55,7 +55,7 @@ export class Router {
       return;
     }
 
-    this.callbacks.forEach(callback => {
+    this.callbacks.forEach((callback) => {
       setTimeout(() => {
         callback();
       });
@@ -65,12 +65,16 @@ export class Router {
   }
 
   private checkRegisteredAndRedirectionUrl(): void {
-    const foundRegistered = this.registeredUrl.find(candidate => this.match(candidate));
+    const foundRegistered = this.registeredUrl.find((candidate) =>
+      this.match(candidate)
+    );
     if (foundRegistered) {
       return;
     }
 
-    const foundRedirection = this.redirectionOptions.find(candidate => this.match(candidate.from));
+    const foundRedirection = this.redirectionOptions.find((candidate) =>
+      this.match(candidate.from)
+    );
     if (foundRedirection) {
       this.goTo(foundRedirection.to);
       return;
@@ -96,22 +100,22 @@ export class Router {
 
   public match(path: string): boolean {
     const route = this.route;
-    const paths = path.split('/');
-    const routes = route.split('/');
+    const paths = path.split("/");
+    const routes = route.split("/");
 
     const result = paths.every((value, i) => {
-      return (value.startsWith(':') && routes[i]) || value === routes[i];
+      return (value.startsWith(":") && routes[i]) || value === routes[i];
     });
 
     return result;
   }
 
   public get(idx: number): string | null {
-    return this.route.split('/').at(idx) || null;
+    return this.route.split("/").at(idx) || null;
   }
 
   public goTo(hash: string): void {
-    window.location.hash = hash.replace(/^#/, '');
+    window.location.hash = hash.replace(/^#/, "");
   }
 
   public goBack(): void {
@@ -119,14 +123,19 @@ export class Router {
   }
 
   public setRedirection(option: RedirectionOptions): void {
-    const alreadySet = this.redirectionOptions.find(candidate => {
+    const alreadySet = this.redirectionOptions.find((candidate) => {
       return candidate.from === option.from;
     });
 
     if (alreadySet) {
-      console.group('OVERWRITE REDIRECTION');
+      console.group("OVERWRITE REDIRECTION");
       console.warn('[Router] Only one redirection allowed by "from" url.');
-      console.warn('"%s" will be redirected to "%s" instead of "%s"', option.from, option.to, alreadySet.to);
+      console.warn(
+        '"%s" will be redirected to "%s" instead of "%s"',
+        option.from,
+        option.to,
+        alreadySet.to
+      );
       console.groupEnd();
 
       alreadySet.to = option.to;

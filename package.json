@@ -18,20 +18,24 @@
     "biome:format": "biome format --write .",
     "deploy:prod": "bash scripts/deploy.sh prod",
     "deploy:preprod": "bash scripts/deploy.sh pre-prod",
-    "deploy:backup": "bash scripts/deploy.sh backup"
+    "deploy:backup": "bash scripts/deploy.sh backup",
+    "check": "ultracite check",
+    "fix": "ultracite fix",
+    "prepare": "husky"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.12",
+    "@biomejs/biome": "^2.4.0",
     "@shoelace-style/shoelace": "^2.20.1",
     "@stencil/core": "^4.41.3",
     "@types/jest": "^29.5.14",
     "http-proxy": "^1.18.1",
+    "husky": "^9.1.7",
     "jest": "^29.7.0",
     "jest-cli": "^29.7.0",
     "puppeteer": "^24.1.1",
     "stencil-tailwind-plugin": "^1.8.0",
     "tailwindcss": "^3.4.17",
-    "ultracite": "^7.0.12"
+    "ultracite": "^7.2.3"
   },
   "engines": {
     "node": ">= 18.x",

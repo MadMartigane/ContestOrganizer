@@ -1,9 +1,9 @@
-import { Component, h, Host } from '@stencil/core';
-import router, { Router } from '../../modules/router';
+import { Component, Host, h } from "@stencil/core";
+import router, { type Router } from "../../modules/router";
 
 @Component({
-  tag: 'app-root',
-  styleUrl: 'app-root.css',
+  tag: "app-root",
+  styleUrl: "app-root.css",
   shadow: false,
 })
 export class AppRoot {
@@ -11,24 +11,30 @@ export class AppRoot {
 
   constructor() {
     this.router.setRedirection({
-      from: '/app/:anything',
-      to: '/home',
+      from: "/app/:anything",
+      to: "/home",
     });
 
-    this.router.setDefaultUrl('/home');
-    this.router.setNotFoundUrl('/404');
+    this.router.setDefaultUrl("/home");
+    this.router.setNotFoundUrl("/404");
   }
 
   render() {
     return (
       <Host>
-        <mad-route url="/home" component="page-home"></mad-route>
-        <mad-route url="/tournaments" component="page-tournament-select"></mad-route>
-        <mad-route url="/team-select/:teamId/:teamType" component="page-team-select"></mad-route>
-        <mad-route url="/tournament/:tournamentId" component="page-tournament"></mad-route>
-        <mad-route url="/match/:tournamentId" component="page-match"></mad-route>
-        <mad-route url="/404" component="page-404"></mad-route>
-        <mad-route url="/config" component="page-config"></mad-route>
+        <mad-route component="page-home" url="/home" />
+        <mad-route component="page-tournament-select" url="/tournaments" />
+        <mad-route
+          component="page-team-select"
+          url="/team-select/:teamId/:teamType"
+        />
+        <mad-route
+          component="page-tournament"
+          url="/tournament/:tournamentId"
+        />
+        <mad-route component="page-match" url="/match/:tournamentId" />
+        <mad-route component="page-404" url="/404" />
+        <mad-route component="page-config" url="/config" />
       </Host>
     );
   }

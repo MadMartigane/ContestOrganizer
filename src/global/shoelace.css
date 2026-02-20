@@ -1,42 +1,42 @@
-@import '~@shoelace-style/shoelace/dist/themes/light.css';
-@import '~@shoelace-style/shoelace/dist/themes/dark.css';
+@import "~@shoelace-style/shoelace/dist/themes/light.css";
+@import "~@shoelace-style/shoelace/dist/themes/dark.css";
 
 .block-primary {
-  background-color: var(--sl-color-primary-600);
   color: var(--sl-color-neutral-100);
+  background-color: var(--sl-color-primary-600);
 }
 .block-success {
-  background-color: var(--sl-color-success-600);
   color: var(--sl-color-neutral-100);
+  background-color: var(--sl-color-success-600);
 }
 .warning,
 div.block-warning {
-  background-color: var(--sl-color-warning-600);
   color: var(--sl-color-neutral-100);
+  background-color: var(--sl-color-warning-600);
 }
 .block-danger {
-  background-color: var(--sl-color-danger-600);
   color: var(--sl-color-neutral-100);
+  background-color: var(--sl-color-danger-600);
 }
 .block-neutral {
-  background-color: var(--sl-color-neutral-600);
   color: var(--sl-color-neutral-50);
+  background-color: var(--sl-color-neutral-600);
 }
 .block-light {
-  background-color: var(--sl-color-neutral-50);
   color: var(--sl-color-neutral-900);
+  background-color: var(--sl-color-neutral-50);
 }
 .block-dark {
-  background-color: var(--sl-color-primary-950);
   color: var(--sl-color-neutral-100);
+  background-color: var(--sl-color-primary-950);
 }
 .block-secondary {
-  background-color: var(--sl-color-teal-600);
   color: var(--sl-color-neutral-100);
+  background-color: var(--sl-color-teal-600);
 }
 .block-tertiary {
-  background-color: var(--sl-color-purple-600);
   color: var(--sl-color-neutral-100);
+  background-color: var(--sl-color-purple-600);
 }
 
 .text-primary {
@@ -103,10 +103,10 @@ div.block-warning {
 sl-card {
   max-width: 600px;
 
-  &.card-common [slot='footer'] {
+  &.card-common [slot="footer"] {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
   }
 }
 
@@ -117,14 +117,14 @@ sl-card {
 sl-breadcrumb {
   position: fixed;
   top: 0;
-  width: 100%;
-  background-color: var(--sl-color-primary-100);
-  padding: var(--sl-spacing-x-small);
   z-index: var(--sl-z-index-tooltip);
-  -webkit-box-shadow: 0 2px hsla(240, 4%, 46%, 0.12);
+  width: 100%;
+  padding: var(--sl-spacing-x-small);
+  background-color: var(--sl-color-primary-100);
+  border-radius: 0;
   -moz-box-shadow: 0 2px hsla(240, 4%, 46%, 0.12);
   -moz-box-shadow: 0px var(--sl-shadow-x-large) var(--sl-color-neutral-900);
-  border-radius: 0;
+  -webkit-box-shadow: 0 2px hsla(240, 4%, 46%, 0.12);
 }
 
 sl-menu {
@@ -138,13 +138,13 @@ sl-menu-item {
 }
 
 sl-carousel {
-  margin: var(--sl-spacing-4x-large) auto;
   max-width: 600px;
+  margin: var(--sl-spacing-4x-large) auto;
 }
 
 sl-dialog {
   --sl-panel-background-color: var(--sl-color-primary-100);
+  font-size: var(--sl-font-size-large);
 
   color: var(--sl-color-yellow-600);
-  font-size: var(--sl-font-size-large);
 }

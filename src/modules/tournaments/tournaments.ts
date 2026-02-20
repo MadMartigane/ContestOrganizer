@@ -1,6 +1,6 @@
 import { HttpRequest } from "../http-request/http-request";
 import type { Match } from "../matchs/matchs";
-import { MatchStatus } from "../matchs/matchs.d";
+import { MatchStatus } from "../matchs/matchs";
 import { Procedure } from "../procedure/procedure";
 import type {
   ProcedureContentStoredTournaments,
@@ -48,9 +48,9 @@ export class Tournaments {
     return `${pathName}_${CACHE_KEY}`;
   }
 
-  private getTournamentsCache(tryOldCach: boolean = false): string | null {
+  private getTournamentsCache(tryOldCach = false): string | null {
     const tournamentsString = localStorage.getItem(
-      tryOldCach ? CACHE_KEY : this.CACHE_KEY,
+      tryOldCach ? CACHE_KEY : this.CACHE_KEY
     );
 
     if (tournamentsString) {
@@ -78,7 +78,7 @@ export class Tournaments {
       } catch (e) {
         console.warn(
           "[Tournaments] Unable to parse stored tournaments. Cleanning of cache. ",
-          e,
+          e
         );
         localStorage.removeItem(this.CACHE_KEY);
       }
@@ -91,7 +91,7 @@ export class Tournaments {
     } catch (e) {
       console.warn(
         "[Tournaments] Unable to fetch the tournaments from the backend.",
-        e,
+        e
       );
     }
 
@@ -116,7 +116,7 @@ export class Tournaments {
 
       mergedTournaments = this.mergeTournaments(
         recentTournaments,
-        oldestTournaments,
+        oldestTournaments
       );
     } else {
       mergedTournaments = localTournaments?.tournaments || [];
@@ -141,9 +141,9 @@ export class Tournaments {
 
   private mergeTournaments(
     primaries: Array<Tournament>,
-    secondaries: Array<Tournament>,
+    secondaries: Array<Tournament>
   ): Array<Tournament> {
-    if (!primaries || !primaries.length) {
+    if (!(primaries && primaries.length)) {
       return secondaries && secondaries.length ? secondaries : [];
     }
 
@@ -151,7 +151,7 @@ export class Tournaments {
 
     primaries.forEach((primary) => {
       const secondary = secondaries.find(
-        (candidate) => candidate.id === primary.id,
+        (candidate) => candidate.id === primary.id
       );
       if (!secondary) {
         // That mean the tournament doesn't exist in the oldest record. We have to keep it.
@@ -184,7 +184,7 @@ export class Tournaments {
 
   private async getBackendTournaments(): Promise<ProcedureContentStoredTournaments | null> {
     const backendData = (await this.httpRequest.load(
-      "/api/index.php/list/tournaments",
+      "/api/index.php/list/tournaments"
     )) as ProcedureData;
 
     const procedure = new Procedure(backendData);
@@ -205,11 +205,11 @@ export class Tournaments {
   }
 
   private async storeBackendTournaments(
-    content: ProcedureContentStoredTournaments,
+    content: ProcedureContentStoredTournaments
   ): Promise<void> {
     const procedureData = (await this.httpRequest.post(
       "/api/index.php/store/tournaments",
-      JSON.stringify(content),
+      JSON.stringify(content)
     )) as ProcedureData;
 
     const procedure = new Procedure(procedureData);
@@ -247,7 +247,7 @@ export class Tournaments {
       // TODO: send global error event.
       console.error(
         "[Tournaments] Unable to save the tournaments on the backend: ",
-        e,
+        e
       );
     }
 
@@ -320,7 +320,7 @@ export class Tournaments {
 
   public async getTournamentTeam(
     tournament: Tournament,
-    teamId: number | null,
+    teamId: number | null
   ): Promise<TeamRow | null> {
     if (!teamId) {
       return Promise.resolve(null);
@@ -329,14 +329,14 @@ export class Tournaments {
     const promise = this.isBusy || Promise.resolve();
 
     return promise.then(
-      () => tournament.grid.find((team) => team.id === teamId) || null,
+      () => tournament.grid.find((team) => team.id === teamId) || null
     );
   }
 
   public async remove(id: number): Promise<number> {
     if (!id) {
       return Promise.reject(
-        new Error("[Tournaments.remove()] Missing tournament id."),
+        new Error("[Tournaments.remove()] Missing tournament id.")
       );
     }
 
@@ -378,7 +378,7 @@ export class Tournaments {
     const promise = this.isBusy || Promise.resolve();
 
     return promise.then(
-      () => this.tournaments.find((t) => t.id === id) || null,
+      () => this.tournaments.find((t) => t.id === id) || null
     );
   }
 
@@ -391,7 +391,7 @@ export class Tournaments {
       if (i === -1) {
         console.warn(
           "[Tournaments] Unable to update the tourmament #%s.",
-          tournament.id,
+          tournament.id
         );
         return this.tournaments.length;
       }
@@ -414,7 +414,7 @@ export class Tournaments {
   public map(callback: Function): Array<any> {
     return this.tournaments.map(
       (value: Tournament, index: number, array: Tournament[]) =>
-        callback(value, index, array),
+        callback(value, index, array)
     );
   }
 

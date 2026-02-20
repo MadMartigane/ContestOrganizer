@@ -1,4 +1,4 @@
-import { MatchStatus } from "../matchs/matchs.d";
+import { MatchStatus } from "../matchs/matchs";
 import type TeamRow from "../team-row/team-row";
 import type { Tournament } from "../tournaments/tournaments.types";
 import type { BasketGridData } from "./data-basket.d";
@@ -11,20 +11,20 @@ export default class Basket {
 
     basketData.sort(
       (teamA, teamB) =>
-        (teamA?.concededPoints || 0) - (teamB?.concededPoints || 0),
+        (teamA?.concededPoints || 0) - (teamB?.concededPoints || 0)
     );
     basketData.sort(
-      (teamA, teamB) => (teamB?.scoredPoints || 0) - (teamA?.scoredPoints || 0),
+      (teamA, teamB) => (teamB?.scoredPoints || 0) - (teamA?.scoredPoints || 0)
     );
     basketData.sort(
-      (teamA, teamB) => (teamA?.looseGames || 0) - (teamB?.looseGames || 0),
+      (teamA, teamB) => (teamA?.looseGames || 0) - (teamB?.looseGames || 0)
     );
     basketData.sort(
-      (teamA, teamB) => (teamB?.winGames || 0) - (teamA?.winGames || 0),
+      (teamA, teamB) => (teamB?.winGames || 0) - (teamA?.winGames || 0)
     );
     basketData.sort(
       (teamA, teamB) =>
-        (teamB?.winGamesPercent || 0) - (teamA?.winGamesPercent || 0),
+        (teamB?.winGamesPercent || 0) - (teamA?.winGamesPercent || 0)
     );
 
     return basketData;
@@ -69,7 +69,7 @@ export default class Basket {
       }
 
       gridData.winGamesPercent = Math.round(
-        (gridData.winGames / (gridData.winGames + gridData.looseGames)) * 100,
+        (gridData.winGames / (gridData.winGames + gridData.looseGames)) * 100
       );
     });
 

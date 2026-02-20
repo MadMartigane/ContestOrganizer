@@ -1,4 +1,4 @@
-import { GenericTeam } from '../team-row/team-row.d';
+import { GenericTeam } from "../team-row/team-row.d";
 
 export type BasketGridData = {
   team: GenericTeam;

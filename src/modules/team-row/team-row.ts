@@ -1,8 +1,8 @@
-import { GenericTeam, TeamRowProperties } from './team-row.d';
-import uuid from '../uuid/uuid';
-import { TournamentType } from '../tournaments/tournaments.types';
+import type { TournamentType } from "../tournaments/tournaments.types";
+import uuid from "../uuid/uuid";
+import type { GenericTeam, TeamRowProperties } from "./team-row.d";
 
-export * from './team-row.d';
+export * from "./team-row.d";
 
 export class TeamRow {
   public readonly id: number;
@@ -42,24 +42,26 @@ export class TeamRow {
 
   public reset() {
     delete this.team;
-    ['points', 'concededGoals', 'scoredGoals', 'goalAverage'].forEach(key => this.set(key, '0'));
+    ["points", "concededGoals", "scoredGoals", "goalAverage"].forEach((key) =>
+      this.set(key, "0")
+    );
   }
 
   public set(key: string, value: string): void {
     switch (key) {
-      case 'points': {
+      case "points": {
         this.points = Number(value);
         break;
       }
-      case 'concededGoals': {
+      case "concededGoals": {
         this.concededGoals = Number(value);
         break;
       }
-      case 'scoredGoals': {
+      case "scoredGoals": {
         this.scoredGoals = Number(value);
         break;
       }
-      case 'goalAverage': {
+      case "goalAverage": {
         this.goalAverage = Number(value);
         break;
       }

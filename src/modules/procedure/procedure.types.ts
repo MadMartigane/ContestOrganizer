@@ -1,20 +1,23 @@
-import { Tournament } from "../tournaments/tournaments.types";
+import type { Tournament } from "../tournaments/tournaments.types";
 
-export type ProcedureDataType = "OK" | "NOT_SUPPORTED" | "NOT_IMPLEMENTED" | "500" | "NOT_FOUND";
+export type ProcedureDataType =
+  | "OK"
+  | "NOT_SUPPORTED"
+  | "NOT_IMPLEMENTED"
+  | "500"
+  | "NOT_FOUND";
 
 export type ProcedureError = {
-    message: string;
-}
+  message: string;
+};
 export type ProcedureData = {
-    procedure: ProcedureDataType;
-    data: unknown;
-    error: ProcedureError;
-    debug: Array<string>;
-}
+  procedure: ProcedureDataType;
+  data: unknown;
+  error: ProcedureError;
+  debug: Array<string>;
+};
 
 export type ProcedureContentStoredTournaments = {
-    timestamp: number;
-    tournaments: Array<Tournament>;
-}
-
-
+  timestamp: number;
+  tournaments: Array<Tournament>;
+};

@@ -1,15 +1,19 @@
-import { Component, h, Host, State } from '@stencil/core';
-import { Tournament, TournamentType, TournamentTypeLabel } from '../../modules/tournaments/tournaments.types';
-import tournaments from '../../modules/tournaments/tournaments';
-import Utils from '../../modules/utils/utils';
-import SlSelect from '@shoelace-style/shoelace/dist/components/select/select.component';
-import SlMenu from '@shoelace-style/shoelace/dist/components/menu/menu.component';
-import SlMenuItem from '@shoelace-style/shoelace/dist/components/menu-item/menu-item.component';
-import SlInput from '@shoelace-style/shoelace/dist/components/input/input.component';
+import type SlInput from "@shoelace-style/shoelace/dist/components/input/input.component";
+import type SlMenu from "@shoelace-style/shoelace/dist/components/menu/menu.component";
+import type SlMenuItem from "@shoelace-style/shoelace/dist/components/menu-item/menu-item.component";
+import type SlSelect from "@shoelace-style/shoelace/dist/components/select/select.component";
+import { Component, Host, h, State } from "@stencil/core";
+import tournaments from "../../modules/tournaments/tournaments";
+import {
+  type Tournament,
+  TournamentType,
+  TournamentTypeLabel,
+} from "../../modules/tournaments/tournaments.types";
+import Utils from "../../modules/utils/utils";
 
 @Component({
-  tag: 'page-tournament-select',
-  styleUrl: 'page-tournament-select.css',
+  tag: "page-tournament-select",
+  styleUrl: "page-tournament-select.css",
   shadow: false,
 })
 export class PageTournamentSelect {
@@ -18,7 +22,7 @@ export class PageTournamentSelect {
   private domSelect: SlSelect;
   private domTournamentList: SlMenu;
   private domTournamentName: SlInput;
-  private uiAddingTournamentJustOpened: boolean = false;
+  private uiAddingTournamentJustOpened = false;
 
   @State() private uiAddingTournament: boolean;
   @State() private numberOfTournaments: number;
@@ -50,9 +54,13 @@ export class PageTournamentSelect {
   }
 
   public componentDidRender() {
-    Utils.installEventHandler(this.domTournamentList, 'sl-select', (ev: CustomEvent) => {
-      this.goPageTournament(ev);
-    });
+    Utils.installEventHandler(
+      this.domTournamentList,
+      "sl-select",
+      (ev: CustomEvent) => {
+        this.goPageTournament(ev);
+      }
+    );
 
     if (this.uiAddingTournamentJustOpened) {
       Utils.setFocus(this.domTournamentName);
@@ -64,7 +72,9 @@ export class PageTournamentSelect {
     const detail = ev.detail as { item: SlMenuItem };
     const tournamentId = detail.item.dataset.tournamentId;
     if (!tournamentId) {
-      throw new Error('<page-tournament-select> Unable to navigate to tournament page, missing tournament id.');
+      throw new Error(
+        "<page-tournament-select> Unable to navigate to tournament page, missing tournament id."
+      );
     }
 
     window.location.hash = `#/tournament/${tournamentId}`;
@@ -75,7 +85,9 @@ export class PageTournamentSelect {
     event.stopPropagation();
 
     const tournament = await this.tournaments.get(id);
-    const confirm = await Utils.confirmChoice(`Supprimer le tournoi: ${tournament?.name}?`);
+    const confirm = await Utils.confirmChoice(
+      `Supprimer le tournoi: ${tournament?.name}?`
+    );
     if (confirm) {
       this.removeTournament(id);
     }
@@ -112,7 +124,7 @@ export class PageTournamentSelect {
     this.uiAddingTournament = false;
   }
 
-  private async onKeyPressNewName(event: KeyboardEvent) {
+  private onKeyPressNewName(event: KeyboardEvent) {
     const value = this.getNewTournamentNameValue();
     if (!value) {
       return;
@@ -125,11 +137,11 @@ export class PageTournamentSelect {
 
     this.isNewTournamentNameReady = true;
 
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
       this.addTournament();
     }
 
-    if (event.key === 'ArrowDown') {
+    if (event.key === "ArrowDown") {
       Utils.setFocus(this.domSelect);
     }
   }
@@ -149,34 +161,44 @@ export class PageTournamentSelect {
     return (
       <sl-card class="card-common">
         <sl-input
-          size="large"
+          autofocus
           class="my-4"
           label="Nom du tournois"
-          placeholder="Playoff"
-          autofocus
           minLength="2"
           name="tournoiNewName"
           onKeyDown={(ev: KeyboardEvent) => this.onKeyPressNewName(ev)}
+          placeholder="Playoff"
           ref={(el: SlInput) => {
             this.domTournamentName = el;
           }}
-        ></sl-input>
+          size="large"
+        />
 
         <div>
           <sl-select
+            help-text="(defaut: Foot ⚽️)"
             label="Quel sport ? "
+            placeholder="Basket, NBA, Foot, …"
             ref={(el: SlSelect) => {
               this.domSelect = el;
             }}
             size="large"
-            help-text="(defaut: Foot ⚽️)"
-            placeholder="Basket, NBA, Foot, …"
           >
-            <sl-option value={TournamentType.NBA}>{TournamentTypeLabel.NBA}</sl-option>
-            <sl-option value={TournamentType.RUGBY}>{TournamentTypeLabel.RUGBY}</sl-option>
-            <sl-option value={TournamentType.NFL}>{TournamentTypeLabel.NFL}</sl-option>
-            <sl-option value={TournamentType.BASKET}>{TournamentTypeLabel.BASKET}</sl-option>
-            <sl-option value={TournamentType.FOOT}>{TournamentTypeLabel.FOOT}</sl-option>
+            <sl-option value={TournamentType.NBA}>
+              {TournamentTypeLabel.NBA}
+            </sl-option>
+            <sl-option value={TournamentType.RUGBY}>
+              {TournamentTypeLabel.RUGBY}
+            </sl-option>
+            <sl-option value={TournamentType.NFL}>
+              {TournamentTypeLabel.NFL}
+            </sl-option>
+            <sl-option value={TournamentType.BASKET}>
+              {TournamentTypeLabel.BASKET}
+            </sl-option>
+            <sl-option value={TournamentType.FOOT}>
+              {TournamentTypeLabel.FOOT}
+            </sl-option>
           </sl-select>
         </div>
 
@@ -188,12 +210,17 @@ export class PageTournamentSelect {
             size="large"
             variant="warning"
           >
-            <sl-icon slot="prefix" name="dash-lg" class="class-2xl"></sl-icon>
+            <sl-icon class="class-2xl" name="dash-lg" slot="prefix" />
             Annuler
           </sl-button>
 
-          <sl-button onclick={() => this.addTournament()} size="large" variant="primary" disabled={!this.isNewTournamentNameReady}>
-            <sl-icon slot="prefix" name="plus-lg" class="class-2xl"></sl-icon>
+          <sl-button
+            disabled={!this.isNewTournamentNameReady}
+            onclick={() => this.addTournament()}
+            size="large"
+            variant="primary"
+          >
+            <sl-icon class="class-2xl" name="plus-lg" slot="prefix" />
             Ajouter
           </sl-button>
         </div>
@@ -205,13 +232,13 @@ export class PageTournamentSelect {
     return (
       <sl-card class="card-common">
         <sl-button
-          variant="primary"
           onclick={() => {
             this.displayUiAddingTournament();
           }}
           size="large"
+          variant="primary"
         >
-          <sl-icon slot="prefix" name="plus-lg" class="class-2xl"></sl-icon>
+          <sl-icon class="class-2xl" name="plus-lg" slot="prefix" />
           Nouveau tournoi
         </sl-button>
       </sl-card>
@@ -229,16 +256,26 @@ export class PageTournamentSelect {
           <sl-menu-item data-tournament-id={tournament.id}>
             <span slot="prefix">
               <span class="container-s">
-                {tournament.name} - {this.tournaments.getTournamentTypeLabel(tournament.type)}
+                {tournament.name} -{" "}
+                {this.tournaments.getTournamentTypeLabel(tournament.type)}
               </span>
-              <sl-badge variant="neutral" pill>
+              <sl-badge pill variant="neutral">
                 {tournament.grid.length}
               </sl-badge>
             </span>
 
             <span slot="suffix">
-              <sl-icon class="text-warning text-2xl container-s" onclick={(ev: Event) => this.confirmRemoveTournament(ev, tournament.id)} name="trash3"></sl-icon>
-              <sl-icon class="text-neutral text-2xl container-s" name="arrow-right-circle"></sl-icon>
+              <sl-icon
+                class="container-s text-2xl text-warning"
+                name="trash3"
+                onclick={(ev: Event) =>
+                  this.confirmRemoveTournament(ev, tournament.id)
+                }
+              />
+              <sl-icon
+                class="container-s text-2xl text-neutral"
+                name="arrow-right-circle"
+              />
             </span>
           </sl-menu-item>
         ))}
@@ -250,7 +287,8 @@ export class PageTournamentSelect {
     return (
       <div class="sl-text-center">
         <h1>
-          <sl-icon name="trophy" class="text-3xl text-warning"></sl-icon> Pas encore de tournois <sl-icon name="dribbble" class="text-2xl text-success"></sl-icon>
+          <sl-icon class="text-3xl text-warning" name="trophy" /> Pas encore de
+          tournois <sl-icon class="text-2xl text-success" name="dribbble" />
         </h1>
       </div>
     );
@@ -261,19 +299,23 @@ export class PageTournamentSelect {
       <Host>
         <sl-breadcrumb>
           <sl-breadcrumb-item href="#/home">
-            <sl-icon name="house" class="text-2xl"></sl-icon>
+            <sl-icon class="text-2xl" name="house" />
           </sl-breadcrumb-item>
           <sl-breadcrumb-item>
-            <sl-icon name="trophy" class="text-2xl"></sl-icon>
+            <sl-icon class="text-2xl" name="trophy" />
           </sl-breadcrumb-item>
         </sl-breadcrumb>
 
         <div class="page-content">
-          {this.numberOfTournaments ? this.renderTournamentList() : this.renderNoTournamentInfo()}
+          {this.numberOfTournaments
+            ? this.renderTournamentList()
+            : this.renderNoTournamentInfo()}
 
-          <sl-divider></sl-divider>
+          <sl-divider />
 
-          {this.uiAddingTournament ? this.renderAddTournament() : this.renderNewTournamentButton()}
+          {this.uiAddingTournament
+            ? this.renderAddTournament()
+            : this.renderNewTournamentButton()}
         </div>
       </Host>
     );

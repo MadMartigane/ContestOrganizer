@@ -96,7 +96,7 @@ export namespace Components {
     }
     interface MadTeamTile {
         "rank"?: number;
-        "reverse": Boolean | null;
+        "reverse": boolean | null;
         "team": GenericTeam1 | null;
     }
     interface Page404 {
@@ -437,7 +437,7 @@ declare namespace LocalJSX {
     }
     interface MadTeamTile {
         "rank"?: number;
-        "reverse"?: Boolean | null;
+        "reverse"?: boolean | null;
         "team"?: GenericTeam1 | null;
     }
     interface Page404 {

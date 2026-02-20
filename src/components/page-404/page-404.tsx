@@ -1,8 +1,8 @@
-import { Component, Host, h } from '@stencil/core';
+import { Component, Host, h } from "@stencil/core";
 
 @Component({
-  tag: 'page-404',
-  styleUrl: 'page-404.css',
+  tag: "page-404",
+  styleUrl: "page-404.css",
   shadow: false,
 })
 export class Page404 {
@@ -11,9 +11,9 @@ export class Page404 {
       <Host>
         <sl-breadcrumb>
           <sl-breadcrumb-item>
-            <sl-icon name="4-circle" class="text-2xl"></sl-icon>
-            <sl-icon name="0-circle" class="text-2xl"></sl-icon>
-            <sl-icon name="4-circle" class="text-2xl"></sl-icon>
+            <sl-icon class="text-2xl" name="4-circle" />
+            <sl-icon class="text-2xl" name="0-circle" />
+            <sl-icon class="text-2xl" name="4-circle" />
           </sl-breadcrumb-item>
         </sl-breadcrumb>
 
@@ -22,22 +22,28 @@ export class Page404 {
 
           <sl-carousel autoplay loop pagination>
             <sl-carousel-item>
-              <img alt="404 - Not found" src="/assets/img/undraw_page_not_found.svg" />
+              <img
+                alt="404 - Not found"
+                src="/assets/img/undraw_page_not_found.svg"
+              />
             </sl-carousel-item>
             <sl-carousel-item>
-              <img alt="404 - Page abducted" src="/assets/img/undraw_taken.svg" />
+              <img
+                alt="404 - Page abducted"
+                src="/assets/img/undraw_taken.svg"
+              />
             </sl-carousel-item>
           </sl-carousel>
 
           <div class="footer">
             <div class="grid-300">
-              <sl-button variant="primary" href="#/home" size="large">
-                <sl-icon name="house" slot="prefix"></sl-icon>
+              <sl-button href="#/home" size="large" variant="primary">
+                <sl-icon name="house" slot="prefix" />
                 <span slot="suffix">Accueil</span>
               </sl-button>
 
-              <sl-button variant="primary" href="#/tournaments" size="large">
-                <sl-icon name="trophy" slot="prefix"></sl-icon>
+              <sl-button href="#/tournaments" size="large" variant="primary">
+                <sl-icon name="trophy" slot="prefix" />
                 <span slot="suffix">Tournois</span>
               </sl-button>
             </div>

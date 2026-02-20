@@ -1,19 +1,31 @@
-import TeamRow from '../team-row/team-row';
-import { Tournament } from '../tournaments/tournaments.types';
-import { MatchStatus } from '../matchs/matchs.d';
-import { CommonGridData } from './data-common.d';
+import { MatchStatus } from "../matchs/matchs";
+import type TeamRow from "../team-row/team-row";
+import type { Tournament } from "../tournaments/tournaments.types";
+import type { CommonGridData } from "./data-common.d";
 
 export default class Common {
   public static data(tournament: Tournament) {
-    const commonData = tournament.grid.map(teamRow => {
-      return this.getOneTeamData(tournament, teamRow);
+    const commonData = tournament.grid.map((teamRow) => {
+      return Common.getOneTeamData(tournament, teamRow);
     });
 
-    commonData.sort((teamA, teamB) => (teamA?.concededPoints || 0) - (teamB?.concededPoints || 0));
-    commonData.sort((teamA, teamB) => (teamB?.scoredPoints || 0) - (teamA?.scoredPoints || 0));
-    commonData.sort((teamA, teamB) => (teamA?.looseGames || 0) - (teamB?.looseGames || 0));
-    commonData.sort((teamA, teamB) => (teamB?.winGames || 0) - (teamA?.winGames || 0));
-    commonData.sort((teamA, teamB) => (teamB?.winGamesPercent || 0) - (teamA?.winGamesPercent || 0));
+    commonData.sort(
+      (teamA, teamB) =>
+        (teamA?.concededPoints || 0) - (teamB?.concededPoints || 0)
+    );
+    commonData.sort(
+      (teamA, teamB) => (teamB?.scoredPoints || 0) - (teamA?.scoredPoints || 0)
+    );
+    commonData.sort(
+      (teamA, teamB) => (teamA?.looseGames || 0) - (teamB?.looseGames || 0)
+    );
+    commonData.sort(
+      (teamA, teamB) => (teamB?.winGames || 0) - (teamA?.winGames || 0)
+    );
+    commonData.sort(
+      (teamA, teamB) =>
+        (teamB?.winGamesPercent || 0) - (teamA?.winGamesPercent || 0)
+    );
 
     return commonData;
   }
@@ -31,7 +43,7 @@ export default class Common {
       winGamesPercent: 0,
     } as CommonGridData;
 
-    tournament.matchs.forEach(match => {
+    tournament.matchs.forEach((match) => {
       if (match.status !== MatchStatus.DONE) {
         return;
       }
@@ -44,15 +56,21 @@ export default class Common {
         gridData.scoredPoints += match.goals.host;
         gridData.concededPoints += match.goals.visitor;
 
-        match.goals.host > match.goals.visitor ? gridData.winGames++ : gridData.looseGames++;
+        match.goals.host > match.goals.visitor
+          ? gridData.winGames++
+          : gridData.looseGames++;
       } else {
         gridData.scoredPoints += match.goals.visitor;
         gridData.concededPoints += match.goals.host;
 
-        match.goals.host > match.goals.visitor ? gridData.looseGames++ : gridData.winGames++;
+        match.goals.host > match.goals.visitor
+          ? gridData.looseGames++
+          : gridData.winGames++;
       }
 
-      gridData.winGamesPercent = Math.round((gridData.winGames / (gridData.winGames + gridData.looseGames)) * 100);
+      gridData.winGamesPercent = Math.round(
+        (gridData.winGames / (gridData.winGames + gridData.looseGames)) * 100
+      );
     });
 
     return gridData;

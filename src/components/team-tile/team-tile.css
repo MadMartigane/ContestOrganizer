@@ -1,37 +1,39 @@
 .rank-badge {
   position: absolute;
   top: -14px;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
+  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 28px;
+  height: 28px;
   font-weight: bold;
   color: #1a1a1a;
   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  z-index: 100;
+  border-radius: 50%;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .rank-badge.rank-1 {
-  background: linear-gradient(to bottom, #FFD700, #B8860B);
-  border: 1.5px solid #FFFACD;
+  background: linear-gradient(to bottom, #ffd700, #b8860b);
+  border: 1.5px solid #fffacd;
 }
 
 .rank-badge.rank-2 {
-  background: linear-gradient(to bottom, #E8E8E8, #A0A0A0);
-  border: 1.5px solid #FFFFFF;
+  background: linear-gradient(to bottom, #e8e8e8, #a0a0a0);
+  border: 1.5px solid #ffffff;
 }
 
 .rank-badge.rank-3 {
-  background: linear-gradient(to bottom, #CD7F32, #8B4513);
-  border: 1.5px solid #FFFACD;
+  background: linear-gradient(to bottom, #cd7f32, #8b4513);
+  border: 1.5px solid #fffacd;
 }
 
 .rank-badge.rank-other {
   background: linear-gradient(to bottom, #e0f2fe, #7dd3fc);
-  border: 1.5px solid #FFFFFF;
+  border: 1.5px solid #ffffff;
 }
 
 .rank-badge-left {

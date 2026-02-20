@@ -1,5 +1,9 @@
-import { PROCEDURE_TYPE_ERROR } from './procedure.constants';
-import { ProcedureData, ProcedureDataType, ProcedureError } from './procedure.types';
+import { PROCEDURE_TYPE_ERROR } from "./procedure.constants";
+import type {
+  ProcedureData,
+  ProcedureDataType,
+  ProcedureError,
+} from "./procedure.types";
 
 export class Procedure {
   private type: ProcedureDataType | null;
@@ -55,9 +59,11 @@ export class Procedure {
 
   public toString(): string {
     if (!this.type) {
-      return '';
+      return "";
     }
 
-    return this.isOk() ? JSON.stringify(this.data) : (this.error && this.error.message) || '';
+    return this.isOk()
+      ? JSON.stringify(this.data)
+      : (this.error && this.error.message) || "";
   }
 }

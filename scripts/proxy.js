@@ -60,7 +60,7 @@ function launchServer(
   proxyHost = DEFAULT_DEV_HOST,
   proxyPort = DEFAULT_PROXY_PORT,
   devHost = DEFAULT_DEV_HOST,
-  devPort = DEFAULT_DEV_PORT,
+  devPort = DEFAULT_DEV_PORT
 ) {
   /*
    * Listen to the `upgrade` event and proxy the
@@ -68,7 +68,7 @@ function launchServer(
    */
   const devProxy = getDevProxy(devHost, devPort);
   const server = http.createServer((req, res) =>
-    requestListener(req, res, devProxy),
+    requestListener(req, res, devProxy)
   );
   server.on("upgrade", (req, socket, head) => {
     devProxy.ws(req, socket, head);
@@ -76,23 +76,23 @@ function launchServer(
 
   server.listen(proxyPort, proxyHost, () => {
     console.log(
-      ` 🌎 [START]: proxy server listening on ${proxyHost}:${proxyPort}`,
+      ` 🌎 [START]: proxy server listening on ${proxyHost}:${proxyPort}`
     );
     console.log(
-      ` 🌎 [START]: on behalf [API] ${API_OPTIONS.protocol}//${API_OPTIONS.hostname}:${API_OPTIONS.port}${API_OPTIONS.path}`,
+      ` 🌎 [START]: on behalf [API] ${API_OPTIONS.protocol}//${API_OPTIONS.hostname}:${API_OPTIONS.port}${API_OPTIONS.path}`
     );
     console.log(
-      ` 🌎 [START]: and       [DEV] http://${proxyHost}:${proxyPort}`,
+      ` 🌎 [START]: and       [DEV] http://${proxyHost}:${proxyPort}`
     );
   });
 }
 
-async function main(proxyHost, proxyPort, defaultDevHost, defaultDevPort) {
+function main(proxyHost, proxyPort, defaultDevHost, defaultDevPort) {
   console.warn(
-    "=========== ContestOrganizer API & Stencil proxy =====================",
+    "=========== ContestOrganizer API & Stencil proxy ====================="
   );
   console.warn(
-    "======================================================================",
+    "======================================================================"
   );
   console.warn(" ");
   console.warn(" ");
@@ -101,7 +101,7 @@ async function main(proxyHost, proxyPort, defaultDevHost, defaultDevPort) {
   let devPort;
   if (args.length > 0) {
     const argDevPort = args.at(0);
-    const checkPort = parseInt(argDevPort, 10);
+    const checkPort = Number.parseInt(argDevPort, 10);
     if (Number.isNaN(checkPort)) {
       console.warn("⚠️  The first argument must be the port number.");
       process.exit(1);
@@ -120,5 +120,5 @@ main(
   DEFAULT_PROXY_HOST,
   DEFAULT_PROXY_PORT,
   DEFAULT_DEV_HOST,
-  DEFAULT_DEV_PORT,
+  DEFAULT_DEV_PORT
 );

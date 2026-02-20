@@ -1,11 +1,12 @@
-import { Component, Host, h, State } from '@stencil/core';
-import setting, { GlobalSetting } from '../../modules/global-setting/global-setting';
-
-import SlSwitch from '@shoelace-style/shoelace/dist/components/switch/switch.js';
+import type SlSwitch from "@shoelace-style/shoelace/dist/components/switch/switch.js";
+import { Component, Host, h, State } from "@stencil/core";
+import setting, {
+  type GlobalSetting,
+} from "../../modules/global-setting/global-setting";
 
 @Component({
-  tag: 'page-config',
-  styleUrl: 'page-config.css',
+  tag: "page-config",
+  styleUrl: "page-config.css",
   shadow: false,
 })
 export class PageConfig {
@@ -25,7 +26,7 @@ export class PageConfig {
 
   private installEventHandler() {
     if (this.darkModeSwitch) {
-      this.darkModeSwitch.addEventListener('sl-change', () => {
+      this.darkModeSwitch.addEventListener("sl-change", () => {
         this.onDarkModeChange();
       });
     }
@@ -45,27 +46,31 @@ export class PageConfig {
       <Host>
         <sl-breadcrumb>
           <sl-breadcrumb-item>
-            <sl-icon name="gear" class="text-2xl"></sl-icon>
+            <sl-icon class="text-2xl" name="gear" />
           </sl-breadcrumb-item>
         </sl-breadcrumb>
 
         <div class="page-content">
           <h1>Configuration</h1>
 
-          <sl-switch ref={(el: SlSwitch) => (this.darkModeSwitch = el)} checked={this.initialDarkModeActivated} size="large">
+          <sl-switch
+            checked={this.initialDarkModeActivated}
+            ref={(el: SlSwitch) => (this.darkModeSwitch = el)}
+            size="large"
+          >
             <span class="container">Mode sombre</span>
-            <sl-icon name="highlights"></sl-icon>
+            <sl-icon name="highlights" />
           </sl-switch>
 
           <div class="footer">
             <div class="grid-300">
-              <sl-button variant="primary" href="#/home" size="large">
-                <sl-icon name="house" slot="prefix"></sl-icon>
+              <sl-button href="#/home" size="large" variant="primary">
+                <sl-icon name="house" slot="prefix" />
                 <span slot="suffix">Acceuil</span>
               </sl-button>
 
-              <sl-button variant="primary" href="#/tournaments" size="large">
-                <sl-icon name="trophy" slot="prefix"></sl-icon>
+              <sl-button href="#/tournaments" size="large" variant="primary">
+                <sl-icon name="trophy" slot="prefix" />
                 <span slot="suffix">Tournois</span>
               </sl-button>
             </div>

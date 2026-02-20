@@ -1,12 +1,23 @@
-import { Component, Event, EventEmitter, h, Host, Prop, State } from '@stencil/core';
-import { Tournament, TournamentUpdateEvent } from '../../modules/tournaments/tournaments.types';
-import tournaments from '../../modules/tournaments/tournaments';
-import Basket from '../../modules/data-basket/data-basket';
-import { GridTeamOnUpdateDetail } from '../../modules/grid-common/grid-common.types';
+import {
+  Component,
+  Event,
+  type EventEmitter,
+  Host,
+  h,
+  Prop,
+  State,
+} from "@stencil/core";
+import Basket from "../../modules/data-basket/data-basket";
+import type { GridTeamOnUpdateDetail } from "../../modules/grid-common/grid-common.types";
+import tournaments from "../../modules/tournaments/tournaments";
+import type {
+  Tournament,
+  TournamentUpdateEvent,
+} from "../../modules/tournaments/tournaments.types";
 
 @Component({
-  tag: 'grid-basket',
-  styleUrl: 'grid-basket.css',
+  tag: "grid-basket",
+  styleUrl: "grid-basket.css",
   shadow: false,
 })
 export class GridBasket {
@@ -46,7 +57,9 @@ export class GridBasket {
   }
 
   private onTeamTeamChange(detail: GridTeamOnUpdateDetail): void {
-    const gridRaw = this.tournament?.grid.find(grid => grid.id === detail.tournamentGridId);
+    const gridRaw = this.tournament?.grid.find(
+      (grid) => grid.id === detail.tournamentGridId
+    );
 
     if (gridRaw) {
       gridRaw.team = detail.genericTeam;
@@ -67,14 +80,14 @@ export class GridBasket {
     return (
       <thead class="block-primary align-middle">
         <th>
-          <sl-icon name="sort-numeric-down" class="text-2xl"></sl-icon>
+          <sl-icon class="text-2xl" name="sort-numeric-down" />
         </th>
         <th>
           <span>Équipes</span>
         </th>
         <th>
           <span class="block text-xl">
-            <sl-icon name="percent"></sl-icon>
+            <sl-icon name="percent" />
           </span>
         </th>
         <th>
@@ -82,24 +95,24 @@ export class GridBasket {
           <span class="hidden md:block">Joués</span>
         </th>
         <th>
-          <span class="block md:hidden text-success">G</span>
-          <span class="hidden md:block text-success">Gagnés</span>
+          <span class="block text-success md:hidden">G</span>
+          <span class="hidden text-success md:block">Gagnés</span>
         </th>
         <th>
-          <span class="block md:hidden text-warning">P</span>
-          <span class="hidden md:block text-warning">Perdus</span>
+          <span class="block text-warning md:hidden">P</span>
+          <span class="hidden text-warning md:block">Perdus</span>
         </th>
         <th>
-          <span class="block md:hidden text-success text-xl">
-            <sl-icon name="plus-lg"></sl-icon>
+          <span class="block text-success text-xl md:hidden">
+            <sl-icon name="plus-lg" />
           </span>
-          <span class="hidden md:block text-success">Marqués</span>
+          <span class="hidden text-success md:block">Marqués</span>
         </th>
         <th>
-          <span class="block md:hidden text-warning text-xl">
-            <sl-icon name="dash-lg"></sl-icon>
+          <span class="block text-warning text-xl md:hidden">
+            <sl-icon name="dash-lg" />
           </span>
-          <span class="hidden md:block text-warning">Encaissés</span>
+          <span class="hidden text-warning md:block">Encaissés</span>
         </th>
       </thead>
     );
@@ -113,23 +126,25 @@ export class GridBasket {
       return null;
     }
 
-    return gridDatas.map(gridData => (
+    return gridDatas.map((gridData) => (
       <tr class="">
         <td>
           <span class="counter">
-            {counter > 8 ? null : '0'}
+            {counter > 8 ? null : "0"}
             {++counter}
           </span>
         </td>
         <td>
           <mad-select-team
-            value={gridData?.team}
             color="dark"
-            type={this.tournament?.type}
-            tournamentGridId={gridData?.tournamentGridId}
-            onMadSelectChange={(ev: CustomEvent<GridTeamOnUpdateDetail>) => this.onTeamTeamChange(ev.detail)}
+            onMadSelectChange={(ev: CustomEvent<GridTeamOnUpdateDetail>) =>
+              this.onTeamTeamChange(ev.detail)
+            }
             placeholder="Équipe vide"
-          ></mad-select-team>
+            tournamentGridId={gridData?.tournamentGridId}
+            type={this.tournament?.type}
+            value={gridData?.team}
+          />
         </td>
         <td>
           <span class="text-primary">{gridData?.winGamesPercent}</span>
@@ -158,18 +173,18 @@ export class GridBasket {
       <Host>
         <table class="my-6">
           <caption class="caption-bottom md:hidden">
-            <div class="text-neutral text-xs text-left text-wrap">
-              <span class="text-primary mx-1">
-                <sl-icon name="percent"></sl-icon>: pourcentage de match gagnés.
+            <div class="text-wrap text-left text-neutral text-xs">
+              <span class="mx-1 text-primary">
+                <sl-icon name="percent" />: pourcentage de match gagnés.
               </span>
               <span class="mx-1">J: total de match joués</span>
-              <span class="text-success mx-1">G: match gagnés</span>
-              <span class="text-warning mx-1">P: match perdus</span>
-              <span class="text-success mx-1">
-                <sl-icon name="plus-lg"></sl-icon>: points marqués
+              <span class="mx-1 text-success">G: match gagnés</span>
+              <span class="mx-1 text-warning">P: match perdus</span>
+              <span class="mx-1 text-success">
+                <sl-icon name="plus-lg" />: points marqués
               </span>
-              <span class="text-warning mx-1">
-                <sl-icon name="dash-lg"></sl-icon>: points encaissés
+              <span class="mx-1 text-warning">
+                <sl-icon name="dash-lg" />: points encaissés
               </span>
             </div>
           </caption>

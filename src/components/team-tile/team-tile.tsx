@@ -1,10 +1,10 @@
-import { Component, Host, Prop, h, State, Watch } from '@stencil/core';
-import apiFutDB from '../../modules/futbd/futdb';
-import { GenericTeam } from '../../components.d';
+import { Component, Host, h, Prop, State, Watch } from "@stencil/core";
+import type { GenericTeam } from "../../components.d";
+import apiFutDB from "../../modules/futbd/futdb";
 
 @Component({
-  tag: 'mad-team-tile',
-  styleUrl: './team-tile.css',
+  tag: "mad-team-tile",
+  styleUrl: "./team-tile.css",
   shadow: false,
 })
 export class MadTeamTile {
@@ -13,7 +13,7 @@ export class MadTeamTile {
   @State() private imgSrc: string;
 
   @Prop() team: GenericTeam | null;
-  @Prop() reverse: Boolean | null;
+  @Prop() reverse: boolean | null;
   @Prop() rank?: number;
 
   constructor() {
@@ -25,16 +25,16 @@ export class MadTeamTile {
   private loadImg(id: number | null) {
     if (this.team?.logo) {
       setTimeout(() => {
-        this.imgSrc = this.team?.logo || '';
+        this.imgSrc = this.team?.logo || "";
       });
     } else if (id) {
-      this.apiFutDB.loadTeamImage(id).then(base64Img => {
+      this.apiFutDB.loadTeamImage(id).then((base64Img) => {
         this.imgSrc = base64Img;
       });
     }
   }
 
-  @Watch('team')
+  @Watch("team")
   onTeamChange(newTeam: GenericTeam | null) {
     if (!newTeam) {
       return;
@@ -46,17 +46,49 @@ export class MadTeamTile {
   render() {
     return (
       <Host class="relative">
-        {this.rank && <div class={`rank-badge rank-${this.rank <= 3 ? this.rank : 'other'} ${this.reverse ? 'rank-badge-left' : 'rank-badge-right'}`}>{this.rank}</div>}
+        {this.rank && (
+          <div
+            class={`rank-badge rank-${this.rank <= 3 ? this.rank : "other"} ${this.reverse ? "rank-badge-left" : "rank-badge-right"}`}
+          >
+            {this.rank}
+          </div>
+        )}
         <div class="w-full">
           {this.team && this.imgSrc ? (
-            <div class={this.reverse ? 'w-full md:w-1/2 min-h-8' : 'w-full md:w-1/2 min-h-8'}>
-              <img class={this.reverse ? 'w-16 float-right' : 'w-16 float-left'} alt={`${this.team?.name} club logo`} src={this.imgSrc} />
+            <div
+              class={
+                this.reverse
+                  ? "min-h-8 w-full md:w-1/2"
+                  : "min-h-8 w-full md:w-1/2"
+              }
+            >
+              <img
+                alt={`${this.team?.name} club logo`}
+                class={this.reverse ? "float-right w-16" : "float-left w-16"}
+                src={this.imgSrc}
+              />
             </div>
           ) : null}
 
-          <div class={this.reverse ? 'w-full md:w-1/2 float-right md:float-none min-h-8' : 'w-full md:w-1/2 float-left md:float-none min-h-8'}>
-            <div class={this.reverse ? 'w-full text-right my-1 float-right' : 'w-full text-left float-left my-1'}>
-              {this.team ? <span class="text-balance">{this.team?.name}</span> : <span>⏳</span>}
+          <div
+            class={
+              this.reverse
+                ? "float-right min-h-8 w-full md:float-none md:w-1/2"
+                : "float-left min-h-8 w-full md:float-none md:w-1/2"
+            }
+          >
+            <div
+              class={
+                this.reverse
+                  ? "float-right my-1 w-full text-right"
+                  : "float-left my-1 w-full text-left"
+              }
+            >
+              {this.team ? (
+                <span class="text-balance">{this.team?.name}</span>
+              ) : (
+                <span>⏳</span>
+              )}
             </div>
           </div>
         </div>
