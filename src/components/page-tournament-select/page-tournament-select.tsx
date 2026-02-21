@@ -211,7 +211,7 @@ export class PageTournamentSelect {
             size="large"
             variant="warning"
           >
-            <sl-icon class="class-2xl" name="dash-lg" slot="prefix" />
+            <sl-icon class="text-2xl" name="dash-lg" slot="prefix" />
             Annuler
           </sl-button>
 
@@ -221,7 +221,7 @@ export class PageTournamentSelect {
             size="large"
             variant="primary"
           >
-            <sl-icon class="class-2xl" name="plus-lg" slot="prefix" />
+            <sl-icon class="text-2xl" name="plus-lg" slot="prefix" />
             Ajouter
           </sl-button>
         </div>
@@ -239,7 +239,7 @@ export class PageTournamentSelect {
           size="large"
           variant="primary"
         >
-          <sl-icon class="class-2xl" name="plus-lg" slot="prefix" />
+          <sl-icon class="text-2xl" name="plus-lg" slot="prefix" />
           Nouveau tournoi
         </sl-button>
       </sl-card>

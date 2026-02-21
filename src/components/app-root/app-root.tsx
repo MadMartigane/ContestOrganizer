@@ -25,7 +25,7 @@ export class AppRoot {
         <mad-route component="page-home" url="/home" />
         <mad-route component="page-tournament-select" url="/tournaments" />
         <mad-route
-          component="page-team-select"
+          component="mad-select-team"
           url="/team-select/:teamId/:teamType"
         />
         <mad-route
