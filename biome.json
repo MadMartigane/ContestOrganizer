@@ -40,6 +40,12 @@
           }
         }
       }
+    },
+    {
+      "includes": ["src/components.d.ts"],
+      "linter": {
+        "enabled": false
+      }
     }
   ],
   "extends": ["ultracite/biome/core"]

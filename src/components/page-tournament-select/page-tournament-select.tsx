@@ -171,6 +171,7 @@ export class PageTournamentSelect {
           ref={(el: SlInput) => {
             this.domTournamentName = el;
           }}
+          role="textbox"
           size="large"
         />
 

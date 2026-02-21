@@ -18,7 +18,7 @@ import {
 export class Tournaments {
   private readonly CACHE_KEY: string;
   private readonly uuid: typeof uuid;
-  private readonly callbackCollector: Function[];
+  private readonly callbackCollector: ((num?: number) => void)[];
   private readonly httpRequest: HttpRequest;
 
   private tournaments: Tournament[];
@@ -65,24 +65,43 @@ export class Tournaments {
     return null;
   }
 
-  private async restore(): Promise<number> {
-    const tournamentsString = this.getTournamentsCache();
-    let localTournaments: {
-      timestamp: number;
-      tournaments: Tournament[];
-    } | null = null;
+  private parseLocalTournaments(tournamentsString: string | null): {
+    timestamp: number;
+    tournaments: Tournament[];
+  } | null {
+    if (!tournamentsString) {
+      return null;
+    }
 
-    if (tournamentsString) {
-      try {
-        localTournaments = JSON.parse(tournamentsString);
-      } catch (e) {
-        console.warn(
-          "[Tournaments] Unable to parse stored tournaments. Cleanning of cache. ",
-          e
-        );
-        localStorage.removeItem(this.CACHE_KEY);
+    try {
+      return JSON.parse(tournamentsString);
+    } catch (e) {
+      console.warn(
+        "[Tournaments] Unable to parse stored tournaments. Cleanning of cache. ",
+        e
+      );
+      localStorage.removeItem(this.CACHE_KEY);
+      return null;
+    }
+  }
+
+  private instantiateTournaments(tournaments: Tournament[]): void {
+    for (const t of tournaments) {
+      for (let i = 0, imax = t.grid.length; i < imax; i++) {
+        const teamRow = new TeamRow({ id: t.grid[i].id, type: t.grid[i].type });
+        teamRow.fromData(t.grid[i]);
+        t.grid[i] = teamRow;
+      }
+
+      if (!t.matchs) {
+        t.matchs = [];
       }
     }
+  }
+
+  private async restore(): Promise<number> {
+    const tournamentsString = this.getTournamentsCache();
+    const localTournaments = this.parseLocalTournaments(tournamentsString);
 
     let backendTournaments: ProcedureContentStoredTournaments | null = null;
 
@@ -95,48 +114,42 @@ export class Tournaments {
       );
     }
 
-    let mergedTournaments: Tournament[];
+    const mergedTournaments = this.getMergedTournaments(
+      localTournaments,
+      backendTournaments
+    );
 
-    if (backendTournaments && !localTournaments) {
-      mergedTournaments = backendTournaments.tournaments;
-    } else if (backendTournaments && localTournaments) {
-      let recentTournaments: Tournament[];
-      let oldestTournaments: Tournament[];
-
-      if (
-        (localTournaments?.timestamp || 0) >=
-        (backendTournaments?.timestamp || 0)
-      ) {
-        recentTournaments = localTournaments?.tournaments || [];
-        oldestTournaments = backendTournaments?.tournaments;
-      } else {
-        recentTournaments = backendTournaments.tournaments;
-        oldestTournaments = localTournaments?.tournaments || [];
-      }
-
-      mergedTournaments = this.mergeTournaments(
-        recentTournaments,
-        oldestTournaments
-      );
-    } else {
-      mergedTournaments = localTournaments?.tournaments || [];
-    }
-
-    /* From stored data to instanciated object */
-    for (const t of mergedTournaments) {
-      for (let i = 0, imax = t.grid.length; i < imax; i++) {
-        const teamRow = new TeamRow({ id: t.grid[i].id, type: t.grid[i].type });
-        teamRow.fromData(t.grid[i]);
-        t.grid[i] = teamRow;
-      }
-
-      if (!t.matchs) {
-        t.matchs = [];
-      }
-    }
-
+    this.instantiateTournaments(mergedTournaments);
     this.tournaments = mergedTournaments;
     return await this.store();
+  }
+
+  private getMergedTournaments(
+    localTournaments: { timestamp: number; tournaments: Tournament[] } | null,
+    backendTournaments: ProcedureContentStoredTournaments | null
+  ): Tournament[] {
+    if (backendTournaments && !localTournaments) {
+      return backendTournaments.tournaments;
+    }
+
+    if (backendTournaments && localTournaments) {
+      const localTimestamp = localTournaments?.timestamp || 0;
+      const backendTimestamp = backendTournaments?.timestamp || 0;
+
+      if (localTimestamp >= backendTimestamp) {
+        return this.mergeTournaments(
+          localTournaments?.tournaments || [],
+          backendTournaments?.tournaments
+        );
+      }
+
+      return this.mergeTournaments(
+        backendTournaments.tournaments,
+        localTournaments?.tournaments || []
+      );
+    }
+
+    return localTournaments?.tournaments || [];
   }
 
   private mergeTournaments(
@@ -234,7 +247,7 @@ export class Tournaments {
     return lastTimeStamp;
   }
 
-  private async store(realLastTimeStamp?: number): Promise<number> {
+  private store(realLastTimeStamp?: number): Promise<number> {
     const lastTimeStamp =
       realLastTimeStamp || this.getLastTimeStampInTournaments();
     const content = { timestamp: lastTimeStamp, tournaments: this.tournaments };
@@ -253,7 +266,7 @@ export class Tournaments {
 
     this.throwOnUpdate();
 
-    return this.tournaments.length;
+    return Promise.resolve(this.tournaments.length);
   }
 
   private throwOnUpdate() {
@@ -271,6 +284,25 @@ export class Tournaments {
       team.goalAverage = 0;
       team.points = 0;
     }
+  }
+
+  private updateTeamScore(
+    team: TeamRow,
+    scoredGoals: number,
+    concededGoals: number,
+    isDraw: boolean,
+    isWinner: boolean
+  ): void {
+    if (isDraw) {
+      team.points += 1;
+    }
+    if (isWinner) {
+      team.points += 3;
+    }
+
+    team.scoredGoals += scoredGoals;
+    team.concededGoals += concededGoals;
+    team.goalAverage = team.scoredGoals - team.concededGoals;
   }
 
   private async updateScores(tournament: Tournament): Promise<void> {
@@ -291,34 +323,28 @@ export class Tournaments {
       const visitor = await this.getTournamentTeam(tournament, match.visitorId);
 
       if (host) {
-        if (vScore === hScore) {
-          host.points += 1;
-        }
-        if (hScore > vScore) {
-          host.points += 3;
-        }
-
-        host.scoredGoals += hScore;
-        host.concededGoals += vScore;
-        host.goalAverage = host.scoredGoals - host.concededGoals;
+        this.updateTeamScore(
+          host,
+          hScore,
+          vScore,
+          vScore === hScore,
+          hScore > vScore
+        );
       }
 
       if (visitor) {
-        if (vScore === hScore) {
-          visitor.points += 1;
-        }
-        if (vScore > hScore) {
-          visitor.points += 3;
-        }
-
-        visitor.scoredGoals += vScore;
-        visitor.concededGoals += hScore;
-        visitor.goalAverage = visitor.scoredGoals - visitor.concededGoals;
+        this.updateTeamScore(
+          visitor,
+          vScore,
+          hScore,
+          vScore === hScore,
+          vScore > hScore
+        );
       }
     }
   }
 
-  async getTournamentTeam(
+  getTournamentTeam(
     tournament: Tournament,
     teamId: number | null
   ): Promise<TeamRow | null> {
@@ -333,7 +359,7 @@ export class Tournaments {
     );
   }
 
-  async remove(id: number): Promise<number> {
+  remove(id: number): Promise<number> {
     if (!id) {
       return Promise.reject(
         new Error("[Tournaments.remove()] Missing tournament id.")
@@ -347,7 +373,7 @@ export class Tournaments {
     });
   }
 
-  async add(arg: {
+  add(arg: {
     name: string;
     grid: TeamRow[];
     matchs: Match[];
@@ -370,7 +396,7 @@ export class Tournaments {
     });
   }
 
-  async get(id: number | null): Promise<Tournament | null> {
+  get(id: number | null): Promise<Tournament | null> {
     if (!id) {
       return Promise.resolve(null);
     }
@@ -392,7 +418,7 @@ export class Tournaments {
         "[Tournaments] Unable to update the tourmament #%s.",
         tournament.id
       );
-      return this.tournaments.length;
+      return Promise.resolve(this.tournaments.length);
     }
 
     if (
@@ -409,19 +435,21 @@ export class Tournaments {
     return this.store();
   }
 
-  map(callback: Function): any[] {
+  map(
+    callback: (value: Tournament, index: number, array: Tournament[]) => unknown
+  ): unknown[] {
     return this.tournaments.map(
       (value: Tournament, index: number, array: Tournament[]) =>
         callback(value, index, array)
     );
   }
 
-  onUpdate(callback: Function) {
+  onUpdate(callback: (num?: number) => void) {
     this.callbackCollector.push(callback);
   }
 
   getTournamentTypeLabel(type: TournamentType): string {
-    let label;
+    let label = "";
 
     switch (type) {
       case TournamentType.NBA:

@@ -295,6 +295,7 @@ export class PageMatch {
         <sl-button
           class="w-full"
           onclick={() => this.deleteMatch(match)}
+          role="button"
           size="large"
           variant="warning"
         >
@@ -305,6 +306,7 @@ export class PageMatch {
           <sl-button
             class="w-full"
             onclick={() => this.stopMatch(match)}
+            role="button"
             size="large"
             variant="primary"
           >
@@ -314,12 +316,302 @@ export class PageMatch {
           <sl-button
             class="w-full"
             onClick={() => this.playMatch(match)}
+            role="button"
             size="large"
             variant="primary"
           >
             <sl-icon name="play-circle" />
           </sl-button>
         )}
+      </div>
+    );
+  }
+
+  private renderMatchStatus(match: Match) {
+    if (match.status === MatchStatus.PENDING) {
+      return (
+        <sl-tag variant="primary">
+          <span class="container">Match programmé</span>
+          <sl-icon class="text-3xl text-primary" name="calendar-check" />
+        </sl-tag>
+      );
+    }
+
+    if (match.status === MatchStatus.DOING) {
+      return (
+        <sl-tag variant="success">
+          <span class="container">Match en cours</span>
+          <sl-spinner class="text-2xl" />
+        </sl-tag>
+      );
+    }
+
+    if (match.status === MatchStatus.DONE) {
+      return (
+        <sl-tag variant="warning">
+          <span class="container">Match terminé</span>
+          <sl-icon class="text-3xl text-warning" name="check2-square" />
+        </sl-tag>
+      );
+    }
+
+    return null;
+  }
+
+  private renderScorers(match: Match) {
+    const tournamentType = this.tournament?.type;
+    const isBasketType =
+      tournamentType === TournamentType.NBA ||
+      tournamentType === TournamentType.BASKET;
+    const isFootType =
+      tournamentType === TournamentType.FOOT || !tournamentType;
+    const isRugbyType =
+      tournamentType === TournamentType.NFL ||
+      tournamentType === TournamentType.RUGBY;
+
+    return (
+      <div class="grid grid-cols-2 gap-4">
+        {isBasketType && (
+          <mad-scorer-basket
+            min={this.config.minGoal}
+            onMadNumberChange={(ev: CustomEvent) =>
+              this.onTeamScores(match, MatchTeamType.HOST, ev.detail)
+            }
+            readonly={match.status !== MatchStatus.DOING}
+            value={match.goals.host}
+          />
+        )}
+
+        {isFootType && (
+          <mad-scorer-common
+            min={this.config.minGoal}
+            onMadNumberChange={(ev: CustomEvent) =>
+              this.onTeamScores(match, MatchTeamType.HOST, ev.detail)
+            }
+            readonly={match.status !== MatchStatus.DOING}
+            value={match.goals.host}
+          />
+        )}
+
+        {isRugbyType && (
+          <mad-scorer-rugby
+            min={this.config.minGoal}
+            onMadNumberChange={(ev: CustomEvent) =>
+              this.onTeamScores(match, MatchTeamType.HOST, ev.detail)
+            }
+            readonly={match.status !== MatchStatus.DOING}
+            value={match.goals.host}
+          />
+        )}
+
+        {isBasketType && (
+          <mad-scorer-basket
+            min={this.config.minGoal}
+            onMadNumberChange={(ev: CustomEvent) =>
+              this.onTeamScores(match, MatchTeamType.VISITOR, ev.detail)
+            }
+            readonly={match.status !== MatchStatus.DOING}
+            value={match.goals.visitor}
+          />
+        )}
+
+        {tournamentType === TournamentType.FOOT && (
+          <mad-scorer-common
+            min={this.config.minGoal}
+            onMadNumberChange={(ev: CustomEvent) =>
+              this.onTeamScores(match, MatchTeamType.VISITOR, ev.detail)
+            }
+            readonly={match.status !== MatchStatus.DOING}
+            value={match.goals.visitor}
+          />
+        )}
+
+        {isRugbyType && (
+          <mad-scorer-rugby
+            min={this.config.minGoal}
+            onMadNumberChange={(ev: CustomEvent) =>
+              this.onTeamScores(match, MatchTeamType.VISITOR, ev.detail)
+            }
+            readonly={match.status !== MatchStatus.DOING}
+            value={match.goals.visitor}
+          />
+        )}
+      </div>
+    );
+  }
+
+  private renderMatchItem(match: Match, index: number) {
+    const hostRank = match.hostId ? this.rankMap.get(match.hostId) : undefined;
+    const visitorRank = match.visitorId
+      ? this.rankMap.get(match.visitorId)
+      : undefined;
+
+    return (
+      <div
+        class="rounded border border-sky border-solid px-1 py-4"
+        ref={(el) => {
+          if (el) {
+            this.matchRefs[index] = el;
+          }
+        }}
+      >
+        <div>{this.renderMatchStatus(match)}</div>
+
+        {this.refreshUIHook ? (
+          <mad-match-tile
+            hostPending={this.getTeam(match.hostId)}
+            hostRank={hostRank}
+            hostScore={match.goals.host}
+            visitorPending={this.getTeam(match.visitorId)}
+            visitorRank={visitorRank}
+            visitorScore={match.goals.visitor}
+          />
+        ) : null}
+
+        {this.renderScorers(match)}
+
+        {this.refreshUIHook ? this.renderActionButtons(match) : null}
+      </div>
+    );
+  }
+
+  private renderTournamentTypeLabel() {
+    const type = this.tournament?.type;
+
+    if (type === TournamentType.NBA) {
+      return TournamentTypeLabel.NBA;
+    }
+    if (type === TournamentType.NFL) {
+      return TournamentTypeLabel.NFL;
+    }
+    if (type === TournamentType.FOOT) {
+      return TournamentTypeLabel.FOOT;
+    }
+    if (type === TournamentType.RUGBY) {
+      return TournamentTypeLabel.RUGBY;
+    }
+    if (type === TournamentType.BASKET) {
+      return TournamentTypeLabel.BASKET;
+    }
+
+    return null;
+  }
+
+  private renderMatchListHeader() {
+    return (
+      <div class="block-primary grid grid-cols-5 items-center py-2">
+        <div class="col-span-2">Locaux</div>
+        <div class="text-2xl">{this.renderTournamentTypeLabel()}</div>
+        <div class="col-span-2">Visiteurs</div>
+      </div>
+    );
+  }
+
+  private renderTeamSelectorRow(row: Row) {
+    return (
+      <tr
+        class="cursor-pointer items-center"
+        onClick={() => this.onTeamSelected(row)}
+      >
+        <td>
+          {row.selected ? (
+            <sl-icon class="text-2xl text-success" name="check-square" />
+          ) : (
+            <sl-icon class="text-2xl text-success" name="square" />
+          )}
+        </td>
+        <td>
+          <mad-team-tile team={row.team.team} />
+        </td>
+        <td>{row.totalMatchs}</td>
+        <td>{row.doneMatchs}</td>
+        <td>{row.scheduledMatchs}</td>
+      </tr>
+    );
+  }
+
+  private renderTeamSelector() {
+    return (
+      <div>
+        <h3>Équipes sélectionnées:</h3>
+        <mad-match-tile
+          hostPending={this.getTeam(this.currentMatch?.hostId || null)}
+          visitorPending={this.getTeam(this.currentMatch?.visitorId || null)}
+        />
+
+        <div class="w-fill overflow-x-auto">
+          <table class="table-auto">
+            <thead class="block-primary">
+              <tr>
+                <th>
+                  <sl-icon class="text-2xl" name="list-check" />
+                </th>
+                <th>
+                  <span>Équipes</span>
+                </th>
+                <th>
+                  <span>Matchs </span>
+                  <span>Total </span>
+                </th>
+                <th>
+                  <span>Matchs </span>
+                  <span>Joués </span>
+                </th>
+                <th>
+                  <span>Matchs </span>
+                  <span>Programmés </span>
+                </th>
+              </tr>
+            </thead>
+
+            {this.teamToSelect?.map((row) => this.renderTeamSelectorRow(row))}
+          </table>
+        </div>
+
+        <div class="footer">
+          <div class="grid-300">
+            <sl-button
+              onclick={() => this.cancelSelection()}
+              role="button"
+              size="large"
+              variant="warning"
+            >
+              <sl-icon name="ban" slot="prefix" />
+              <span slot="suffix">Annuler</span>
+            </sl-button>
+            <sl-button
+              disabled={Boolean(
+                this.currentMatch &&
+                  !(this.currentMatch.visitorId && this.currentMatch.hostId)
+              )}
+              onclick={() => this.goValidateSelection()}
+              role="button"
+              size="large"
+              variant="primary"
+            >
+              <span slot="prefix">Valider</span>
+              <sl-icon name="arrow-right" slot="suffix" />
+            </sl-button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  private renderNewMatchButton() {
+    return (
+      <div class="footer">
+        <div class="grid-300">
+          <sl-button
+            onclick={() => this.goMatch()}
+            role="button"
+            size="large"
+            variant="primary"
+          >
+            <sl-icon name="plus-lg" slot="prefix" />
+            <span slot="suffix">Nouveau match</span>
+          </sl-button>
+        </div>
       </div>
     );
   }
@@ -362,216 +654,11 @@ export class PageMatch {
 
               {this.matchNumber > 0 && !this.displayTeamSelector ? (
                 <div class="grid grid-cols-1 gap-4">
-                  <div class="block-primary grid grid-cols-5 items-center py-2">
-                    <div class="col-span-2">Locaux</div>
-                    <div class="text-2xl">
-                      {this.tournament?.type === TournamentType.NBA
-                        ? TournamentTypeLabel.NBA
-                        : null}
-                      {this.tournament?.type === TournamentType.NFL
-                        ? TournamentTypeLabel.NFL
-                        : null}
-                      {this.tournament?.type === TournamentType.FOOT
-                        ? TournamentTypeLabel.FOOT
-                        : null}
-                      {this.tournament?.type === TournamentType.RUGBY
-                        ? TournamentTypeLabel.RUGBY
-                        : null}
-                      {this.tournament?.type === TournamentType.BASKET
-                        ? TournamentTypeLabel.BASKET
-                        : null}
-                    </div>
-                    <div class="col-span-2">Visiteurs</div>
-                  </div>
+                  {this.renderMatchListHeader()}
 
-                  {this.tournament?.matchs.map((match, index) => {
-                    const hostRank = match.hostId
-                      ? this.rankMap.get(match.hostId)
-                      : undefined;
-                    const visitorRank = match.visitorId
-                      ? this.rankMap.get(match.visitorId)
-                      : undefined;
-
-                    return (
-                      <div
-                        class="rounded border border-sky border-solid px-1 py-4"
-                        ref={(el) => {
-                          if (el) {
-                            this.matchRefs[index] = el;
-                          }
-                        }}
-                      >
-                        <div>
-                          {match.status === MatchStatus.PENDING && (
-                            <sl-tag variant="primary">
-                              <span class="container">Match programmé</span>
-                              <sl-icon
-                                class="text-3xl text-primary"
-                                name="calendar-check"
-                              />
-                            </sl-tag>
-                          )}
-                          {match.status === MatchStatus.DOING && (
-                            <sl-tag variant="success">
-                              <span class="container">Match en cours</span>
-                              <sl-spinner class="text-2xl" />
-                            </sl-tag>
-                          )}
-                          {match.status === MatchStatus.DONE && (
-                            <sl-tag variant="warning">
-                              <span class="container">Match terminé</span>
-                              <sl-icon
-                                class="text-3xl text-warning"
-                                name="check2-square"
-                              />
-                            </sl-tag>
-                          )}
-                        </div>
-
-                        {this.refreshUIHook ? (
-                          <mad-match-tile
-                            hostPending={this.getTeam(match.hostId)}
-                            hostRank={hostRank}
-                            hostScore={match.goals.host}
-                            visitorPending={this.getTeam(match.visitorId)}
-                            visitorRank={visitorRank}
-                            visitorScore={match.goals.visitor}
-                          />
-                        ) : null}
-
-                        <div class="grid grid-cols-2 gap-4">
-                          {(this.tournament?.type === TournamentType.NBA ||
-                            this.tournament?.type ===
-                              TournamentType.BASKET) && (
-                            <mad-scorer-basket
-                              min={this.config.minGoal}
-                              onMadNumberChange={(ev: CustomEvent) =>
-                                this.onTeamScores(
-                                  match,
-                                  MatchTeamType.HOST,
-                                  ev.detail
-                                )
-                              }
-                              readonly={match.status !== MatchStatus.DOING}
-                              value={match.goals.host}
-                            />
-                          )}
-
-                          {(this.tournament?.type === TournamentType.FOOT ||
-                            !this.tournament?.type) && (
-                            <mad-scorer-common
-                              min={this.config.minGoal}
-                              onMadNumberChange={(ev: CustomEvent) =>
-                                this.onTeamScores(
-                                  match,
-                                  MatchTeamType.HOST,
-                                  ev.detail
-                                )
-                              }
-                              readonly={match.status !== MatchStatus.DOING}
-                              value={match.goals.host}
-                            />
-                          )}
-
-                          {this.tournament?.type === TournamentType.NFL && (
-                            <mad-scorer-rugby
-                              min={this.config.minGoal}
-                              onMadNumberChange={(ev: CustomEvent) =>
-                                this.onTeamScores(
-                                  match,
-                                  MatchTeamType.HOST,
-                                  ev.detail
-                                )
-                              }
-                              readonly={match.status !== MatchStatus.DOING}
-                              value={match.goals.host}
-                            />
-                          )}
-
-                          {this.tournament?.type === TournamentType.RUGBY && (
-                            <mad-scorer-rugby
-                              min={this.config.minGoal}
-                              onMadNumberChange={(ev: CustomEvent) =>
-                                this.onTeamScores(
-                                  match,
-                                  MatchTeamType.HOST,
-                                  ev.detail
-                                )
-                              }
-                              readonly={match.status !== MatchStatus.DOING}
-                              value={match.goals.host}
-                            />
-                          )}
-
-                          {(this.tournament?.type === TournamentType.NBA ||
-                            this.tournament?.type ===
-                              TournamentType.BASKET) && (
-                            <mad-scorer-basket
-                              min={this.config.minGoal}
-                              onMadNumberChange={(ev: CustomEvent) =>
-                                this.onTeamScores(
-                                  match,
-                                  MatchTeamType.VISITOR,
-                                  ev.detail
-                                )
-                              }
-                              readonly={match.status !== MatchStatus.DOING}
-                              value={match.goals.visitor}
-                            />
-                          )}
-
-                          {this.tournament?.type === TournamentType.FOOT && (
-                            <mad-scorer-common
-                              min={this.config.minGoal}
-                              onMadNumberChange={(ev: CustomEvent) =>
-                                this.onTeamScores(
-                                  match,
-                                  MatchTeamType.VISITOR,
-                                  ev.detail
-                                )
-                              }
-                              readonly={match.status !== MatchStatus.DOING}
-                              value={match.goals.visitor}
-                            />
-                          )}
-
-                          {this.tournament?.type === TournamentType.NFL && (
-                            <mad-scorer-rugby
-                              min={this.config.minGoal}
-                              onMadNumberChange={(ev: CustomEvent) =>
-                                this.onTeamScores(
-                                  match,
-                                  MatchTeamType.VISITOR,
-                                  ev.detail
-                                )
-                              }
-                              readonly={match.status !== MatchStatus.DOING}
-                              value={match.goals.visitor}
-                            />
-                          )}
-
-                          {this.tournament?.type === TournamentType.RUGBY && (
-                            <mad-scorer-rugby
-                              min={this.config.minGoal}
-                              onMadNumberChange={(ev: CustomEvent) =>
-                                this.onTeamScores(
-                                  match,
-                                  MatchTeamType.VISITOR,
-                                  ev.detail
-                                )
-                              }
-                              readonly={match.status !== MatchStatus.DOING}
-                              value={match.goals.visitor}
-                            />
-                          )}
-                        </div>
-
-                        {this.refreshUIHook
-                          ? this.renderActionButtons(match)
-                          : null}
-                      </div>
-                    );
-                  })}
+                  {this.tournament?.matchs.map((match, index) =>
+                    this.renderMatchItem(match, index)
+                  )}
                 </div>
               ) : (
                 <div>
@@ -583,114 +670,9 @@ export class PageMatch {
                 </div>
               )}
 
-              {this.displayTeamSelector ? (
-                <div>
-                  <h3>Équipes sélectionnées:</h3>
-                  <mad-match-tile
-                    hostPending={this.getTeam(
-                      this.currentMatch?.hostId || null
-                    )}
-                    visitorPending={this.getTeam(
-                      this.currentMatch?.visitorId || null
-                    )}
-                  />
-
-                  <div class="w-fill overflow-x-auto">
-                    <table class="table-auto">
-                      <thead class="block-primary">
-                        <tr>
-                          <th>
-                            <sl-icon class="text-2xl" name="list-check" />
-                          </th>
-                          <th>
-                            <span>Équipes</span>
-                          </th>
-                          <th>
-                            <span>Matchs </span>
-                            <span>Total </span>
-                          </th>
-                          <th>
-                            <span>Matchs </span>
-                            <span>Joués </span>
-                          </th>
-                          <th>
-                            <span>Matchs </span>
-                            <span>Programmés </span>
-                          </th>
-                        </tr>
-                      </thead>
-
-                      {this.teamToSelect?.map((row) => (
-                        <tr
-                          class="cursor-pointer items-center"
-                          onClick={() => this.onTeamSelected(row)}
-                        >
-                          <td>
-                            {row.selected ? (
-                              <sl-icon
-                                class="text-2xl text-success"
-                                name="check-square"
-                              />
-                            ) : (
-                              <sl-icon
-                                class="text-2xl text-success"
-                                name="square"
-                              />
-                            )}
-                          </td>
-                          <td>
-                            <mad-team-tile team={row.team.team} />
-                          </td>
-                          <td>{row.totalMatchs}</td>
-                          <td>{row.doneMatchs}</td>
-                          <td>{row.scheduledMatchs}</td>
-                        </tr>
-                      ))}
-                    </table>
-                  </div>
-
-                  <div class="footer">
-                    <div class="grid-300">
-                      <sl-button
-                        onclick={() => this.cancelSelection()}
-                        size="large"
-                        variant="warning"
-                      >
-                        <sl-icon name="ban" slot="prefix" />
-                        <span slot="suffix">Annuler</span>
-                      </sl-button>
-                      <sl-button
-                        disabled={Boolean(
-                          this.currentMatch &&
-                            !(
-                              this.currentMatch.visitorId &&
-                              this.currentMatch.hostId
-                            )
-                        )}
-                        onclick={() => this.goValidateSelection()}
-                        size="large"
-                        variant="primary"
-                      >
-                        <span slot="prefix">Valider</span>
-                        <sl-icon name="arrow-right" slot="suffix" />
-                      </sl-button>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div class="footer">
-                  <div class="grid-300">
-                    <sl-button
-                      onclick={() => this.goMatch()}
-                      size="large"
-                      variant="primary"
-                    >
-                      <sl-icon name="plus-lg" slot="prefix" />
-                      <span slot="suffix">Nouveau match</span>
-                    </sl-button>
-                  </div>
-                </div>
-              )}
+              {this.displayTeamSelector
+                ? this.renderTeamSelector()
+                : this.renderNewMatchButton()}
             </div>
           )}
         </div>
