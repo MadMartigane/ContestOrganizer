@@ -13,7 +13,7 @@ export class PageConfig {
   private readonly globalSetting: GlobalSetting;
 
   private darkModeSwitch: SlSwitch;
-  private initialDarkModeActivated: boolean;
+  private readonly initialDarkModeActivated: boolean;
 
   @State() isDarkModeActive: boolean;
 
@@ -37,7 +37,7 @@ export class PageConfig {
     this.isDarkModeActive = this.darkModeSwitch.checked;
   }
 
-  public componentDidLoad() {
+  componentDidLoad() {
     this.installEventHandler();
   }
 
