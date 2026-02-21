@@ -23,9 +23,9 @@ export class Tournaments {
 
   private tournaments: Tournament[];
 
-  public isBusy: Promise<unknown> | null;
+  isBusy: Promise<unknown> | null;
 
-  public get length() {
+  get length() {
     return this.tournaments.length;
   }
 
@@ -123,7 +123,7 @@ export class Tournaments {
     }
 
     /* From stored data to instanciated object */
-    mergedTournaments.forEach((t) => {
+    for (const t of mergedTournaments) {
       for (let i = 0, imax = t.grid.length; i < imax; i++) {
         const teamRow = new TeamRow({ id: t.grid[i].id, type: t.grid[i].type });
         teamRow.fromData(t.grid[i]);
@@ -133,7 +133,7 @@ export class Tournaments {
       if (!t.matchs) {
         t.matchs = [];
       }
-    });
+    }
 
     this.tournaments = mergedTournaments;
     return await this.store();
@@ -149,7 +149,7 @@ export class Tournaments {
 
     const merged: Tournament[] = [];
 
-    primaries.forEach((primary) => {
+    for (const primary of primaries) {
       const secondary = secondaries.find(
         (candidate) => candidate.id === primary.id
       );
@@ -161,7 +161,7 @@ export class Tournaments {
         }
 
         merged.push(primary);
-        return;
+        continue;
       }
 
       if ((primary?.timestamp || 0) >= (secondary?.timestamp || 0)) {
@@ -177,7 +177,7 @@ export class Tournaments {
 
         merged.push(secondary);
       }
-    });
+    }
 
     return merged;
   }
@@ -220,7 +220,7 @@ export class Tournaments {
 
   private getLastTimeStampInTournaments(): number {
     let lastTimeStamp = 0;
-    this.tournaments.forEach((currentTournament: Tournament) => {
+    for (const currentTournament of this.tournaments) {
       if (!currentTournament.timestamp) {
         currentTournament.timestamp = 0;
       }
@@ -229,7 +229,7 @@ export class Tournaments {
         currentTournament.timestamp > lastTimeStamp
           ? currentTournament.timestamp
           : lastTimeStamp;
-    });
+    }
 
     return lastTimeStamp;
   }
@@ -257,20 +257,20 @@ export class Tournaments {
   }
 
   private throwOnUpdate() {
-    this.callbackCollector.forEach((callback) => {
+    for (const callback of this.callbackCollector) {
       setTimeout(() => {
         callback();
       });
-    });
+    }
   }
 
   private resetScores(tournament: Tournament) {
-    tournament.grid.forEach((team) => {
+    for (const team of tournament.grid) {
       team.concededGoals = 0;
       team.scoredGoals = 0;
       team.goalAverage = 0;
       team.points = 0;
-    });
+    }
   }
 
   private async updateScores(tournament: Tournament): Promise<void> {
@@ -280,9 +280,9 @@ export class Tournaments {
 
     this.resetScores(tournament);
 
-    tournament.matchs.forEach(async (match) => {
+    for (const match of tournament.matchs) {
       if (match.status !== MatchStatus.DONE) {
-        return;
+        continue;
       }
 
       const vScore = match.goals.visitor || 0;
@@ -315,10 +315,10 @@ export class Tournaments {
         visitor.concededGoals += hScore;
         visitor.goalAverage = visitor.scoredGoals - visitor.concededGoals;
       }
-    });
+    }
   }
 
-  public async getTournamentTeam(
+  async getTournamentTeam(
     tournament: Tournament,
     teamId: number | null
   ): Promise<TeamRow | null> {
@@ -333,7 +333,7 @@ export class Tournaments {
     );
   }
 
-  public async remove(id: number): Promise<number> {
+  async remove(id: number): Promise<number> {
     if (!id) {
       return Promise.reject(
         new Error("[Tournaments.remove()] Missing tournament id.")
@@ -347,7 +347,7 @@ export class Tournaments {
     });
   }
 
-  public async add(arg: {
+  async add(arg: {
     name: string;
     grid: TeamRow[];
     matchs: Match[];
@@ -370,7 +370,7 @@ export class Tournaments {
     });
   }
 
-  public async get(id: number | null): Promise<Tournament | null> {
+  async get(id: number | null): Promise<Tournament | null> {
     if (!id) {
       return Promise.resolve(null);
     }
@@ -382,7 +382,7 @@ export class Tournaments {
     );
   }
 
-  public async update(tournament: Tournament): Promise<number> {
+  async update(tournament: Tournament): Promise<number> {
     await (this.isBusy || Promise.resolve());
 
     const i = this.tournaments.findIndex((t) => t.id === tournament.id);
@@ -409,18 +409,18 @@ export class Tournaments {
     return this.store();
   }
 
-  public map(callback: Function): any[] {
+  map(callback: Function): any[] {
     return this.tournaments.map(
       (value: Tournament, index: number, array: Tournament[]) =>
         callback(value, index, array)
     );
   }
 
-  public onUpdate(callback: Function) {
+  onUpdate(callback: Function) {
     this.callbackCollector.push(callback);
   }
 
-  public getTournamentTypeLabel(type: TournamentType): string {
+  getTournamentTypeLabel(type: TournamentType): string {
     let label;
 
     switch (type) {
@@ -444,7 +444,7 @@ export class Tournaments {
     return label;
   }
 
-  public static sortGrid(grid: TeamRow[]): TeamRow[] {
+  static sortGrid(grid: TeamRow[]): TeamRow[] {
     return [...grid].sort((a, b) => {
       if (a.points !== b.points) {
         return b.points - a.points;

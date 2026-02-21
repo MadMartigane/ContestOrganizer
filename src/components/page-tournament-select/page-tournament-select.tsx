@@ -53,7 +53,7 @@ export class PageTournamentSelect {
     });
   }
 
-  public componentDidRender() {
+  componentDidRender() {
     Utils.installEventHandler(
       this.domTournamentList,
       "sl-select",
@@ -63,7 +63,7 @@ export class PageTournamentSelect {
     );
 
     if (this.uiAddingTournamentJustOpened) {
-      Utils.setFocus(this.domTournamentName);
+      Utils.setFocus(this.domTournamentName as unknown as HTMLElement);
       this.uiAddingTournamentJustOpened = false;
     }
   }

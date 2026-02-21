@@ -38,7 +38,7 @@ export class ApiFutDB {
     });
   }
 
-  private async loadCache(): Promise<GenericTeam[] | null> {
+  private loadCache(): Promise<GenericTeam[] | null> {
     const cacheString = localStorage.getItem(LOCAL_STORAGE_TEAM_KEY);
     let cache = null as GenericTeam[] | null;
 
@@ -51,17 +51,17 @@ export class ApiFutDB {
           e
         );
         localStorage.removeItem(LOCAL_STORAGE_TEAM_KEY);
-        return null;
+        return Promise.resolve(null);
       }
     }
 
-    return cache;
+    return Promise.resolve(cache);
   }
 
-  private async loadTeamsPage(
+  private loadTeamsPage(
     pageNumber: number,
-    resolve: Function,
-    reject: Function
+    resolve: (value: GenericTeam[]) => void,
+    reject: (reason?: unknown) => void
   ): Promise<FutDBPagination> {
     const url = `https://futdb.app/api/clubs?page=${pageNumber}`;
     return httpRequest
@@ -71,9 +71,9 @@ export class ApiFutDB {
       .then((rawData) => {
         const data = rawData as FutDBTeamReturn;
         if (data?.items.length) {
-          data.items.forEach((team) => {
+          for (const team of data.items) {
             team.type = TournamentType.FOOT;
-          });
+          }
           this.allTeams = this.allTeams.concat(data.items);
           this.pagination.countCurrent = this.allTeams.length;
         }
@@ -102,7 +102,7 @@ export class ApiFutDB {
       });
   }
 
-  public async loadTeams(): Promise<GenericTeam[]> {
+  loadTeams(): Promise<GenericTeam[]> {
     if (this.isLoading) {
       return this.isLoading;
     }
@@ -131,7 +131,7 @@ export class ApiFutDB {
     return this.isLoading;
   }
 
-  public async loadTeamImage(id: number): Promise<string> {
+  loadTeamImage(id: number): Promise<string> {
     const buffer = this.loadedImg.find((buff) => buff.id === id);
     if (buffer) {
       return new Promise((resolve) => {
@@ -148,7 +148,7 @@ export class ApiFutDB {
         const data = rawData as Blob;
         /* Use one file reader for each img */
         const fileReader = new FileReader();
-        const handler = (resolve: Function) => {
+        const handler = (resolve: (value: string) => void) => {
           fileReader.addEventListener("load", () => {
             const src = fileReader.result as string;
             this.loadedImg.push({ id, src });

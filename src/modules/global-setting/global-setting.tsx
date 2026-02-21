@@ -5,7 +5,7 @@ export class GlobalSetting {
   private alreadyInit: boolean;
   private devicePrefersDark: boolean; // Device system setting
   private darkModeSet: boolean | null; // The user choice
-  private readonly darkThemeChangeCallbacks: Function[];
+  private readonly darkThemeChangeCallbacks: ((isDark: boolean) => void)[];
 
   constructor() {
     this.STORE_KEY = "CONTEST_ORGANIZER_SETTING";
@@ -77,28 +77,28 @@ export class GlobalSetting {
   }
 
   private execDarkThemeChangeCallbacks() {
-    this.darkThemeChangeCallbacks.forEach((callback) => {
+    for (const callback of this.darkThemeChangeCallbacks) {
       setTimeout(() => {
         callback(this.isDarkThemeActive());
       });
-    });
+    }
   }
 
-  public setDarkTheme(state = true) {
+  setDarkTheme(state = true) {
     this.toggleDarkTheme(state);
   }
 
-  public isDarkThemeActive() {
+  isDarkThemeActive() {
     return this.darkModeSet === null
       ? this.isPreferDarkTheme()
       : this.darkModeSet;
   }
 
-  public isPreferDarkTheme() {
+  isPreferDarkTheme() {
     return this.devicePrefersDark;
   }
 
-  public onDarkThemeChange(callback: Function) {
+  onDarkThemeChange(callback: (isDark: boolean) => void) {
     this.darkThemeChangeCallbacks.push(callback);
   }
 }

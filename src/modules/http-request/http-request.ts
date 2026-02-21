@@ -6,7 +6,7 @@ import type {
 } from "./http-request.types";
 
 export class HttpRequest {
-  public readonly CONSTANTS: HttpRequestResponseTypesContants;
+  readonly CONSTANTS: HttpRequestResponseTypesContants;
 
   constructor() {
     this.CONSTANTS = {
@@ -16,7 +16,7 @@ export class HttpRequest {
 
   private xmlHttpOnError(
     req: XMLHttpRequest,
-    reject: Function,
+    reject: (reason?: unknown) => void,
     error: string,
     promise: Promise<unknown>
   ): Promise<unknown> {
@@ -38,7 +38,7 @@ export class HttpRequest {
     return fullUrl;
   }
 
-  private async request(
+  private request(
     url: string,
     data: XMLHttpRequestBodyInit | null,
     responseType: XMLHttpRequestResponseType = HttpRequestResponseTypes.JSON,
@@ -75,9 +75,9 @@ export class HttpRequest {
       };
 
       if (headers) {
-        headers.forEach((header) =>
-          req.setRequestHeader(header.name, header.value)
-        );
+        for (const header of headers) {
+          req.setRequestHeader(header.name, header.value);
+        }
       }
 
       req.send(data);
@@ -86,7 +86,7 @@ export class HttpRequest {
     return promise;
   }
 
-  private async promise(thing: any, action: string) {
+  private promise(thing: unknown, action: string) {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         if (action === "reject") {
@@ -98,7 +98,7 @@ export class HttpRequest {
     });
   }
 
-  public load(
+  load(
     url: string,
     responseType: XMLHttpRequestResponseType = HttpRequestResponseTypes.JSON,
     headers?: HttpHeader[]
@@ -106,7 +106,7 @@ export class HttpRequest {
     return this.request(url, null, responseType, headers, "GET");
   }
 
-  public post(
+  post(
     url: string,
     data: XMLHttpRequestBodyInit,
     responseType: XMLHttpRequestResponseType = HttpRequestResponseTypes.JSON,
@@ -115,11 +115,11 @@ export class HttpRequest {
     return this.request(url, data, responseType, headers, "POST");
   }
 
-  public async resolve(thing: any) {
+  resolve(thing: unknown) {
     return this.promise(thing, "resolve");
   }
 
-  public async reject(thing: any) {
+  reject(thing: unknown) {
     return this.promise(thing, "reject");
   }
 }

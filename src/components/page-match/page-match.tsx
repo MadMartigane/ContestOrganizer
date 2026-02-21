@@ -36,7 +36,7 @@ export class PageMatch {
   private readonly config: Config;
   private readonly SCROLL_CONFIG: ScrollConfig;
 
-  @Prop() public tournamentId: number;
+  @Prop() tournamentId: number;
 
   @Element() host: HTMLElement;
 
@@ -114,7 +114,9 @@ export class PageMatch {
     }, this.SCROLL_CONFIG.scrollDelay);
   }
 
-  componentDidLoad() {}
+  componentDidLoad() {
+    // Lifecycle hook - no initialization needed
+  }
 
   private async initTournaments(): Promise<number> {
     this.tournament = await this.tournaments.get(this.tournamentId);
@@ -130,19 +132,15 @@ export class PageMatch {
     return this.updateTournament();
   }
 
-  async updateTournament(): Promise<number> {
+  updateTournament(): Promise<number> {
     if (!this.tournament) {
-      return 0;
+      return Promise.resolve(0);
     }
 
     return this.tournaments.update(this.tournament);
   }
 
-  public onTeamChange(
-    detail: { value: string },
-    team: TeamRow,
-    key: string
-  ): void {
+  onTeamChange(detail: { value: string }, team: TeamRow, key: string): void {
     team.set(key, String(detail.value));
     team.goalAverage = team.scoredGoals - team.concededGoals;
 
@@ -167,20 +165,20 @@ export class PageMatch {
   }
 
   private resetRowStates() {
-    this.teamToSelect?.forEach((row) => {
+    for (const row of this.teamToSelect || []) {
       row.selected = false;
-    });
+    }
   }
 
   private cleanRowStates() {
-    this.teamToSelect?.forEach((row) => {
+    for (const row of this.teamToSelect || []) {
       if (
         row.team.id !== this.currentMatch?.hostId &&
         row.team.id !== this.currentMatch?.visitorId
       ) {
         row.selected = false;
       }
-    });
+    }
   }
 
   private onTeamSelected(row: Row) {
@@ -271,7 +269,7 @@ export class PageMatch {
     this.refreshUI();
   }
 
-  private async getTeam(teamId: number | null): Promise<TeamRow | null> {
+  private getTeam(teamId: number | null): Promise<TeamRow | null> {
     if (!this.tournament) {
       return Promise.resolve(null);
     }
@@ -329,7 +327,9 @@ export class PageMatch {
   private updateRankMap(): void {
     const sortedGrid = Tournaments.sortGrid(this.tournament?.grid || []);
     this.rankMap = new Map<number, number>();
-    sortedGrid.forEach((team, index) => this.rankMap.set(team.id, index + 1));
+    for (const [index, team] of sortedGrid.entries()) {
+      this.rankMap.set(team.id, index + 1);
+    }
   }
 
   render() {

@@ -40,7 +40,7 @@ export class PageTournament {
   private domInputTournamentName: SlInput;
   private domDivTournamentName: HTMLElement;
 
-  @Prop() public tournamentId: number;
+  @Prop() tournamentId: number;
 
   @State() private tournament: Tournament | null;
   @State() private uiError: string | null;
@@ -188,13 +188,13 @@ export class PageTournament {
     }
   }
 
-  public componentDidUpdate() {
+  componentDidUpdate() {
     Utils.installEventHandler(this.domDivTournamentName, "click", () => {
       this.isEditTournamentName = true;
     });
 
     if (this.domInputTournamentName) {
-      Utils.setFocus(this.domInputTournamentName);
+      Utils.setFocus(this.domInputTournamentName as unknown as HTMLElement);
     }
   }
 

@@ -35,7 +35,7 @@ export class MadScorerBasket {
   }
 
   @Watch("value")
-  public onPropValueChange() {
+  onPropValueChange() {
     this.number = this.value || 0;
   }
 
@@ -61,7 +61,7 @@ export class MadScorerBasket {
     this.minusMode = !this.minusMode;
   }
 
-  public componentDidRender() {
+  componentDidRender() {
     Utils.installEventHandler(this.domPlusMinusSwitch, "sl-change", () => {
       this.switchMode();
     });

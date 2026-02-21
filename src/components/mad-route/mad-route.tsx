@@ -1,5 +1,5 @@
 import { Component, h, Prop, State } from "@stencil/core";
-import router, { type Router } from "../../modules/router/";
+import router, { type Router } from "../../modules/router/router";
 
 const REGEX_START_COLON = /^:/;
 const REGEX_UPPERCASE = /[A-Z]+(?![a-z])|[A-Z]/g;
@@ -42,11 +42,11 @@ export class MadRoute {
     const fragments: Fragment[] = [];
     const urlFragments = this.url.split("/");
 
-    urlFragments.forEach((fragment: string, idx: number) => {
+    for (const [idx, fragment] of urlFragments.entries()) {
       if (fragment.startsWith(":")) {
         fragments.push({ name: fragment, idx });
       }
-    });
+    }
 
     return fragments;
   }

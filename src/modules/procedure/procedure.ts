@@ -22,30 +22,30 @@ export class Procedure {
     }
   }
 
-  public setData(data: ProcedureData) {
+  setData(data: ProcedureData) {
     this.type = data.procedure;
     this.data = data.data;
     this.error = data.error;
     this.debug = data.debug;
   }
 
-  public getType(): ProcedureDataType | null {
+  getType(): ProcedureDataType | null {
     return this.type;
   }
 
-  public getData(): unknown | null {
+  getData(): unknown | null {
     return this.data;
   }
 
-  public getLogs(): string[] | null {
+  getLogs(): string[] | null {
     return this.debug;
   }
 
-  public getError(): ProcedureError | null {
+  getError(): ProcedureError | null {
     return this.error;
   }
 
-  public isError(): boolean {
+  isError(): boolean {
     if (!this.type) {
       return false;
     }
@@ -53,11 +53,11 @@ export class Procedure {
     return PROCEDURE_TYPE_ERROR.includes(this.type);
   }
 
-  public isOk(): boolean {
+  isOk(): boolean {
     return !this.isError();
   }
 
-  public toString(): string {
+  toString(): string {
     if (!this.type) {
       return "";
     }

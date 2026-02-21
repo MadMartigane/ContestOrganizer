@@ -23,9 +23,9 @@ export class ApiSports {
     });
   }
 
-  private async loadCache(): Promise<ApiSportsCache | null> {
+  private loadCache(): Promise<ApiSportsCache | null> {
     const cacheString = localStorage.getItem(LOCAL_STORAGE_TEAM_KEY);
-    let cache = null;
+    let cache: ApiSportsCache | null = null;
 
     if (cacheString) {
       try {
@@ -36,11 +36,11 @@ export class ApiSports {
           e
         );
         localStorage.removeItem(LOCAL_STORAGE_TEAM_KEY);
-        return null;
+        return Promise.resolve(null);
       }
     }
 
-    return cache;
+    return Promise.resolve(cache);
   }
 
   private saveCache(): void {
@@ -54,7 +54,7 @@ export class ApiSports {
   }
 
   private getSearchBaseUrl(type: TournamentType) {
-    let url;
+    let url: string;
 
     switch (type) {
       case TournamentType.BASKET:
@@ -77,10 +77,7 @@ export class ApiSports {
     return url;
   }
 
-  public async searchTeam(
-    type: TournamentType,
-    search: string
-  ): Promise<GenericTeam[]> {
+  searchTeam(type: TournamentType, search: string): Promise<GenericTeam[]> {
     if (search.length < 3) {
       return new Promise((resolve) => {
         setTimeout(() => {
@@ -118,9 +115,9 @@ export class ApiSports {
           results: data.response.map((r) => r.id),
         });
 
-        data.response.forEach((team) => {
+        for (const team of data.response) {
           team.type = type;
-        });
+        }
         this.allTeams = this.allTeams.concat(data.response);
         this.saveCache();
 

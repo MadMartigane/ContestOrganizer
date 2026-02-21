@@ -5,7 +5,7 @@ class Uuid {
     this.length = 3;
   }
 
-  public new(): number {
+  new(): number {
     const array = new Uint32Array(this.length);
     crypto.getRandomValues(array);
     return array[Math.floor(Math.random() * this.length)];

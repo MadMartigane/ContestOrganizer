@@ -30,7 +30,7 @@ export class MadScorerCommon {
   }
 
   @Watch("value")
-  public onPropValueChange() {
+  onPropValueChange() {
     this.number = this.value || this.min || 0;
   }
 
@@ -87,7 +87,7 @@ export class MadScorerCommon {
     );
   }
 
-  public render() {
+  render() {
     return <Host>{this.renderEditingState()}</Host>;
   }
 }

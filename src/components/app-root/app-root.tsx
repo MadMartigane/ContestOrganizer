@@ -1,5 +1,5 @@
 import { Component, Host, h } from "@stencil/core";
-import router, { type Router } from "../../modules/router";
+import router, { type Router } from "../../modules/router/router";
 
 @Component({
   tag: "app-root",

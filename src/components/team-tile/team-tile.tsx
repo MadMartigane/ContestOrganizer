@@ -65,7 +65,9 @@ export class MadTeamTile {
               <img
                 alt={`${this.team?.name} club logo`}
                 class={this.reverse ? "float-right w-16" : "float-left w-16"}
+                height="64"
                 src={this.imgSrc}
+                width="64"
               />
             </div>
           ) : null}

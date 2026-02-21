@@ -10,21 +10,27 @@ export interface Tournament {
   type: TournamentType;
 }
 
-export enum TournamentType {
-  FOOT = "Foot",
-  BASKET = "Basket",
-  NBA = "NBA",
-  NFL = "NFL",
-  RUGBY = "Rugby",
-}
+export const TournamentType = {
+  FOOT: "Foot",
+  BASKET: "Basket",
+  NBA: "NBA",
+  NFL: "NFL",
+  RUGBY: "Rugby",
+} as const;
 
-export enum TournamentTypeLabel {
-  FOOT = "⚽ Foot",
-  NBA = "🏀 NBA",
-  BASKET = "🏀 Basket",
-  NFL = "🏈 NFL",
-  RUGBY = "🏉 Rugby",
-}
+export type TournamentType =
+  (typeof TournamentType)[keyof typeof TournamentType];
+
+export const TournamentTypeLabel = {
+  FOOT: "⚽ Foot",
+  NBA: "🏀 NBA",
+  BASKET: "🏀 Basket",
+  NFL: "🏈 NFL",
+  RUGBY: "🏉 Rugby",
+} as const;
+
+export type TournamentTypeLabel =
+  (typeof TournamentTypeLabel)[keyof typeof TournamentTypeLabel];
 
 export interface TournamentUpdateEvent {
   tournamentId: number;

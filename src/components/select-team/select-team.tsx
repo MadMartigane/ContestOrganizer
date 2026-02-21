@@ -77,7 +77,7 @@ export class MadSelectTeam {
           .then((teams: GenericTeam[]) => {
             this.teams = teams;
           })
-          .catch((error: any) => {
+          .catch((error: unknown) => {
             console.warn("teams on load error: ", error);
           })
           .finally(() => {
@@ -150,7 +150,7 @@ export class MadSelectTeam {
   private openDrawer(): void {
     this.domDrawer.show();
     if (this.domInputSearch) {
-      Utils.setFocus(this.domInputSearch);
+      Utils.setFocus(this.domInputSearch as unknown as HTMLElement);
     }
   }
 
@@ -158,7 +158,7 @@ export class MadSelectTeam {
     this.domDrawer.hide();
   }
 
-  public componentDidRender() {
+  componentDidRender() {
     Utils.installEventHandler(
       this.domSearchResultList,
       "sl-select",
@@ -174,7 +174,7 @@ export class MadSelectTeam {
     });
 
     Utils.installEventHandler(
-      this.domInputSearch,
+      this.domInputSearch as unknown as HTMLElement,
       "sl-input",
       (ev: CustomEvent) => {
         ev.stopPropagation();

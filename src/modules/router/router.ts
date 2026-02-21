@@ -3,6 +3,8 @@ export interface RedirectionOptions {
   to: string;
 }
 
+const HASH_PREFIX_REGEX = /^#/;
+
 export class Router {
   private readonly callbacks: Array<() => void> = [];
   private readonly redirectionOptions: RedirectionOptions[] = [];
@@ -23,7 +25,7 @@ export class Router {
   }
 
   get route() {
-    return window.location.hash.replace(/^#/, "");
+    return window.location.hash.replace(HASH_PREFIX_REGEX, "");
   }
 
   private attachEventListners() {
@@ -58,11 +60,11 @@ export class Router {
       return;
     }
 
-    this.callbacks.forEach((callback) => {
+    for (const callback of this.callbacks) {
       setTimeout(() => {
         callback();
       });
-    });
+    }
 
     this.scheduleCheckOfRegisteredAndRedirectionUrl();
   }
@@ -97,11 +99,11 @@ export class Router {
     }, 100);
   }
 
-  public onUpdate(callbak: () => void) {
+  onUpdate(callbak: () => void) {
     this.callbacks.push(callbak);
   }
 
-  public match(path: string): boolean {
+  match(path: string): boolean {
     const route = this.route;
     const paths = path.split("/");
     const routes = route.split("/");
@@ -113,19 +115,19 @@ export class Router {
     return result;
   }
 
-  public get(idx: number): string | null {
+  get(idx: number): string | null {
     return this.route.split("/").at(idx) || null;
   }
 
-  public goTo(hash: string): void {
-    window.location.hash = hash.replace(/^#/, "");
+  goTo(hash: string): void {
+    window.location.hash = hash.replace(HASH_PREFIX_REGEX, "");
   }
 
-  public goBack(): void {
+  goBack(): void {
     window.history.back();
   }
 
-  public setRedirection(option: RedirectionOptions): void {
+  setRedirection(option: RedirectionOptions): void {
     const alreadySet = this.redirectionOptions.find((candidate) => {
       return candidate.from === option.from;
     });
@@ -149,7 +151,7 @@ export class Router {
     this.scheduleCheckOfRegisteredAndRedirectionUrl();
   }
 
-  public registerUrl(url: string): void {
+  registerUrl(url: string): void {
     if (this.registeredUrl.includes(url)) {
       return;
     }
@@ -158,11 +160,11 @@ export class Router {
     this.scheduleCheckOfRegisteredAndRedirectionUrl();
   }
 
-  public setDefaultUrl(url: string): void {
+  setDefaultUrl(url: string): void {
     this.defaultUrl = url;
   }
 
-  public setNotFoundUrl(url: string): void {
+  setNotFoundUrl(url: string): void {
     this.notFoundUrl = url;
   }
 }
