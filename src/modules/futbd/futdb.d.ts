@@ -9,7 +9,7 @@ export interface FutDBPagination {
 }
 
 export interface FutDBTeamReturn {
-  items: Array<GenericTeam>;
+  items: GenericTeam[];
   pagination: FutDBPagination;
 }
 

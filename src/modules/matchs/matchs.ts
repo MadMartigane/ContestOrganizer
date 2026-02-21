@@ -1,6 +1,7 @@
 import type { Tournament } from "../tournaments/tournaments.types";
 import uuid from "../uuid/uuid";
-import { type Row } from "./matchs.d";
+import type { Row } from "./matchs.d";
+export type { Row };
 export enum MatchStatus {
   PENDING = "Pending",
   DOING = "Doing",

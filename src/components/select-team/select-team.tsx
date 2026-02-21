@@ -32,9 +32,9 @@ export class MadSelectTeam {
   private domDivBody?: HTMLDivElement;
   private domInputSearch?: SlInput;
   private domSearchResultList?: SlMenu;
-  private teams: Array<GenericTeam>;
+  private teams: GenericTeam[];
   private searchValue: string;
-  private minNumberSearchLetter: number;
+  private readonly minNumberSearchLetter: number;
 
   @Prop() color: string;
   @Prop() placeholder: string;
@@ -45,7 +45,7 @@ export class MadSelectTeam {
 
   @State() private team: GenericTeam;
   @State() private isLoading: boolean;
-  @State() private suggested: Array<GenericTeam>;
+  @State() private suggested: GenericTeam[];
 
   @Event() madSelectChange: EventEmitter<GridTeamOnUpdateDetail>;
 
@@ -74,7 +74,7 @@ export class MadSelectTeam {
         this.isLoading = true;
         this.apiFutDB
           .loadTeams()
-          .then((teams: Array<GenericTeam>) => {
+          .then((teams: GenericTeam[]) => {
             this.teams = teams;
           })
           .catch((error: any) => {

@@ -5,7 +5,7 @@ export class GlobalSetting {
   private alreadyInit: boolean;
   private devicePrefersDark: boolean; // Device system setting
   private darkModeSet: boolean | null; // The user choice
-  private darkThemeChangeCallbacks: Function[];
+  private readonly darkThemeChangeCallbacks: Function[];
 
   constructor() {
     this.STORE_KEY = "CONTEST_ORGANIZER_SETTING";

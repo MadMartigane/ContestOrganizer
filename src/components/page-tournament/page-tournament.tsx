@@ -30,7 +30,7 @@ export interface PageConfConstants {
 export class PageTournament {
   private readonly tournaments: typeof tournaments;
   private readonly conf: PageConfConstants;
-  private readonly basketGridCompliants: Array<TournamentType> = [
+  private readonly basketGridCompliants: TournamentType[] = [
     TournamentType.NBA,
     TournamentType.BASKET,
     TournamentType.NFL,
@@ -80,9 +80,7 @@ export class PageTournament {
   }
 
   private onTeamNumberChange(detail?: { value: string }): void {
-    this.teamNumber = Number(
-      (detail && detail.value) || this.conf.teamNumberDefault
-    );
+    this.teamNumber = Number(detail?.value || this.conf.teamNumberDefault);
     this.updateTournament();
   }
 
@@ -104,7 +102,7 @@ export class PageTournament {
     this.tournament = {
       id: this.tournament.id,
       name: this.tournament.name,
-      grid: [] as Array<TeamRow>,
+      grid: [] as TeamRow[],
       matchs: this.tournament.matchs,
       type: this.tournament.type,
     };

@@ -41,7 +41,7 @@ export class TeamRow {
   }
 
   public reset() {
-    delete this.team;
+    this.team = undefined;
     ["points", "concededGoals", "scoredGoals", "goalAverage"].forEach((key) =>
       this.set(key, "0")
     );

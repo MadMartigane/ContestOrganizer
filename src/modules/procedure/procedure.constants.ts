@@ -1,6 +1,6 @@
 import type { ProcedureDataType } from "./procedure.types";
 
-export const PROCEDURE_TYPE_ERROR: Array<ProcedureDataType> = [
+export const PROCEDURE_TYPE_ERROR: ProcedureDataType[] = [
   "500",
   "NOT_FOUND",
   "NOT_IMPLEMENTED",

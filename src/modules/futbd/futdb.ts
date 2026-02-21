@@ -13,10 +13,10 @@ import type {
 } from "./futdb.d";
 
 export class ApiFutDB {
-  private readonly loadedImg: Array<FutDBLoadedImgBuffer>;
+  private readonly loadedImg: FutDBLoadedImgBuffer[];
 
-  private isLoading: Promise<Array<GenericTeam>> | null;
-  private allTeams: Array<GenericTeam>;
+  private isLoading: Promise<GenericTeam[]> | null;
+  private allTeams: GenericTeam[];
   private pagination: FutDBPagination;
   private countReturn: number;
 
@@ -38,9 +38,9 @@ export class ApiFutDB {
     });
   }
 
-  private async loadCache(): Promise<Array<GenericTeam> | null> {
+  private async loadCache(): Promise<GenericTeam[] | null> {
     const cacheString = localStorage.getItem(LOCAL_STORAGE_TEAM_KEY);
-    let cache = null as Array<GenericTeam> | null;
+    let cache = null as GenericTeam[] | null;
 
     if (cacheString) {
       try {
@@ -102,7 +102,7 @@ export class ApiFutDB {
       });
   }
 
-  public async loadTeams(): Promise<Array<GenericTeam>> {
+  public async loadTeams(): Promise<GenericTeam[]> {
     if (this.isLoading) {
       return this.isLoading;
     }

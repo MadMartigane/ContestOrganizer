@@ -1,14 +1,14 @@
 import type { Match } from "../matchs/matchs";
 import type TeamRow from "../team-row/team-row";
 
-export type Tournament = {
+export interface Tournament {
+  grid: TeamRow[];
   id: number;
+  matchs: Match[];
   name: string;
-  grid: Array<TeamRow>;
-  matchs: Array<Match>;
-  type: TournamentType;
   timestamp?: number;
-};
+  type: TournamentType;
+}
 
 export enum TournamentType {
   FOOT = "Foot",
@@ -26,6 +26,6 @@ export enum TournamentTypeLabel {
   RUGBY = "🏉 Rugby",
 }
 
-export type TournamentUpdateEvent = {
+export interface TournamentUpdateEvent {
   tournamentId: number;
-};
+}

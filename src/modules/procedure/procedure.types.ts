@@ -7,17 +7,17 @@ export type ProcedureDataType =
   | "500"
   | "NOT_FOUND";
 
-export type ProcedureError = {
+export interface ProcedureError {
   message: string;
-};
-export type ProcedureData = {
-  procedure: ProcedureDataType;
+}
+export interface ProcedureData {
   data: unknown;
+  debug: string[];
   error: ProcedureError;
-  debug: Array<string>;
-};
+  procedure: ProcedureDataType;
+}
 
-export type ProcedureContentStoredTournaments = {
+export interface ProcedureContentStoredTournaments {
   timestamp: number;
-  tournaments: Array<Tournament>;
-};
+  tournaments: Tournament[];
+}

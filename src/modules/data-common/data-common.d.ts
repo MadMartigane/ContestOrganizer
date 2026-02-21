@@ -1,19 +1,19 @@
 import { GenericTeam } from "../team-row/team-row.d";
 
-export type CommonGridData = {
-  team: GenericTeam;
-  winGames: number;
-  looseGames: number;
-  winGamesPercent: number;
+export interface CommonGridData {
   concededPoints: number;
+  looseGames: number;
   scoredPoints: number;
+  team: GenericTeam;
   tournamentGridId: number;
-};
+  winGames: number;
+  winGamesPercent: number;
+}
 
-export type CommonGridConfConstants = {
+export interface CommonGridConfConstants {
   concededPointsMin: number;
-  scoredPointsMin: number;
   looseGamesMin: number;
+  scoredPointsMin: number;
   winGamesMin: number;
   winGamesPercentMin: number;
-};
+}

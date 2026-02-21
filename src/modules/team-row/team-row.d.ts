@@ -1,20 +1,20 @@
 import { TournamentType } from "../tournaments/tournaments.types";
 
-export type GenericTeamCountry = {
-  id: number;
-  name: string;
-  flag: string;
+export interface GenericTeamCountry {
   code: string;
-};
-
-export type GenericTeam = {
+  flag: string;
   id: number;
   name: string;
-  type: TournamentType;
+}
+
+export interface GenericTeam {
+  country?: GenericTeamCountry;
+  id: number;
   league?: number;
   logo?: string;
-  country?: GenericTeamCountry;
-};
+  name: string;
+  type: TournamentType;
+}
 
 export interface TeamRowProperties {
   concededGoals: number;
@@ -26,7 +26,7 @@ export interface TeamRowProperties {
   type: TournamentType;
 }
 
-export type GenericTeamLogo = {
-  url?: string;
+export interface GenericTeamLogo {
   base64?: string;
-};
+  url?: string;
+}

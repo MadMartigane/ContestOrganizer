@@ -18,10 +18,10 @@ import {
 export class Tournaments {
   private readonly CACHE_KEY: string;
   private readonly uuid: typeof uuid;
-  private readonly callbackCollector: Array<Function>;
+  private readonly callbackCollector: Function[];
   private readonly httpRequest: HttpRequest;
 
-  private tournaments: Array<Tournament>;
+  private tournaments: Tournament[];
 
   public isBusy: Promise<unknown> | null;
 
@@ -69,7 +69,7 @@ export class Tournaments {
     const tournamentsString = this.getTournamentsCache();
     let localTournaments: {
       timestamp: number;
-      tournaments: Array<Tournament>;
+      tournaments: Tournament[];
     } | null = null;
 
     if (tournamentsString) {
@@ -95,13 +95,13 @@ export class Tournaments {
       );
     }
 
-    let mergedTournaments: Array<Tournament>;
+    let mergedTournaments: Tournament[];
 
     if (backendTournaments && !localTournaments) {
       mergedTournaments = backendTournaments.tournaments;
     } else if (backendTournaments && localTournaments) {
-      let recentTournaments: Array<Tournament>;
-      let oldestTournaments: Array<Tournament>;
+      let recentTournaments: Tournament[];
+      let oldestTournaments: Tournament[];
 
       if (
         (localTournaments?.timestamp || 0) >=
@@ -140,11 +140,11 @@ export class Tournaments {
   }
 
   private mergeTournaments(
-    primaries: Array<Tournament>,
-    secondaries: Array<Tournament>
-  ): Array<Tournament> {
-    if (!(primaries && primaries.length)) {
-      return secondaries && secondaries.length ? secondaries : [];
+    primaries: Tournament[],
+    secondaries: Tournament[]
+  ): Tournament[] {
+    if (!primaries?.length) {
+      return secondaries?.length ? secondaries : [];
     }
 
     const merged: Tournament[] = [];
@@ -349,7 +349,7 @@ export class Tournaments {
 
   public async add(arg: {
     name: string;
-    grid: Array<TeamRow>;
+    grid: TeamRow[];
     matchs: Match[];
     type: TournamentType;
   }): Promise<number> {
@@ -383,35 +383,33 @@ export class Tournaments {
   }
 
   public async update(tournament: Tournament): Promise<number> {
-    const promise = this.isBusy || Promise.resolve();
+    await (this.isBusy || Promise.resolve());
 
-    return promise.then(() => {
-      const i = this.tournaments.findIndex((t) => t.id === tournament.id);
+    const i = this.tournaments.findIndex((t) => t.id === tournament.id);
 
-      if (i === -1) {
-        console.warn(
-          "[Tournaments] Unable to update the tourmament #%s.",
-          tournament.id
-        );
-        return this.tournaments.length;
-      }
+    if (i === -1) {
+      console.warn(
+        "[Tournaments] Unable to update the tourmament #%s.",
+        tournament.id
+      );
+      return this.tournaments.length;
+    }
 
-      if (
-        tournament.type !== TournamentType.NBA &&
-        tournament.type !== TournamentType.BASKET
-      ) {
-        this.updateScores(tournament);
-      } else {
-        this.resetScores(tournament);
-      }
+    if (
+      tournament.type !== TournamentType.NBA &&
+      tournament.type !== TournamentType.BASKET
+    ) {
+      await this.updateScores(tournament);
+    } else {
+      this.resetScores(tournament);
+    }
 
-      tournament.timestamp = Date.now();
-      this.tournaments[i] = tournament;
-      return this.store();
-    });
+    tournament.timestamp = Date.now();
+    this.tournaments[i] = tournament;
+    return this.store();
   }
 
-  public map(callback: Function): Array<any> {
+  public map(callback: Function): any[] {
     return this.tournaments.map(
       (value: Tournament, index: number, array: Tournament[]) =>
         callback(value, index, array)

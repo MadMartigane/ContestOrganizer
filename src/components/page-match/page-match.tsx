@@ -17,14 +17,14 @@ import {
 import Utils from "../../modules/utils/utils";
 import uuid from "../../modules/uuid/uuid";
 
-type Config = {
+interface Config {
   minGoal: number;
-};
+}
 
-type ScrollConfig = {
+interface ScrollConfig {
   matchThreshold: number;
   scrollDelay: number;
-};
+}
 
 @Component({
   tag: "page-match",
@@ -47,7 +47,7 @@ export class PageMatch {
   @State() private matchNumber: number;
   @State() private currentMatch: Match | null;
   @State() private refreshUIHook: number;
-  @State() private matchRefs: HTMLElement[] = [];
+  @State() private readonly matchRefs: HTMLElement[] = [];
   @State() private rankMap: Map<number, number> = new Map();
 
   constructor() {

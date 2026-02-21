@@ -18,8 +18,8 @@ export class ApiSports {
 
   constructor() {
     this.loadCache().then((cache) => {
-      this.allTeams = (cache && cache.allTeams) || [];
-      this.allSearch = (cache && cache.allSearch) || [];
+      this.allTeams = cache?.allTeams || [];
+      this.allSearch = cache?.allSearch || [];
     });
   }
 

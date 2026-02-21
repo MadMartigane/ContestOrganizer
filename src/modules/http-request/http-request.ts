@@ -42,7 +42,7 @@ export class HttpRequest {
     url: string,
     data: XMLHttpRequestBodyInit | null,
     responseType: XMLHttpRequestResponseType = HttpRequestResponseTypes.JSON,
-    headers?: Array<HttpHeader>,
+    headers?: HttpHeader[],
     type: HTTP_REQUEST_TYPE = "GET"
   ): Promise<unknown> {
     const fullUrl = this.getFullUrl(url);
@@ -101,7 +101,7 @@ export class HttpRequest {
   public load(
     url: string,
     responseType: XMLHttpRequestResponseType = HttpRequestResponseTypes.JSON,
-    headers?: Array<HttpHeader>
+    headers?: HttpHeader[]
   ): Promise<unknown> {
     return this.request(url, null, responseType, headers, "GET");
   }
@@ -110,7 +110,7 @@ export class HttpRequest {
     url: string,
     data: XMLHttpRequestBodyInit,
     responseType: XMLHttpRequestResponseType = HttpRequestResponseTypes.JSON,
-    headers?: Array<HttpHeader>
+    headers?: HttpHeader[]
   ): Promise<unknown> {
     return this.request(url, data, responseType, headers, "POST");
   }

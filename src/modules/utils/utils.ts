@@ -18,7 +18,7 @@ export default class Utils {
     if (typeof selector === "string") {
       setTimeout(() => {
         const element: HTMLElement | null = document.querySelector(selector);
-        if (element && element.focus) {
+        if (element?.focus) {
           element.focus();
         }
       }, 300);
@@ -40,7 +40,7 @@ export default class Utils {
     cancel = "Non",
     confirm = "Oui"
   ): Promise<boolean> {
-    let resolve: (value: boolean) => void | null;
+    let resolve: (value: boolean | PromiseLike<boolean>) => void;
     const promise: Promise<boolean> = new Promise((res) => {
       resolve = res;
     });

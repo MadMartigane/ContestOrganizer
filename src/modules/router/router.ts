@@ -1,9 +1,12 @@
-export type RedirectionOptions = { from: string; to: string };
+export interface RedirectionOptions {
+  from: string;
+  to: string;
+}
 
 export class Router {
   private readonly callbacks: Array<() => void> = [];
-  private readonly redirectionOptions: Array<RedirectionOptions> = [];
-  private readonly registeredUrl: Array<string> = [];
+  private readonly redirectionOptions: RedirectionOptions[] = [];
+  private readonly registeredUrl: string[] = [];
 
   private checkingUrlTimeoutId: number | null = null;
   private defaultUrl: string | null;

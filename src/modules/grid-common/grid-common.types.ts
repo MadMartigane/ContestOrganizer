@@ -11,7 +11,7 @@ export interface GridConfConstants {
   teamNumberStep: number;
 }
 
-export type GridTeamOnUpdateDetail = {
+export interface GridTeamOnUpdateDetail {
   genericTeam: GenericTeam;
   tournamentGridId: number | null;
-};
+}

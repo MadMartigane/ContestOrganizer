@@ -9,7 +9,7 @@ export class Procedure {
   private type: ProcedureDataType | null;
   private data: unknown | null;
   private error: ProcedureError | null;
-  private debug: Array<string> | null;
+  private debug: string[] | null;
 
   constructor(data: ProcedureData) {
     this.type = null;
@@ -37,7 +37,7 @@ export class Procedure {
     return this.data;
   }
 
-  public getLogs(): Array<string> | null {
+  public getLogs(): string[] | null {
     return this.debug;
   }
 
@@ -62,8 +62,6 @@ export class Procedure {
       return "";
     }
 
-    return this.isOk()
-      ? JSON.stringify(this.data)
-      : (this.error && this.error.message) || "";
+    return this.isOk() ? JSON.stringify(this.data) : this.error?.message || "";
   }
 }

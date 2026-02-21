@@ -8,7 +8,7 @@ import apiFutDB from "../../modules/futbd/futdb";
   shadow: false,
 })
 export class MadTeamTile {
-  private apiFutDB: typeof apiFutDB;
+  private readonly apiFutDB: typeof apiFutDB;
 
   @State() private imgSrc: string;
 

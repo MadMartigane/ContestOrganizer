@@ -6,20 +6,20 @@ export interface ApiSportsReturnError {
   status: number;
 }
 
-export type ApiSportsTeamReturn = {
+export interface ApiSportsTeamReturn {
   errors: ApiSportsReturnError[];
   get: string;
-  results: number;
   response: GenericTeam[];
-};
+  results: number;
+}
 
-export type ApiSportsSearchCache = {
+export interface ApiSportsSearchCache {
+  results: number[];
   search: string;
   type: TournamentType;
-  results: number[];
-};
+}
 
-export type ApiSportsCache = {
-  allTeams: GenericTeam[];
+export interface ApiSportsCache {
   allSearch: ApiSportsSearchCache[];
-};
+  allTeams: GenericTeam[];
+}
