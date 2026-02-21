@@ -25,7 +25,7 @@ export class GridBasket {
 
   @State() private tournament: Tournament | null;
 
-  @Prop() public tournamentId: number | null;
+  @Prop() tournamentId: number | null;
 
   @Event() gridTournamentChange: EventEmitter<TournamentUpdateEvent>;
 
