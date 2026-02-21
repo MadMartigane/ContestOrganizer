@@ -24,13 +24,17 @@ export class Page404 {
             <sl-carousel-item>
               <img
                 alt="404 - Not found"
+                height="300"
                 src="/assets/img/undraw_page_not_found.svg"
+                width="400"
               />
             </sl-carousel-item>
             <sl-carousel-item>
               <img
                 alt="404 - Page abducted"
+                height="300"
                 src="/assets/img/undraw_taken.svg"
+                width="400"
               />
             </sl-carousel-item>
           </sl-carousel>
