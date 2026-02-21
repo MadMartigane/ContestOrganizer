@@ -3,22 +3,24 @@
  */
 
 import httpRequest from "../http-request/http-request";
-import { FutDBLoadedImgBuffer, FutDBTeamReturn, FutDBPagination } from "./futdb.d";
-import { SECRETS, LOCAL_STORAGE_TEAM_KEY } from "./futdb.constants";
-import { GenericTeam } from "../team-row/team-row.d";
+import type { GenericTeam } from "../team-row/team-row.d";
 import { TournamentType } from "../tournaments/tournaments.types";
+import { LOCAL_STORAGE_TEAM_KEY, SECRETS } from "./futdb.constants";
+import type {
+  FutDBLoadedImgBuffer,
+  FutDBPagination,
+  FutDBTeamReturn,
+} from "./futdb.d";
 
 export class ApiFutDB {
+  private readonly loadedImg: FutDBLoadedImgBuffer[];
 
-  private readonly loadedImg: Array<FutDBLoadedImgBuffer>;
-
-  private isLoading: Promise<Array<GenericTeam>> | null;
-  private allTeams: Array<GenericTeam>;
+  private isLoading: Promise<GenericTeam[]> | null;
+  private allTeams: GenericTeam[];
   private pagination: FutDBPagination;
   private countReturn: number;
 
-
-  constructor () {
+  constructor() {
     this.isLoading = null;
     this.allTeams = [];
     this.loadedImg = [];
@@ -27,7 +29,7 @@ export class ApiFutDB {
       countTotal: 0,
       pageCurrent: 0,
       pageTotal: 30, // Fake start condition
-      itemsPerPage: 0
+      itemsPerPage: 0,
     };
     this.countReturn = 0;
 
@@ -36,61 +38,71 @@ export class ApiFutDB {
     });
   }
 
-  private async loadCache(): Promise<Array<GenericTeam> | null> {
+  private loadCache(): Promise<GenericTeam[] | null> {
     const cacheString = localStorage.getItem(LOCAL_STORAGE_TEAM_KEY);
-    let cache = null as Array<GenericTeam> | null;
+    let cache = null as GenericTeam[] | null;
 
     if (cacheString) {
       try {
         cache = JSON.parse(cacheString);
       } catch (e) {
-        console.warn("[ApiFutDB] unable to parse stored teams. Clear cache:", e);
+        console.warn(
+          "[ApiFutDB] unable to parse stored teams. Clear cache:",
+          e
+        );
         localStorage.removeItem(LOCAL_STORAGE_TEAM_KEY);
-        return null;
+        return Promise.resolve(null);
       }
     }
 
-    return cache;
+    return Promise.resolve(cache);
   }
 
-  private async loadTeamsPage(pageNumber: number, resolve: Function, reject: Function): Promise<FutDBPagination> {
+  private loadTeamsPage(
+    pageNumber: number,
+    resolve: (value: GenericTeam[]) => void,
+    reject: (reason?: unknown) => void
+  ): Promise<FutDBPagination> {
     const url = `https://futdb.app/api/clubs?page=${pageNumber}`;
-    return httpRequest.load(
-      url,
-      httpRequest.CONSTANTS.RESPONSE_TYPES.JSON,
-      [ { name: "X-AUTH-TOKEN", value: SECRETS } ]
-    )
-    .then((rawData) => {
-      const data = rawData as FutDBTeamReturn;
-      if (data?.items.length) {
-        data.items.forEach((team) => { team.type = TournamentType.FOOT; });
-        this.allTeams = this.allTeams.concat((data.items));
-        this.pagination.countCurrent = this.allTeams.length;
-      }
+    return httpRequest
+      .load(url, httpRequest.CONSTANTS.RESPONSE_TYPES.JSON, [
+        { name: "X-AUTH-TOKEN", value: SECRETS },
+      ])
+      .then((rawData) => {
+        const data = rawData as FutDBTeamReturn;
+        if (data?.items.length) {
+          for (const team of data.items) {
+            team.type = TournamentType.FOOT;
+          }
+          this.allTeams = this.allTeams.concat(data.items);
+          this.pagination.countCurrent = this.allTeams.length;
+        }
 
-      this.countReturn++;
-      if (pageNumber > 1 && this.pagination.pageCurrent < this.pagination.pageTotal) {
-        this.pagination.pageCurrent++;
-        this.loadTeamsPage(this.pagination.pageCurrent, resolve, reject)
-      }
+        this.countReturn++;
+        if (
+          pageNumber > 1 &&
+          this.pagination.pageCurrent < this.pagination.pageTotal
+        ) {
+          this.pagination.pageCurrent++;
+          this.loadTeamsPage(this.pagination.pageCurrent, resolve, reject);
+        }
 
-      if (this.countReturn >= this.pagination.pageTotal) {
-        resolve(this.allTeams);
+        if (this.countReturn >= this.pagination.pageTotal) {
+          resolve(this.allTeams);
 
-        localStorage.setItem(
-          LOCAL_STORAGE_TEAM_KEY,
-          JSON.stringify(this.allTeams)
-        );
+          localStorage.setItem(
+            LOCAL_STORAGE_TEAM_KEY,
+            JSON.stringify(this.allTeams)
+          );
 
-        this.isLoading = null;
-      }
+          this.isLoading = null;
+        }
 
-      return data.pagination;
-    });
+        return data.pagination;
+      });
   }
 
-  public async loadTeams (): Promise<Array<GenericTeam>> {
-
+  loadTeams(): Promise<GenericTeam[]> {
     if (this.isLoading) {
       return this.isLoading;
     }
@@ -103,25 +115,23 @@ export class ApiFutDB {
 
     this.isLoading = new Promise((resolve, reject) => {
       this.loadTeamsPage(1, resolve, reject)
-      .then((pagination) => {
+        .then((pagination) => {
+          this.pagination = pagination;
 
-        this.pagination = pagination;
-
-        for( let i = 0; i < 3; i++ ) {
-          this.pagination.pageCurrent++;
-          this.loadTeamsPage(this.pagination.pageCurrent, resolve, reject)
-        }
-
-      })
-      .catch((error) => {
-        reject(error);
-      });
+          for (let i = 0; i < 3; i++) {
+            this.pagination.pageCurrent++;
+            this.loadTeamsPage(this.pagination.pageCurrent, resolve, reject);
+          }
+        })
+        .catch((error) => {
+          reject(error);
+        });
     });
 
     return this.isLoading;
   }
 
-  public async loadTeamImage(id: number): Promise<string> {
+  loadTeamImage(id: number): Promise<string> {
     const buffer = this.loadedImg.find((buff) => buff.id === id);
     if (buffer) {
       return new Promise((resolve) => {
@@ -130,32 +140,28 @@ export class ApiFutDB {
     }
 
     const url = `https://futdb.app/api/clubs/${id}/image`;
-    return httpRequest.load(
-      url,
-      httpRequest.CONSTANTS.RESPONSE_TYPES.BLOB,
-      [ { name: "X-AUTH-TOKEN", value: SECRETS } ]
-    )
-    .then((rawData) => {
-      const data = rawData as Blob;
-      /* Use one file reader for each img */
-      const fileReader = new FileReader();
-      const handler = (resolve: Function) => {
+    return httpRequest
+      .load(url, httpRequest.CONSTANTS.RESPONSE_TYPES.BLOB, [
+        { name: "X-AUTH-TOKEN", value: SECRETS },
+      ])
+      .then((rawData) => {
+        const data = rawData as Blob;
+        /* Use one file reader for each img */
+        const fileReader = new FileReader();
+        const handler = (resolve: (value: string) => void) => {
+          fileReader.addEventListener("load", () => {
+            const src = fileReader.result as string;
+            this.loadedImg.push({ id, src });
+            resolve(src);
+          });
 
-        fileReader.addEventListener("load", () => {
-          const src = fileReader.result as string;
-          this.loadedImg.push({ id, src })
-          resolve(src);
-        });
+          fileReader.readAsDataURL(data);
+        };
 
-        fileReader.readAsDataURL(data);
-      };
-
-      return new Promise(handler);
-    });
+        return new Promise(handler);
+      });
   }
 }
 
-
 const apiFutDB = new ApiFutDB();
 export default apiFutDB;
-

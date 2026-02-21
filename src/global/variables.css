@@ -3,12 +3,12 @@ html {
 }
 
 div.grid-300 {
-  max-width: 1280px;
-  margin-left: auto;
-  margin-right: auto;
   display: grid;
-  gap: var(--sl-spacing-medium);
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--sl-spacing-medium);
+  max-width: 1280px;
+  margin-right: auto;
+  margin-left: auto;
 
   & > * {
     display: block;
@@ -16,27 +16,26 @@ div.grid-300 {
 }
 
 .can-be-clicked {
-  &:hover {
-    cursor: pointer;
-  }
-
   border-color: var(--sl-color-blue-100);
   border-style: dashed;
   border-width: 0.5px;
+  &:hover {
+    cursor: pointer;
+  }
 }
 
 div.page-content {
   max-width: 1280px;
-  margin: var(--sl-spacing-3x-large) auto;
   padding: var(--sl-spacing-small);
+  margin: var(--sl-spacing-3x-large) auto;
   color: var(--sl-color-primary-900);
-  background-color: var(--sl-color-neutral-100);
   text-align: center;
+  background-color: var(--sl-color-neutral-100);
   border-color: var(--sl-color-neutral-300);
   border-radius: var(--sl-border-radius-large);
-  box-shadow: var(--sl-shadow-medium);
-  -webkit-box-shadow: var(--sl-shadow-medium);
   -moz-box-shadow: var(--sl-shadow-medium);
+  -webkit-box-shadow: var(--sl-shadow-medium);
+  box-shadow: var(--sl-shadow-medium);
 }
 
 div.footer {

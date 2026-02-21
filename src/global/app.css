@@ -8,13 +8,13 @@
   Any global CSS variables should also be applied here.
 */
 /* ####### GENERIC CSS ######### */
-@import './variables.css';
+@import "./variables.css";
 /* ####### END OF GENERIC CSS ######### */
 
 /* ####### SHOELACE CSS ########## */
-@import './shoelace.css';
+@import "./shoelace.css";
 /* ####### END OF SHOELACE CSS ########## */
 
 /* ####### TAILWIND CSS ########## */
-@import './tailwind.css';
+@import "./tailwind.css";
 /* ####### END OF TAILWIND CSS ########## */

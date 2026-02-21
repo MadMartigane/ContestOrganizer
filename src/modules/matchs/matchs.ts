@@ -1,15 +1,30 @@
-import { MatchStatus, Row } from './matchs.d';
-import uuid from '../uuid/uuid';
-import { Tournament } from '../tournaments/tournaments.types';
+import type { Tournament } from "../tournaments/tournaments.types";
+import uuid from "../uuid/uuid";
 
-export * from './matchs.d';
+import type { Row } from "./matchs.d";
+
+export type { Row } from "./matchs.d";
+export const MatchStatus = {
+  PENDING: "Pending",
+  DOING: "Doing",
+  DONE: "Done",
+} as const;
+
+export type MatchStatus = (typeof MatchStatus)[keyof typeof MatchStatus];
+
+export const MatchTeamType = {
+  HOST: "Host",
+  VISITOR: "Visitor",
+} as const;
+
+export type MatchTeamType = (typeof MatchTeamType)[keyof typeof MatchTeamType];
 
 export class Match {
-  public readonly id: number;
-  public hostId: number | null;
-  public visitorId: number | null;
-  public goals: { visitor: number; host: number };
-  public status: MatchStatus;
+  readonly id: number;
+  hostId: number | null;
+  visitorId: number | null;
+  goals: { visitor: number; host: number };
+  status: MatchStatus;
 
   constructor(host = null, visitor = null, status = MatchStatus.PENDING) {
     this.id = uuid.new();
@@ -20,36 +35,51 @@ export class Match {
   }
 }
 
-export default class Matchs {
-  static teamSortedByMatch(tournament: Tournament): Row[] {
-    const bulk = tournament.grid.map(teamRow => {
-      const row: Row = {
-        selected: false,
-        team: teamRow,
-        scheduledMatchs: 0,
-        doneMatchs: 0,
-        totalMatchs: 0,
-      };
+function teamSortedByMatch(tournament: Tournament): Row[] {
+  const bulk = tournament.grid.map((teamRow) => {
+    const row: Row = {
+      selected: false,
+      team: teamRow,
+      scheduledMatchs: 0,
+      doneMatchs: 0,
+      totalMatchs: 0,
+    };
 
-      row.scheduledMatchs =
-        tournament.matchs.filter(match => {
-          return (match.status === MatchStatus.DOING || match.status === MatchStatus.PENDING) && (match.hostId === teamRow.id || match.visitorId === teamRow.id);
-        }).length || 0;
+    row.scheduledMatchs =
+      tournament.matchs.filter((match) => {
+        return (
+          (match.status === MatchStatus.DOING ||
+            match.status === MatchStatus.PENDING) &&
+          (match.hostId === teamRow.id || match.visitorId === teamRow.id)
+        );
+      }).length || 0;
 
-      row.doneMatchs =
-        tournament.matchs.filter(match => {
-          return match.status === MatchStatus.DONE && (match.hostId === teamRow.id || match.visitorId === teamRow.id);
-        }).length || 0;
+    row.doneMatchs =
+      tournament.matchs.filter((match) => {
+        return (
+          match.status === MatchStatus.DONE &&
+          (match.hostId === teamRow.id || match.visitorId === teamRow.id)
+        );
+      }).length || 0;
 
-      row.totalMatchs = row.scheduledMatchs + row.doneMatchs;
+    row.totalMatchs = row.scheduledMatchs + row.doneMatchs;
 
-      return row;
-    });
+    return row;
+  });
 
-    bulk.sort((teamA, teamB) => (teamA?.doneMatchs || 0) - (teamB?.doneMatchs || 0));
-    bulk.sort((teamA, teamB) => (teamB?.scheduledMatchs || 0) - (teamA?.scheduledMatchs || 0));
-    bulk.sort((teamA, teamB) => (teamA?.totalMatchs || 0) - (teamB?.totalMatchs || 0));
+  bulk.sort(
+    (teamA, teamB) => (teamA?.doneMatchs || 0) - (teamB?.doneMatchs || 0)
+  );
+  bulk.sort(
+    (teamA, teamB) =>
+      (teamB?.scheduledMatchs || 0) - (teamA?.scheduledMatchs || 0)
+  );
 
-    return bulk;
-  }
+  return bulk;
 }
+
+const Matchs = {
+  teamSortedByMatch,
+};
+
+export default Matchs;

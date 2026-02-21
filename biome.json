@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.12/schema.json",
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "linter": {
     "enabled": true,
     "rules": {
@@ -28,7 +28,7 @@
     }
   },
   "files": {
-    "includes": ["**", "!**/node_modules", "!**/www", "!**/dist"]
+    "includes": ["!**/node_modules", "!**/www", "!**/dist"]
   },
   "overrides": [
     {
@@ -40,6 +40,13 @@
           }
         }
       }
+    },
+    {
+      "includes": ["src/components.d.ts"],
+      "linter": {
+        "enabled": false
+      }
     }
-  ]
+  ],
+  "extends": ["ultracite/biome/core"]
 }

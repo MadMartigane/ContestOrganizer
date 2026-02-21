@@ -1,9 +1,14 @@
-export type RedirectionOptions = { from: string; to: string };
+export interface RedirectionOptions {
+  from: string;
+  to: string;
+}
+
+const HASH_PREFIX_REGEX = /^#/;
 
 export class Router {
   private readonly callbacks: Array<() => void> = [];
-  private readonly redirectionOptions: Array<RedirectionOptions> = [];
-  private readonly registeredUrl: Array<string> = [];
+  private readonly redirectionOptions: RedirectionOptions[] = [];
+  private readonly registeredUrl: string[] = [];
 
   private checkingUrlTimeoutId: number | null = null;
   private defaultUrl: string | null;
@@ -20,24 +25,24 @@ export class Router {
   }
 
   get route() {
-    return window.location.hash.replace(/^#/, '');
+    return window.location.hash.replace(HASH_PREFIX_REGEX, "");
   }
 
   private attachEventListners() {
-    window.addEventListener('hashchange', () => {
+    window.addEventListener("hashchange", () => {
       this.update();
     });
   }
 
   private checkDeadRoute(): void {
-    if (['', '/'].includes(this.route)) {
+    if (["", "/"].includes(this.route)) {
       if (this.defaultUrl) {
         this.goTo(this.defaultUrl);
         return;
       }
 
       if (this.registeredUrl.length > 0) {
-        this.goTo(this.registeredUrl.at(0) || '');
+        this.goTo(this.registeredUrl.at(0) || "");
         return;
       }
     }
@@ -55,22 +60,26 @@ export class Router {
       return;
     }
 
-    this.callbacks.forEach(callback => {
+    for (const callback of this.callbacks) {
       setTimeout(() => {
         callback();
       });
-    });
+    }
 
     this.scheduleCheckOfRegisteredAndRedirectionUrl();
   }
 
   private checkRegisteredAndRedirectionUrl(): void {
-    const foundRegistered = this.registeredUrl.find(candidate => this.match(candidate));
+    const foundRegistered = this.registeredUrl.find((candidate) =>
+      this.match(candidate)
+    );
     if (foundRegistered) {
       return;
     }
 
-    const foundRedirection = this.redirectionOptions.find(candidate => this.match(candidate.from));
+    const foundRedirection = this.redirectionOptions.find((candidate) =>
+      this.match(candidate.from)
+    );
     if (foundRedirection) {
       this.goTo(foundRedirection.to);
       return;
@@ -90,43 +99,48 @@ export class Router {
     }, 100);
   }
 
-  public onUpdate(callbak: () => void) {
+  onUpdate(callbak: () => void) {
     this.callbacks.push(callbak);
   }
 
-  public match(path: string): boolean {
+  match(path: string): boolean {
     const route = this.route;
-    const paths = path.split('/');
-    const routes = route.split('/');
+    const paths = path.split("/");
+    const routes = route.split("/");
 
     const result = paths.every((value, i) => {
-      return (value.startsWith(':') && routes[i]) || value === routes[i];
+      return (value.startsWith(":") && routes[i]) || value === routes[i];
     });
 
     return result;
   }
 
-  public get(idx: number): string | null {
-    return this.route.split('/').at(idx) || null;
+  get(idx: number): string | null {
+    return this.route.split("/").at(idx) || null;
   }
 
-  public goTo(hash: string): void {
-    window.location.hash = hash.replace(/^#/, '');
+  goTo(hash: string): void {
+    window.location.hash = hash.replace(HASH_PREFIX_REGEX, "");
   }
 
-  public goBack(): void {
+  goBack(): void {
     window.history.back();
   }
 
-  public setRedirection(option: RedirectionOptions): void {
-    const alreadySet = this.redirectionOptions.find(candidate => {
+  setRedirection(option: RedirectionOptions): void {
+    const alreadySet = this.redirectionOptions.find((candidate) => {
       return candidate.from === option.from;
     });
 
     if (alreadySet) {
-      console.group('OVERWRITE REDIRECTION');
+      console.group("OVERWRITE REDIRECTION");
       console.warn('[Router] Only one redirection allowed by "from" url.');
-      console.warn('"%s" will be redirected to "%s" instead of "%s"', option.from, option.to, alreadySet.to);
+      console.warn(
+        '"%s" will be redirected to "%s" instead of "%s"',
+        option.from,
+        option.to,
+        alreadySet.to
+      );
       console.groupEnd();
 
       alreadySet.to = option.to;
@@ -137,7 +151,7 @@ export class Router {
     this.scheduleCheckOfRegisteredAndRedirectionUrl();
   }
 
-  public registerUrl(url: string): void {
+  registerUrl(url: string): void {
     if (this.registeredUrl.includes(url)) {
       return;
     }
@@ -146,11 +160,11 @@ export class Router {
     this.scheduleCheckOfRegisteredAndRedirectionUrl();
   }
 
-  public setDefaultUrl(url: string): void {
+  setDefaultUrl(url: string): void {
     this.defaultUrl = url;
   }
 
-  public setNotFoundUrl(url: string): void {
+  setNotFoundUrl(url: string): void {
     this.notFoundUrl = url;
   }
 }

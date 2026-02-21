@@ -1,15 +1,23 @@
-import { Component, Event, EventEmitter, Host, Prop, h, State, Watch } from '@stencil/core';
-import uuid from '../../modules/uuid/uuid';
-
-import SlInput from '@shoelace-style/shoelace/dist/components/input/input.component';
+import type SlInput from "@shoelace-style/shoelace/dist/components/input/input.component";
+import {
+  Component,
+  Event,
+  type EventEmitter,
+  Host,
+  h,
+  Prop,
+  State,
+  Watch,
+} from "@stencil/core";
+import uuid from "../../modules/uuid/uuid";
 
 @Component({
-  tag: 'mad-input-number',
-  styleUrl: './input-number.css',
+  tag: "mad-input-number",
+  styleUrl: "./input-number.css",
   shadow: false,
 })
 export class MadInputNumber {
-  private itemId: string;
+  private readonly itemId: string;
   private domInput: SlInput;
 
   @Prop() placeholder: string;
@@ -29,16 +37,16 @@ export class MadInputNumber {
     this.itemId = `mad_input_number_${uuid.new()}`;
   }
 
-  public componentDidLoad() {
+  componentDidLoad() {
     if (this.domInput) {
-      this.domInput.addEventListener('sl-change', () => {
+      this.domInput.addEventListener("sl-change", () => {
         this.onNumberChange();
       });
     }
   }
 
-  @Watch('value')
-  public onPropValueChange() {
+  @Watch("value")
+  onPropValueChange() {
     this.number = this.value || 0;
   }
 
@@ -77,9 +85,11 @@ export class MadInputNumber {
   private onNumberChange() {
     const oldValue: number = this.number;
 
-    this.number = parseInt(this.domInput.value, 10);
-    if (isNaN(this.number)) {
-      console.warn('<mad-input-number> unable to parse input value as integer.');
+    this.number = Number.parseInt(this.domInput.value, 10);
+    if (Number.isNaN(this.number)) {
+      console.warn(
+        "<mad-input-number> unable to parse input value as integer."
+      );
       this.number = oldValue;
       this.domInput.value = String(oldValue);
       return;
@@ -93,45 +103,45 @@ export class MadInputNumber {
       <span class="container-xl">
         <span class="container-xl">
           <sl-input
-            autofocus
-            no-spin-buttons
             autocomplete="off"
-            type="number"
+            autofocus
             id={this.itemId}
             label={this.label}
-            value={this.number}
-            min={this.min}
             max={this.max}
-            step={this.step}
+            min={this.min}
+            no-spin-buttons
+            placeholder="Score"
             readonly={Boolean(this.readonly)}
             ref={(el: SlInput) => {
               this.domInput = el;
             }}
-            placeholder="Score"
             size="large"
-          ></sl-input>
+            step={this.step}
+            type="number"
+            value={this.number}
+          />
         </span>
         <span class="container-xl">
           <sl-button-group label="Plus/minus action buttons">
             <sl-button
+              disabled={Boolean(this.readonly)}
               onclick={() => {
                 this.decrementNumber();
               }}
-              disabled={Boolean(this.readonly)}
-              size="large"
               pill
+              size="large"
             >
-              <sl-icon class="text-warning" name="dash-lg"></sl-icon>
+              <sl-icon class="text-warning" name="dash-lg" />
             </sl-button>
             <sl-button
+              disabled={Boolean(this.readonly)}
               onclick={() => {
                 this.incrementNumber();
               }}
-              disabled={Boolean(this.readonly)}
-              size="large"
               pill
+              size="large"
             >
-              <sl-icon class="text-primary" name="plus-lg"></sl-icon>
+              <sl-icon class="text-primary" name="plus-lg" />
             </sl-button>
           </sl-button-group>
         </span>
@@ -139,7 +149,7 @@ export class MadInputNumber {
     );
   }
 
-  public render() {
+  render() {
     return <Host>{this.renderEditingState()}</Host>;
   }
 }

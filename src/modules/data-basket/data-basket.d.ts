@@ -1,19 +1,19 @@
-import { GenericTeam } from '../team-row/team-row.d';
+import { GenericTeam } from "../team-row/team-row.d";
 
-export type BasketGridData = {
-  team: GenericTeam;
-  winGames: number;
-  looseGames: number;
-  winGamesPercent: number;
+export interface BasketGridData {
   concededPoints: number;
+  looseGames: number;
   scoredPoints: number;
+  team: GenericTeam;
   tournamentGridId: number;
-};
+  winGames: number;
+  winGamesPercent: number;
+}
 
-export type BasketGridConfConstants = {
+export interface BasketGridConfConstants {
   concededPointsMin: number;
-  scoredPointsMin: number;
   looseGamesMin: number;
+  scoredPointsMin: number;
   winGamesMin: number;
   winGamesPercentMin: number;
-};
+}
