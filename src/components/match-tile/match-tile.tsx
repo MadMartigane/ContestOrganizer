@@ -35,7 +35,7 @@ export class MadMatchTile {
 
   @Watch("hostScore")
   @Watch("visitorScore")
-  public onUpadateScore() {
+  onUpadateScore() {
     this.refreshUIHook++;
     console.log("%s hostScore: ", this.refreshUIHook, this.hostScore);
     console.log("%s visitorScore: ", this.refreshUIHook, this.visitorScore);
