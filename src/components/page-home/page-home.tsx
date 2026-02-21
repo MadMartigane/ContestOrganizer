@@ -47,6 +47,7 @@ export class PageHome {
             <img
               alt="Greek freak basketball"
               class="h-64"
+              height="300"
               ref={(el) => {
                 this.domImg = el || null;
               }}
