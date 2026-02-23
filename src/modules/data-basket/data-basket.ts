@@ -14,6 +14,7 @@ function getOneTeamData(tournament: Tournament, team: TeamRow) {
     winGames: 0,
     looseGames: 0,
     winGamesPercent: 0,
+    scheduledMatchs: team.scheduledMatchs,
   } as BasketGridData;
 
   for (const match of tournament.matchs) {

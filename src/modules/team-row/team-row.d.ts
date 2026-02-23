@@ -21,6 +21,7 @@ export interface TeamRowProperties {
   goalAverage: number;
   id: number;
   points: number;
+  scheduledMatchs: number;
   scoredGoals: number;
   team?: GenericTeam;
   type: TournamentType;

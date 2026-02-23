@@ -13,11 +13,15 @@ function getOneTeamData(tournament: Tournament, team: TeamRow) {
     scoredPoints: 0,
     winGames: 0,
     looseGames: 0,
+    scheduledMatchs: 0,
     winGamesPercent: 0,
   } as CommonGridData;
 
   for (const match of tournament.matchs) {
     if (match.status !== MatchStatus.DONE) {
+      if (match.hostId === teamId || match.visitorId === teamId) {
+        gridData.scheduledMatchs++;
+      }
       continue;
     }
 

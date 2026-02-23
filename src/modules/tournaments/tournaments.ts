@@ -283,6 +283,7 @@ export class Tournaments {
       team.scoredGoals = 0;
       team.goalAverage = 0;
       team.points = 0;
+      team.scheduledMatchs = 0;
     }
   }
 
@@ -314,6 +315,20 @@ export class Tournaments {
 
     for (const match of tournament.matchs) {
       if (match.status !== MatchStatus.DONE) {
+        const host = await this.getTournamentTeam(tournament, match.hostId);
+        const visitor = await this.getTournamentTeam(
+          tournament,
+          match.visitorId
+        );
+
+        if (host) {
+          host.scheduledMatchs++;
+        }
+
+        if (visitor) {
+          visitor.scheduledMatchs++;
+        }
+
         continue;
       }
 

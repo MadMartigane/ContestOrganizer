@@ -3,6 +3,7 @@ import { GenericTeam } from "../team-row/team-row.d";
 export interface BasketGridData {
   concededPoints: number;
   looseGames: number;
+  scheduledMatchs: number;
   scoredPoints: number;
   team: GenericTeam;
   tournamentGridId: number;

@@ -9,6 +9,7 @@ export class TeamRow {
   concededGoals: number;
   scoredGoals: number;
   goalAverage: number;
+  scheduledMatchs: number;
   type: TournamentType;
 
   constructor(options: { id?: number; type: TournamentType }) {
@@ -19,6 +20,7 @@ export class TeamRow {
     this.concededGoals = 0;
     this.scoredGoals = 0;
     this.goalAverage = 0;
+    this.scheduledMatchs = 0;
   }
 
   toData(): TeamRowProperties {
@@ -31,6 +33,7 @@ export class TeamRow {
       concededGoals: this.concededGoals,
       scoredGoals: this.scoredGoals,
       goalAverage: this.goalAverage,
+      scheduledMatchs: this.scheduledMatchs,
     };
   }
 
@@ -45,6 +48,7 @@ export class TeamRow {
       "concededGoals",
       "scoredGoals",
       "goalAverage",
+      "scheduledMatchs",
     ]) {
       this.set(key, "0");
     }
@@ -66,6 +70,10 @@ export class TeamRow {
       }
       case "goalAverage": {
         this.goalAverage = Number(value);
+        break;
+      }
+      case "scheduledMatchs": {
+        this.scheduledMatchs = Number(value);
         break;
       }
       default: {

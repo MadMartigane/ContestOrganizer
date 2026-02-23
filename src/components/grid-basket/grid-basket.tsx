@@ -114,6 +114,10 @@ export class GridBasket {
           </span>
           <span class="hidden text-warning md:block">Encaissés</span>
         </th>
+        <th>
+          <sl-icon class="block text-2xl md:hidden" name="calendar-event" />
+          <span class="hidden md:block">Programmés</span>
+        </th>
       </thead>
     );
   }
@@ -164,6 +168,9 @@ export class GridBasket {
         <td>
           <span class="text-warning">{gridData?.concededPoints}</span>
         </td>
+        <td>
+          <span class="text-primary">{gridData?.scheduledMatchs}</span>
+        </td>
       </tr>
     ));
   }
@@ -185,6 +192,9 @@ export class GridBasket {
               </span>
               <span class="mx-1 text-warning">
                 <sl-icon name="dash-lg" />: points encaissés
+              </span>
+              <span class="mx-1">
+                <sl-icon name="calendar-event" />: match programmés
               </span>
             </div>
           </caption>
