@@ -22,8 +22,6 @@ import type {
 export class GridDefault {
   private readonly tournaments: typeof tournaments;
 
-  private counter: number;
-
   @State() private tournament: Tournament | null;
 
   @Prop() tournamentId: number | null;
@@ -39,7 +37,6 @@ export class GridDefault {
 
   private async forceGridRender() {
     this.tournament = null;
-    this.counter = 0;
 
     this.tournament = await this.tournaments.get(this.tournamentId);
   }
@@ -67,6 +64,7 @@ export class GridDefault {
   }
 
   render() {
+    let counter = 0;
     return (
       <Host>
         <table class="table-auto">
@@ -97,8 +95,8 @@ export class GridDefault {
             <tr class="">
               <td>
                 <span class="counter">
-                  {this.counter > 8 ? null : "0"}
-                  {++this.counter}
+                  {counter > 8 ? null : "0"}
+                  {++counter}
                 </span>
               </td>
               <td>

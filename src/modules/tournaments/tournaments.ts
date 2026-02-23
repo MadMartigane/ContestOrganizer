@@ -421,14 +421,7 @@ export class Tournaments {
       return Promise.resolve(this.tournaments.length);
     }
 
-    if (
-      tournament.type !== TournamentType.NBA &&
-      tournament.type !== TournamentType.BASKET
-    ) {
-      await this.updateScores(tournament);
-    } else {
-      this.resetScores(tournament);
-    }
+    await this.updateScores(tournament);
 
     tournament.timestamp = Date.now();
     this.tournaments[i] = tournament;

@@ -48,7 +48,6 @@ export class PageMatch {
   @State() private currentMatch: Match | null;
   @State() private refreshUIHook: number;
   @State() private readonly matchRefs: HTMLElement[] = [];
-  @State() private rankMap: Map<number, number> = new Map();
 
   constructor() {
     this.tournaments = tournaments;
@@ -70,8 +69,7 @@ export class PageMatch {
   }
 
   componentWillLoad() {
-    this.tournaments.onUpdate(() => this.updateRankMap());
-    this.updateRankMap();
+    this.tournaments.onUpdate(() => this.refreshUI());
   }
 
   get targetMatchIndex(): number | null {
@@ -140,11 +138,15 @@ export class PageMatch {
     return this.tournaments.update(this.tournament);
   }
 
-  onTeamChange(detail: { value: string }, team: TeamRow, key: string): void {
+  async onTeamChange(
+    detail: { value: string },
+    team: TeamRow,
+    key: string
+  ): Promise<void> {
     team.set(key, String(detail.value));
     team.goalAverage = team.scoredGoals - team.concededGoals;
 
-    this.updateTournament();
+    await this.updateTournament();
   }
 
   private goMatch() {
@@ -224,11 +226,11 @@ export class PageMatch {
 
     this.matchNumber = this.tournament.matchs.length;
 
-    this.updateTournament();
+    await this.updateTournament();
     this.refreshUI();
   }
 
-  private goValidateSelection() {
+  private async goValidateSelection() {
     if (!this.tournament) {
       return;
     }
@@ -242,7 +244,7 @@ export class PageMatch {
     }
 
     this.matchNumber = this.tournament.matchs.length;
-    this.updateTournament();
+    await this.updateTournament();
 
     this.displayTeamSelector = false;
     this.currentMatch = null;
@@ -253,7 +255,7 @@ export class PageMatch {
     this.currentMatch = null;
   }
 
-  private onTeamScores(
+  private async onTeamScores(
     match: Match,
     teamType: MatchTeamType,
     detail: { value: string }
@@ -265,7 +267,7 @@ export class PageMatch {
       match.goals.host = value;
     }
 
-    this.updateTournament();
+    await this.updateTournament();
     this.refreshUI();
   }
 
@@ -277,15 +279,15 @@ export class PageMatch {
     return this.tournaments.getTournamentTeam(this.tournament, teamId);
   }
 
-  private playMatch(match: Match) {
+  private async playMatch(match: Match) {
     match.status = MatchStatus.DOING;
-    this.updateTournament();
+    await this.updateTournament();
     this.refreshUI();
   }
 
-  private stopMatch(match: Match) {
+  private async stopMatch(match: Match) {
     match.status = MatchStatus.DONE;
-    this.updateTournament();
+    await this.updateTournament();
     this.refreshUI();
   }
 
@@ -440,10 +442,14 @@ export class PageMatch {
     );
   }
 
-  private renderMatchItem(match: Match, index: number) {
-    const hostRank = match.hostId ? this.rankMap.get(match.hostId) : undefined;
+  private renderMatchItem(
+    match: Match,
+    index: number,
+    rankMap: Map<number, number>
+  ) {
+    const hostRank = match.hostId ? rankMap.get(match.hostId) : undefined;
     const visitorRank = match.visitorId
-      ? this.rankMap.get(match.visitorId)
+      ? rankMap.get(match.visitorId)
       : undefined;
 
     return (
@@ -616,16 +622,12 @@ export class PageMatch {
     );
   }
 
-  private updateRankMap(): void {
-    const sortedGrid = Tournaments.sortGrid(this.tournament?.grid || []);
-    this.rankMap = new Map<number, number>();
-    for (const [index, team] of sortedGrid.entries()) {
-      this.rankMap.set(team.id, index + 1);
-    }
-  }
-
   render() {
-    this.updateRankMap();
+    const sortedGrid = Tournaments.sortGrid(this.tournament?.grid || []);
+    const rankMap = new Map<number, number>();
+    for (const [index, team] of sortedGrid.entries()) {
+      rankMap.set(team.id, index + 1);
+    }
 
     return (
       <Host>
@@ -657,7 +659,7 @@ export class PageMatch {
                   {this.renderMatchListHeader()}
 
                   {this.tournament?.matchs.map((match, index) =>
-                    this.renderMatchItem(match, index)
+                    this.renderMatchItem(match, index, rankMap)
                   )}
                 </div>
               ) : (
