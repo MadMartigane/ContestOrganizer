@@ -283,6 +283,7 @@ export class Tournaments {
       team.scoredGoals = 0;
       team.goalAverage = 0;
       team.points = 0;
+      team.scheduledMatchs = 0;
     }
   }
 
@@ -313,14 +314,23 @@ export class Tournaments {
     this.resetScores(tournament);
 
     for (const match of tournament.matchs) {
+      const host = await this.getTournamentTeam(tournament, match.hostId);
+      const visitor = await this.getTournamentTeam(tournament, match.visitorId);
+
+      if (host) {
+        host.scheduledMatchs++;
+      }
+
+      if (visitor) {
+        visitor.scheduledMatchs++;
+      }
+
       if (match.status !== MatchStatus.DONE) {
         continue;
       }
 
       const vScore = match.goals.visitor || 0;
       const hScore = match.goals.host || 0;
-      const host = await this.getTournamentTeam(tournament, match.hostId);
-      const visitor = await this.getTournamentTeam(tournament, match.visitorId);
 
       if (host) {
         this.updateTeamScore(

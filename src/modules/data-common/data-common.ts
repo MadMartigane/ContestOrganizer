@@ -13,19 +13,25 @@ function getOneTeamData(tournament: Tournament, team: TeamRow) {
     scoredPoints: 0,
     winGames: 0,
     looseGames: 0,
+    scheduledMatchs: 0,
     winGamesPercent: 0,
   } as CommonGridData;
 
   for (const match of tournament.matchs) {
+    const isHost = match.hostId === teamId;
+    const isVisitor = match.visitorId === teamId;
+
+    if (!(isHost || isVisitor)) {
+      continue;
+    }
+
+    gridData.scheduledMatchs++;
+
     if (match.status !== MatchStatus.DONE) {
       continue;
     }
 
-    if (match.hostId !== teamId && match.visitorId !== teamId) {
-      continue;
-    }
-
-    if (match.hostId === teamId) {
+    if (isHost) {
       gridData.scoredPoints += match.goals.host;
       gridData.concededPoints += match.goals.visitor;
 

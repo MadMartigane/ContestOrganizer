@@ -89,6 +89,9 @@ export class GridDefault {
             <th>
               <span>Goal average</span>
             </th>
+            <th class="text-center">
+              <sl-icon class="inline-block text-2xl" name="calendar-event" />
+            </th>
           </thead>
 
           {this.tournament?.grid.map((gridRow) => (
@@ -122,6 +125,9 @@ export class GridDefault {
               </td>
               <td>
                 <span class="text-primary">{gridRow.goalAverage}</span>
+              </td>
+              <td class="text-center">
+                <span class="text-primary">{gridRow.scheduledMatchs}</span>
               </td>
             </tr>
           ))}
