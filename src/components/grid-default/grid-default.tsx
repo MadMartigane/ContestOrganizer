@@ -1,21 +1,30 @@
-import { Component, Event, EventEmitter, h, Host, Prop, State } from '@stencil/core';
-import { Tournament, TournamentUpdateEvent } from '../../modules/tournaments/tournaments.types';
-import tournaments from '../../modules/tournaments/tournaments';
-import { GridTeamOnUpdateDetail } from '../../modules/grid-common/grid-common.types';
+import {
+  Component,
+  Event,
+  type EventEmitter,
+  Host,
+  h,
+  Prop,
+  State,
+} from "@stencil/core";
+import type { GridTeamOnUpdateDetail } from "../../modules/grid-common/grid-common.types";
+import tournaments from "../../modules/tournaments/tournaments";
+import type {
+  Tournament,
+  TournamentUpdateEvent,
+} from "../../modules/tournaments/tournaments.types";
 
 @Component({
-  tag: 'grid-default',
-  styleUrl: 'grid-default.css',
+  tag: "grid-default",
+  styleUrl: "grid-default.css",
   shadow: false,
 })
 export class GridDefault {
   private readonly tournaments: typeof tournaments;
 
-  private counter: number;
-
   @State() private tournament: Tournament | null;
 
-  @Prop() public tournamentId: number | null;
+  @Prop() tournamentId: number | null;
 
   @Event() gridTournamentChange: EventEmitter<TournamentUpdateEvent>;
 
@@ -28,7 +37,6 @@ export class GridDefault {
 
   private async forceGridRender() {
     this.tournament = null;
-    this.counter = 0;
 
     this.tournament = await this.tournaments.get(this.tournamentId);
   }
@@ -44,7 +52,9 @@ export class GridDefault {
   }
 
   private onTeamTeamChange(detail: GridTeamOnUpdateDetail): void {
-    const gridRaw = this.tournament?.grid.find(grid => grid.id === detail.tournamentGridId);
+    const gridRaw = this.tournament?.grid.find(
+      (grid) => grid.id === detail.tournamentGridId
+    );
 
     if (gridRaw) {
       gridRaw.team = detail.genericTeam;
@@ -54,12 +64,13 @@ export class GridDefault {
   }
 
   render() {
+    let counter = 0;
     return (
       <Host>
         <table class="table-auto">
           <thead class="block-primary align-middle">
             <th>
-              <sl-icon class="text-2xl" name="sort-numeric-down"></sl-icon>
+              <sl-icon class="text-2xl" name="sort-numeric-down" />
             </th>
             <th>
               <span>Équipes</span>
@@ -69,34 +80,36 @@ export class GridDefault {
             </th>
             <th>
               <span class="text-success">Buts</span>
-              <sl-icon name="plus-lg" class="text-2xl text-success"></sl-icon>
+              <sl-icon class="text-2xl text-success" name="plus-lg" />
             </th>
             <th>
               <span class="text-warning">Buts</span>
-              <sl-icon name="dash-lg" class="text-2xl text-warning"></sl-icon>
+              <sl-icon class="text-2xl text-warning" name="dash-lg" />
             </th>
             <th>
               <span>Goal average</span>
             </th>
           </thead>
 
-          {this.tournament?.grid.map(gridRow => (
+          {this.tournament?.grid.map((gridRow) => (
             <tr class="">
               <td>
                 <span class="counter">
-                  {this.counter > 8 ? null : '0'}
-                  {++this.counter}
+                  {counter > 8 ? null : "0"}
+                  {++counter}
                 </span>
               </td>
               <td>
                 <mad-select-team
-                  value={gridRow.team}
                   color="primary"
-                  type={this.tournament?.type}
-                  tournamentGridId={gridRow.id}
-                  onMadSelectChange={(ev: CustomEvent<GridTeamOnUpdateDetail>) => this.onTeamTeamChange(ev.detail)}
+                  onMadSelectChange={(
+                    ev: CustomEvent<GridTeamOnUpdateDetail>
+                  ) => this.onTeamTeamChange(ev.detail)}
                   placeholder="Équipe vide"
-                ></mad-select-team>
+                  tournamentGridId={gridRow.id}
+                  type={this.tournament?.type}
+                  value={gridRow.team}
+                />
               </td>
               <td>
                 <span class="text-primary">{gridRow.points}</span>

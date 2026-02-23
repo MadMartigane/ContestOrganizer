@@ -1,17 +1,15 @@
-import { GenericTeam, TeamRowProperties } from './team-row.d';
-import uuid from '../uuid/uuid';
-import { TournamentType } from '../tournaments/tournaments.types';
-
-export * from './team-row.d';
+import type { TournamentType } from "../tournaments/tournaments.types";
+import uuid from "../uuid/uuid";
+import type { GenericTeam, TeamRowProperties } from "./team-row.d";
 
 export class TeamRow {
-  public readonly id: number;
-  public team?: GenericTeam;
-  public points: number;
-  public concededGoals: number;
-  public scoredGoals: number;
-  public goalAverage: number;
-  public type: TournamentType;
+  readonly id: number;
+  team?: GenericTeam;
+  points: number;
+  concededGoals: number;
+  scoredGoals: number;
+  goalAverage: number;
+  type: TournamentType;
 
   constructor(options: { id?: number; type: TournamentType }) {
     this.id = options.id || uuid.new();
@@ -23,7 +21,7 @@ export class TeamRow {
     this.goalAverage = 0;
   }
 
-  public toData(): TeamRowProperties {
+  toData(): TeamRowProperties {
     // TODO return Object.fromEntries(Object.entries(this) as any);
     return {
       id: this.id,
@@ -36,31 +34,42 @@ export class TeamRow {
     };
   }
 
-  public fromData(data: TeamRowProperties): TeamRow {
+  fromData(data: TeamRowProperties): TeamRow {
     return Object.assign(this, data);
   }
 
-  public reset() {
-    delete this.team;
-    ['points', 'concededGoals', 'scoredGoals', 'goalAverage'].forEach(key => this.set(key, '0'));
+  reset() {
+    this.team = undefined;
+    for (const key of [
+      "points",
+      "concededGoals",
+      "scoredGoals",
+      "goalAverage",
+    ]) {
+      this.set(key, "0");
+    }
   }
 
-  public set(key: string, value: string): void {
+  set(key: string, value: string): void {
     switch (key) {
-      case 'points': {
+      case "points": {
         this.points = Number(value);
         break;
       }
-      case 'concededGoals': {
+      case "concededGoals": {
         this.concededGoals = Number(value);
         break;
       }
-      case 'scoredGoals': {
+      case "scoredGoals": {
         this.scoredGoals = Number(value);
         break;
       }
-      case 'goalAverage': {
+      case "goalAverage": {
         this.goalAverage = Number(value);
+        break;
+      }
+      default: {
+        // Unknown key - no action needed
         break;
       }
     }

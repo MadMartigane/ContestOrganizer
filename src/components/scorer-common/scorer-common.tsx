@@ -1,8 +1,17 @@
-import { Component, Event, EventEmitter, Host, Prop, h, State, Watch } from '@stencil/core';
+import {
+  Component,
+  Event,
+  type EventEmitter,
+  Host,
+  h,
+  Prop,
+  State,
+  Watch,
+} from "@stencil/core";
 
 @Component({
-  tag: 'mad-scorer-common',
-  styleUrl: './scorer-common.css',
+  tag: "mad-scorer-common",
+  styleUrl: "./scorer-common.css",
   shadow: false,
 })
 export class MadScorerCommon {
@@ -20,8 +29,8 @@ export class MadScorerCommon {
     this.number = this.value || this.min || 0;
   }
 
-  @Watch('value')
-  public onPropValueChange() {
+  @Watch("value")
+  onPropValueChange() {
     this.number = this.value || this.min || 0;
   }
 
@@ -54,31 +63,31 @@ export class MadScorerCommon {
       <span class="container-xl">
         <sl-button-group label="Plus/minus action buttons">
           <sl-button
+            disabled={Boolean(this.readonly)}
             onclick={() => {
               this.decrementNumber();
             }}
-            disabled={Boolean(this.readonly)}
-            size="large"
             pill
+            size="large"
           >
-            <sl-icon class="text-warning" name="dash-lg"></sl-icon>
+            <sl-icon class="text-warning" name="dash-lg" />
           </sl-button>
           <sl-button
+            disabled={Boolean(this.readonly)}
             onclick={() => {
               this.incrementNumber();
             }}
-            disabled={Boolean(this.readonly)}
-            size="large"
             pill
+            size="large"
           >
-            <sl-icon class="text-primary" name="plus-lg"></sl-icon>
+            <sl-icon class="text-primary" name="plus-lg" />
           </sl-button>
         </sl-button-group>
       </span>
     );
   }
 
-  public render() {
+  render() {
     return <Host>{this.renderEditingState()}</Host>;
   }
 }

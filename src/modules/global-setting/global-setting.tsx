@@ -1,14 +1,14 @@
-import { SettingStorageData } from './global-setting.d';
+import type { SettingStorageData } from "./global-setting.d";
 
 export class GlobalSetting {
   private readonly STORE_KEY: string;
   private alreadyInit: boolean;
   private devicePrefersDark: boolean; // Device system setting
   private darkModeSet: boolean | null; // The user choice
-  private darkThemeChangeCallbacks: Function[];
+  private readonly darkThemeChangeCallbacks: ((isDark: boolean) => void)[];
 
   constructor() {
-    this.STORE_KEY = 'CONTEST_ORGANIZER_SETTING';
+    this.STORE_KEY = "CONTEST_ORGANIZER_SETTING";
 
     this.darkThemeChangeCallbacks = [];
     this.alreadyInit = false;
@@ -22,7 +22,7 @@ export class GlobalSetting {
     }
 
     // Use matchMedia to check the user preference
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
     if (prefersDark) {
       this.devicePrefersDark = prefersDark.matches;
     }
@@ -35,17 +35,19 @@ export class GlobalSetting {
     }
 
     // Listen for changes to the prefers-color-scheme media query
-    prefersDark.addEventListener('change', mediaQuery => this.toggleDarkTheme(mediaQuery.matches, true));
+    prefersDark.addEventListener("change", (mediaQuery) =>
+      this.toggleDarkTheme(mediaQuery.matches, true)
+    );
 
     // Init only once.
     this.alreadyInit = true;
   }
 
   // Add or remove the "dark" class on the document body
-  private toggleDarkTheme(shouldBeDark: boolean, fromDevice: boolean = false) {
+  private toggleDarkTheme(shouldBeDark: boolean, fromDevice = false) {
     // shoelace theme
-    document.documentElement.classList.toggle('sl-theme-dark', shouldBeDark);
-    document.body.classList.toggle('sl-theme-light', !shouldBeDark);
+    document.documentElement.classList.toggle("sl-theme-dark", shouldBeDark);
+    document.body.classList.toggle("sl-theme-light", !shouldBeDark);
 
     if (fromDevice) {
       this.devicePrefersDark = shouldBeDark;
@@ -59,7 +61,10 @@ export class GlobalSetting {
   private storeSetting(shouldBeDark: boolean) {
     this.darkModeSet = shouldBeDark;
 
-    localStorage.setItem(this.STORE_KEY, JSON.stringify({ darkMode: this.darkModeSet }));
+    localStorage.setItem(
+      this.STORE_KEY,
+      JSON.stringify({ darkMode: this.darkModeSet })
+    );
   }
 
   private getStoredSetting() {
@@ -72,26 +77,28 @@ export class GlobalSetting {
   }
 
   private execDarkThemeChangeCallbacks() {
-    this.darkThemeChangeCallbacks.forEach(callback => {
+    for (const callback of this.darkThemeChangeCallbacks) {
       setTimeout(() => {
         callback(this.isDarkThemeActive());
       });
-    });
+    }
   }
 
-  public setDarkTheme(state: boolean = true) {
+  setDarkTheme(state = true) {
     this.toggleDarkTheme(state);
   }
 
-  public isDarkThemeActive() {
-    return this.darkModeSet === null ? this.isPreferDarkTheme() : this.darkModeSet;
+  isDarkThemeActive() {
+    return this.darkModeSet === null
+      ? this.isPreferDarkTheme()
+      : this.darkModeSet;
   }
 
-  public isPreferDarkTheme() {
+  isPreferDarkTheme() {
     return this.devicePrefersDark;
   }
 
-  public onDarkThemeChange(callback: Function) {
+  onDarkThemeChange(callback: (isDark: boolean) => void) {
     this.darkThemeChangeCallbacks.push(callback);
   }
 }

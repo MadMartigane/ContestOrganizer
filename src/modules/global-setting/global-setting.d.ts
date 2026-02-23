@@ -1,3 +1,3 @@
-export type SettingStorageData = {
+export interface SettingStorageData {
   darkMode?: boolean;
-};
+}

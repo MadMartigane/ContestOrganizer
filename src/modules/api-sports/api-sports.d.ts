@@ -1,25 +1,25 @@
-import { GenericTeam } from "../team-row/team-row.d"
-import { TournamentType } from "../tournaments/tournaments.types"
+import { GenericTeam } from "../team-row/team-row.d";
+import { TournamentType } from "../tournaments/tournaments.types";
 
 export interface ApiSportsReturnError {
-  status: number,
-  message: string
+  message: string;
+  status: number;
 }
 
-export type ApiSportsTeamReturn = {
-  errors: ApiSportsReturnError[],
-  get: string,
-  results: number,
-  response: GenericTeam[]
+export interface ApiSportsTeamReturn {
+  errors: ApiSportsReturnError[];
+  get: string;
+  response: GenericTeam[];
+  results: number;
 }
 
-export type ApiSportsSearchCache = {
-  search: string,
-  type: TournamentType,
-  results: number[]
+export interface ApiSportsSearchCache {
+  results: number[];
+  search: string;
+  type: TournamentType;
 }
 
-export type ApiSportsCache = {
-  allTeams: GenericTeam[],
-  allSearch: ApiSportsSearchCache[]
+export interface ApiSportsCache {
+  allSearch: ApiSportsSearchCache[];
+  allTeams: GenericTeam[];
 }

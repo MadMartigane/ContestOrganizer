@@ -1,18 +1,27 @@
-import { Component, Event, EventEmitter, Host, Prop, h, State, Watch } from '@stencil/core';
-import { TournamentType } from '../../modules/tournaments/tournaments.types';
-import { GenericTeam } from '../../modules/team-row/team-row.d';
-import { GridTeamOnUpdateDetail } from '../../modules/grid-common/grid-common.types';
-import SlDrawer from '@shoelace-style/shoelace/dist/components/drawer/drawer';
-import apiFutDB from '../../modules/futbd/futdb';
-import apiSports from '../../modules/api-sports/api-sports';
-import Utils from '../../modules/utils/utils';
-import SlInput from '@shoelace-style/shoelace/dist/components/input/input.component';
-import SlMenu from '@shoelace-style/shoelace/dist/components/menu/menu.component';
-import SlMenuItem from '@shoelace-style/shoelace/dist/components/menu-item/menu-item.component';
+import type SlDrawer from "@shoelace-style/shoelace/dist/components/drawer/drawer";
+import type SlInput from "@shoelace-style/shoelace/dist/components/input/input.component";
+import type SlMenu from "@shoelace-style/shoelace/dist/components/menu/menu.component";
+import type SlMenuItem from "@shoelace-style/shoelace/dist/components/menu-item/menu-item.component";
+import {
+  Component,
+  Event,
+  type EventEmitter,
+  Host,
+  h,
+  Prop,
+  State,
+  Watch,
+} from "@stencil/core";
+import apiSports from "../../modules/api-sports/api-sports";
+import apiFutDB from "../../modules/futbd/futdb";
+import type { GridTeamOnUpdateDetail } from "../../modules/grid-common/grid-common.types";
+import type { GenericTeam } from "../../modules/team-row/team-row.d";
+import { TournamentType } from "../../modules/tournaments/tournaments.types";
+import Utils from "../../modules/utils/utils";
 
 @Component({
-  tag: 'mad-select-team',
-  styleUrl: './select-team.css',
+  tag: "mad-select-team",
+  styleUrl: "./select-team.css",
   shadow: false,
 })
 export class MadSelectTeam {
@@ -23,9 +32,9 @@ export class MadSelectTeam {
   private domDivBody?: HTMLDivElement;
   private domInputSearch?: SlInput;
   private domSearchResultList?: SlMenu;
-  private teams: Array<GenericTeam>;
+  private teams: GenericTeam[];
   private searchValue: string;
-  private minNumberSearchLetter: number;
+  private readonly minNumberSearchLetter: number;
 
   @Prop() color: string;
   @Prop() placeholder: string;
@@ -36,11 +45,11 @@ export class MadSelectTeam {
 
   @State() private team: GenericTeam;
   @State() private isLoading: boolean;
-  @State() private suggested: Array<GenericTeam>;
+  @State() private suggested: GenericTeam[];
 
   @Event() madSelectChange: EventEmitter<GridTeamOnUpdateDetail>;
 
-  @Watch('value')
+  @Watch("value")
   onValueChange() {
     this.team = this.value;
   }
@@ -50,7 +59,7 @@ export class MadSelectTeam {
 
     this.teams = [];
     this.suggested = [];
-    this.searchValue = '';
+    this.searchValue = "";
 
     switch (this.type) {
       case TournamentType.NBA:
@@ -65,11 +74,11 @@ export class MadSelectTeam {
         this.isLoading = true;
         this.apiFutDB
           .loadTeams()
-          .then((teams: Array<GenericTeam>) => {
+          .then((teams: GenericTeam[]) => {
             this.teams = teams;
           })
-          .catch((error: any) => {
-            console.warn('teams on load error: ', error);
+          .catch((error: unknown) => {
+            console.warn("teams on load error: ", error);
           })
           .finally(() => {
             this.isLoading = false;
@@ -85,17 +94,20 @@ export class MadSelectTeam {
       return;
     }
 
-    const pattern = new RegExp(this.searchValue, 'i');
+    const pattern = new RegExp(this.searchValue, "i");
 
     switch (this.type) {
       case TournamentType.NBA:
       case TournamentType.BASKET:
       case TournamentType.NFL:
       case TournamentType.RUGBY:
-        this.suggested = await this.apiSports.searchTeam(this.type, this.searchValue);
+        this.suggested = await this.apiSports.searchTeam(
+          this.type,
+          this.searchValue
+        );
         break;
       default:
-        this.suggested = this.teams.filter(team => pattern.test(team.name));
+        this.suggested = this.teams.filter((team) => pattern.test(team.name));
         break;
     }
 
@@ -103,12 +115,15 @@ export class MadSelectTeam {
   }
 
   private scrollOnSearchResult() {
-    Utils.scrollIntoView(this.domSearchResultList || '');
+    Utils.scrollIntoView(this.domSearchResultList || "");
   }
 
   private onPageTeamNewSelection(team: GenericTeam) {
     this.team = team;
-    this.madSelectChange.emit({ genericTeam: this.team, tournamentGridId: this.tournamentGridId || null });
+    this.madSelectChange.emit({
+      genericTeam: this.team,
+      tournamentGridId: this.tournamentGridId || null,
+    });
   }
 
   private onTeamSelected(team: GenericTeam) {
@@ -122,7 +137,9 @@ export class MadSelectTeam {
     const detail = ev.detail as { item: SlMenuItem };
     const teamId = detail.item.dataset.teamId;
 
-    const team: GenericTeam | undefined = this.suggested.find(candidate => candidate.id === Number(teamId));
+    const team: GenericTeam | undefined = this.suggested.find(
+      (candidate) => candidate.id === Number(teamId)
+    );
     if (team) {
       this.onTeamSelected(team);
     }
@@ -133,7 +150,7 @@ export class MadSelectTeam {
   private openDrawer(): void {
     this.domDrawer.show();
     if (this.domInputSearch) {
-      Utils.setFocus(this.domInputSearch);
+      Utils.setFocus(this.domInputSearch as unknown as HTMLElement);
     }
   }
 
@@ -141,23 +158,31 @@ export class MadSelectTeam {
     this.domDrawer.hide();
   }
 
-  public componentDidRender() {
-    Utils.installEventHandler(this.domSearchResultList, 'sl-select', (ev: CustomEvent) => {
-      ev.stopPropagation();
-      this.onTeamRadioChange(ev);
-    });
+  componentDidRender() {
+    Utils.installEventHandler(
+      this.domSearchResultList,
+      "sl-select",
+      (ev: CustomEvent) => {
+        ev.stopPropagation();
+        this.onTeamRadioChange(ev);
+      }
+    );
 
-    Utils.installEventHandler(this.domDivBody, 'click', (ev: CustomEvent) => {
+    Utils.installEventHandler(this.domDivBody, "click", (ev: CustomEvent) => {
       ev.stopPropagation();
       this.openDrawer();
     });
 
-    Utils.installEventHandler(this.domInputSearch, 'sl-input', (ev: CustomEvent) => {
-      ev.stopPropagation();
-      Utils.debounce('select-team-input-search', () => {
-        this.onSearchChange(this.domInputSearch?.value || '');
-      });
-    });
+    Utils.installEventHandler(
+      this.domInputSearch as unknown as HTMLElement,
+      "sl-input",
+      (ev: CustomEvent) => {
+        ev.stopPropagation();
+        Utils.debounce("select-team-input-search", () => {
+          this.onSearchChange(this.domInputSearch?.value || "");
+        });
+      }
+    );
   }
 
   private renderTeamResultList() {
@@ -169,10 +194,13 @@ export class MadSelectTeam {
       >
         {this.suggested.map((team: GenericTeam) => (
           <sl-menu-item data-team-id={team.id}>
-            <mad-team-tile team={team}></mad-team-tile>
+            <mad-team-tile team={team} />
 
             <span slot="suffix">
-              <sl-icon class="text-neutral text-4xl" name="arrow-right-circle"></sl-icon>
+              <sl-icon
+                class="text-4xl text-neutral"
+                name="arrow-right-circle"
+              />
             </span>
           </sl-menu-item>
         ))}
@@ -183,33 +211,41 @@ export class MadSelectTeam {
   private renderTeamSelection() {
     return (
       <div class="footer">
-        {this.isLoading ? <sl-progress-bar indeterminate></sl-progress-bar> : null}
+        {this.isLoading ? <sl-progress-bar indeterminate /> : null}
         <sl-card>
           <div slot="header">
-            <h3>{this.isLoading ? 'Changement des équipes…' : `Recherche ton équipe. (${this.minNumberSearchLetter} lettres min)`}</h3>
+            <h3>
+              {this.isLoading
+                ? "Changement des équipes…"
+                : `Recherche ton équipe. (${this.minNumberSearchLetter} lettres min)`}
+            </h3>
           </div>
           <div>
             <div class="my-4">
               <sl-input
+                autocomplete="off"
+                autofocus
+                disabled={this.isLoading}
+                placeholder="nom de d’équipe"
                 ref={(el: SlInput) => {
                   this.domInputSearch = el;
                 }}
-                type="text"
-                autocomplete="off"
-                disabled={this.isLoading}
-                placeholder="nom de d’équipe"
-                autofocus
                 size="medium"
+                type="text"
               >
-                <sl-icon name="search" slot="prefix"></sl-icon>
+                <sl-icon name="search" slot="prefix" />
               </sl-input>
             </div>
 
             {this.suggested.length ? this.renderTeamResultList() : null}
 
             {this.searchValue?.length > 2 && !this.suggested.length ? (
-              <sl-alert variant="warning" open>
-                <sl-icon name="emoji-frown" slot="icon" class="text-6xl text-warning"></sl-icon>
+              <sl-alert open variant="warning">
+                <sl-icon
+                  class="text-6xl text-warning"
+                  name="emoji-frown"
+                  slot="icon"
+                />
                 <span class="mx-2 text-2xl">Aucun résultat</span>
               </sl-alert>
             ) : null}
@@ -222,19 +258,19 @@ export class MadSelectTeam {
     return (
       <Host
         class={{
-          'cursor-pointer': true,
+          "cursor-pointer": true,
         }}
       >
         <sl-drawer
+          no-header
+          placement="start"
           ref={(el: SlDrawer) => {
             this.domDrawer = el;
           }}
-          no-header
-          placement="start"
         >
           {this.renderTeamSelection()}
 
-          <div slot="footer" class="grid-300">
+          <div class="grid-300" slot="footer">
             <sl-button
               onclick={() => {
                 this.closeDrawer();
@@ -246,12 +282,16 @@ export class MadSelectTeam {
           </div>
         </sl-drawer>
         <div
-          ref={el => {
+          ref={(el) => {
             this.domDivBody = el;
           }}
         >
           {this.label ? <span>{this.label}</span> : null}
-          {this.team?.id ? <mad-team-tile team={this.team}></mad-team-tile> : <span class="text-neutral text-sm">{this.placeholder}</span>}
+          {this.team?.id ? (
+            <mad-team-tile team={this.team} />
+          ) : (
+            <span class="text-neutral text-sm">{this.placeholder}</span>
+          )}
         </div>
       </Host>
     );

@@ -1,17 +1,17 @@
-import { GenericTeam } from '../team-row/team-row.d';
+import type { GenericTeam } from "../team-row/team-row.d";
 
 export interface GridConfConstants {
+  concededGoalsMin: number;
+  inputDebounce: number;
+  pointMin: number;
+  scoredGoalsMin: number;
+  teamNumberDefault: number;
   teamNumberMax: number;
   teamNumberMin: number;
-  teamNumberDefault: number;
-  scoredGoalsMin: number;
-  concededGoalsMin: number;
   teamNumberStep: number;
-  pointMin: number;
-  inputDebounce: number;
 }
 
-export type GridTeamOnUpdateDetail = {
+export interface GridTeamOnUpdateDetail {
   genericTeam: GenericTeam;
   tournamentGridId: number | null;
-};
+}

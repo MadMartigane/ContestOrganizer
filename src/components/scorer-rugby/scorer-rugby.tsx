@@ -1,10 +1,19 @@
-import { Component, Event, EventEmitter, Host, Prop, h, State, Watch } from '@stencil/core';
-import SlSwitch from '@shoelace-style/shoelace/dist/components/switch/switch.component';
-import Utils from '../../modules/utils/utils';
+import type SlSwitch from "@shoelace-style/shoelace/dist/components/switch/switch.component";
+import {
+  Component,
+  Event,
+  type EventEmitter,
+  Host,
+  h,
+  Prop,
+  State,
+  Watch,
+} from "@stencil/core";
+import Utils from "../../modules/utils/utils";
 
 @Component({
-  tag: 'mad-scorer-rugby',
-  styleUrl: './scorer-rugby.css',
+  tag: "mad-scorer-rugby",
+  styleUrl: "./scorer-rugby.css",
   shadow: false,
 })
 export class MadScorerBasket {
@@ -25,8 +34,8 @@ export class MadScorerBasket {
     this.minusMode = false;
   }
 
-  @Watch('value')
-  public onPropValueChange() {
+  @Watch("value")
+  onPropValueChange() {
     this.number = this.value || 0;
   }
 
@@ -52,8 +61,8 @@ export class MadScorerBasket {
     this.minusMode = !this.minusMode;
   }
 
-  public componentDidRender() {
-    Utils.installEventHandler(this.domPlusMinusSwitch, 'sl-change', () => {
+  componentDidRender() {
+    Utils.installEventHandler(this.domPlusMinusSwitch, "sl-change", () => {
       this.switchMode();
     });
   }
@@ -62,39 +71,56 @@ export class MadScorerBasket {
     return (
       <Host>
         {this.readonly ? null : (
-          <div class="grid grid-rows-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 my-4">
+          <div class="my-4 grid grid-rows-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             <sl-button
-              variant={this.minusMode ? 'warning' : 'primary'}
               onclick={() => {
                 this.onIncrementNumber(2);
               }}
               size="large"
+              variant={this.minusMode ? "warning" : "primary"}
             >
-              <sl-icon slot="prefix" name={this.minusMode ? 'dash-lg' : 'plus-lg'} class="xl"></sl-icon>
+              <sl-icon
+                class="xl"
+                name={this.minusMode ? "dash-lg" : "plus-lg"}
+                slot="prefix"
+              />
               <span slot="suffix">2</span>
             </sl-button>
             <sl-button
-              variant={this.minusMode ? 'warning' : 'primary'}
               onclick={() => {
                 this.onIncrementNumber(3);
               }}
               size="large"
+              variant={this.minusMode ? "warning" : "primary"}
             >
-              <sl-icon slot="prefix" name={this.minusMode ? 'dash-lg' : 'plus-lg'} class="xl"></sl-icon>
+              <sl-icon
+                class="xl"
+                name={this.minusMode ? "dash-lg" : "plus-lg"}
+                slot="prefix"
+              />
               <span slot="suffix">3</span>
             </sl-button>
             <sl-button
-              variant={this.minusMode ? 'warning' : 'primary'}
               onclick={() => {
                 this.onIncrementNumber(5);
               }}
               size="large"
+              variant={this.minusMode ? "warning" : "primary"}
             >
-              <sl-icon slot="prefix" name={this.minusMode ? 'dash-lg' : 'plus-lg'} class="xl"></sl-icon>
+              <sl-icon
+                class="xl"
+                name={this.minusMode ? "dash-lg" : "plus-lg"}
+                slot="prefix"
+              />
               <span slot="suffix">5</span>
             </sl-button>
-            <sl-switch ref={(el: SlSwitch) => (this.domPlusMinusSwitch = el)} size="large" checked={!this.minusMode} help-text="Ajouter/Supprimer des points">
-              <sl-icon name="plus-slash-minus" class="xl"></sl-icon>
+            <sl-switch
+              checked={!this.minusMode}
+              help-text="Ajouter/Supprimer des points"
+              ref={(el: SlSwitch) => (this.domPlusMinusSwitch = el)}
+              size="large"
+            >
+              <sl-icon class="xl" name="plus-slash-minus" />
             </sl-switch>
           </div>
         )}
