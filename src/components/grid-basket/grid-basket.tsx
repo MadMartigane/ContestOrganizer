@@ -114,9 +114,8 @@ export class GridBasket {
           </span>
           <span class="hidden text-warning md:block">Encaissés</span>
         </th>
-        <th>
-          <sl-icon class="block text-2xl md:hidden" name="calendar-event" />
-          <span class="hidden md:block">Programmés</span>
+        <th class="text-center">
+          <sl-icon class="inline-block text-2xl" name="calendar-event" />
         </th>
       </thead>
     );
@@ -168,7 +167,7 @@ export class GridBasket {
         <td>
           <span class="text-warning">{gridData?.concededPoints}</span>
         </td>
-        <td>
+        <td class="text-center">
           <span class="text-primary">{gridData?.scheduledMatchs}</span>
         </td>
       </tr>

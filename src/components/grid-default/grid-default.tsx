@@ -89,9 +89,8 @@ export class GridDefault {
             <th>
               <span>Goal average</span>
             </th>
-            <th>
-              <sl-icon class="block text-2xl md:hidden" name="calendar-event" />
-              <span class="hidden md:block">Programmés</span>
+            <th class="text-center">
+              <sl-icon class="inline-block text-2xl" name="calendar-event" />
             </th>
           </thead>
 
@@ -127,7 +126,7 @@ export class GridDefault {
               <td>
                 <span class="text-primary">{gridRow.goalAverage}</span>
               </td>
-              <td>
+              <td class="text-center">
                 <span class="text-primary">{gridRow.scheduledMatchs}</span>
               </td>
             </tr>
