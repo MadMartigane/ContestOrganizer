@@ -314,28 +314,23 @@ export class Tournaments {
     this.resetScores(tournament);
 
     for (const match of tournament.matchs) {
+      const host = await this.getTournamentTeam(tournament, match.hostId);
+      const visitor = await this.getTournamentTeam(tournament, match.visitorId);
+
+      if (host) {
+        host.scheduledMatchs++;
+      }
+
+      if (visitor) {
+        visitor.scheduledMatchs++;
+      }
+
       if (match.status !== MatchStatus.DONE) {
-        const host = await this.getTournamentTeam(tournament, match.hostId);
-        const visitor = await this.getTournamentTeam(
-          tournament,
-          match.visitorId
-        );
-
-        if (host) {
-          host.scheduledMatchs++;
-        }
-
-        if (visitor) {
-          visitor.scheduledMatchs++;
-        }
-
         continue;
       }
 
       const vScore = match.goals.visitor || 0;
       const hScore = match.goals.host || 0;
-      const host = await this.getTournamentTeam(tournament, match.hostId);
-      const visitor = await this.getTournamentTeam(tournament, match.visitorId);
 
       if (host) {
         this.updateTeamScore(
