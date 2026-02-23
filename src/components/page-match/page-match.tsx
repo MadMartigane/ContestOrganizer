@@ -160,6 +160,32 @@ export class PageMatch {
     this.resetRowStates();
   }
 
+  private async goAutoMatch() {
+    if (!this.tournament) {
+      return;
+    }
+
+    const teams = Matchs.getAutoMatchTeams(this.tournament);
+    if (!teams) {
+      return;
+    }
+
+    const [hostId, visitorId] = teams;
+    const match = new Match();
+    match.hostId = hostId;
+    match.visitorId = visitorId;
+
+    if (!this.tournament.matchs) {
+      this.tournament.matchs = [];
+    }
+
+    this.tournament.matchs.push(match);
+    this.matchNumber = this.tournament.matchs.length;
+
+    await this.updateTournament();
+    this.refreshUI();
+  }
+
   private refreshUI() {
     // Change ref
     this.teamToSelect = this.teamToSelect?.map((row) => row) || null;
@@ -607,7 +633,7 @@ export class PageMatch {
   private renderNewMatchButton() {
     return (
       <div class="footer">
-        <div class="grid-300">
+        <div class="grid-300 gap-4">
           <sl-button
             onclick={() => this.goMatch()}
             role="button"
@@ -616,6 +642,15 @@ export class PageMatch {
           >
             <sl-icon name="plus-lg" slot="prefix" />
             <span slot="suffix">Nouveau match</span>
+          </sl-button>
+          <sl-button
+            onclick={() => this.goAutoMatch()}
+            role="button"
+            size="large"
+            variant="success"
+          >
+            <sl-icon name="robot" slot="prefix" />
+            <span slot="suffix">Auto-Match</span>
           </sl-button>
         </div>
       </div>
