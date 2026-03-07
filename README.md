@@ -7,7 +7,7 @@ A modern web application to organize and enjoy your sport contests. Built with S
 ## ✨ Features
 
 - 🏆 **Tournament Management**: Create and manage various sport tournaments (Football, Basketball, Rugby, NFL, etc.)
-- 👥 **Team Handling**: Add teams with real data from APIs (FutDB, API-Sports)
+- 👥 **Team Handling**: Add teams with real data from API-Sports
 - 📊 **Live Scoring**: Real-time match updates and scoring
 - 🏅 **Ranking System**: Automatic ranking with premium 3D badges
 - 🎯 **Match Organization**: Schedule and track match progress
@@ -85,4 +85,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Built with [Stencil.js](https://stenciljs.com/)
 - UI components from [Shoelace](https://shoelace.style/)
 - Styling with [Tailwind CSS](https://tailwindcss.com/)
-- Data from [FutDB](https://futdb.app/) and [API-Sports](https://api-sports.io/)
+- Data from [API-Sports](https://api-sports.io/)

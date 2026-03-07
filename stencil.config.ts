@@ -19,7 +19,6 @@ export const config: Config = {
         "process.env.API_SPORTS_KEY": JSON.stringify(
           process.env.API_SPORTS_KEY
         ),
-        "process.env.FUTDB_KEY": JSON.stringify(process.env.FUTDB_KEY),
       },
     }),
   ],
