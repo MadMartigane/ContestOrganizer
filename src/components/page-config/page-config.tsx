@@ -93,7 +93,7 @@ export class PageConfig {
             {this.cacheCleared && (
               <sl-alert class="mt-2" open variant="success">
                 <sl-icon name="check2-circle" slot="icon" />
-                Le cache des équipes a été vidé avec succès.
+                Le cache des équipes a été vidé.
               </sl-alert>
             )}
           </div>

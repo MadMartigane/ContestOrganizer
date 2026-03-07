@@ -113,17 +113,18 @@ export class ApiSports {
             this.allSearch.push({
               search,
               type,
-              results: data.response.map((r) => r.id),
+              results: data.response.map((r) => r.team.id),
             });
 
-            for (const team of data.response) {
-              team.type = type;
-            }
-            this.allTeams = this.allTeams.concat(data.response);
+            const teams = data.response.map((r) => ({
+              ...r.team,
+              type,
+            }));
+            this.allTeams = this.allTeams.concat(teams);
             this.saveCache();
           }
 
-          return data.response;
+          return data.response.map((r) => r.team);
         })
         .catch((error) => {
           console.error("[ApiSports] API request failed:", error);

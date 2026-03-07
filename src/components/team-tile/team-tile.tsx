@@ -1,6 +1,5 @@
 import { Component, Element, Host, h, Prop, State, Watch } from "@stencil/core";
 import type { GenericTeam } from "../../components.d";
-import apiFutDB from "../../modules/futbd/futdb";
 
 @Component({
   tag: "mad-team-tile",
@@ -8,12 +7,9 @@ import apiFutDB from "../../modules/futbd/futdb";
   shadow: false,
 })
 export class MadTeamTile {
-  private readonly apiFutDB: typeof apiFutDB;
-
   @Element() private readonly el: HTMLElement;
 
   @State() private imgSrc: string;
-  @State() private imgError = false;
 
   private intersectionObserver: IntersectionObserver | null = null;
   private imageLoaded = false;
@@ -23,9 +19,7 @@ export class MadTeamTile {
   @Prop() rank?: number;
 
   constructor() {
-    this.apiFutDB = apiFutDB;
     this.imgSrc = "";
-    this.imgError = false;
     this.imageLoaded = false;
   }
 
@@ -48,28 +42,12 @@ export class MadTeamTile {
     this.intersectionObserver?.disconnect();
   }
 
-  private loadImg(id: number | null) {
+  private loadImg(_id: number | null) {
     if (this.team?.logo) {
       // API-Sports teams have direct logo URL
       setTimeout(() => {
         this.imgSrc = this.team?.logo || "";
       });
-    } else if (id) {
-      // FutDB teams need image fetch
-      this.apiFutDB
-        .loadTeamImage(id)
-        .then((base64Img) => {
-          this.imgSrc = base64Img;
-          this.imgError = false;
-        })
-        .catch((error) => {
-          console.warn(
-            `[TeamTile] Failed to load image for team ${id}:`,
-            error
-          );
-          this.imgError = true;
-          this.imgSrc = "";
-        });
     }
   }
 
@@ -92,13 +70,6 @@ export class MadTeamTile {
           src={this.imgSrc}
           width="64"
         />
-      );
-    }
-    if (this.imgError) {
-      return (
-        <div class="team-image-fallback">
-          <sl-icon class="text-2xl" name="shield" />
-        </div>
       );
     }
     return <sl-spinner />;

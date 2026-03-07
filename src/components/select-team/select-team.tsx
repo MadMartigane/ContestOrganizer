@@ -13,10 +13,9 @@ import {
   Watch,
 } from "@stencil/core";
 import apiSports from "../../modules/api-sports/api-sports";
-import apiFutDB from "../../modules/futbd/futdb";
 import type { GridTeamOnUpdateDetail } from "../../modules/grid-common/grid-common.types";
 import type { GenericTeam } from "../../modules/team-row/team-row.d";
-import { TournamentType } from "../../modules/tournaments/tournaments.types";
+import type { TournamentType } from "../../modules/tournaments/tournaments.types";
 import Utils from "../../modules/utils/utils";
 
 @Component({
@@ -25,14 +24,12 @@ import Utils from "../../modules/utils/utils";
   shadow: false,
 })
 export class MadSelectTeam {
-  private readonly apiFutDB = apiFutDB;
   private readonly apiSports = apiSports;
 
   private domDrawer: SlDrawer;
   private domDivBody?: HTMLDivElement;
   private domInputSearch?: SlInput;
   private domSearchResultList?: SlMenu;
-  private teams: GenericTeam[];
   private searchValue: string;
   private readonly minNumberSearchLetter: number;
 
@@ -57,34 +54,12 @@ export class MadSelectTeam {
   constructor() {
     this.team = this.value;
 
-    this.teams = [];
     this.suggested = [];
     this.searchValue = "";
 
-    switch (this.type) {
-      case TournamentType.NBA:
-      case TournamentType.BASKET:
-      case TournamentType.NFL:
-      case TournamentType.RUGBY:
-        this.minNumberSearchLetter = 3;
-        this.isLoading = false;
-        break;
-      default:
-        this.minNumberSearchLetter = 2;
-        this.isLoading = true;
-        this.apiFutDB
-          .loadTeams()
-          .then((teams: GenericTeam[]) => {
-            this.teams = teams;
-          })
-          .catch((error: unknown) => {
-            console.warn("teams on load error: ", error);
-          })
-          .finally(() => {
-            this.isLoading = false;
-          });
-        break;
-    }
+    // All sports use api-sports with same settings
+    this.minNumberSearchLetter = 3;
+    this.isLoading = false;
   }
 
   private async onSearchChange(value: string): Promise<void> {
@@ -94,22 +69,11 @@ export class MadSelectTeam {
       return;
     }
 
-    const pattern = new RegExp(this.searchValue, "i");
-
-    switch (this.type) {
-      case TournamentType.NBA:
-      case TournamentType.BASKET:
-      case TournamentType.NFL:
-      case TournamentType.RUGBY:
-        this.suggested = await this.apiSports.searchTeam(
-          this.type,
-          this.searchValue
-        );
-        break;
-      default:
-        this.suggested = this.teams.filter((team) => pattern.test(team.name));
-        break;
-    }
+    // All sports use api-sports search
+    this.suggested = await this.apiSports.searchTeam(
+      this.type,
+      this.searchValue
+    );
 
     this.scrollOnSearchResult();
   }
