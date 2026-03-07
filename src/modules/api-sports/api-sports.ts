@@ -19,9 +19,12 @@ import type {
 export class ApiSports {
   private allTeams: GenericTeam[];
   private allSearch: ApiSportsSearchCache[];
+  private readonly cacheLoaded: Promise<void>;
 
   constructor() {
-    this.loadCache().then((cache) => {
+    this.allTeams = [];
+    this.allSearch = [];
+    this.cacheLoaded = this.loadCache().then((cache) => {
       this.allTeams = cache?.allTeams || [];
       this.allSearch = cache?.allSearch || [];
     });
@@ -83,50 +86,50 @@ export class ApiSports {
 
   searchTeam(type: TournamentType, search: string): Promise<GenericTeam[]> {
     if (search.length < 3) {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve([]);
-        });
-      });
+      return Promise.resolve([]);
     }
 
-    const cache = this.allSearch.find(
-      (candidate) => candidate.search === search && candidate.type === type
-    );
-    if (cache) {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(
-            cache.results.map((teamId) =>
-              this.allTeams.find((t) => t.id === teamId && t.type === type)
-            ) as GenericTeam[]
-          );
+    return this.cacheLoaded.then(() => {
+      const cache = this.allSearch.find(
+        (candidate) => candidate.search === search && candidate.type === type
+      );
+      if (cache && cache.results.length > 0) {
+        return Promise.resolve(
+          cache.results.map((teamId) =>
+            this.allTeams.find((t) => t.id === teamId && t.type === type)
+          ) as GenericTeam[]
+        );
+      }
+
+      const url = `${this.getSearchBaseUrl(type)}teams?search=${search}`;
+      return httpRequest
+        .load(url, httpRequest.CONSTANTS.RESPONSE_TYPES.JSON, [
+          { name: "x-apisports-key", value: API_SPORTS_KEY },
+        ])
+        .then((rawData) => {
+          const data = rawData as ApiSportsTeamReturn;
+
+          if (data.response && data.response.length > 0) {
+            this.allSearch.push({
+              search,
+              type,
+              results: data.response.map((r) => r.id),
+            });
+
+            for (const team of data.response) {
+              team.type = type;
+            }
+            this.allTeams = this.allTeams.concat(data.response);
+            this.saveCache();
+          }
+
+          return data.response;
+        })
+        .catch((error) => {
+          console.error("[ApiSports] API request failed:", error);
+          throw error;
         });
-      });
-    }
-
-    const url = `${this.getSearchBaseUrl(type)}teams?search=${search}`;
-    return httpRequest
-      .load(url, httpRequest.CONSTANTS.RESPONSE_TYPES.JSON, [
-        { name: "x-apisports-key", value: API_SPORTS_KEY },
-      ])
-      .then((rawData) => {
-        const data = rawData as ApiSportsTeamReturn;
-
-        this.allSearch.push({
-          search,
-          type,
-          results: data.response.map((r) => r.id),
-        });
-
-        for (const team of data.response) {
-          team.type = type;
-        }
-        this.allTeams = this.allTeams.concat(data.response);
-        this.saveCache();
-
-        return data.response;
-      });
+    });
   }
 }
 
