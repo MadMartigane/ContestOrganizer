@@ -5,7 +5,7 @@
 import httpRequest from "../http-request/http-request";
 import type { GenericTeam } from "../team-row/team-row.d";
 import { TournamentType } from "../tournaments/tournaments.types";
-import { LOCAL_STORAGE_TEAM_KEY, SECRETS } from "./futdb.constants";
+import { FUTDB_KEY, LOCAL_STORAGE_TEAM_KEY } from "./futdb.constants";
 import type {
   FutDBLoadedImgBuffer,
   FutDBPagination,
@@ -66,7 +66,7 @@ export class ApiFutDB {
     const url = `https://futdb.app/api/clubs?page=${pageNumber}`;
     return httpRequest
       .load(url, httpRequest.CONSTANTS.RESPONSE_TYPES.JSON, [
-        { name: "X-AUTH-TOKEN", value: SECRETS },
+        { name: "X-AUTH-TOKEN", value: FUTDB_KEY },
       ])
       .then((rawData) => {
         const data = rawData as FutDBTeamReturn;
@@ -142,7 +142,7 @@ export class ApiFutDB {
     const url = `https://futdb.app/api/clubs/${id}/image`;
     return httpRequest
       .load(url, httpRequest.CONSTANTS.RESPONSE_TYPES.BLOB, [
-        { name: "X-AUTH-TOKEN", value: SECRETS },
+        { name: "X-AUTH-TOKEN", value: FUTDB_KEY },
       ])
       .then((rawData) => {
         const data = rawData as Blob;

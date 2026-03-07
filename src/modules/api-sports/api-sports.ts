@@ -5,7 +5,11 @@
 import httpRequest from "../http-request/http-request";
 import type { GenericTeam } from "../team-row/team-row.d";
 import { TournamentType } from "../tournaments/tournaments.types";
-import { LOCAL_STORAGE_TEAM_KEY, SECRETS, URLS } from "./api-sports.constants";
+import {
+  API_SPORTS_KEY,
+  LOCAL_STORAGE_TEAM_KEY,
+  URLS,
+} from "./api-sports.constants";
 import type {
   ApiSportsCache,
   ApiSportsSearchCache,
@@ -104,7 +108,7 @@ export class ApiSports {
     const url = `${this.getSearchBaseUrl(type)}teams?search=${search}`;
     return httpRequest
       .load(url, httpRequest.CONSTANTS.RESPONSE_TYPES.JSON, [
-        { name: "x-apisports-key", value: SECRETS },
+        { name: "x-apisports-key", value: API_SPORTS_KEY },
       ])
       .then((rawData) => {
         const data = rawData as ApiSportsTeamReturn;

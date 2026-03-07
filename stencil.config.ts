@@ -1,13 +1,28 @@
 // https://stenciljs.com/docs/config
+
+import replace from "@rollup/plugin-replace";
 import type { Config } from "@stencil/core";
 import tailwind, { tailwindHMR } from "stencil-tailwind-plugin";
+import "dotenv/config";
 
 export const config: Config = {
   globalStyle: "src/global/app.css",
   globalScript: "src/global/app.ts",
   taskQueue: "async",
   sourceMap: false,
-  plugins: [tailwind(), tailwindHMR()],
+  plugins: [
+    tailwind(),
+    tailwindHMR(),
+    replace({
+      preventAssignment: true,
+      values: {
+        "process.env.API_SPORTS_KEY": JSON.stringify(
+          process.env.API_SPORTS_KEY
+        ),
+        "process.env.FUTDB_KEY": JSON.stringify(process.env.FUTDB_KEY),
+      },
+    }),
+  ],
   outputTargets: [
     {
       type: "www",
