@@ -31,6 +31,7 @@ export class MadSelectTeam {
   private domInputSearch?: SlInput;
   private domSearchResultList?: SlMenu;
   private searchValue: string;
+  private searchRequestId = 0;
   private readonly minNumberSearchLetter: number;
 
   @Prop() color: string;
@@ -64,18 +65,23 @@ export class MadSelectTeam {
 
   private async onSearchChange(value: string): Promise<void> {
     this.searchValue = value;
+
     if (this.searchValue.length < this.minNumberSearchLetter) {
       this.suggested = [];
       return;
     }
 
-    // All sports use api-sports search
-    this.suggested = await this.apiSports.searchTeam(
+    const requestId = ++this.searchRequestId;
+
+    const results = await this.apiSports.searchTeam(
       this.type,
       this.searchValue
     );
 
-    this.scrollOnSearchResult();
+    if (requestId === this.searchRequestId) {
+      this.suggested = results;
+      this.scrollOnSearchResult();
+    }
   }
 
   private scrollOnSearchResult() {

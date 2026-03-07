@@ -7,6 +7,7 @@ import type { GenericTeam } from "../team-row/team-row.d";
 import { TournamentType } from "../tournaments/tournaments.types";
 import {
   API_SPORTS_KEY,
+  LEGACY_CACHE_KEYS,
   LOCAL_STORAGE_TEAM_KEY,
   URLS,
 } from "./api-sports.constants";
@@ -24,10 +25,20 @@ export class ApiSports {
   constructor() {
     this.allTeams = [];
     this.allSearch = [];
+    this.cleanupLegacyCache();
     this.cacheLoaded = this.loadCache().then((cache) => {
       this.allTeams = cache?.allTeams || [];
       this.allSearch = cache?.allSearch || [];
     });
+  }
+
+  // TODO: Remove this legacy cache cleanup after a few weeks
+  private cleanupLegacyCache(): void {
+    for (const key of LEGACY_CACHE_KEYS) {
+      if (localStorage.getItem(key) !== null) {
+        localStorage.removeItem(key);
+      }
+    }
   }
 
   private loadCache(): Promise<ApiSportsCache | null> {
@@ -94,11 +105,16 @@ export class ApiSports {
         (candidate) => candidate.search === search && candidate.type === type
       );
       if (cache && cache.results.length > 0) {
-        return Promise.resolve(
-          cache.results.map((teamId) =>
+        const teams = cache.results
+          .map((teamId) =>
             this.allTeams.find((t) => t.id === teamId && t.type === type)
-          ) as GenericTeam[]
-        );
+          )
+          .filter((team): team is GenericTeam => team !== undefined);
+
+        if (teams.length > 0) {
+          return Promise.resolve(teams);
+        }
+        // If no valid teams found, fall through to API call
       }
 
       const url = `${this.getSearchBaseUrl(type)}teams?search=${search}`;
@@ -110,24 +126,34 @@ export class ApiSports {
           const data = rawData as ApiSportsTeamReturn;
 
           if (data.response && data.response.length > 0) {
+            // Handle both API response structures:
+            // Structure 1: { team: { id, name, ... } } - used by FOOT, NBA, etc.
+            // Structure 2: { id, name, ... } - team data directly, used by RUGBY
+            const teams = data.response.map((r) => {
+              const teamData = r.team || r;
+              return {
+                ...teamData,
+                type,
+              };
+            });
+
+            const teamIds = teams.map((t) => t.id);
+
             this.allSearch.push({
               search,
               type,
-              results: data.response.map((r) => r.team.id),
+              results: teamIds,
             });
 
-            const teams = data.response.map((r) => ({
-              ...r.team,
-              type,
-            }));
             this.allTeams = this.allTeams.concat(teams);
             this.saveCache();
-          }
 
-          return data.response.map((r) => r.team);
+            return teams;
+          }
+          return [];
         })
         .catch((error) => {
-          console.error("[ApiSports] API request failed:", error);
+          console.error("[ApiSports] Error searching for team:", error);
           throw error;
         });
     });
