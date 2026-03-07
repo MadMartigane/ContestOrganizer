@@ -1,4 +1,4 @@
-import { Component, Host, h, Prop, State, Watch } from "@stencil/core";
+import { Component, Element, Host, h, Prop, State, Watch } from "@stencil/core";
 import type { GenericTeam } from "../../components.d";
 import apiFutDB from "../../modules/futbd/futdb";
 
@@ -10,7 +10,13 @@ import apiFutDB from "../../modules/futbd/futdb";
 export class MadTeamTile {
   private readonly apiFutDB: typeof apiFutDB;
 
+  @Element() private readonly el: HTMLElement;
+
   @State() private imgSrc: string;
+  @State() private imgError = false;
+
+  private intersectionObserver: IntersectionObserver | null = null;
+  private imageLoaded = false;
 
   @Prop() team: GenericTeam | null;
   @Prop() reverse: boolean | null;
@@ -18,19 +24,52 @@ export class MadTeamTile {
 
   constructor() {
     this.apiFutDB = apiFutDB;
+    this.imgSrc = "";
+    this.imgError = false;
+    this.imageLoaded = false;
+  }
 
-    this.loadImg(this.team?.id || null);
+  componentDidLoad() {
+    // Only load image when component becomes visible
+    this.intersectionObserver = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !this.imageLoaded) {
+          this.imageLoaded = true;
+          this.loadImg(this.team?.id || null);
+          this.intersectionObserver?.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    this.intersectionObserver.observe(this.el);
+  }
+
+  disconnectedCallback() {
+    this.intersectionObserver?.disconnect();
   }
 
   private loadImg(id: number | null) {
     if (this.team?.logo) {
+      // API-Sports teams have direct logo URL
       setTimeout(() => {
         this.imgSrc = this.team?.logo || "";
       });
     } else if (id) {
-      this.apiFutDB.loadTeamImage(id).then((base64Img) => {
-        this.imgSrc = base64Img;
-      });
+      // FutDB teams need image fetch
+      this.apiFutDB
+        .loadTeamImage(id)
+        .then((base64Img) => {
+          this.imgSrc = base64Img;
+          this.imgError = false;
+        })
+        .catch((error) => {
+          console.warn(
+            `[TeamTile] Failed to load image for team ${id}:`,
+            error
+          );
+          this.imgError = true;
+          this.imgSrc = "";
+        });
     }
   }
 
@@ -41,6 +80,28 @@ export class MadTeamTile {
     }
 
     this.loadImg(newTeam.id);
+  }
+
+  private renderImage() {
+    if (this.imgSrc) {
+      return (
+        <img
+          alt={`${this.team?.name} club logo`}
+          class={this.reverse ? "float-right w-16" : "float-left w-16"}
+          height="64"
+          src={this.imgSrc}
+          width="64"
+        />
+      );
+    }
+    if (this.imgError) {
+      return (
+        <div class="team-image-fallback">
+          <sl-icon class="text-2xl" name="shield" />
+        </div>
+      );
+    }
+    return <sl-spinner />;
   }
 
   render() {
@@ -54,7 +115,7 @@ export class MadTeamTile {
           </div>
         )}
         <div class="w-full">
-          {this.team && this.imgSrc ? (
+          {this.team && (
             <div
               class={
                 this.reverse
@@ -62,15 +123,9 @@ export class MadTeamTile {
                   : "min-h-8 w-full md:w-1/2"
               }
             >
-              <img
-                alt={`${this.team?.name} club logo`}
-                class={this.reverse ? "float-right w-16" : "float-left w-16"}
-                height="64"
-                src={this.imgSrc}
-                width="64"
-              />
+              {this.renderImage()}
             </div>
-          ) : null}
+          )}
 
           <div
             class={

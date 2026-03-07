@@ -43,3 +43,17 @@
 .rank-badge-right {
   right: -14px;
 }
+
+.team-image-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  background-color: #e5e7eb;
+  border-radius: 0.25rem;
+}
+
+.team-image-fallback sl-icon {
+  color: #9ca3af;
+}

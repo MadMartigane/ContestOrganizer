@@ -12,6 +12,15 @@ import type {
   FutDBTeamReturn,
 } from "./futdb.d";
 
+const DB_NAME = "FutDBCache";
+const DB_VERSION = 1;
+const STORE_NAME = "teamImages";
+
+interface HttpHeaderType {
+  name: string;
+  value: string;
+}
+
 export class ApiFutDB {
   private readonly loadedImg: FutDBLoadedImgBuffer[];
 
@@ -19,6 +28,14 @@ export class ApiFutDB {
   private allTeams: GenericTeam[];
   private pagination: FutDBPagination;
   private countReturn: number;
+
+  // Request queue for rate limiting
+  private readonly requestQueue: Array<() => Promise<void>> = [];
+  private activeRequests = 0;
+  private readonly MAX_CONCURRENT = 3;
+
+  // IndexedDB for persistent caching
+  private db: IDBDatabase | null = null;
 
   constructor() {
     this.isLoading = null;
@@ -33,9 +50,98 @@ export class ApiFutDB {
     };
     this.countReturn = 0;
 
+    this.initDB()
+      .then(() => {
+        console.log("[ApiFutDB] IndexedDB initialized");
+      })
+      .catch((error) => {
+        console.warn("[ApiFutDB] Failed to initialize IndexedDB:", error);
+      });
+
     this.loadCache().then((cache) => {
       this.allTeams = cache || [];
     });
+  }
+
+  private initDB(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(DB_NAME, DB_VERSION);
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        this.db = request.result;
+        resolve();
+      };
+      request.onupgradeneeded = (event) => {
+        const db = (event.target as IDBOpenDBRequest).result;
+        if (!db.objectStoreNames.contains(STORE_NAME)) {
+          db.createObjectStore(STORE_NAME, { keyPath: "id" });
+        }
+      };
+    });
+  }
+
+  private getCachedImage(id: number): Promise<string | null> {
+    const db = this.db;
+    if (!db) {
+      return Promise.resolve(null);
+    }
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, "readonly");
+      const store = tx.objectStore(STORE_NAME);
+      const request = store.get(id);
+      request.onsuccess = () => resolve(request.result?.src || null);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  private async cacheImage(id: number, src: string): Promise<void> {
+    if (!this.db) {
+      return;
+    }
+    const tx = this.db.transaction(STORE_NAME, "readwrite");
+    const store = tx.objectStore(STORE_NAME);
+    await store.put({ id, src, timestamp: Date.now() });
+  }
+
+  private processQueue(): void {
+    while (
+      this.requestQueue.length > 0 &&
+      this.activeRequests < this.MAX_CONCURRENT
+    ) {
+      this.activeRequests++;
+      const request = this.requestQueue.shift();
+      if (request) {
+        request().finally(() => {
+          this.activeRequests--;
+          this.processQueue();
+        });
+      }
+    }
+  }
+
+  private async fetchWithRetry(
+    url: string,
+    headers: HttpHeaderType[],
+    maxRetries = 3
+  ): Promise<Blob> {
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        return (await httpRequest.load(
+          url,
+          httpRequest.CONSTANTS.RESPONSE_TYPES.BLOB,
+          headers
+        )) as Blob;
+      } catch (error) {
+        const is429 = error instanceof Error && error.message.includes("429");
+        if (is429 && attempt < maxRetries - 1) {
+          const delay = 2 ** attempt * 1000;
+          await new Promise((resolve) => setTimeout(resolve, delay));
+          continue;
+        }
+        throw error;
+      }
+    }
+    throw new Error("Max retries exceeded");
   }
 
   private loadCache(): Promise<GenericTeam[] | null> {
@@ -132,34 +238,51 @@ export class ApiFutDB {
   }
 
   loadTeamImage(id: number): Promise<string> {
+    // Check memory cache first
     const buffer = this.loadedImg.find((buff) => buff.id === id);
     if (buffer) {
-      return new Promise((resolve) => {
-        resolve(buffer.src);
-      });
+      return Promise.resolve(buffer.src);
     }
 
-    const url = `https://futdb.app/api/clubs/${id}/image`;
-    return httpRequest
-      .load(url, httpRequest.CONSTANTS.RESPONSE_TYPES.BLOB, [
-        { name: "X-AUTH-TOKEN", value: FUTDB_KEY },
-      ])
-      .then((rawData) => {
-        const data = rawData as Blob;
-        /* Use one file reader for each img */
-        const fileReader = new FileReader();
-        const handler = (resolve: (value: string) => void) => {
-          fileReader.addEventListener("load", () => {
-            const src = fileReader.result as string;
-            this.loadedImg.push({ id, src });
-            resolve(src);
-          });
+    // Check IndexedDB cache
+    return this.getCachedImage(id).then((cachedSrc) => {
+      if (cachedSrc) {
+        this.loadedImg.push({ id, src: cachedSrc });
+        return cachedSrc;
+      }
 
-          fileReader.readAsDataURL(data);
+      // Add to request queue
+      return new Promise<string>((resolve) => {
+        const request = async () => {
+          const url = `https://futdb.app/api/clubs/${id}/image`;
+          const headers: HttpHeaderType[] = [
+            { name: "X-AUTH-TOKEN", value: FUTDB_KEY },
+          ];
+
+          try {
+            const data = await this.fetchWithRetry(url, headers);
+            /* Use one file reader for each img */
+            const fileReader = new FileReader();
+            fileReader.addEventListener("load", () => {
+              const src = fileReader.result as string;
+              this.loadedImg.push({ id, src });
+              this.cacheImage(id, src);
+              resolve(src);
+            });
+            fileReader.readAsDataURL(data);
+          } catch (error) {
+            console.error(
+              `[ApiFutDB] Failed to load image for team ${id}:`,
+              error
+            );
+            resolve("");
+          }
         };
 
-        return new Promise(handler);
+        this.requestQueue.push(request);
+        this.processQueue();
       });
+    });
   }
 }
 
