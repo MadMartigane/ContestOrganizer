@@ -6,10 +6,23 @@ export interface ApiSportsReturnError {
   status: number;
 }
 
+export interface ApiSportsTeamResponse {
+  team: GenericTeam;
+  venue?: {
+    id: number;
+    name: string;
+    address?: string;
+    city?: string;
+    capacity?: number;
+    surface?: string;
+    image?: string;
+  };
+}
+
 export interface ApiSportsTeamReturn {
   errors: ApiSportsReturnError[];
   get: string;
-  response: GenericTeam[];
+  response: ApiSportsTeamResponse[];
   results: number;
 }
 

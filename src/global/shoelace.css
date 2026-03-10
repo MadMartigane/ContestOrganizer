@@ -122,9 +122,8 @@ sl-breadcrumb {
   padding: var(--sl-spacing-x-small);
   background-color: var(--sl-color-primary-100);
   border-radius: 0;
-  -moz-box-shadow: 0 2px hsla(240, 4%, 46%, 0.12);
   -moz-box-shadow: 0px var(--sl-shadow-x-large) var(--sl-color-neutral-900);
-  -webkit-box-shadow: 0 2px hsla(240, 4%, 46%, 0.12);
+  -webkit-box-shadow: 0px var(--sl-shadow-x-large) var(--sl-color-neutral-900);
 }
 
 sl-menu {

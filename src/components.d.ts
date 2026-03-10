@@ -454,24 +454,91 @@ declare namespace LocalJSX {
     }
     interface PageTournamentSelect {
     }
+
+    interface ErrorMessageAttributes {
+        "message": string;
+        "goHomeButton": boolean;
+    }
+    interface GridBasketAttributes {
+        "tournamentId": number | null;
+    }
+    interface GridDefaultAttributes {
+        "tournamentId": number | null;
+    }
+    interface MadInputNumberAttributes {
+        "placeholder": string;
+        "label": string;
+        "min": number | null;
+        "max": number;
+        "step": number;
+        "value": number;
+        "readonly": boolean;
+    }
+    interface MadMatchTileAttributes {
+        "hostScore": number | null;
+        "visitorScore": number | null;
+        "hostRank": number;
+        "visitorRank": number;
+    }
+    interface MadRouteAttributes {
+        "url": string;
+        "component": string;
+    }
+    interface MadScorerBasketAttributes {
+        "min": number;
+        "max": number;
+        "value": number;
+        "readonly": boolean;
+    }
+    interface MadScorerCommonAttributes {
+        "min": number | null;
+        "max": number;
+        "step": number;
+        "value": number;
+        "readonly": boolean;
+    }
+    interface MadScorerRugbyAttributes {
+        "min": number;
+        "max": number;
+        "value": number;
+        "readonly": boolean;
+    }
+    interface MadSelectTeamAttributes {
+        "color": string;
+        "placeholder": string;
+        "label": string;
+        "type": TournamentType;
+        "tournamentGridId": number;
+    }
+    interface MadTeamTileAttributes {
+        "reverse": boolean | null;
+        "rank": number;
+    }
+    interface PageMatchAttributes {
+        "tournamentId": number;
+    }
+    interface PageTournamentAttributes {
+        "tournamentId": number;
+    }
+
     interface IntrinsicElements {
         "app-root": AppRoot;
-        "error-message": ErrorMessage;
-        "grid-basket": GridBasket;
-        "grid-default": GridDefault;
-        "mad-input-number": MadInputNumber;
-        "mad-match-tile": MadMatchTile;
-        "mad-route": MadRoute;
-        "mad-scorer-basket": MadScorerBasket;
-        "mad-scorer-common": MadScorerCommon;
-        "mad-scorer-rugby": MadScorerRugby;
-        "mad-select-team": MadSelectTeam;
-        "mad-team-tile": MadTeamTile;
+        "error-message": Omit<ErrorMessage, keyof ErrorMessageAttributes> & { [K in keyof ErrorMessage & keyof ErrorMessageAttributes]?: ErrorMessage[K] } & { [K in keyof ErrorMessage & keyof ErrorMessageAttributes as `attr:${K}`]?: ErrorMessageAttributes[K] } & { [K in keyof ErrorMessage & keyof ErrorMessageAttributes as `prop:${K}`]?: ErrorMessage[K] };
+        "grid-basket": Omit<GridBasket, keyof GridBasketAttributes> & { [K in keyof GridBasket & keyof GridBasketAttributes]?: GridBasket[K] } & { [K in keyof GridBasket & keyof GridBasketAttributes as `attr:${K}`]?: GridBasketAttributes[K] } & { [K in keyof GridBasket & keyof GridBasketAttributes as `prop:${K}`]?: GridBasket[K] };
+        "grid-default": Omit<GridDefault, keyof GridDefaultAttributes> & { [K in keyof GridDefault & keyof GridDefaultAttributes]?: GridDefault[K] } & { [K in keyof GridDefault & keyof GridDefaultAttributes as `attr:${K}`]?: GridDefaultAttributes[K] } & { [K in keyof GridDefault & keyof GridDefaultAttributes as `prop:${K}`]?: GridDefault[K] };
+        "mad-input-number": Omit<MadInputNumber, keyof MadInputNumberAttributes> & { [K in keyof MadInputNumber & keyof MadInputNumberAttributes]?: MadInputNumber[K] } & { [K in keyof MadInputNumber & keyof MadInputNumberAttributes as `attr:${K}`]?: MadInputNumberAttributes[K] } & { [K in keyof MadInputNumber & keyof MadInputNumberAttributes as `prop:${K}`]?: MadInputNumber[K] };
+        "mad-match-tile": Omit<MadMatchTile, keyof MadMatchTileAttributes> & { [K in keyof MadMatchTile & keyof MadMatchTileAttributes]?: MadMatchTile[K] } & { [K in keyof MadMatchTile & keyof MadMatchTileAttributes as `attr:${K}`]?: MadMatchTileAttributes[K] } & { [K in keyof MadMatchTile & keyof MadMatchTileAttributes as `prop:${K}`]?: MadMatchTile[K] };
+        "mad-route": Omit<MadRoute, keyof MadRouteAttributes> & { [K in keyof MadRoute & keyof MadRouteAttributes]?: MadRoute[K] } & { [K in keyof MadRoute & keyof MadRouteAttributes as `attr:${K}`]?: MadRouteAttributes[K] } & { [K in keyof MadRoute & keyof MadRouteAttributes as `prop:${K}`]?: MadRoute[K] };
+        "mad-scorer-basket": Omit<MadScorerBasket, keyof MadScorerBasketAttributes> & { [K in keyof MadScorerBasket & keyof MadScorerBasketAttributes]?: MadScorerBasket[K] } & { [K in keyof MadScorerBasket & keyof MadScorerBasketAttributes as `attr:${K}`]?: MadScorerBasketAttributes[K] } & { [K in keyof MadScorerBasket & keyof MadScorerBasketAttributes as `prop:${K}`]?: MadScorerBasket[K] };
+        "mad-scorer-common": Omit<MadScorerCommon, keyof MadScorerCommonAttributes> & { [K in keyof MadScorerCommon & keyof MadScorerCommonAttributes]?: MadScorerCommon[K] } & { [K in keyof MadScorerCommon & keyof MadScorerCommonAttributes as `attr:${K}`]?: MadScorerCommonAttributes[K] } & { [K in keyof MadScorerCommon & keyof MadScorerCommonAttributes as `prop:${K}`]?: MadScorerCommon[K] };
+        "mad-scorer-rugby": Omit<MadScorerRugby, keyof MadScorerRugbyAttributes> & { [K in keyof MadScorerRugby & keyof MadScorerRugbyAttributes]?: MadScorerRugby[K] } & { [K in keyof MadScorerRugby & keyof MadScorerRugbyAttributes as `attr:${K}`]?: MadScorerRugbyAttributes[K] } & { [K in keyof MadScorerRugby & keyof MadScorerRugbyAttributes as `prop:${K}`]?: MadScorerRugby[K] };
+        "mad-select-team": Omit<MadSelectTeam, keyof MadSelectTeamAttributes> & { [K in keyof MadSelectTeam & keyof MadSelectTeamAttributes]?: MadSelectTeam[K] } & { [K in keyof MadSelectTeam & keyof MadSelectTeamAttributes as `attr:${K}`]?: MadSelectTeamAttributes[K] } & { [K in keyof MadSelectTeam & keyof MadSelectTeamAttributes as `prop:${K}`]?: MadSelectTeam[K] };
+        "mad-team-tile": Omit<MadTeamTile, keyof MadTeamTileAttributes> & { [K in keyof MadTeamTile & keyof MadTeamTileAttributes]?: MadTeamTile[K] } & { [K in keyof MadTeamTile & keyof MadTeamTileAttributes as `attr:${K}`]?: MadTeamTileAttributes[K] } & { [K in keyof MadTeamTile & keyof MadTeamTileAttributes as `prop:${K}`]?: MadTeamTile[K] };
         "page-404": Page404;
         "page-config": PageConfig;
         "page-home": PageHome;
-        "page-match": PageMatch;
-        "page-tournament": PageTournament;
+        "page-match": Omit<PageMatch, keyof PageMatchAttributes> & { [K in keyof PageMatch & keyof PageMatchAttributes]?: PageMatch[K] } & { [K in keyof PageMatch & keyof PageMatchAttributes as `attr:${K}`]?: PageMatchAttributes[K] } & { [K in keyof PageMatch & keyof PageMatchAttributes as `prop:${K}`]?: PageMatch[K] };
+        "page-tournament": Omit<PageTournament, keyof PageTournamentAttributes> & { [K in keyof PageTournament & keyof PageTournamentAttributes]?: PageTournament[K] } & { [K in keyof PageTournament & keyof PageTournamentAttributes as `attr:${K}`]?: PageTournamentAttributes[K] } & { [K in keyof PageTournament & keyof PageTournamentAttributes as `prop:${K}`]?: PageTournament[K] };
         "page-tournament-select": PageTournamentSelect;
     }
 }
@@ -479,24 +546,24 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "app-root": LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
-            "error-message": LocalJSX.ErrorMessage & JSXBase.HTMLAttributes<HTMLErrorMessageElement>;
-            "grid-basket": LocalJSX.GridBasket & JSXBase.HTMLAttributes<HTMLGridBasketElement>;
-            "grid-default": LocalJSX.GridDefault & JSXBase.HTMLAttributes<HTMLGridDefaultElement>;
-            "mad-input-number": LocalJSX.MadInputNumber & JSXBase.HTMLAttributes<HTMLMadInputNumberElement>;
-            "mad-match-tile": LocalJSX.MadMatchTile & JSXBase.HTMLAttributes<HTMLMadMatchTileElement>;
-            "mad-route": LocalJSX.MadRoute & JSXBase.HTMLAttributes<HTMLMadRouteElement>;
-            "mad-scorer-basket": LocalJSX.MadScorerBasket & JSXBase.HTMLAttributes<HTMLMadScorerBasketElement>;
-            "mad-scorer-common": LocalJSX.MadScorerCommon & JSXBase.HTMLAttributes<HTMLMadScorerCommonElement>;
-            "mad-scorer-rugby": LocalJSX.MadScorerRugby & JSXBase.HTMLAttributes<HTMLMadScorerRugbyElement>;
-            "mad-select-team": LocalJSX.MadSelectTeam & JSXBase.HTMLAttributes<HTMLMadSelectTeamElement>;
-            "mad-team-tile": LocalJSX.MadTeamTile & JSXBase.HTMLAttributes<HTMLMadTeamTileElement>;
-            "page-404": LocalJSX.Page404 & JSXBase.HTMLAttributes<HTMLPage404Element>;
-            "page-config": LocalJSX.PageConfig & JSXBase.HTMLAttributes<HTMLPageConfigElement>;
-            "page-home": LocalJSX.PageHome & JSXBase.HTMLAttributes<HTMLPageHomeElement>;
-            "page-match": LocalJSX.PageMatch & JSXBase.HTMLAttributes<HTMLPageMatchElement>;
-            "page-tournament": LocalJSX.PageTournament & JSXBase.HTMLAttributes<HTMLPageTournamentElement>;
-            "page-tournament-select": LocalJSX.PageTournamentSelect & JSXBase.HTMLAttributes<HTMLPageTournamentSelectElement>;
+            "app-root": LocalJSX.IntrinsicElements["app-root"] & JSXBase.HTMLAttributes<HTMLAppRootElement>;
+            "error-message": LocalJSX.IntrinsicElements["error-message"] & JSXBase.HTMLAttributes<HTMLErrorMessageElement>;
+            "grid-basket": LocalJSX.IntrinsicElements["grid-basket"] & JSXBase.HTMLAttributes<HTMLGridBasketElement>;
+            "grid-default": LocalJSX.IntrinsicElements["grid-default"] & JSXBase.HTMLAttributes<HTMLGridDefaultElement>;
+            "mad-input-number": LocalJSX.IntrinsicElements["mad-input-number"] & JSXBase.HTMLAttributes<HTMLMadInputNumberElement>;
+            "mad-match-tile": LocalJSX.IntrinsicElements["mad-match-tile"] & JSXBase.HTMLAttributes<HTMLMadMatchTileElement>;
+            "mad-route": LocalJSX.IntrinsicElements["mad-route"] & JSXBase.HTMLAttributes<HTMLMadRouteElement>;
+            "mad-scorer-basket": LocalJSX.IntrinsicElements["mad-scorer-basket"] & JSXBase.HTMLAttributes<HTMLMadScorerBasketElement>;
+            "mad-scorer-common": LocalJSX.IntrinsicElements["mad-scorer-common"] & JSXBase.HTMLAttributes<HTMLMadScorerCommonElement>;
+            "mad-scorer-rugby": LocalJSX.IntrinsicElements["mad-scorer-rugby"] & JSXBase.HTMLAttributes<HTMLMadScorerRugbyElement>;
+            "mad-select-team": LocalJSX.IntrinsicElements["mad-select-team"] & JSXBase.HTMLAttributes<HTMLMadSelectTeamElement>;
+            "mad-team-tile": LocalJSX.IntrinsicElements["mad-team-tile"] & JSXBase.HTMLAttributes<HTMLMadTeamTileElement>;
+            "page-404": LocalJSX.IntrinsicElements["page-404"] & JSXBase.HTMLAttributes<HTMLPage404Element>;
+            "page-config": LocalJSX.IntrinsicElements["page-config"] & JSXBase.HTMLAttributes<HTMLPageConfigElement>;
+            "page-home": LocalJSX.IntrinsicElements["page-home"] & JSXBase.HTMLAttributes<HTMLPageHomeElement>;
+            "page-match": LocalJSX.IntrinsicElements["page-match"] & JSXBase.HTMLAttributes<HTMLPageMatchElement>;
+            "page-tournament": LocalJSX.IntrinsicElements["page-tournament"] & JSXBase.HTMLAttributes<HTMLPageTournamentElement>;
+            "page-tournament-select": LocalJSX.IntrinsicElements["page-tournament-select"] & JSXBase.HTMLAttributes<HTMLPageTournamentSelectElement>;
         }
     }
 }

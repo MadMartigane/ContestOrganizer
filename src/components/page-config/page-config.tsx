@@ -4,6 +4,8 @@ import setting, {
   type GlobalSetting,
 } from "../../modules/global-setting/global-setting";
 
+const API_SPORTS_CACHE_KEY = "API_SPORTS_CACHE_TEAMS";
+
 @Component({
   tag: "page-config",
   styleUrl: "page-config.css",
@@ -16,6 +18,7 @@ export class PageConfig {
   private readonly initialDarkModeActivated: boolean;
 
   @State() isDarkModeActive: boolean;
+  @State() cacheCleared = false;
 
   constructor() {
     this.globalSetting = setting;
@@ -35,6 +38,14 @@ export class PageConfig {
   private onDarkModeChange() {
     this.globalSetting.setDarkTheme(this.darkModeSwitch.checked);
     this.isDarkModeActive = this.darkModeSwitch.checked;
+  }
+
+  private clearCache() {
+    localStorage.removeItem(API_SPORTS_CACHE_KEY);
+    this.cacheCleared = true;
+    setTimeout(() => {
+      this.cacheCleared = false;
+    }, 3000);
   }
 
   componentDidLoad() {
@@ -61,6 +72,31 @@ export class PageConfig {
             <span class="container">Mode sombre</span>
             <sl-icon name="highlights" />
           </sl-switch>
+
+          <sl-divider />
+
+          <div class="my-4">
+            <h3>Cache des équipes</h3>
+            <p class="text-neutral text-sm">
+              Vide le cache des équipes si vous rencontrez des problèmes de
+              recherche.
+            </p>
+            <sl-button
+              class="mt-2"
+              onclick={() => this.clearCache()}
+              size="medium"
+              variant="warning"
+            >
+              <sl-icon name="trash" slot="prefix" />
+              Vider le cache
+            </sl-button>
+            {this.cacheCleared && (
+              <sl-alert class="mt-2" open variant="success">
+                <sl-icon name="check2-circle" slot="icon" />
+                Le cache des équipes a été vidé.
+              </sl-alert>
+            )}
+          </div>
 
           <div class="footer">
             <div class="grid-300">

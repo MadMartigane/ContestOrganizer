@@ -1,6 +1,5 @@
-import { Component, Host, h, Prop, State, Watch } from "@stencil/core";
+import { Component, Element, Host, h, Prop, State, Watch } from "@stencil/core";
 import type { GenericTeam } from "../../components.d";
-import apiFutDB from "../../modules/futbd/futdb";
 
 @Component({
   tag: "mad-team-tile",
@@ -8,39 +7,124 @@ import apiFutDB from "../../modules/futbd/futdb";
   shadow: false,
 })
 export class MadTeamTile {
-  private readonly apiFutDB: typeof apiFutDB;
+  @Element() private readonly el: HTMLElement;
 
   @State() private imgSrc: string;
+  @State() private imageError = false;
+
+  private intersectionObserver: IntersectionObserver | null = null;
+  private imageLoaded = false;
 
   @Prop() team: GenericTeam | null;
   @Prop() reverse: boolean | null;
   @Prop() rank?: number;
 
   constructor() {
-    this.apiFutDB = apiFutDB;
-
-    this.loadImg(this.team?.id || null);
+    this.imgSrc = "";
+    this.imageLoaded = false;
   }
 
-  private loadImg(id: number | null) {
+  componentDidLoad() {
+    // Only load image when component becomes visible
+    this.intersectionObserver = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !this.imageLoaded) {
+          this.imageLoaded = true;
+          this.loadImg(this.team?.id || null);
+          this.intersectionObserver?.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    this.intersectionObserver.observe(this.el);
+  }
+
+  disconnectedCallback() {
+    this.intersectionObserver?.disconnect();
+  }
+
+  private loadImg(_id: number | null) {
     if (this.team?.logo) {
+      // API-Sports teams have direct logo URL
       setTimeout(() => {
         this.imgSrc = this.team?.logo || "";
-      });
-    } else if (id) {
-      this.apiFutDB.loadTeamImage(id).then((base64Img) => {
-        this.imgSrc = base64Img;
       });
     }
   }
 
+  private onImageError(): void {
+    this.imageError = true;
+    console.warn("[TeamTile] Image failed to load:", this.team?.logo);
+  }
+
   @Watch("team")
   onTeamChange(newTeam: GenericTeam | null) {
+    this.imageError = false; // Reset error state for new team
+
     if (!newTeam) {
       return;
     }
 
     this.loadImg(newTeam.id);
+  }
+
+  private renderImage() {
+    if (this.imageError) {
+      return (
+        <sl-icon
+          class={
+            this.reverse
+              ? "float-right text-6xl text-neutral"
+              : "float-left text-6xl text-neutral"
+          }
+          name="shield-x"
+          style={{ width: "64px", height: "64px" }}
+        />
+      );
+    }
+
+    if (this.imgSrc) {
+      return (
+        <img
+          alt={`${this.team?.name} club logo`}
+          class={this.reverse ? "float-right w-16" : "float-left w-16"}
+          height="64"
+          ref={(el) => {
+            if (el) {
+              el.addEventListener("error", () => this.onImageError());
+            }
+          }}
+          src={this.imgSrc}
+          width="64"
+        />
+      );
+    }
+
+    return (
+      <div
+        class={
+          this.reverse
+            ? "team-image-fallback float-right"
+            : "team-image-fallback float-left"
+        }
+      >
+        <svg
+          aria-hidden="true"
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.5"
+          viewBox="0 0 24 24"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <line x1="2" x2="22" y1="12" y2="12" />
+          <line x1="12" x2="12" y1="2" y2="22" />
+          <path d="M12 2c-3 3-3 17 0 22" />
+          <path d="M12 2c3 3 3 17 0 22" />
+        </svg>
+      </div>
+    );
   }
 
   render() {
@@ -54,7 +138,7 @@ export class MadTeamTile {
           </div>
         )}
         <div class="w-full">
-          {this.team && this.imgSrc ? (
+          {this.team && (
             <div
               class={
                 this.reverse
@@ -62,15 +146,9 @@ export class MadTeamTile {
                   : "min-h-8 w-full md:w-1/2"
               }
             >
-              <img
-                alt={`${this.team?.name} club logo`}
-                class={this.reverse ? "float-right w-16" : "float-left w-16"}
-                height="64"
-                src={this.imgSrc}
-                width="64"
-              />
+              {this.renderImage()}
             </div>
-          ) : null}
+          )}
 
           <div
             class={
