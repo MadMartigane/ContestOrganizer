@@ -44,16 +44,41 @@
   right: -14px;
 }
 
+/* Animated basketball placeholder */
 .team-image-fallback {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 64px;
   height: 64px;
-  background-color: #e5e7eb;
-  border-radius: 0.25rem;
+  background-color: var(--sl-color-neutral-200);
+  border-radius: var(--sl-border-radius-small);
 }
 
-.team-image-fallback sl-icon {
-  color: #9ca3af;
+.team-image-fallback svg {
+  width: 40px;
+  height: 40px;
+  color: var(--sl-color-neutral-400);
+  animation: basketball-pulse 1.5s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes basketball-pulse {
+  0%,
+  100% {
+    transform: scale(0.95);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .team-image-fallback svg {
+    opacity: 0.8;
+    animation: none;
+  }
 }

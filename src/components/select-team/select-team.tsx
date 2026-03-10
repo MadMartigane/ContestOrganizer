@@ -13,9 +13,12 @@ import {
   Watch,
 } from "@stencil/core";
 import apiSports from "../../modules/api-sports/api-sports";
+import type { ClassifiedError } from "../../modules/error/error.utils";
+import { classifyError } from "../../modules/error/error.utils";
 import type { GridTeamOnUpdateDetail } from "../../modules/grid-common/grid-common.types";
 import type { GenericTeam } from "../../modules/team-row/team-row.d";
-import type { TournamentType } from "../../modules/tournaments/tournaments.types";
+import theSportsDbService from "../../modules/thesportsdb/thesportsdb.service";
+import { TournamentType } from "../../modules/tournaments/tournaments.types";
 import Utils from "../../modules/utils/utils";
 
 @Component({
@@ -43,6 +46,7 @@ export class MadSelectTeam {
 
   @State() private team: GenericTeam;
   @State() private isLoading: boolean;
+  @State() private searchError: ClassifiedError | null = null;
   @State() private suggested: GenericTeam[];
 
   @Event() madSelectChange: EventEmitter<GridTeamOnUpdateDetail>;
@@ -57,6 +61,7 @@ export class MadSelectTeam {
 
     this.suggested = [];
     this.searchValue = "";
+    this.searchError = null;
 
     // All sports use api-sports with same settings
     this.minNumberSearchLetter = 3;
@@ -68,20 +73,65 @@ export class MadSelectTeam {
 
     if (this.searchValue.length < this.minNumberSearchLetter) {
       this.suggested = [];
+      this.isLoading = false;
+      this.searchError = null;
       return;
     }
 
     const requestId = ++this.searchRequestId;
+    this.isLoading = true;
+    this.searchError = null;
 
-    const results = await this.apiSports.searchTeam(
-      this.type,
-      this.searchValue
-    );
+    try {
+      let results: GenericTeam[];
+      if (this.type === TournamentType.NBA) {
+        results = await theSportsDbService.searchTeams(this.searchValue);
+      } else {
+        results = await this.apiSports.searchTeam(this.type, this.searchValue);
+      }
 
-    if (requestId === this.searchRequestId) {
-      this.suggested = results;
-      this.scrollOnSearchResult();
+      if (requestId === this.searchRequestId) {
+        this.suggested = results;
+        this.scrollOnSearchResult();
+      }
+    } catch (error) {
+      if (requestId === this.searchRequestId) {
+        this.searchError = classifyError(error);
+        this.suggested = [];
+      }
+    } finally {
+      if (requestId === this.searchRequestId) {
+        this.isLoading = false;
+      }
     }
+  }
+
+  private retrySearch(): void {
+    this.onSearchChange(this.searchValue);
+  }
+
+  private renderErrorAlert() {
+    if (!this.searchError) {
+      return null;
+    }
+
+    return (
+      <sl-alert class="my-2" open variant="danger">
+        <sl-icon name="exclamation-triangle" slot="icon" />
+        <strong>{this.searchError.title}</strong>
+        <p class="text-sm">{this.searchError.message}</p>
+        {this.searchError.retryable && (
+          <sl-button
+            onclick={() => this.retrySearch()}
+            size="small"
+            variant="primary"
+          >
+            <sl-icon name="arrow-clockwise" slot="prefix" />
+            Réessayer
+          </sl-button>
+        )}
+      </sl-alert>
+    );
   }
 
   private scrollOnSearchResult() {
@@ -178,17 +228,44 @@ export class MadSelectTeam {
     );
   }
 
+  private renderResultsContent() {
+    if (this.isLoading) {
+      return (
+        <div class="flex flex-col items-center justify-center py-8">
+          <div class="mb-3">
+            <sl-spinner class="text-4xl" />
+          </div>
+          <span class="text-neutral">Chargement des équipes…</span>
+        </div>
+      );
+    }
+
+    if (this.suggested.length) {
+      return this.renderTeamResultList();
+    }
+
+    if (this.searchValue?.length > 2) {
+      return (
+        <sl-alert open variant="warning">
+          <sl-icon
+            class="text-6xl text-warning"
+            name="emoji-frown"
+            slot="icon"
+          />
+          <span class="mx-2 text-2xl">Aucun résultat</span>
+        </sl-alert>
+      );
+    }
+
+    return null;
+  }
+
   private renderTeamSelection() {
     return (
       <div class="footer">
-        {this.isLoading ? <sl-progress-bar indeterminate /> : null}
         <sl-card>
           <div slot="header">
-            <h3>
-              {this.isLoading
-                ? "Changement des équipes…"
-                : `Recherche ton équipe. (${this.minNumberSearchLetter} lettres min)`}
-            </h3>
+            <h3>{`Recherche ton équipe. (${this.minNumberSearchLetter} lettres min)`}</h3>
           </div>
           <div>
             <div class="my-4">
@@ -196,7 +273,7 @@ export class MadSelectTeam {
                 autocomplete="off"
                 autofocus
                 disabled={this.isLoading}
-                placeholder="nom de d’équipe"
+                placeholder="nom de d'équipe"
                 ref={(el: SlInput) => {
                   this.domInputSearch = el;
                 }}
@@ -207,18 +284,9 @@ export class MadSelectTeam {
               </sl-input>
             </div>
 
-            {this.suggested.length ? this.renderTeamResultList() : null}
+            {this.renderErrorAlert()}
 
-            {this.searchValue?.length > 2 && !this.suggested.length ? (
-              <sl-alert open variant="warning">
-                <sl-icon
-                  class="text-6xl text-warning"
-                  name="emoji-frown"
-                  slot="icon"
-                />
-                <span class="mx-2 text-2xl">Aucun résultat</span>
-              </sl-alert>
-            ) : null}
+            {this.renderResultsContent()}
           </div>
         </sl-card>
       </div>

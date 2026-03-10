@@ -10,6 +10,7 @@ export class MadTeamTile {
   @Element() private readonly el: HTMLElement;
 
   @State() private imgSrc: string;
+  @State() private imageError = false;
 
   private intersectionObserver: IntersectionObserver | null = null;
   private imageLoaded = false;
@@ -51,8 +52,15 @@ export class MadTeamTile {
     }
   }
 
+  private onImageError(): void {
+    this.imageError = true;
+    console.warn("[TeamTile] Image failed to load:", this.team?.logo);
+  }
+
   @Watch("team")
   onTeamChange(newTeam: GenericTeam | null) {
+    this.imageError = false; // Reset error state for new team
+
     if (!newTeam) {
       return;
     }
@@ -61,18 +69,62 @@ export class MadTeamTile {
   }
 
   private renderImage() {
+    if (this.imageError) {
+      return (
+        <sl-icon
+          class={
+            this.reverse
+              ? "float-right text-6xl text-neutral"
+              : "float-left text-6xl text-neutral"
+          }
+          name="shield-x"
+          style={{ width: "64px", height: "64px" }}
+        />
+      );
+    }
+
     if (this.imgSrc) {
       return (
         <img
           alt={`${this.team?.name} club logo`}
           class={this.reverse ? "float-right w-16" : "float-left w-16"}
           height="64"
+          ref={(el) => {
+            if (el) {
+              el.addEventListener("error", () => this.onImageError());
+            }
+          }}
           src={this.imgSrc}
           width="64"
         />
       );
     }
-    return <sl-spinner />;
+
+    return (
+      <div
+        class={
+          this.reverse
+            ? "team-image-fallback float-right"
+            : "team-image-fallback float-left"
+        }
+      >
+        <svg
+          aria-hidden="true"
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.5"
+          viewBox="0 0 24 24"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <line x1="2" x2="22" y1="12" y2="12" />
+          <line x1="12" x2="12" y1="2" y2="22" />
+          <path d="M12 2c-3 3-3 17 0 22" />
+          <path d="M12 2c3 3 3 17 0 22" />
+        </svg>
+      </div>
+    );
   }
 
   render() {

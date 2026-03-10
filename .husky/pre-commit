@@ -1,7 +1,9 @@
-npm test
+#!/bin/sh
+
+# Run unit tests only (no e2e/Puppeteer needed)
+pnpm test
 
 # ultracite
-#!/bin/sh
 # Exit on any error
 set -e
 
@@ -13,7 +15,7 @@ if [ -z "$STAGED_FILES" ]; then
 fi
 
 # Run formatter
-npx ultracite fix
+pnpm exec ultracite fix
 FORMAT_EXIT_CODE=$?
 
 # Re-stage files that were already staged
