@@ -1,4 +1,4 @@
-import type { SettingStorageData } from "./global-setting.d";
+import type { SettingStorageData } from "./global-setting.types";
 
 export class GlobalSetting {
   private readonly STORE_KEY: string;
