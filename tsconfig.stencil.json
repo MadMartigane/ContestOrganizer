@@ -6,7 +6,7 @@
     "experimentalDecorators": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
-    "lib": ["dom", "es2015"],
+    "lib": ["dom", "es2015", "es2023"],
     "moduleResolution": "node",
     "module": "esnext",
     "target": "es2017",

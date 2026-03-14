@@ -22,13 +22,10 @@ import {
 import Utils from "../../modules/utils/utils";
 import uuid from "../../modules/uuid/uuid";
 
+import { calculateTargetMatchIndex } from "./page-match.logic";
+
 interface Config {
   minGoal: number;
-}
-
-interface ScrollConfig {
-  matchThreshold: number;
-  scrollDelay: number;
 }
 
 @Component({
@@ -39,7 +36,6 @@ interface ScrollConfig {
 export class PageMatch {
   private readonly tournaments: typeof tournaments;
   private readonly config: Config;
-  private readonly SCROLL_CONFIG: ScrollConfig;
 
   @Prop() tournamentId: number;
 
@@ -64,11 +60,6 @@ export class PageMatch {
       minGoal: 0,
     };
 
-    this.SCROLL_CONFIG = {
-      matchThreshold: 10,
-      scrollDelay: 1000,
-    };
-
     this.initTournaments();
     this.refreshUI();
   }
@@ -78,20 +69,7 @@ export class PageMatch {
   }
 
   get targetMatchIndex(): number | null {
-    if (
-      !this.tournament?.matchs ||
-      this.tournament.matchs.length <= this.SCROLL_CONFIG.matchThreshold
-    ) {
-      return null;
-    }
-    const doingIndex = this.tournament.matchs.findIndex(
-      (match) => match.status === MatchStatus.DOING
-    );
-    if (doingIndex !== -1) {
-      return doingIndex;
-    }
-
-    return this.tournament.matchs.length - 1;
+    return calculateTargetMatchIndex(this.tournament);
   }
 
   private autoScrollToMatch(retryCount = 0): void {
@@ -105,16 +83,14 @@ export class PageMatch {
         requestAnimationFrame(() => this.autoScrollToMatch(retryCount + 1));
         return;
       }
-
       return;
     }
 
-    setTimeout(() => {
-      this.matchRefs[targetIndex].scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-    }, this.SCROLL_CONFIG.scrollDelay);
+    // No delay - scroll immediately
+    this.matchRefs[targetIndex].scrollIntoView({
+      behavior: "smooth",
+      block: "start", // Changed from 'center'
+    });
   }
 
   componentDidLoad() {

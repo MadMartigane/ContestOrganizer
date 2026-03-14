@@ -17,6 +17,7 @@ export const config: Config = {
       "<rootDir>/src/modules/nba/", // Vitest tests for NBA module
       "<rootDir>/src/components/error-message/error-message.spec.ts", // Vanilla component tests
       "<rootDir>/src/components/page-404/page-404.spec.ts", // Vanilla component tests
+      "<rootDir>/src/components/page-match/page-match.spec.ts", // Pure function tests
     ],
   },
   plugins: [

@@ -5,7 +5,7 @@
   "description": "Tool to organize & enjoy your sport contest.",
   "type": "module",
   "scripts": {
-    "build": "stencil build && pnpm clean-build",
+    "build": "bash scripts/build-all.sh",
     "start": "stencil build --dev --watch --serve",
     "test": "pnpm test:stencil && pnpm test:vitest",
     "test:stencil": "stencil test --spec",
