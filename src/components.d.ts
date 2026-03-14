@@ -18,13 +18,6 @@ export { GenericTeam as GenericTeam1 } from "./components.d";
 export namespace Components {
     interface AppRoot {
     }
-    interface ErrorMessage {
-        /**
-          * @default true
-         */
-        "goHomeButton": boolean;
-        "message": string;
-    }
     interface GridBasket {
         "tournamentId": number | null;
     }
@@ -99,11 +92,7 @@ export namespace Components {
         "reverse": boolean | null;
         "team": GenericTeam1 | null;
     }
-    interface Page404 {
-    }
     interface PageConfig {
-    }
-    interface PageHome {
     }
     interface PageMatch {
         "tournamentId": number;
@@ -148,12 +137,6 @@ declare global {
     var HTMLAppRootElement: {
         prototype: HTMLAppRootElement;
         new (): HTMLAppRootElement;
-    };
-    interface HTMLErrorMessageElement extends Components.ErrorMessage, HTMLStencilElement {
-    }
-    var HTMLErrorMessageElement: {
-        prototype: HTMLErrorMessageElement;
-        new (): HTMLErrorMessageElement;
     };
     interface HTMLGridBasketElementEventMap {
         "gridTournamentChange": TournamentUpdateEvent;
@@ -292,23 +275,11 @@ declare global {
         prototype: HTMLMadTeamTileElement;
         new (): HTMLMadTeamTileElement;
     };
-    interface HTMLPage404Element extends Components.Page404, HTMLStencilElement {
-    }
-    var HTMLPage404Element: {
-        prototype: HTMLPage404Element;
-        new (): HTMLPage404Element;
-    };
     interface HTMLPageConfigElement extends Components.PageConfig, HTMLStencilElement {
     }
     var HTMLPageConfigElement: {
         prototype: HTMLPageConfigElement;
         new (): HTMLPageConfigElement;
-    };
-    interface HTMLPageHomeElement extends Components.PageHome, HTMLStencilElement {
-    }
-    var HTMLPageHomeElement: {
-        prototype: HTMLPageHomeElement;
-        new (): HTMLPageHomeElement;
     };
     interface HTMLPageMatchElement extends Components.PageMatch, HTMLStencilElement {
     }
@@ -330,7 +301,6 @@ declare global {
     };
     interface HTMLElementTagNameMap {
         "app-root": HTMLAppRootElement;
-        "error-message": HTMLErrorMessageElement;
         "grid-basket": HTMLGridBasketElement;
         "grid-default": HTMLGridDefaultElement;
         "mad-input-number": HTMLMadInputNumberElement;
@@ -341,9 +311,7 @@ declare global {
         "mad-scorer-rugby": HTMLMadScorerRugbyElement;
         "mad-select-team": HTMLMadSelectTeamElement;
         "mad-team-tile": HTMLMadTeamTileElement;
-        "page-404": HTMLPage404Element;
         "page-config": HTMLPageConfigElement;
-        "page-home": HTMLPageHomeElement;
         "page-match": HTMLPageMatchElement;
         "page-tournament": HTMLPageTournamentElement;
         "page-tournament-select": HTMLPageTournamentSelectElement;
@@ -351,13 +319,6 @@ declare global {
 }
 declare namespace LocalJSX {
     interface AppRoot {
-    }
-    interface ErrorMessage {
-        /**
-          * @default true
-         */
-        "goHomeButton"?: boolean;
-        "message"?: string;
     }
     interface GridBasket {
         "onGridTournamentChange"?: (event: GridBasketCustomEvent<TournamentUpdateEvent>) => void;
@@ -440,11 +401,7 @@ declare namespace LocalJSX {
         "reverse"?: boolean | null;
         "team"?: GenericTeam1 | null;
     }
-    interface Page404 {
-    }
     interface PageConfig {
-    }
-    interface PageHome {
     }
     interface PageMatch {
         "tournamentId"?: number;
@@ -455,10 +412,6 @@ declare namespace LocalJSX {
     interface PageTournamentSelect {
     }
 
-    interface ErrorMessageAttributes {
-        "message": string;
-        "goHomeButton": boolean;
-    }
     interface GridBasketAttributes {
         "tournamentId": number | null;
     }
@@ -523,7 +476,6 @@ declare namespace LocalJSX {
 
     interface IntrinsicElements {
         "app-root": AppRoot;
-        "error-message": Omit<ErrorMessage, keyof ErrorMessageAttributes> & { [K in keyof ErrorMessage & keyof ErrorMessageAttributes]?: ErrorMessage[K] } & { [K in keyof ErrorMessage & keyof ErrorMessageAttributes as `attr:${K}`]?: ErrorMessageAttributes[K] } & { [K in keyof ErrorMessage & keyof ErrorMessageAttributes as `prop:${K}`]?: ErrorMessage[K] };
         "grid-basket": Omit<GridBasket, keyof GridBasketAttributes> & { [K in keyof GridBasket & keyof GridBasketAttributes]?: GridBasket[K] } & { [K in keyof GridBasket & keyof GridBasketAttributes as `attr:${K}`]?: GridBasketAttributes[K] } & { [K in keyof GridBasket & keyof GridBasketAttributes as `prop:${K}`]?: GridBasket[K] };
         "grid-default": Omit<GridDefault, keyof GridDefaultAttributes> & { [K in keyof GridDefault & keyof GridDefaultAttributes]?: GridDefault[K] } & { [K in keyof GridDefault & keyof GridDefaultAttributes as `attr:${K}`]?: GridDefaultAttributes[K] } & { [K in keyof GridDefault & keyof GridDefaultAttributes as `prop:${K}`]?: GridDefault[K] };
         "mad-input-number": Omit<MadInputNumber, keyof MadInputNumberAttributes> & { [K in keyof MadInputNumber & keyof MadInputNumberAttributes]?: MadInputNumber[K] } & { [K in keyof MadInputNumber & keyof MadInputNumberAttributes as `attr:${K}`]?: MadInputNumberAttributes[K] } & { [K in keyof MadInputNumber & keyof MadInputNumberAttributes as `prop:${K}`]?: MadInputNumber[K] };
@@ -534,9 +486,7 @@ declare namespace LocalJSX {
         "mad-scorer-rugby": Omit<MadScorerRugby, keyof MadScorerRugbyAttributes> & { [K in keyof MadScorerRugby & keyof MadScorerRugbyAttributes]?: MadScorerRugby[K] } & { [K in keyof MadScorerRugby & keyof MadScorerRugbyAttributes as `attr:${K}`]?: MadScorerRugbyAttributes[K] } & { [K in keyof MadScorerRugby & keyof MadScorerRugbyAttributes as `prop:${K}`]?: MadScorerRugby[K] };
         "mad-select-team": Omit<MadSelectTeam, keyof MadSelectTeamAttributes> & { [K in keyof MadSelectTeam & keyof MadSelectTeamAttributes]?: MadSelectTeam[K] } & { [K in keyof MadSelectTeam & keyof MadSelectTeamAttributes as `attr:${K}`]?: MadSelectTeamAttributes[K] } & { [K in keyof MadSelectTeam & keyof MadSelectTeamAttributes as `prop:${K}`]?: MadSelectTeam[K] };
         "mad-team-tile": Omit<MadTeamTile, keyof MadTeamTileAttributes> & { [K in keyof MadTeamTile & keyof MadTeamTileAttributes]?: MadTeamTile[K] } & { [K in keyof MadTeamTile & keyof MadTeamTileAttributes as `attr:${K}`]?: MadTeamTileAttributes[K] } & { [K in keyof MadTeamTile & keyof MadTeamTileAttributes as `prop:${K}`]?: MadTeamTile[K] };
-        "page-404": Page404;
         "page-config": PageConfig;
-        "page-home": PageHome;
         "page-match": Omit<PageMatch, keyof PageMatchAttributes> & { [K in keyof PageMatch & keyof PageMatchAttributes]?: PageMatch[K] } & { [K in keyof PageMatch & keyof PageMatchAttributes as `attr:${K}`]?: PageMatchAttributes[K] } & { [K in keyof PageMatch & keyof PageMatchAttributes as `prop:${K}`]?: PageMatch[K] };
         "page-tournament": Omit<PageTournament, keyof PageTournamentAttributes> & { [K in keyof PageTournament & keyof PageTournamentAttributes]?: PageTournament[K] } & { [K in keyof PageTournament & keyof PageTournamentAttributes as `attr:${K}`]?: PageTournamentAttributes[K] } & { [K in keyof PageTournament & keyof PageTournamentAttributes as `prop:${K}`]?: PageTournament[K] };
         "page-tournament-select": PageTournamentSelect;
@@ -547,7 +497,6 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "app-root": LocalJSX.IntrinsicElements["app-root"] & JSXBase.HTMLAttributes<HTMLAppRootElement>;
-            "error-message": LocalJSX.IntrinsicElements["error-message"] & JSXBase.HTMLAttributes<HTMLErrorMessageElement>;
             "grid-basket": LocalJSX.IntrinsicElements["grid-basket"] & JSXBase.HTMLAttributes<HTMLGridBasketElement>;
             "grid-default": LocalJSX.IntrinsicElements["grid-default"] & JSXBase.HTMLAttributes<HTMLGridDefaultElement>;
             "mad-input-number": LocalJSX.IntrinsicElements["mad-input-number"] & JSXBase.HTMLAttributes<HTMLMadInputNumberElement>;
@@ -558,9 +507,7 @@ declare module "@stencil/core" {
             "mad-scorer-rugby": LocalJSX.IntrinsicElements["mad-scorer-rugby"] & JSXBase.HTMLAttributes<HTMLMadScorerRugbyElement>;
             "mad-select-team": LocalJSX.IntrinsicElements["mad-select-team"] & JSXBase.HTMLAttributes<HTMLMadSelectTeamElement>;
             "mad-team-tile": LocalJSX.IntrinsicElements["mad-team-tile"] & JSXBase.HTMLAttributes<HTMLMadTeamTileElement>;
-            "page-404": LocalJSX.IntrinsicElements["page-404"] & JSXBase.HTMLAttributes<HTMLPage404Element>;
             "page-config": LocalJSX.IntrinsicElements["page-config"] & JSXBase.HTMLAttributes<HTMLPageConfigElement>;
-            "page-home": LocalJSX.IntrinsicElements["page-home"] & JSXBase.HTMLAttributes<HTMLPageHomeElement>;
             "page-match": LocalJSX.IntrinsicElements["page-match"] & JSXBase.HTMLAttributes<HTMLPageMatchElement>;
             "page-tournament": LocalJSX.IntrinsicElements["page-tournament"] & JSXBase.HTMLAttributes<HTMLPageTournamentElement>;
             "page-tournament-select": LocalJSX.IntrinsicElements["page-tournament-select"] & JSXBase.HTMLAttributes<HTMLPageTournamentSelectElement>;

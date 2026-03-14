@@ -10,6 +10,7 @@ export const config: Config = {
   globalScript: "src/global/app.ts",
   taskQueue: "async",
   sourceMap: false,
+  tsconfig: "./tsconfig.stencil.json",
   plugins: [
     tailwind(),
     tailwindHMR(),
