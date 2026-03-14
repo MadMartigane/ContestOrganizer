@@ -6,16 +6,17 @@ const config = defineConfig({
   publicDir: "../www", // Serve www/ at root (relative to src/)
 
   build: {
-    outDir: "../www",
-    emptyOutDir: true,
+    outDir: "../www/vanilla",
+    emptyOutDir: false,
     sourcemap: true,
+    lib: {
+      entry: "./vanilla-entry.ts",
+      name: "VanillaComponents",
+      fileName: "vanilla",
+    },
     rollupOptions: {
-      // Remove input: (not needed with root: "src")
       output: {
         format: "es",
-        entryFileNames: "build/[name].js",
-        chunkFileNames: "build/[name]-[hash].js",
-        assetFileNames: "build/[name].[ext]",
       },
     },
   },

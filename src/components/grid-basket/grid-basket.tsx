@@ -9,11 +9,16 @@ import {
 } from "@stencil/core";
 import Basket from "../../modules/data-basket/data-basket";
 import type { GridTeamOnUpdateDetail } from "../../modules/grid-common/grid-common.types";
+import TeamRow from "../../modules/team-row/team-row";
+import theSportsDbService from "../../modules/thesportsdb/thesportsdb.service";
 import tournaments from "../../modules/tournaments/tournaments";
 import type {
   Tournament,
+  TournamentType,
   TournamentUpdateEvent,
 } from "../../modules/tournaments/tournaments.types";
+
+import "../action-bar/action-bar"; // Register custom element
 
 @Component({
   tag: "grid-basket",
@@ -24,6 +29,10 @@ export class GridBasket {
   private readonly tournaments: typeof tournaments;
 
   @State() private tournament: Tournament | null;
+
+  @State() private isLoadingNbaTeams = false;
+
+  @State() private magicFillError: string | null = null;
 
   @Prop() tournamentId: number | null;
 
@@ -74,6 +83,79 @@ export class GridBasket {
     }
 
     return Basket.data(this.tournament);
+  }
+
+  private shuffleArray<T>(array: T[]): T[] {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
+  private async magicFillUpNbaTeams(): Promise<void> {
+    if (!this.tournament || this.tournament.type !== "NBA") {
+      return;
+    }
+
+    this.isLoadingNbaTeams = true;
+    this.magicFillError = null;
+
+    try {
+      // Fetch all 30 NBA teams
+      const allNbaTeams = await theSportsDbService.getAllNbaTeams();
+
+      // Remove duplicates from current grid
+      const seenIds = new Set<number>();
+      const uniqueGrid: TeamRow[] = [];
+
+      for (const row of this.tournament.grid) {
+        if (row.team?.id) {
+          if (!seenIds.has(row.team.id)) {
+            seenIds.add(row.team.id);
+            uniqueGrid.push(row);
+          }
+          // Duplicates are skipped (removed)
+        } else {
+          uniqueGrid.push(row); // Keep empty slots
+        }
+      }
+
+      // Get missing teams
+      const missingTeams = allNbaTeams.filter((t) => !seenIds.has(t.id));
+
+      // Shuffle using Fisher-Yates
+      const shuffled = this.shuffleArray([...missingTeams]);
+
+      // Fill empty slots first
+      const newGrid = [...uniqueGrid];
+      for (let i = 0; i < newGrid.length && shuffled.length > 0; i++) {
+        if (!newGrid[i].team) {
+          // biome-ignore lint/style/noNonNullAssertion: Safe - checked in loop condition
+          newGrid[i].team = shuffled.pop()!;
+        }
+      }
+
+      // Add remaining teams as new rows
+      while (shuffled.length > 0) {
+        const newRow = new TeamRow({
+          type: this.tournament.type as TournamentType,
+        });
+        // biome-ignore lint/style/noNonNullAssertion: Safe - checked in while condition
+        newRow.team = shuffled.pop()!;
+        newGrid.push(newRow);
+      }
+
+      // Update tournament
+      this.tournament.grid = newGrid;
+      await this.tournaments.update(this.tournament);
+      this.updateTournament();
+    } catch (error) {
+      this.magicFillError = "Failed to load NBA teams";
+      console.error(error);
+    } finally {
+      this.isLoadingNbaTeams = false;
+    }
   }
 
   private renderGridHeader() {
@@ -201,6 +283,29 @@ export class GridBasket {
 
           {this.tournament && this.renderGridBody()}
         </table>
+        {this.tournament?.type === "NBA" && (
+          <action-bar>
+            {/* biome-ignore lint/a11y/noStaticElementInteractions: sl-button is a Shoelace web component */}
+            <sl-button
+              loading={this.isLoadingNbaTeams}
+              onClick={() => this.magicFillUpNbaTeams()}
+              onKeyDown={(e: KeyboardEvent) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  this.magicFillUpNbaTeams();
+                }
+              }}
+              size="medium"
+              variant="primary"
+            >
+              <sl-icon name="magic" slot="prefix" />
+              Magic fill-up
+            </sl-button>
+            {this.magicFillError && (
+              <span class="text-danger text-sm">{this.magicFillError}</span>
+            )}
+          </action-bar>
+        )}
       </Host>
     );
   }
