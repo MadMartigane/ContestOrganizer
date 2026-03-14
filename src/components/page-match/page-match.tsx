@@ -5,6 +5,11 @@ import Matchs, {
   MatchTeamType,
   type Row,
 } from "../../modules/matchs/matchs";
+import {
+  generateNBASchedule,
+  getNBAMissingMatchCount,
+  validateNBAScheduleGeneration,
+} from "../../modules/nba/nba.scheduler";
 import type { TeamRow } from "../../modules/team-row/team-row";
 import tournaments, {
   Tournaments,
@@ -182,6 +187,41 @@ export class PageMatch {
     this.tournament.matchs.push(match);
     this.matchNumber = this.tournament.matchs.length;
 
+    await this.updateTournament();
+    this.refreshUI();
+  }
+
+  private async goGenerateAllNBAMatches() {
+    if (!this.tournament || this.tournament.type !== TournamentType.NBA) {
+      return;
+    }
+
+    const validation = validateNBAScheduleGeneration(this.tournament);
+    if (!validation.valid) {
+      await Utils.alertChoice(validation.warnings.join("\n"));
+      return;
+    }
+
+    const missingCount = getNBAMissingMatchCount(this.tournament);
+    const confirmed = await Utils.confirmChoice(
+      `Generate ${missingCount} matches to complete the season?`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    const result = generateNBASchedule(this.tournament);
+
+    if (result.warnings.length > 0) {
+      console.warn("NBA Schedule warnings:", result.warnings);
+    }
+
+    for (const match of result.matches) {
+      this.tournament.matchs.push(match);
+    }
+
+    this.matchNumber = this.tournament.matchs.length;
     await this.updateTournament();
     this.refreshUI();
   }
@@ -652,8 +692,36 @@ export class PageMatch {
             <sl-icon name="robot" slot="prefix" />
             <span slot="suffix">Auto-Match</span>
           </sl-button>
+          {this.renderNBAGenerateButton()}
         </div>
       </div>
+    );
+  }
+
+  private renderNBAGenerateButton() {
+    if (this.tournament?.type !== TournamentType.NBA) {
+      return null;
+    }
+
+    const missingCount = getNBAMissingMatchCount(this.tournament);
+    if (missingCount === 0) {
+      return (
+        <sl-button disabled size="large" variant="success">
+          <sl-icon name="check-circle" slot="prefix" />
+          <span slot="suffix">Season Complete (82 games)</span>
+        </sl-button>
+      );
+    }
+
+    return (
+      <sl-button
+        onclick={() => this.goGenerateAllNBAMatches()}
+        size="large"
+        variant="success"
+      >
+        <sl-icon name="calendar-plus" slot="prefix" />
+        <span slot="suffix">Generate All Missing ({missingCount})</span>
+      </sl-button>
     );
   }
 
