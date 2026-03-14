@@ -1,7 +1,12 @@
 #!/bin/sh
 
-# Run unit tests only (no e2e/Puppeteer needed)
-pnpm test
+# Run Stencil tests (Jest)
+echo "🧪 Running Stencil tests..."
+pnpm test:stencil
+
+# Run Vitest tests
+echo "🧪 Running Vitest tests..."
+pnpm test:vitest
 
 # ultracite
 # Exit on any error

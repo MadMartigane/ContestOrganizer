@@ -7,7 +7,9 @@
   "scripts": {
     "build": "stencil build && pnpm clean-build",
     "start": "stencil build --dev --watch --serve",
-    "test": "stencil test --spec",
+    "test": "pnpm test:stencil && pnpm test:vitest",
+    "test:stencil": "stencil test --spec",
+    "test:vitest": "vitest run",
     "test.watch": "stencil test --spec --e2e --watchAll",
     "proxy": "node ./scripts/proxy.js",
     "clean-build": "rm -rf www/build/svg",
@@ -25,13 +27,11 @@
     "vite:dev": "vite",
     "vite:build": "vite build",
     "vite:preview": "vite preview",
-    "test:vitest": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "dev": "concurrently -k -n \"[STENCIL],[VITE]\" -c \"cyan,green\" \"stencil build --dev --watch --serve\" \"vite\"",
     "dev:modern": "vite",
-    "dev:legacy": "stencil build --dev --watch --serve",
-    "test:all": "pnpm test && pnpm test:vitest"
+    "dev:legacy": "stencil build --dev --watch --serve"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.0",
