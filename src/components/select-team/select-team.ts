@@ -1,5 +1,5 @@
-import { BaseElement } from "@core/base-element.js";
-import { Signal } from "@core/signal.js";
+import { BaseElement } from "../../core/base-element.js";
+import { Signal } from "../../core/signal.js";
 import apiSports from "../../modules/api-sports/api-sports";
 import type { ClassifiedError } from "../../modules/error/error.utils";
 import { classifyError } from "../../modules/error/error.utils";
@@ -19,25 +19,27 @@ export class SelectTeam extends BaseElement {
 
   private domDrawer: HTMLElement & { show?: () => void; hide?: () => void };
   private domDivBody: HTMLDivElement | null = null;
-  private domInputSearch: HTMLElement | null = null;
+  private domInputSearch:
+    | (HTMLElement & { value: string; disabled: boolean })
+    | null = null;
   private domResultsContainer: HTMLElement | null = null;
   private searchValue = "";
   private searchRequestId = 0;
   private readonly minNumberSearchLetter = 3;
 
   // Props as signals (initialized in _setupProperties to run after parent constructor)
-  private _color!: Signal<string>;
-  private _placeholder!: Signal<string>;
-  private _label!: Signal<string>;
-  private _value!: Signal<GenericTeam | null>;
-  private _type!: Signal<TournamentType | null>;
-  private _tournamentGridId!: Signal<number | null>;
+  private declare _color: Signal<string>;
+  private declare _placeholder: Signal<string>;
+  private declare _label: Signal<string>;
+  private declare _value: Signal<GenericTeam | null>;
+  private declare _type: Signal<TournamentType | null>;
+  private declare _tournamentGridId: Signal<number | null>;
 
   // State signals (initialized in _setupProperties)
-  private _team!: Signal<GenericTeam | null>;
-  private _isLoading!: Signal<boolean>;
-  private _searchError!: Signal<ClassifiedError | null>;
-  private _suggested!: Signal<GenericTeam[]>;
+  private declare _team: Signal<GenericTeam | null>;
+  private declare _isLoading: Signal<boolean>;
+  private declare _searchError: Signal<ClassifiedError | null>;
+  private declare _suggested: Signal<GenericTeam[]>;
 
   /**
    * Observed attributes for reactive updates
@@ -504,7 +506,12 @@ export class SelectTeam extends BaseElement {
         hide?: () => void;
       };
       this.domDivBody = this.querySelector(".cursor-pointer");
-      this.domInputSearch = this.querySelector("sl-input");
+      this.domInputSearch = this.querySelector(
+        "sl-input"
+      ) as unknown as HTMLElement & {
+        value: string;
+        disabled: boolean;
+      };
       this.domResultsContainer = this.querySelector("#results-container");
 
       this.setupButtonEvents();
@@ -535,9 +542,8 @@ export class SelectTeam extends BaseElement {
     }
 
     // Update search input disabled state
-    if (this.domInputSearch && "disabled" in this.domInputSearch) {
-      (this.domInputSearch as HTMLElement & { disabled: boolean }).disabled =
-        this._isLoading.value;
+    if (this.domInputSearch) {
+      this.domInputSearch.disabled = this._isLoading.value;
     }
 
     // Update results container

@@ -50,8 +50,8 @@ BaseElement provides an `_initialized` flag that prevents rendering until explic
 
 ```typescript
 export class MyComponent extends BaseElement {
-  private _count!: Signal<number>;
-  private _name!: Signal<string>;
+  declare private _count: Signal<number>;
+  declare private _name: Signal<string>;
 
   protected _setupProperties(): void {
     // 1. Initialize all signals first
@@ -75,6 +75,7 @@ export class MyComponent extends BaseElement {
 
 ### Key Points
 
+- Use `declare` for signal properties (e.g., `declare private _count: Signal<number>;`). This is required to prevent TypeScript from emitting initialization code that overwrites the signal instance created in `_setupProperties()` when `useDefineForClassFields: true` is enabled (default in modern Vite/esbuild).
 - Always set `this._initialized = true` at the end of `_setupProperties()`
 - This ensures `_render()` is only called after all signals are ready
 - The flag is checked in `_requestRender()` before scheduling any render

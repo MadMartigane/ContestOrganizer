@@ -1,4 +1,21 @@
-export const API_SPORTS_KEY = import.meta.env.VITE_API_SPORTS_KEY || "";
+/**
+ * Safely retrieves an environment variable from either import.meta.env (Vite)
+ * or process.env (Node/Jest), ensuring cross-environment compatibility.
+ */
+const getEnvVar = (key: string): string => {
+  try {
+    // Check for process.env (Node/Tests/Vite with define)
+    if (typeof process !== "undefined" && process.env?.[key]) {
+      return process.env[key] as string;
+    }
+  } catch {
+    // Fallback if process is not defined
+  }
+
+  return "";
+};
+
+export const API_SPORTS_KEY = getEnvVar("VITE_API_SPORTS_KEY");
 
 export const LOCAL_STORAGE_TEAM_KEY = "API_SPORTS_CACHE_TEAMS_V2";
 

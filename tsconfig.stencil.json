@@ -10,6 +10,7 @@
     "moduleResolution": "node",
     "module": "esnext",
     "target": "es2017",
+    "downlevelIteration": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "jsx": "react",

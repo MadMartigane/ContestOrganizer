@@ -122,7 +122,8 @@ export abstract class BaseElement extends HTMLElement {
    * Called automatically during disconnectedCallback.
    */
   protected _cleanupSignals(): void {
-    for (const [, unsubscribe] of this._signals) {
+    for (const entry of Array.from(this._signals.entries())) {
+      const unsubscribe = entry[1];
       unsubscribe();
     }
     this._signals.clear();

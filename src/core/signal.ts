@@ -21,15 +21,15 @@ interface ReactiveSource<T> {
  * @template T - The type of value held by the signal
  */
 export class Signal<T> {
-  #value: T;
-  readonly #subscribers: Set<Subscriber<T>> = new Set();
+  private _value: T;
+  private readonly _subscribers: Set<Subscriber<T>> = new Set();
 
   /**
    * Creates a new Signal instance.
    * @param initialValue - The initial value to store
    */
   constructor(initialValue: T) {
-    this.#value = initialValue;
+    this._value = initialValue;
   }
 
   /**
@@ -37,7 +37,7 @@ export class Signal<T> {
    * @returns The current value
    */
   get value(): T {
-    return this.#value;
+    return this._value;
   }
 
   /**
@@ -46,9 +46,9 @@ export class Signal<T> {
    * @param newValue - The new value to set
    */
   set value(newValue: T) {
-    if (!Object.is(this.#value, newValue)) {
-      this.#value = newValue;
-      this.#notify();
+    if (!Object.is(this._value, newValue)) {
+      this._value = newValue;
+      this._notify();
     }
   }
 
@@ -58,13 +58,13 @@ export class Signal<T> {
    * @returns Unsubscribe function to remove the subscription
    */
   subscribe(callback: Subscriber<T>): () => void {
-    this.#subscribers.add(callback);
+    this._subscribers.add(callback);
     // Call immediately with current value
-    callback(this.#value);
+    callback(this._value);
 
     // Return unsubscribe function
     return () => {
-      this.#subscribers.delete(callback);
+      this._subscribers.delete(callback);
     };
   }
 
@@ -73,16 +73,17 @@ export class Signal<T> {
    * Useful for cleanup when the signal is no longer needed.
    */
   unsubscribeAll(): void {
-    this.#subscribers.clear();
+    this._subscribers.clear();
   }
 
   /**
    * Notifies all subscribers of the current value.
    * Uses batch notification (synchronous).
    */
-  #notify(): void {
-    for (const subscriber of this.#subscribers) {
-      subscriber(this.#value);
+  private _notify(): void {
+    const subscribers = Array.from(this._subscribers);
+    for (const subscriber of subscribers) {
+      subscriber(this._value);
     }
   }
 }
@@ -93,11 +94,11 @@ export class Signal<T> {
  * @template T - The type of the computed value
  */
 export class Computed<T> {
-  readonly #compute: () => T;
-  readonly #dependencies: ReactiveSource<unknown>[];
-  #value: T;
-  readonly #subscribers: Set<Subscriber<T>> = new Set();
-  #unsubscribers: (() => void)[] = [];
+  private readonly _compute: () => T;
+  private readonly _dependencies: ReactiveSource<unknown>[];
+  private _value: T;
+  private readonly _subscribers: Set<Subscriber<T>> = new Set();
+  private _unsubscribers: (() => void)[] = [];
 
   /**
    * Creates a new Computed signal.
@@ -105,14 +106,14 @@ export class Computed<T> {
    * @param dependencies - Array of signals this computation depends on
    */
   constructor(compute: () => T, dependencies: ReactiveSource<unknown>[]) {
-    this.#compute = compute;
-    this.#dependencies = dependencies;
+    this._compute = compute;
+    this._dependencies = dependencies;
 
     // Initial computation
-    this.#value = this.#compute();
+    this._value = this._compute();
 
     // Subscribe to dependency changes
-    this.#subscribeToDependencies();
+    this._subscribeToDependencies();
   }
 
   /**
@@ -120,7 +121,7 @@ export class Computed<T> {
    * @returns The computed value
    */
   get value(): T {
-    return this.#value;
+    return this._value;
   }
 
   /**
@@ -129,13 +130,13 @@ export class Computed<T> {
    * @returns Unsubscribe function to remove the subscription
    */
   subscribe(callback: Subscriber<T>): () => void {
-    this.#subscribers.add(callback);
+    this._subscribers.add(callback);
     // Call immediately with current value
-    callback(this.#value);
+    callback(this._value);
 
     // Return unsubscribe function
     return () => {
-      this.#subscribers.delete(callback);
+      this._subscribers.delete(callback);
     };
   }
 
@@ -143,49 +144,50 @@ export class Computed<T> {
    * Removes all subscribers from this computed signal.
    */
   unsubscribeAll(): void {
-    this.#subscribers.clear();
-    this.#unsubscribeFromDependencies();
+    this._subscribers.clear();
+    this._unsubscribeFromDependencies();
   }
 
   /**
    * Subscribes to all dependency signals for changes.
    */
-  #subscribeToDependencies(): void {
-    for (const dependency of this.#dependencies) {
+  private _subscribeToDependencies(): void {
+    for (const dependency of this._dependencies) {
       const unsubscribe = dependency.subscribe(() => {
-        this.#recompute();
+        this._recompute();
       });
-      this.#unsubscribers.push(unsubscribe);
+      this._unsubscribers.push(unsubscribe);
     }
   }
 
   /**
    * Unsubscribes from all dependency signals.
    */
-  #unsubscribeFromDependencies(): void {
-    for (const unsubscribe of this.#unsubscribers) {
+  private _unsubscribeFromDependencies(): void {
+    for (const unsubscribe of this._unsubscribers) {
       unsubscribe();
     }
-    this.#unsubscribers = [];
+    this._unsubscribers = [];
   }
 
   /**
    * Recomputes the value and notifies subscribers if it changed.
    */
-  #recompute(): void {
-    const newValue = this.#compute();
-    if (!Object.is(this.#value, newValue)) {
-      this.#value = newValue;
-      this.#notify();
+  private _recompute(): void {
+    const newValue = this._compute();
+    if (!Object.is(this._value, newValue)) {
+      this._value = newValue;
+      this._notify();
     }
   }
 
   /**
    * Notifies all subscribers of the current computed value.
    */
-  #notify(): void {
-    for (const subscriber of this.#subscribers) {
-      subscriber(this.#value);
+  private _notify(): void {
+    const subscribers = Array.from(this._subscribers);
+    for (const subscriber of subscribers) {
+      subscriber(this._value);
     }
   }
 }
