@@ -31,6 +31,12 @@ export abstract class BaseElement extends HTMLElement {
   protected _renderPending = false;
 
   /**
+   * Flag indicating whether the component has completed initialization.
+   * Prevents premature rendering during _setupProperties().
+   */
+  protected _initialized = false;
+
+  /**
    * Array of attribute names to observe for changes.
    * Override in subclasses to observe specific attributes.
    */
@@ -126,8 +132,8 @@ export abstract class BaseElement extends HTMLElement {
    * Uses queueMicrotask for efficient render coalescing.
    */
   protected _requestRender(): void {
-    // Prevent duplicate render requests
-    if (this._renderPending) {
+    // Prevent duplicate render requests or rendering before initialization
+    if (this._renderPending || !this._initialized) {
       return;
     }
 

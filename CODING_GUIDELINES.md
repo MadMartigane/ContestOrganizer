@@ -30,3 +30,51 @@ You are a Senior Web Architect specialized in "Vanilla-First" development. Your 
 - **NO Bloat:** Do not install NPM packages for features handled natively (e.g., no `lodash`, no `classnames`, no `framer-motion`).
 - **NO Virtual DOM:** Work directly with the live DOM or DocumentFragments.
 - **NO Global CSS:** Keep styles scoped within Web Components or use CSS Modules.
+
+## Signal Initialization Pattern in BaseElement Components
+
+When creating vanilla Web Components that extend `BaseElement` and use signals, follow this pattern to prevent premature rendering issues:
+
+### The Problem
+
+The `_trackSignal()` method subscribes to a signal, which immediately triggers a callback that calls `_requestRender()`. If this happens before all signals are initialized in `_setupProperties()`, `_render()` may try to access undefined signals.
+
+### The Solution
+
+BaseElement provides an `_initialized` flag that prevents rendering until explicitly set:
+
+1. **In BaseElement**: The `_requestRender()` method checks `this._initialized` and returns early if false.
+2. **In Component**: Set `this._initialized = true` at the end of `_setupProperties()` after all signals are initialized and tracked.
+
+### Example
+
+```typescript
+export class MyComponent extends BaseElement {
+  private _count!: Signal<number>;
+  private _name!: Signal<string>;
+
+  protected _setupProperties(): void {
+    // 1. Initialize all signals first
+    this._count = new Signal(0);
+    this._name = new Signal('');
+
+    // 2. Track all signals
+    this._trackSignal(this._count);
+    this._trackSignal(this._name);
+
+    // 3. Mark initialization as complete (REQUIRED)
+    this._initialized = true;
+  }
+
+  protected _render(): void {
+    // Safe to access signals here - _render() won't be called until _initialized is true
+    this.innerHTML = `<div>${this._name.value}: ${this._count.value}</div>`;
+  }
+}
+```
+
+### Key Points
+
+- Always set `this._initialized = true` at the end of `_setupProperties()`
+- This ensures `_render()` is only called after all signals are ready
+- The flag is checked in `_requestRender()` before scheduling any render
