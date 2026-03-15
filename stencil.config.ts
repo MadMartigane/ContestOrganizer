@@ -1,5 +1,8 @@
 // https://stenciljs.com/docs/config
+
 import type { Config } from "@stencil/core";
+import tailwind, { tailwindGlobal, tailwindHMR } from "stencil-tailwind-plugin";
+import tailwindConfig from "./tailwind.config.js";
 
 export const config: Config = {
   globalStyle: "src/global/app.css",
@@ -15,9 +18,14 @@ export const config: Config = {
       "<rootDir>/src/components/page-404/page-404.spec.ts", // Vanilla component tests
       "<rootDir>/src/components/action-bar/action-bar.spec.ts", // Vanilla component tests
       "<rootDir>/src/components/page-match/page-match.spec.ts", // Pure function tests
+      "<rootDir>/src/components/select-team/select-team.spec.ts", // Vanilla component tests
     ],
   },
-  // plugins: [tailwind(), tailwindHMR()], // Disabled - pre-existing error in worktree
+  plugins: [
+    tailwindGlobal({ tailwindConf: tailwindConfig }),
+    tailwind({ tailwindConf: tailwindConfig }),
+    tailwindHMR({ tailwindConf: tailwindConfig }),
+  ],
   outputTargets: [
     {
       type: "www",

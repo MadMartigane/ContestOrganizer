@@ -82,3 +82,6 @@
     animation: none;
   }
 }
+:host {
+  display: block;
+}
