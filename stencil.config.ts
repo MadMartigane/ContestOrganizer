@@ -1,9 +1,5 @@
 // https://stenciljs.com/docs/config
-
-import replace from "@rollup/plugin-replace";
 import type { Config } from "@stencil/core";
-import tailwind, { tailwindHMR } from "stencil-tailwind-plugin";
-import "dotenv/config";
 
 export const config: Config = {
   globalStyle: "src/global/app.css",
@@ -17,24 +13,14 @@ export const config: Config = {
       "<rootDir>/src/modules/nba/", // Vitest tests for NBA module
       "<rootDir>/src/components/error-message/error-message.spec.ts", // Vanilla component tests
       "<rootDir>/src/components/page-404/page-404.spec.ts", // Vanilla component tests
+      "<rootDir>/src/components/action-bar/action-bar.spec.ts", // Vanilla component tests
+      "<rootDir>/src/components/page-match/page-match.spec.ts", // Pure function tests
     ],
   },
-  plugins: [
-    tailwind(),
-    tailwindHMR(),
-    replace({
-      preventAssignment: true,
-      values: {
-        "process.env.API_SPORTS_KEY": JSON.stringify(
-          process.env.API_SPORTS_KEY
-        ),
-      },
-    }),
-  ],
+  // plugins: [tailwind(), tailwindHMR()], // Disabled - pre-existing error in worktree
   outputTargets: [
     {
       type: "www",
-      // comment the following line to disable service workers in production
       serviceWorker: null,
       baseUrl: "/",
       copy: [
