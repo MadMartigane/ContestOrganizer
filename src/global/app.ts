@@ -37,6 +37,7 @@ setBasePath("build/shoelace");
 import "../components/page-home/page-home.js";
 import "../components/page-404/page-404.js";
 import "../components/error-message/error-message.js";
+import "../components/select-team/select-team";
 /* ########### END OF VANILLA WEB COMPONENTS IMPORT ########*/
 
 import setting from "../modules/global-setting/global-setting";
