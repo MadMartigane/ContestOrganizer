@@ -2,10 +2,8 @@ import path from "node:path";
 import { defineConfig } from "vite";
 
 const config = defineConfig({
-  define: {
-    "import.meta.env": JSON.stringify(process.env),
-  },
-  root: "src", // Serve from src/
+  root: "src",
+  envDir: "../", // Serve from src/
   publicDir: "../www", // Serve www/ at root (relative to src/)
 
   build: {
