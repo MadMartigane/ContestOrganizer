@@ -15,6 +15,7 @@ export const config: Config = {
       "<rootDir>/src/components/page-404/page-404.spec.ts", // Vanilla component tests
       "<rootDir>/src/components/action-bar/action-bar.spec.ts", // Vanilla component tests
       "<rootDir>/src/components/page-match/page-match.spec.ts", // Pure function tests
+      "<rootDir>/src/components/select-team/select-team.spec.ts", // Vanilla component tests
     ],
   },
   // plugins: [tailwind(), tailwindHMR()], // Disabled - pre-existing error in worktree

@@ -13,6 +13,7 @@ class TestElement extends BaseElement {
 
   protected _setupProperties(): void {
     // No properties to set up for testing
+    this._initialized = true;
   }
 
   protected _render(): void {
@@ -42,6 +43,7 @@ class TestElementDefault extends BaseElement {
 
   protected _setupProperties(): void {
     // No properties to set up for testing
+    this._initialized = true;
   }
 
   protected _render(): void {
@@ -61,6 +63,7 @@ class TestElementWithSignals extends BaseElement {
 
   protected _setupProperties(): void {
     // No properties to set up for testing
+    this._initialized = true;
   }
 
   protected _render(): void {

@@ -35,6 +35,11 @@ print_info() {
     echo -e "${FOLDER} $1"
 }
 
+# Function to print warning
+print_warning() {
+    echo -e "${YELLOW} $1 ${NC}"
+}
+
 # Exit on any error
 set -e
 
@@ -69,6 +74,15 @@ rm -f www/vanilla/vanilla.umd.cjs
 rm -f www/vanilla/vanilla.umd.cjs.map
 rm -rf www/vanilla/build
 print_success "Extra files removed."
+
+# Step 4.5: Update index.html to use production vanilla bundle
+print_step "Updating index.html for production vanilla bundle..."
+if [ -f "www/index.html" ]; then
+    sed -i 's|/vanilla-entry.ts|/vanilla/vanilla.js|g' www/index.html
+    print_success "index.html updated for production"
+else
+    print_warning "www/index.html not found"
+fi
 
 # Step 5: Output summary
 echo ""

@@ -1,4 +1,4 @@
-export const API_SPORTS_KEY = process.env.API_SPORTS_KEY || "";
+export const API_SPORTS_KEY = import.meta.env.VITE_API_SPORTS_KEY || "";
 
 export const LOCAL_STORAGE_TEAM_KEY = "API_SPORTS_CACHE_TEAMS_V2";
 

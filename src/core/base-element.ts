@@ -51,6 +51,7 @@ export abstract class BaseElement extends HTMLElement {
   constructor() {
     super();
     this._setupProperties();
+    this._initialized = true;
   }
 
   /**
