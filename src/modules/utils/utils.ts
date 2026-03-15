@@ -133,6 +133,50 @@ function debounce(name: string, callback: () => void): void {
   }, 300);
 }
 
+function alertChoice(message = "Attention", close = "Fermer"): Promise<void> {
+  let resolve: (value: void | PromiseLike<void>) => void;
+  const promise: Promise<void> = new Promise((res) => {
+    resolve = res;
+  });
+
+  const dialog: SlDialog = document.createElement("sl-dialog");
+  const paramElement: HTMLParagraphElement = document.createElement("p");
+  paramElement.innerText = message;
+  dialog.append(paramElement);
+
+  const titleElement: HTMLSpanElement = document.createElement("span");
+  titleElement.innerText = "⚠️";
+  titleElement.classList.add("3xl");
+  titleElement.slot = "label";
+  dialog.append(titleElement);
+
+  const closeButton: SlButton = document.createElement("sl-button");
+  closeButton.innerText = close;
+  closeButton.variant = "primary";
+  closeButton.slot = "footer";
+  closeButton.size = "large";
+
+  dialog.append(closeButton);
+
+  document.body.appendChild(dialog);
+  dialog.show();
+
+  closeButton.addEventListener("click", () => {
+    dialog.hide();
+    unmount(dialog);
+    resolve();
+  });
+
+  // Prevent the dialog from closing when the user clicks on the overlay
+  dialog.addEventListener("sl-request-close", (event: CustomEvent) => {
+    if (event.detail.source === "overlay") {
+      event.preventDefault();
+    }
+  });
+
+  return promise;
+}
+
 function installEventHandler(
   domElement: HTMLElement | null | undefined,
   eventName: string,
@@ -155,6 +199,7 @@ const Utils = {
   scrollIntoView,
   debounce,
   installEventHandler,
+  alertChoice,
 };
 
 export default Utils;

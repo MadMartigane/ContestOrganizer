@@ -10,6 +10,15 @@ export const config: Config = {
   globalScript: "src/global/app.ts",
   taskQueue: "async",
   sourceMap: false,
+  tsconfig: "./tsconfig.stencil.json",
+  testing: {
+    testPathIgnorePatterns: [
+      "<rootDir>/src/core/", // Vitest tests for core framework
+      "<rootDir>/src/modules/nba/", // Vitest tests for NBA module
+      "<rootDir>/src/components/error-message/error-message.spec.ts", // Vanilla component tests
+      "<rootDir>/src/components/page-404/page-404.spec.ts", // Vanilla component tests
+    ],
+  },
   plugins: [
     tailwind(),
     tailwindHMR(),

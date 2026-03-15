@@ -1,7 +1,23 @@
 #!/bin/sh
 
-# Run unit tests only (no e2e/Puppeteer needed)
-pnpm test
+# Run Stencil tests (Jest)
+echo "🧪 Running Stencil tests..."
+pnpm test:stencil
+
+# Run Vitest tests
+echo "🧪 Running Vitest tests..."
+pnpm test:vitest
+
+# Verify build passes
+echo "🏗️  Verifying build..."
+if ! pnpm run build > /tmp/build.log 2>&1; then
+    echo "❌ Build failed!"
+    echo ""
+    echo "Build output:"
+    cat /tmp/build.log
+    exit 1
+fi
+echo "✅ Build verification passed"
 
 # ultracite
 # Exit on any error

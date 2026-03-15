@@ -57,7 +57,7 @@ BACKUP_DIR="$HOME/backup/contest-data"
 
 # Step 1: Build the project
 print_step "Building the project..."
-if ! npm run build; then
+if ! pnpm run build; then
     print_error "Build failed."
     exit 1
 fi
@@ -87,6 +87,15 @@ print_success "Target directory created."
 print_step "Copying files to target..."
 cp -r www/* "$TARGET_PATH/"
 print_success "Files copied."
+
+# Step 5b: Verify vanilla bundle was copied
+print_step "Verifying vanilla bundle..."
+if [ -d "$TARGET_PATH/vanilla" ]; then
+    print_success "Vanilla directory copied."
+else
+    print_error "Vanilla directory not found."
+    exit 1
+fi
 
 # Step 6: Update paths in index.html
 print_step "Updating paths in index.html..."
