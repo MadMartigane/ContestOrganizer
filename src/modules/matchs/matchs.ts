@@ -83,56 +83,70 @@ function getAutoMatchTeams(tournament: Tournament): [number, number] | null {
     return null;
   }
 
-  const sortedTeams = [...tournament.grid].sort((a, b) => {
-    if (a.points !== b.points) {
-      return b.points - a.points;
-    }
-    return b.goalAverage - a.goalAverage;
-  });
-
-  const teamStats = sortedTeams.map((team) => {
-    const matches = tournament.matchs.filter(
+  // Calculate total matches per team (all statuses)
+  const teamTotalMatches = new Map<number, number>();
+  for (const team of tournament.grid) {
+    const count = tournament.matchs.filter(
       (m) => m.hostId === team.id || m.visitorId === team.id
-    );
-    return {
-      id: team.id,
-      totalPlayed: matches.length,
-    };
+    ).length;
+    teamTotalMatches.set(team.id, count);
+  }
+
+  // Find min total matches
+  const teamMatchCounts = Array.from(teamTotalMatches.values());
+  const minMatches = Math.min(...teamMatchCounts);
+
+  // Get teams with min matches (preserve grid order - first in array)
+  const teamsWithMin = tournament.grid.filter(
+    (team) => teamTotalMatches.get(team.id) === minMatches
+  );
+
+  // Team1 = FIRST in grid order
+  const team1 = teamsWithMin[0];
+  const team1Id = team1.id;
+
+  // Calculate confrontations against Team1
+  const confrontations = new Map<number, number>();
+  for (const team of tournament.grid) {
+    if (team.id === team1Id) {
+      continue;
+    }
+    const count = tournament.matchs.filter(
+      (m) =>
+        (m.hostId === team1Id && m.visitorId === team.id) ||
+        (m.hostId === team.id && m.visitorId === team1Id)
+    ).length;
+    confrontations.set(team.id, count);
+  }
+
+  // Find min confrontations
+  const confrontationCounts = Array.from(confrontations.values());
+  const minConfrontations = Math.min(...confrontationCounts);
+
+  // Get candidates with min confrontations
+  const candidates = tournament.grid.filter(
+    (team) =>
+      team.id !== team1Id && confrontations.get(team.id) === minConfrontations
+  );
+
+  if (candidates.length === 1) {
+    return [team1Id, candidates[0].id];
+  }
+
+  // Sort by: total matches ASC, then grid index DESC (last in grid)
+  candidates.sort((a, b) => {
+    const totalA = teamTotalMatches.get(a.id) ?? 0;
+    const totalB = teamTotalMatches.get(b.id) ?? 0;
+    if (totalA !== totalB) {
+      return totalA - totalB;
+    }
+    // Same total: pick LAST in grid (higher index)
+    const indexA = tournament.grid.findIndex((t) => t.id === a.id);
+    const indexB = tournament.grid.findIndex((t) => t.id === b.id);
+    return indexB - indexA;
   });
 
-  const team1Id = [...teamStats].sort((a, b) => {
-    if (a.totalPlayed !== b.totalPlayed) {
-      return a.totalPlayed - b.totalPlayed;
-    }
-    const rankA = sortedTeams.findIndex((t) => t.id === a.id);
-    const rankB = sortedTeams.findIndex((t) => t.id === b.id);
-    return rankA - rankB;
-  })[0].id;
-
-  const team2Id = [...teamStats]
-    .filter((t) => t.id !== team1Id)
-    .sort((a, b) => {
-      const matchesAgainstT1A = tournament.matchs.filter(
-        (m) =>
-          (m.hostId === team1Id && m.visitorId === a.id) ||
-          (m.hostId === a.id && m.visitorId === team1Id)
-      ).length;
-      const matchesAgainstT1B = tournament.matchs.filter(
-        (m) =>
-          (m.hostId === team1Id && m.visitorId === b.id) ||
-          (m.hostId === b.id && m.visitorId === team1Id)
-      ).length;
-
-      if (matchesAgainstT1A !== matchesAgainstT1B) {
-        return matchesAgainstT1A - matchesAgainstT1B;
-      }
-
-      const rankA = sortedTeams.findIndex((t) => t.id === a.id);
-      const rankB = sortedTeams.findIndex((t) => t.id === b.id);
-      return rankA - rankB;
-    })[0].id;
-
-  return [team1Id, team2Id];
+  return [team1Id, candidates[0].id];
 }
 
 const Matchs = {

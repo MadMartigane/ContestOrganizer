@@ -419,53 +419,53 @@ declare namespace LocalJSX {
         "tournamentId": number | null;
     }
     interface MadInputNumberAttributes {
-        "placeholder": string;
         "label": string;
-        "min": number | null;
         "max": number;
+        "min": number | null;
+        "placeholder": string;
+        "readonly": boolean;
         "step": number;
         "value": number;
-        "readonly": boolean;
     }
     interface MadMatchTileAttributes {
-        "hostScore": number | null;
-        "visitorScore": number | null;
         "hostRank": number;
+        "hostScore": number | null;
         "visitorRank": number;
+        "visitorScore": number | null;
     }
     interface MadRouteAttributes {
-        "url": string;
         "component": string;
+        "url": string;
     }
     interface MadScorerBasketAttributes {
-        "min": number;
         "max": number;
-        "value": number;
+        "min": number;
         "readonly": boolean;
+        "value": number;
     }
     interface MadScorerCommonAttributes {
-        "min": number | null;
         "max": number;
+        "min": number | null;
+        "readonly": boolean;
         "step": number;
         "value": number;
-        "readonly": boolean;
     }
     interface MadScorerRugbyAttributes {
-        "min": number;
         "max": number;
-        "value": number;
+        "min": number;
         "readonly": boolean;
+        "value": number;
     }
     interface MadSelectTeamAttributes {
         "color": string;
-        "placeholder": string;
         "label": string;
-        "type": TournamentType;
+        "placeholder": string;
         "tournamentGridId": number;
+        "type": TournamentType;
     }
     interface MadTeamTileAttributes {
-        "reverse": boolean | null;
         "rank": number;
+        "reverse": boolean | null;
     }
     interface PageMatchAttributes {
         "tournamentId": number;
