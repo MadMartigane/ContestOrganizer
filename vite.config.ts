@@ -2,10 +2,12 @@ import path from "node:path";
 import { defineConfig } from "vite";
 
 const config = defineConfig({
-  root: "src", // Serve from src/
+  root: "src",
+  envDir: "../", // Serve from src/
   publicDir: "../www", // Serve www/ at root (relative to src/)
 
   build: {
+    target: "es2015",
     outDir: "../www/vanilla",
     emptyOutDir: false,
     sourcemap: true,
@@ -46,13 +48,14 @@ const config = defineConfig({
     tsconfigRaw: JSON.stringify({
       compilerOptions: {
         strict: true,
-        target: "ES2022",
-        module: "ESNext",
+        target: "ES2015",
+        module: "ES2015",
         moduleResolution: "bundler",
-        lib: ["ES2022", "DOM", "DOM.Iterable"],
+        lib: ["ES2015", "DOM", "DOM.Iterable"],
         jsx: "preserve",
         jsxFactory: "h",
         jsxFragmentFactory: "Fragment",
+        downlevelIteration: true,
       },
     }),
   },

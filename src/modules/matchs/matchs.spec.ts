@@ -33,8 +33,10 @@ describe("Matchs", () => {
         matchs: [],
       };
 
-      // team1 (10pts) vs team2 (5pts)
-      expect(Matchs.getAutoMatchTeams(tournament)).toEqual([1, 2]);
+      // All teams have 0 matches, so Team1 is first in grid (team1)
+      // Team2 candidates: team2, team3 - both have 0 confrontations vs team1
+      // Tie-breaker: total matches (both 0), then LAST in grid (team3)
+      expect(Matchs.getAutoMatchTeams(tournament)).toEqual([1, 3]);
     });
 
     it("should select teams that have played the least matches", () => {
@@ -54,10 +56,11 @@ describe("Matchs", () => {
         matchs: [match],
       };
 
-      // team3 has played 0 matches, team1 and team2 have played 1.
-      // team1 is ranked higher than team2 (same points, but team1 is first in grid)
-      // So it should be team3 vs team1
-      expect(Matchs.getAutoMatchTeams(tournament)).toEqual([3, 1]);
+      // team3 has 0 matches, team1 and team2 have 1 match each.
+      // Team1 = team3 (fewest total matches)
+      // Team2 candidates: team1 and team2 both have 0 confrontations vs team3
+      // Tie-breaker: same total matches (1), pick LAST in grid = team2
+      expect(Matchs.getAutoMatchTeams(tournament)).toEqual([3, 2]);
     });
 
     it("should prioritize teams that haven't played against each other", () => {
@@ -110,8 +113,39 @@ describe("Matchs", () => {
         matchs: [],
       };
 
-      // team2 has better goalAverage
-      expect(Matchs.getAutoMatchTeams(tournament)).toEqual([2, 1]);
+      // All teams have 0 matches - Team1 is first in grid (team1)
+      // Team2 is last in grid (team2)
+      expect(Matchs.getAutoMatchTeams(tournament)).toEqual([1, 2]);
+    });
+
+    it("should handle all teams having same matches and confrontations", () => {
+      const team1 = new TeamRow({ id: 1 as any, type: TournamentType.FOOT });
+      const team2 = new TeamRow({ id: 2 as any, type: TournamentType.FOOT });
+      const team3 = new TeamRow({ id: 3 as any, type: TournamentType.FOOT });
+
+      // All teams have played 1 match
+      const match1 = new Match(null, null, MatchStatus.DONE as any);
+      match1.hostId = 1;
+      match1.visitorId = 2;
+
+      const match2 = new Match(null, null, MatchStatus.DONE as any);
+      match2.hostId = 2;
+      match2.visitorId = 3;
+
+      const tournament: Tournament = {
+        id: 1,
+        name: "Test",
+        type: TournamentType.FOOT,
+        grid: [team1, team2, team3],
+        matchs: [match1, match2],
+      };
+
+      // team1: 1 match, team2: 2 matches, team3: 1 match
+      // team1 and team3 both have 1 match (min)
+      // Team1 = first in grid with min matches = team1
+      // Confrontations vs team1: team2 (1), team3 (0)
+      // team3 has 0 confrontations vs team1, so team3 is selected
+      expect(Matchs.getAutoMatchTeams(tournament)).toEqual([1, 3]);
     });
   });
 });

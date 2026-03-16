@@ -67,17 +67,17 @@ export class MadMatchTile {
               <span>Sélection…</span>
             )}
           </div>
-          {this.hostScore !== null ? (
+          {this.hostScore === null ? null : (
             <div class="col-span-2 text-4xl">
               {this.refreshUIHook && this.hostScore}
             </div>
-          ) : null}
+          )}
           <div class="text-xs">VS</div>
-          {this.visitorScore !== null ? (
+          {this.visitorScore === null ? null : (
             <div class="col-span-2 text-4xl">
               {this.refreshUIHook && this.visitorScore}
             </div>
-          ) : null}
+          )}
           <div
             class={
               this.visitorScore === null

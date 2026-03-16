@@ -283,7 +283,11 @@ For reactive state, use the Signal pattern:
 import { signal } from "@core/signals.js";
 
 export class Counter extends BaseElement {
-  private _count = signal(0);
+  private _count!: ReturnType<typeof signal<number>>;
+
+  protected _setupProperties(): void {
+    this._count = signal(0);
+  }
 
   protected _render(): void {
     this.innerHTML = `
@@ -301,6 +305,129 @@ export class Counter extends BaseElement {
   }
 }
 ```
+
+### Correct Signal Initialization Pattern (Important)
+
+⚠️ **Critical**: Do NOT use field initializers for Signals in vanilla BaseElement components. This causes JavaScript class initialization order issues.
+
+#### Why Field Initializers Fail
+
+When you declare a Signal as a class field initializer:
+
+```typescript
+// ❌ WRONG - will cause issues
+private _count = signal(0);
+```
+
+JavaScript executes field initializers **before** the `super()` call in the constructor. Since `BaseElement` (which extends `HTMLElement`) must call `super()` first, any initialization that depends on the element being fully constructed will fail or behave unexpectedly.
+
+#### The Correct Pattern
+
+Declare Signals with the non-null assertion operator (`!`) and initialize them in `_setupProperties()`:
+
+```typescript
+// ✅ CORRECT - proper initialization order
+export class Counter extends BaseElement {
+  // Declare without initialization, using ! to assert it will be assigned
+  private _count!: ReturnType<typeof signal<number>>;
+
+  protected _setupProperties(): void {
+    // Initialize after super() has completed
+    this._count = signal(0);
+  }
+
+  protected _render(): void {
+    this.innerHTML = `
+      <div>Count: ${this._count()}</div>
+      <button class="increment">+</button>
+    `;
+  }
+
+  protected _setupEvents(): void {
+    const button = this.shadowRoot?.querySelector('.increment');
+    button?.addEventListener('click', () => {
+      this._count.set(this._count() + 1);
+      this._requestRender();
+    });
+  }
+}
+```
+
+#### SelectTeam Example
+
+A more complete example showing multiple Signals:
+
+```typescript
+import { signal } from "@core/signals.js";
+
+export class SelectTeam extends BaseElement {
+  // Declare all signals with !, initialize in _setupProperties()
+  private _teams!: ReturnType<typeof signal<Team[]>>;
+  private _selectedTeamId!: ReturnType<typeof signal<string | null>>;
+  private _isLoading!: ReturnType<typeof signal<boolean>>;
+
+  protected _setupProperties(): void {
+    this._teams = signal([]);
+    this._selectedTeamId = signal(null);
+    this._isLoading = signal(true);
+
+    // Fetch teams after signals are initialized
+    this._fetchTeams();
+  }
+
+  private async _fetchTeams(): Promise<void> {
+    try {
+      const teams = await fetch('/api/teams').then(r => r.json());
+      this._teams.set(teams);
+    } catch (error) {
+      console.error('Failed to load teams:', error);
+    } finally {
+      this._isLoading.set(false);
+      this._requestRender();
+    }
+  }
+
+  protected _render(): void {
+    this.innerHTML = `
+      <div class="select-team">
+        ${this._isLoading() ? '<p>Loading...</p>' : this._renderTeamList()}
+      </div>
+    `;
+  }
+
+  private _renderTeamList(): string {
+    return this._teams().map(team => `
+      <button
+        class="team-btn ${this._selectedTeamId() === team.id ? 'selected' : ''}"
+        data-team-id="${team.id}"
+      >
+        ${team.name}
+      </button>
+    `).join('');
+  }
+
+  protected _setupEvents(): void {
+    const teamButtons = this.shadowRoot?.querySelectorAll('.team-btn');
+    teamButtons?.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const target = e.target as HTMLButtonElement;
+        const teamId = target.dataset.teamId;
+        if (teamId) {
+          this._selectedTeamId.set(teamId);
+          this._emit('team-selected', { detail: { teamId } });
+          this._requestRender();
+        }
+      });
+    });
+  }
+}
+```
+
+#### Key Takeaways
+
+1. **Always use `!` for Signal declarations** - This tells TypeScript the property will be assigned before use
+2. **Initialize in `_setupProperties()`** - This runs after `super()` completes, ensuring proper initialization order
+3. **Use `ReturnType<typeof signal<T>>`** - This provides proper typing for the Signal
 
 ## Examples
 
@@ -337,9 +464,11 @@ import { BaseElement } from "@core/base-element.js";
 import { signal } from "@core/signals.js";
 
 export class PageHome extends BaseElement {
-  private _userName = signal<string | null>(null);
+  private _userName!: ReturnType<typeof signal<string | null>>;
 
   protected _setupProperties(): void {
+    this._userName = signal<string | null>(null);
+
     // Simulate fetching user data
     setTimeout(() => {
       this._userName.set('John');

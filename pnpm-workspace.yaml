@@ -1,0 +1,5 @@
+allowBuilds:
+  esbuild: true
+  puppeteer: true
+patchedDependencies:
+  stencil-tailwind-plugin@1.8.0: patches/stencil-tailwind-plugin@1.8.0.patch

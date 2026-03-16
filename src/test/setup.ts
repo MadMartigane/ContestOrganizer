@@ -31,9 +31,9 @@ export function triggerAttributeChange(
   attributeName: string,
   newValue: string | null
 ): void {
-  if (newValue !== null) {
-    element.setAttribute(attributeName, newValue);
-  } else {
+  if (newValue === null) {
     element.removeAttribute(attributeName);
+  } else {
+    element.setAttribute(attributeName, newValue);
   }
 }

@@ -42,7 +42,7 @@ function confirmChoice(
     resolve = res;
   });
 
-  const dialog: SlDialog = document.createElement("sl-dialog");
+  const dialog = document.createElement("sl-dialog") as unknown as SlDialog;
   const paramElement: HTMLParagraphElement = document.createElement("p");
   paramElement.innerText = message;
   dialog.append(paramElement);
@@ -53,8 +53,12 @@ function confirmChoice(
   titleElement.slot = "label";
   dialog.append(titleElement);
 
-  const cancelButton: SlButton = document.createElement("sl-button");
-  const confirmButton: SlButton = document.createElement("sl-button");
+  const cancelButton = document.createElement(
+    "sl-button"
+  ) as unknown as SlButton;
+  const confirmButton = document.createElement(
+    "sl-button"
+  ) as unknown as SlButton;
 
   cancelButton.innerText = cancel;
   cancelButton.variant = "warning";
@@ -69,18 +73,18 @@ function confirmChoice(
   dialog.append(cancelButton);
   dialog.append(confirmButton);
 
-  document.body.appendChild(dialog);
+  document.body.appendChild(dialog as unknown as HTMLElement);
   dialog.show();
 
   cancelButton.addEventListener("click", () => {
     dialog.hide();
-    unmount(dialog);
+    unmount(dialog as unknown as HTMLElement);
     resolve(false);
   });
 
   confirmButton.addEventListener("click", () => {
     dialog.hide();
-    unmount(dialog);
+    unmount(dialog as unknown as HTMLElement);
     resolve(true);
   });
 
@@ -139,7 +143,7 @@ function alertChoice(message = "Attention", close = "Fermer"): Promise<void> {
     resolve = res;
   });
 
-  const dialog: SlDialog = document.createElement("sl-dialog");
+  const dialog = document.createElement("sl-dialog") as unknown as SlDialog;
   const paramElement: HTMLParagraphElement = document.createElement("p");
   paramElement.innerText = message;
   dialog.append(paramElement);
@@ -150,7 +154,9 @@ function alertChoice(message = "Attention", close = "Fermer"): Promise<void> {
   titleElement.slot = "label";
   dialog.append(titleElement);
 
-  const closeButton: SlButton = document.createElement("sl-button");
+  const closeButton = document.createElement(
+    "sl-button"
+  ) as unknown as SlButton;
   closeButton.innerText = close;
   closeButton.variant = "primary";
   closeButton.slot = "footer";
@@ -158,12 +164,12 @@ function alertChoice(message = "Attention", close = "Fermer"): Promise<void> {
 
   dialog.append(closeButton);
 
-  document.body.appendChild(dialog);
+  document.body.appendChild(dialog as unknown as HTMLElement);
   dialog.show();
 
   closeButton.addEventListener("click", () => {
     dialog.hide();
-    unmount(dialog);
+    unmount(dialog as unknown as HTMLElement);
     resolve();
   });
 

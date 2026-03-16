@@ -129,8 +129,8 @@ export class ApiSports {
             // Handle both API response structures:
             // Structure 1: { team: { id, name, ... } } - used by FOOT, NBA, etc.
             // Structure 2: { id, name, ... } - team data directly, used by RUGBY
-            const teams = data.response.map((r) => {
-              const teamData = r.team || r;
+            const teams: GenericTeam[] = data.response.map((r) => {
+              const teamData = "team" in r ? r.team : r;
               return {
                 ...teamData,
                 type,
