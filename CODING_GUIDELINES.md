@@ -79,3 +79,52 @@ export class MyComponent extends BaseElement {
 - Always set `this._initialized = true` at the end of `_setupProperties()`
 - This ensures `_render()` is only called after all signals are ready
 - The flag is checked in `_requestRender()` before scheduling any render
+
+## Signal API Reference
+
+This codebase uses a custom Signal implementation with **property-based access**:
+
+### Reading Values
+```typescript
+// ✅ CORRECT - Use .value getter
+const currentValue = this._mySignal.value;
+
+// ❌ WRONG - Signals are not callable
+const currentValue = this._mySignal(); // Error!
+```
+
+### Writing Values
+```typescript
+// ✅ CORRECT - Use .value setter
+this._mySignal.value = newValue;
+
+// ❌ WRONG - No .set() method exists
+this._mySignal.set(newValue); // Error!
+```
+
+### Complete Example
+```typescript
+export class MyComponent extends BaseElement {
+  declare private _count: Signal<number>;
+  
+  protected _setupProperties(): void {
+    this._count = new Signal(0);
+    this._trackSignal(this._count);
+    this._initialized = true;
+  }
+  
+  private _increment(): void {
+    // Read current value
+    const current = this._count.value;
+    // Write new value
+    this._count.value = current + 1;
+  }
+}
+```
+
+### Common Mistakes to Avoid
+
+| Mistake | Error Message | Fix |
+|---------|---------------|-----|
+| `this._signal()` | "This expression is not callable" | Use `this._signal.value` |
+| `this._signal.set(x)` | "Property 'set' does not exist" | Use `this._signal.value = x` |

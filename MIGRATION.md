@@ -2,6 +2,24 @@
 
 This guide provides comprehensive instructions for migrating Stencil components to native Web Components using our BaseElement pattern.
 
+## Prerequisites
+
+Before starting any migration work, you **MUST** load the `stencil-migration` skill:
+
+```
+/load-skill stencil-migration
+```
+
+This skill contains critical patterns and traps to avoid during migration, including:
+- **Trap 1**: Property vs Attribute (Object Props) - How to pass complex objects to Stencil children
+- **Trap 2**: Promise vs String (Async Props) - Handling async data correctly
+- **Trap 3**: Boolean Attribute Coercion - Why `reverse="true"` doesn't work as expected
+- **Trap 4**: Number Attribute Parsing - String vs number types in HTML attributes
+- **Two-Pass Rendering Pattern** - The correct way to render vanilla parents with Stencil children
+- **Type-Safe Best Practices** - Defining interfaces for type-safe property assignment
+
+**Failure to follow these patterns will result in silent failures where components don't display correctly.**
+
 ## Overview
 
 ### Philosophy: "Touch it, modernize it"
