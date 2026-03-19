@@ -546,7 +546,7 @@ export class PageMatch extends BaseElement {
   private renderActionButtons(match: Match): string {
     const isDoing = match.status === MatchStatus.DOING;
     return `
-      <div class="columns-2 content-center gap-8 py-4">
+      <div class="flex justify-center gap-8 py-4">
         <sl-button
           class="delete-btn w-full"
           data-match-id="${match.id || ""}"
@@ -622,6 +622,7 @@ export class PageMatch extends BaseElement {
       tournamentType === TournamentType.NFL ||
       tournamentType === TournamentType.RUGBY;
     const isDoing = match.status === MatchStatus.DOING;
+    const readonlyAttr = isDoing ? "" : "readonly";
     const minGoal = this.config.minGoal;
     const hostScore = match.goals.host;
     const visitorScore = match.goals.visitor;
@@ -635,7 +636,7 @@ export class PageMatch extends BaseElement {
             class="host-scorer"
             data-match-id="${match.id || ""}"
             data-team-type="host"
-            readonly="${!isDoing}"
+            ${readonlyAttr}
             value="${hostScore}"
           ></mad-scorer-basket>`
             : ""
@@ -648,7 +649,7 @@ export class PageMatch extends BaseElement {
             class="host-scorer"
             data-match-id="${match.id || ""}"
             data-team-type="host"
-            readonly="${!isDoing}"
+            ${readonlyAttr}
             value="${hostScore}"
           ></mad-scorer-common>`
             : ""
@@ -661,7 +662,7 @@ export class PageMatch extends BaseElement {
             class="host-scorer"
             data-match-id="${match.id || ""}"
             data-team-type="host"
-            readonly="${!isDoing}"
+            ${readonlyAttr}
             value="${hostScore}"
           ></mad-scorer-rugby>`
             : ""
@@ -674,7 +675,7 @@ export class PageMatch extends BaseElement {
             class="visitor-scorer"
             data-match-id="${match.id || ""}"
             data-team-type="visitor"
-            readonly="${!isDoing}"
+            ${readonlyAttr}
             value="${visitorScore}"
           ></mad-scorer-basket>`
             : ""
@@ -687,7 +688,7 @@ export class PageMatch extends BaseElement {
             class="visitor-scorer"
             data-match-id="${match.id || ""}"
             data-team-type="visitor"
-            readonly="${!isDoing}"
+            ${readonlyAttr}
             value="${visitorScore}"
           ></mad-scorer-common>`
             : ""
@@ -700,7 +701,7 @@ export class PageMatch extends BaseElement {
             class="visitor-scorer"
             data-match-id="${match.id || ""}"
             data-team-type="visitor"
-            readonly="${!isDoing}"
+            ${readonlyAttr}
             value="${visitorScore}"
           ></mad-scorer-rugby>`
             : ""
@@ -1243,7 +1244,7 @@ export class PageMatch extends BaseElement {
     // Scorer change events
     const hostScorers = Array.from(this.querySelectorAll(".host-scorer"));
     for (const scorer of hostScorers) {
-      scorer.addEventListener("mad-number-change", (ev: Event) => {
+      scorer.addEventListener("madNumberChange", (ev: Event) => {
         const matchId = (scorer as HTMLElement).dataset.matchId;
         const tournament = this._tournament.value;
         const match = tournament?.matchs?.find((m) => m.id === Number(matchId));
@@ -1259,7 +1260,7 @@ export class PageMatch extends BaseElement {
 
     const visitorScorers = Array.from(this.querySelectorAll(".visitor-scorer"));
     for (const scorer of visitorScorers) {
-      scorer.addEventListener("mad-number-change", (ev: Event) => {
+      scorer.addEventListener("madNumberChange", (ev: Event) => {
         const matchId = (scorer as HTMLElement).dataset.matchId;
         const tournament = this._tournament.value;
         const match = tournament?.matchs?.find((m) => m.id === Number(matchId));
