@@ -1,0 +1,194 @@
+import { BaseElement } from "../../core/base-element.js";
+import { Signal } from "../../core/signal.js";
+import type { GenericTeam } from "../../modules/team-row/team-row.d.js";
+import type TeamRow from "../../modules/team-row/team-row.js";
+import tournaments from "../../modules/tournaments/tournaments.js";
+import type { Tournament } from "../../modules/tournaments/tournaments.types.js";
+
+interface MadTeamTileElement extends HTMLElement {
+  rank?: number;
+  reverse: boolean | null;
+  team: GenericTeam | null;
+}
+
+/**
+ * MatchTile - Displays a match with host and visitor teams
+ * @element mad-match-tile
+ */
+export class MatchTile extends BaseElement {
+  private declare _hostSignal: Signal<TeamRow | null>;
+  private declare _visitorSignal: Signal<TeamRow | null>;
+
+  static get observedAttributes(): string[] {
+    return [
+      "host-id",
+      "visitor-id",
+      "tournament-id",
+      "host-score",
+      "visitor-score",
+      "host-rank",
+      "visitor-rank",
+    ];
+  }
+
+  protected _setupProperties(): void {
+    this._hostSignal = new Signal<TeamRow | null>(null);
+    this._visitorSignal = new Signal<TeamRow | null>(null);
+
+    this._trackSignal(this._hostSignal);
+    this._trackSignal(this._visitorSignal);
+
+    this._initialized = true;
+  }
+
+  protected _createRenderRoot(): Element {
+    return this;
+  }
+
+  protected _onAttributeChange(name: string, value: string | null): void {
+    if (name === "host-id" || name === "visitor-id") {
+      this._fetchTeam(name.replace("-id", "") as "host" | "visitor", value);
+    }
+  }
+
+  private async _fetchTeam(
+    side: "host" | "visitor",
+    value: string | null
+  ): Promise<void> {
+    const teamId = value !== null ? Number.parseInt(value, 10) : null;
+    if (!teamId) {
+      if (side === "host") {
+        this._hostSignal.value = null;
+      } else {
+        this._visitorSignal.value = null;
+      }
+      return;
+    }
+
+    const tournamentId = this.getAttribute("tournament-id");
+    if (!tournamentId) {
+      return;
+    }
+
+    const tid = Number.parseInt(tournamentId, 10);
+    const tournament = await tournaments.get(tid);
+    if (!tournament) {
+      return;
+    }
+
+    const team = await tournaments.getTournamentTeam(
+      tournament as Tournament,
+      teamId
+    );
+
+    if (side === "host") {
+      this._hostSignal.value = team;
+    } else {
+      this._visitorSignal.value = team;
+    }
+  }
+
+  private _getHostScore(): number | null {
+    const value = this.getAttribute("host-score");
+    return value !== null ? Number.parseInt(value, 10) : null;
+  }
+
+  private _getVisitorScore(): number | null {
+    const value = this.getAttribute("visitor-score");
+    return value !== null ? Number.parseInt(value, 10) : null;
+  }
+
+  private _getRank(attr: string): number | undefined {
+    const value = this.getAttribute(attr);
+    return value !== null ? Number.parseInt(value, 10) : undefined;
+  }
+
+  protected _render(): void {
+    const host = this._hostSignal.value;
+    const visitor = this._visitorSignal.value;
+    const hostScore = this._getHostScore();
+    const visitorScore = this._getVisitorScore();
+    const hostRank = this._getRank("host-rank");
+    const visitorRank = this._getRank("visitor-rank");
+    const hasScore = hostScore !== null && visitorScore !== null;
+
+    const hostColClass = hasScore ? "col-span-3" : "col-span-5";
+    const visitorColClass = hasScore ? "col-span-3" : "col-span-5";
+
+    // First render: create HTML structure without complex data
+    this.innerHTML = `
+      <style>
+        mad-match-tile {
+          display: block;
+        }
+        .match-grid {
+          display: grid;
+          min-height: 144px;
+          grid-template-columns: repeat(11, 1fr);
+          align-content: center;
+          align-items: center;
+          gap: 0.25rem;
+        }
+        .host-section {
+          text-align: end;
+        }
+        .visitor-section {
+          text-align: start;
+        }
+        .col-span-3 {
+          grid-column: span 3 / span 3;
+        }
+        .col-span-5 {
+          grid-column: span 5 / span 5;
+        }
+        .col-span-2 {
+          grid-column: span 2 / span 2;
+        }
+        .score {
+          font-size: 2.25rem;
+          text-align: center;
+        }
+        .vs {
+          text-align: center;
+          font-size: 0.75rem;
+        }
+      </style>
+      <div class="match-grid">
+        <div class="host-section ${hostColClass}">
+          ${host?.team ? `<mad-team-tile class="host-team-tile" rank="${hostRank ?? ""}"></mad-team-tile>` : "<span>Sélection…</span>"}
+        </div>
+        ${hasScore ? `<div class="col-span-2 score">${hostScore}</div>` : ""}
+        <div class="vs">VS</div>
+        ${hasScore ? `<div class="col-span-2 score">${visitorScore}</div>` : ""}
+        <div class="visitor-section ${visitorColClass}">
+          ${visitor?.team ? `<mad-team-tile class="visitor-team-tile" rank="${visitorRank ?? ""}"></mad-team-tile>` : "<span>Sélection…</span>"}
+        </div>
+      </div>
+    `;
+
+    // Second pass: set properties directly on the DOM elements
+    const hostTile = this.querySelector(
+      ".host-team-tile"
+    ) as MadTeamTileElement | null;
+    const visitorTile = this.querySelector(
+      ".visitor-team-tile"
+    ) as MadTeamTileElement | null;
+
+    if (hostTile && host?.team) {
+      hostTile.team = host.team;
+      hostTile.reverse = true;
+      if (hostRank !== undefined) {
+        hostTile.rank = hostRank;
+      }
+    }
+
+    if (visitorTile && visitor?.team) {
+      visitorTile.team = visitor.team;
+      if (visitorRank !== undefined) {
+        visitorTile.rank = visitorRank;
+      }
+    }
+  }
+}
+
+customElements.define("mad-match-tile", MatchTile);
