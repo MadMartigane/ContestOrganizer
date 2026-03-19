@@ -18,6 +18,7 @@ interface MadTeamTileElement extends HTMLElement {
 export class MatchTile extends BaseElement {
   private declare _hostSignal: Signal<TeamRow | null>;
   private declare _visitorSignal: Signal<TeamRow | null>;
+  private _fetchPending = false;
 
   static get observedAttributes(): string[] {
     return [
@@ -45,10 +46,54 @@ export class MatchTile extends BaseElement {
     return this;
   }
 
-  protected _onAttributeChange(name: string, value: string | null): void {
-    if (name === "host-id" || name === "visitor-id") {
-      this._fetchTeam(name.replace("-id", "") as "host" | "visitor", value);
+  protected _onAttributeChange(name: string, _value: string | null): void {
+    // Score changes don't require team data fetch - just re-render
+    if (name === "host-score" || name === "visitor-score") {
+      this._requestRender();
+      return;
     }
+
+    // Team ID or tournament changes require fetching new team data
+    if (
+      name === "host-id" ||
+      name === "visitor-id" ||
+      name === "tournament-id"
+    ) {
+      this._scheduleFetch();
+    }
+  }
+
+  private _scheduleFetch(): void {
+    if (this._fetchPending) {
+      return;
+    }
+    this._fetchPending = true;
+    queueMicrotask(() => {
+      this._fetchPending = false;
+      this._fetchTeamsFromAttributes();
+    });
+  }
+
+  private _fetchTeamsFromAttributes(): void {
+    const tournamentId = this.getAttribute("tournament-id");
+    if (!tournamentId) {
+      return;
+    }
+
+    const hostId = this.getAttribute("host-id");
+    const visitorId = this.getAttribute("visitor-id");
+
+    if (hostId) {
+      this._fetchTeam("host", hostId);
+    }
+    if (visitorId) {
+      this._fetchTeam("visitor", visitorId);
+    }
+  }
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    this._fetchTeamsFromAttributes();
   }
 
   private async _fetchTeam(
@@ -103,6 +148,92 @@ export class MatchTile extends BaseElement {
     return value !== null ? Number.parseInt(value, 10) : undefined;
   }
 
+  /**
+   * Try to update only score elements without recreating team tiles
+   * Returns true if incremental update was performed, false if full render needed
+   */
+  private _tryIncrementalUpdate(
+    host: TeamRow | null,
+    visitor: TeamRow | null,
+    hostScore: number | null,
+    visitorScore: number | null,
+    hostRank: number | undefined,
+    visitorRank: number | undefined,
+    hasScore: boolean
+  ): boolean {
+    // Get existing team tiles
+    const hostTile = this.querySelector(
+      ".host-team-tile"
+    ) as MadTeamTileElement | null;
+    const visitorTile = this.querySelector(
+      ".visitor-team-tile"
+    ) as MadTeamTileElement | null;
+
+    // Check team existence alignment
+    const hasHostTeam = host?.team != null;
+    const hasVisitorTeam = visitor?.team != null;
+
+    if (hasHostTeam !== (hostTile != null)) {
+      return false;
+    }
+    if (hasVisitorTeam !== (visitorTile != null)) {
+      return false;
+    }
+
+    // Check team data identity (same team = incremental safe)
+    if (
+      hasHostTeam &&
+      hostTile &&
+      host?.team &&
+      hostTile.team?.id !== host.team.id
+    ) {
+      return false;
+    }
+    if (
+      hasVisitorTeam &&
+      visitorTile &&
+      visitor?.team &&
+      visitorTile.team?.id !== visitor.team.id
+    ) {
+      return false;
+    }
+
+    // Check layout state (score existence)
+    const existingScores = this.querySelectorAll(".score");
+    if (hasScore !== (existingScores.length === 2)) {
+      return false;
+    }
+
+    // No incremental update needed if no scores
+    if (!hasScore) {
+      return false;
+    }
+
+    // === ALL CHECKS PASSED: PERFORM INCREMENTAL UPDATE ===
+
+    // Update team object references (in case reference changed but ID same)
+    if (hostTile && host?.team && hostTile.team !== host.team) {
+      hostTile.team = host.team;
+    }
+    if (visitorTile && visitor?.team && visitorTile.team !== visitor.team) {
+      visitorTile.team = visitor.team;
+    }
+
+    // Update score text content
+    existingScores[0].textContent = String(hostScore);
+    existingScores[1].textContent = String(visitorScore);
+
+    // Update rank properties
+    if (hostTile && hostRank !== undefined) {
+      hostTile.rank = hostRank;
+    }
+    if (visitorTile && visitorRank !== undefined) {
+      visitorTile.rank = visitorRank;
+    }
+
+    return true;
+  }
+
   protected _render(): void {
     const host = this._hostSignal.value;
     const visitor = this._visitorSignal.value;
@@ -112,10 +243,45 @@ export class MatchTile extends BaseElement {
     const visitorRank = this._getRank("visitor-rank");
     const hasScore = hostScore !== null && visitorScore !== null;
 
+    // Try incremental update first (preserves team tiles, no flash)
+    if (
+      this._tryIncrementalUpdate(
+        host,
+        visitor,
+        hostScore,
+        visitorScore,
+        hostRank,
+        visitorRank,
+        hasScore
+      )
+    ) {
+      return;
+    }
+
+    // Fallback to full render (destroys and recreates everything)
+    this._fullRender(
+      host,
+      visitor,
+      hostScore,
+      visitorScore,
+      hostRank,
+      visitorRank,
+      hasScore
+    );
+  }
+
+  private _fullRender(
+    host: TeamRow | null,
+    visitor: TeamRow | null,
+    hostScore: number | null,
+    visitorScore: number | null,
+    hostRank: number | undefined,
+    visitorRank: number | undefined,
+    hasScore: boolean
+  ): void {
     const hostColClass = hasScore ? "col-span-3" : "col-span-5";
     const visitorColClass = hasScore ? "col-span-3" : "col-span-5";
 
-    // First render: create HTML structure without complex data
     this.innerHTML = `
       <style>
         mad-match-tile {
@@ -166,7 +332,7 @@ export class MatchTile extends BaseElement {
       </div>
     `;
 
-    // Second pass: set properties directly on the DOM elements
+    // Second pass: set properties on newly created team-tiles
     const hostTile = this.querySelector(
       ".host-team-tile"
     ) as MadTeamTileElement | null;

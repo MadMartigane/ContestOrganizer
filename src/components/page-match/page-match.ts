@@ -20,7 +20,6 @@ import {
   TournamentTypeLabel,
 } from "../../modules/tournaments/tournaments.types";
 import Utils from "../../modules/utils/utils";
-import uuid from "../../modules/uuid/uuid";
 
 import { calculateTargetMatchIndex } from "./page-match.logic";
 
@@ -47,7 +46,7 @@ export class PageMatch extends BaseElement {
   private declare _teamToSelect: Signal<Row[] | null>;
   private declare _matchNumber: Signal<number>;
   private declare _currentMatch: Signal<Match | null>;
-  private declare _refreshUIHook: Signal<number>;
+
   private declare _scrollNavVisible: Signal<boolean>;
   private declare _matchRefs: Signal<HTMLElement[]>;
 
@@ -128,7 +127,6 @@ export class PageMatch extends BaseElement {
     this._teamToSelect = new Signal<Row[] | null>(null);
     this._matchNumber = new Signal<number>(0);
     this._currentMatch = new Signal<Match | null>(null);
-    this._refreshUIHook = new Signal<number>(0);
     this._scrollNavVisible = new Signal<boolean>(false);
     this._matchRefs = new Signal<HTMLElement[]>([]);
 
@@ -143,7 +141,6 @@ export class PageMatch extends BaseElement {
     this._trackSignal(this._teamToSelect);
     this._trackSignal(this._matchNumber);
     this._trackSignal(this._currentMatch);
-    this._trackSignal(this._refreshUIHook);
     this._trackSignal(this._scrollNavVisible);
     this._trackSignal(this._matchRefs);
 
@@ -310,10 +307,20 @@ export class PageMatch extends BaseElement {
    * Refresh UI hook to trigger re-renders
    */
   private refreshUI(): void {
-    const current = this._teamToSelect.value;
-    this._teamToSelect.value = current ? current.map((row) => row) : null;
-    this._refreshUIHook.value = uuid.new();
     this._requestRender();
+  }
+
+  /**
+   * Update only the score display for a specific match without full re-render
+   */
+  private updateMatchScore(index: number, match: Match): void {
+    const matchTile = this.querySelector(
+      `mad-match-tile[data-match-index="${index}"]`
+    );
+    if (matchTile) {
+      matchTile.setAttribute("host-score", String(match.goals.host));
+      matchTile.setAttribute("visitor-score", String(match.goals.visitor));
+    }
   }
 
   /**
@@ -443,7 +450,13 @@ export class PageMatch extends BaseElement {
     }
 
     await this.updateTournament();
-    this.refreshUI();
+
+    // Incremental update: only update the specific match that changed
+    const matchIndex =
+      this._tournament.value?.matchs?.findIndex((m) => m.id === match.id) ?? -1;
+    if (matchIndex >= 0) {
+      this.updateMatchScore(matchIndex, match);
+    }
   }
 
   /**
@@ -727,25 +740,21 @@ export class PageMatch extends BaseElement {
       <div id="match-${index}" class="match-item rounded border border-sky border-solid px-1 py-4" data-match-index="${index}">
         <div>${this.renderMatchStatus(match)}</div>
 
-        ${
-          this._refreshUIHook.value
-            ? `<mad-match-tile
-            class="match-tile"
-            data-match-index="${index}"
-            tournament-id="${this._tournament.value?.id || ""}"
-            host-id="${match.hostId || ""}"
-            host-rank="${hostRank || ""}"
-            host-score="${match.goals.host}"
-            visitor-id="${match.visitorId || ""}"
-            visitor-rank="${visitorRank || ""}"
-            visitor-score="${match.goals.visitor}"
-          ></mad-match-tile>`
-            : ""
-        }
+        <mad-match-tile
+          class="match-tile"
+          data-match-index="${index}"
+          tournament-id="${this._tournament.value?.id || ""}"
+          host-id="${match.hostId || ""}"
+          host-rank="${hostRank || ""}"
+          host-score="${match.goals.host}"
+          visitor-id="${match.visitorId || ""}"
+          visitor-rank="${visitorRank || ""}"
+          visitor-score="${match.goals.visitor}"
+        ></mad-match-tile>
 
         ${this.renderScorers(match)}
 
-        ${this._refreshUIHook.value ? this.renderActionButtons(match) : ""}
+        ${this.renderActionButtons(match)}
       </div>
     `;
   }
