@@ -6,10 +6,8 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { TournamentUpdateEvent } from "./modules/tournaments/tournaments.types";
-import { TeamRow } from "./modules/team-row/team-row";
 import { GenericTeam } from "./components.d";
 export { TournamentUpdateEvent } from "./modules/tournaments/tournaments.types";
-export { TeamRow } from "./modules/team-row/team-row";
 export { GenericTeam } from "./components.d";
 export namespace Components {
     interface AppRoot {
@@ -31,20 +29,6 @@ export namespace Components {
         "readonly"?: boolean;
         "step"?: number;
         "value"?: number;
-    }
-    interface MadMatchTile {
-        "hostPending": Promise<TeamRow | null>;
-        "hostRank"?: number;
-        /**
-          * @default null
-         */
-        "hostScore"?: number | null;
-        "visitorPending": Promise<TeamRow | null>;
-        "visitorRank"?: number;
-        /**
-          * @default null
-         */
-        "visitorScore"?: number | null;
     }
     interface MadRoute {
         "component": string;
@@ -81,9 +65,6 @@ export namespace Components {
         "team": GenericTeam | null;
     }
     interface PageConfig {
-    }
-    interface PageMatch {
-        "tournamentId": number;
     }
     interface PageTournament {
         "tournamentId": number;
@@ -173,12 +154,6 @@ declare global {
         prototype: HTMLMadInputNumberElement;
         new (): HTMLMadInputNumberElement;
     };
-    interface HTMLMadMatchTileElement extends Components.MadMatchTile, HTMLStencilElement {
-    }
-    var HTMLMadMatchTileElement: {
-        prototype: HTMLMadMatchTileElement;
-        new (): HTMLMadMatchTileElement;
-    };
     interface HTMLMadRouteElement extends Components.MadRoute, HTMLStencilElement {
     }
     var HTMLMadRouteElement: {
@@ -248,12 +223,6 @@ declare global {
         prototype: HTMLPageConfigElement;
         new (): HTMLPageConfigElement;
     };
-    interface HTMLPageMatchElement extends Components.PageMatch, HTMLStencilElement {
-    }
-    var HTMLPageMatchElement: {
-        prototype: HTMLPageMatchElement;
-        new (): HTMLPageMatchElement;
-    };
     interface HTMLPageTournamentElement extends Components.PageTournament, HTMLStencilElement {
     }
     var HTMLPageTournamentElement: {
@@ -271,14 +240,12 @@ declare global {
         "grid-basket": HTMLGridBasketElement;
         "grid-default": HTMLGridDefaultElement;
         "mad-input-number": HTMLMadInputNumberElement;
-        "mad-match-tile": HTMLMadMatchTileElement;
         "mad-route": HTMLMadRouteElement;
         "mad-scorer-basket": HTMLMadScorerBasketElement;
         "mad-scorer-common": HTMLMadScorerCommonElement;
         "mad-scorer-rugby": HTMLMadScorerRugbyElement;
         "mad-team-tile": HTMLMadTeamTileElement;
         "page-config": HTMLPageConfigElement;
-        "page-match": HTMLPageMatchElement;
         "page-tournament": HTMLPageTournamentElement;
         "page-tournament-select": HTMLPageTournamentSelectElement;
     }
@@ -306,20 +273,6 @@ declare namespace LocalJSX {
         "readonly"?: boolean;
         "step"?: number;
         "value"?: number;
-    }
-    interface MadMatchTile {
-        "hostPending"?: Promise<TeamRow | null>;
-        "hostRank"?: number;
-        /**
-          * @default null
-         */
-        "hostScore"?: number | null;
-        "visitorPending"?: Promise<TeamRow | null>;
-        "visitorRank"?: number;
-        /**
-          * @default null
-         */
-        "visitorScore"?: number | null;
     }
     interface MadRoute {
         "component"?: string;
@@ -360,9 +313,6 @@ declare namespace LocalJSX {
     }
     interface PageConfig {
     }
-    interface PageMatch {
-        "tournamentId"?: number;
-    }
     interface PageTournament {
         "tournamentId"?: number;
     }
@@ -383,12 +333,6 @@ declare namespace LocalJSX {
         "step": number;
         "value": number;
         "readonly": boolean;
-    }
-    interface MadMatchTileAttributes {
-        "hostScore": number | null;
-        "visitorScore": number | null;
-        "hostRank": number;
-        "visitorRank": number;
     }
     interface MadRouteAttributes {
         "url": string;
@@ -418,9 +362,6 @@ declare namespace LocalJSX {
         "reverse": boolean | null;
         "rank": number;
     }
-    interface PageMatchAttributes {
-        "tournamentId": number;
-    }
     interface PageTournamentAttributes {
         "tournamentId": number;
     }
@@ -430,14 +371,12 @@ declare namespace LocalJSX {
         "grid-basket": Omit<GridBasket, keyof GridBasketAttributes> & { [K in keyof GridBasket & keyof GridBasketAttributes]?: GridBasket[K] } & { [K in keyof GridBasket & keyof GridBasketAttributes as `attr:${K}`]?: GridBasketAttributes[K] } & { [K in keyof GridBasket & keyof GridBasketAttributes as `prop:${K}`]?: GridBasket[K] };
         "grid-default": Omit<GridDefault, keyof GridDefaultAttributes> & { [K in keyof GridDefault & keyof GridDefaultAttributes]?: GridDefault[K] } & { [K in keyof GridDefault & keyof GridDefaultAttributes as `attr:${K}`]?: GridDefaultAttributes[K] } & { [K in keyof GridDefault & keyof GridDefaultAttributes as `prop:${K}`]?: GridDefault[K] };
         "mad-input-number": Omit<MadInputNumber, keyof MadInputNumberAttributes> & { [K in keyof MadInputNumber & keyof MadInputNumberAttributes]?: MadInputNumber[K] } & { [K in keyof MadInputNumber & keyof MadInputNumberAttributes as `attr:${K}`]?: MadInputNumberAttributes[K] } & { [K in keyof MadInputNumber & keyof MadInputNumberAttributes as `prop:${K}`]?: MadInputNumber[K] };
-        "mad-match-tile": Omit<MadMatchTile, keyof MadMatchTileAttributes> & { [K in keyof MadMatchTile & keyof MadMatchTileAttributes]?: MadMatchTile[K] } & { [K in keyof MadMatchTile & keyof MadMatchTileAttributes as `attr:${K}`]?: MadMatchTileAttributes[K] } & { [K in keyof MadMatchTile & keyof MadMatchTileAttributes as `prop:${K}`]?: MadMatchTile[K] };
         "mad-route": Omit<MadRoute, keyof MadRouteAttributes> & { [K in keyof MadRoute & keyof MadRouteAttributes]?: MadRoute[K] } & { [K in keyof MadRoute & keyof MadRouteAttributes as `attr:${K}`]?: MadRouteAttributes[K] } & { [K in keyof MadRoute & keyof MadRouteAttributes as `prop:${K}`]?: MadRoute[K] };
         "mad-scorer-basket": Omit<MadScorerBasket, keyof MadScorerBasketAttributes> & { [K in keyof MadScorerBasket & keyof MadScorerBasketAttributes]?: MadScorerBasket[K] } & { [K in keyof MadScorerBasket & keyof MadScorerBasketAttributes as `attr:${K}`]?: MadScorerBasketAttributes[K] } & { [K in keyof MadScorerBasket & keyof MadScorerBasketAttributes as `prop:${K}`]?: MadScorerBasket[K] };
         "mad-scorer-common": Omit<MadScorerCommon, keyof MadScorerCommonAttributes> & { [K in keyof MadScorerCommon & keyof MadScorerCommonAttributes]?: MadScorerCommon[K] } & { [K in keyof MadScorerCommon & keyof MadScorerCommonAttributes as `attr:${K}`]?: MadScorerCommonAttributes[K] } & { [K in keyof MadScorerCommon & keyof MadScorerCommonAttributes as `prop:${K}`]?: MadScorerCommon[K] };
         "mad-scorer-rugby": Omit<MadScorerRugby, keyof MadScorerRugbyAttributes> & { [K in keyof MadScorerRugby & keyof MadScorerRugbyAttributes]?: MadScorerRugby[K] } & { [K in keyof MadScorerRugby & keyof MadScorerRugbyAttributes as `attr:${K}`]?: MadScorerRugbyAttributes[K] } & { [K in keyof MadScorerRugby & keyof MadScorerRugbyAttributes as `prop:${K}`]?: MadScorerRugby[K] };
         "mad-team-tile": Omit<MadTeamTile, keyof MadTeamTileAttributes> & { [K in keyof MadTeamTile & keyof MadTeamTileAttributes]?: MadTeamTile[K] } & { [K in keyof MadTeamTile & keyof MadTeamTileAttributes as `attr:${K}`]?: MadTeamTileAttributes[K] } & { [K in keyof MadTeamTile & keyof MadTeamTileAttributes as `prop:${K}`]?: MadTeamTile[K] };
         "page-config": PageConfig;
-        "page-match": Omit<PageMatch, keyof PageMatchAttributes> & { [K in keyof PageMatch & keyof PageMatchAttributes]?: PageMatch[K] } & { [K in keyof PageMatch & keyof PageMatchAttributes as `attr:${K}`]?: PageMatchAttributes[K] } & { [K in keyof PageMatch & keyof PageMatchAttributes as `prop:${K}`]?: PageMatch[K] };
         "page-tournament": Omit<PageTournament, keyof PageTournamentAttributes> & { [K in keyof PageTournament & keyof PageTournamentAttributes]?: PageTournament[K] } & { [K in keyof PageTournament & keyof PageTournamentAttributes as `attr:${K}`]?: PageTournamentAttributes[K] } & { [K in keyof PageTournament & keyof PageTournamentAttributes as `prop:${K}`]?: PageTournament[K] };
         "page-tournament-select": PageTournamentSelect;
     }
@@ -450,14 +389,12 @@ declare module "@stencil/core" {
             "grid-basket": LocalJSX.IntrinsicElements["grid-basket"] & JSXBase.HTMLAttributes<HTMLGridBasketElement>;
             "grid-default": LocalJSX.IntrinsicElements["grid-default"] & JSXBase.HTMLAttributes<HTMLGridDefaultElement>;
             "mad-input-number": LocalJSX.IntrinsicElements["mad-input-number"] & JSXBase.HTMLAttributes<HTMLMadInputNumberElement>;
-            "mad-match-tile": LocalJSX.IntrinsicElements["mad-match-tile"] & JSXBase.HTMLAttributes<HTMLMadMatchTileElement>;
             "mad-route": LocalJSX.IntrinsicElements["mad-route"] & JSXBase.HTMLAttributes<HTMLMadRouteElement>;
             "mad-scorer-basket": LocalJSX.IntrinsicElements["mad-scorer-basket"] & JSXBase.HTMLAttributes<HTMLMadScorerBasketElement>;
             "mad-scorer-common": LocalJSX.IntrinsicElements["mad-scorer-common"] & JSXBase.HTMLAttributes<HTMLMadScorerCommonElement>;
             "mad-scorer-rugby": LocalJSX.IntrinsicElements["mad-scorer-rugby"] & JSXBase.HTMLAttributes<HTMLMadScorerRugbyElement>;
             "mad-team-tile": LocalJSX.IntrinsicElements["mad-team-tile"] & JSXBase.HTMLAttributes<HTMLMadTeamTileElement>;
             "page-config": LocalJSX.IntrinsicElements["page-config"] & JSXBase.HTMLAttributes<HTMLPageConfigElement>;
-            "page-match": LocalJSX.IntrinsicElements["page-match"] & JSXBase.HTMLAttributes<HTMLPageMatchElement>;
             "page-tournament": LocalJSX.IntrinsicElements["page-tournament"] & JSXBase.HTMLAttributes<HTMLPageTournamentElement>;
             "page-tournament-select": LocalJSX.IntrinsicElements["page-tournament-select"] & JSXBase.HTMLAttributes<HTMLPageTournamentSelectElement>;
         }

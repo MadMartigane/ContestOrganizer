@@ -11,3 +11,5 @@ import "./components/page-home/page-home";
 import "./components/page-404/page-404";
 import "./components/error-message/error-message";
 import "./components/select-team/select-team";
+import "./components/page-match/page-match";
+import "./components/match-tile/match-tile";

@@ -6,10 +6,14 @@
     "experimentalDecorators": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
-    "lib": ["dom", "es2015"],
+    "lib": ["dom", "es2023"],
     "moduleResolution": "node",
-    "module": "ES2015",
-    "target": "ES2015",
+    "baseUrl": ".",
+    "paths": {
+      "@core/*": ["./src/core/*"]
+    },
+    "module": "ES2020",
+    "target": "ES2023",
     "downlevelIteration": true,
     "types": ["vite/client", "jest"],
     "noUnusedLocals": true,
