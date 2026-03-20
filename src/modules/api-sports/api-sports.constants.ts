@@ -4,13 +4,11 @@
  */
 const getEnvVar = (): string => {
   try {
-    // Check for import.meta.env (Vite/Stencil with replace)
-    if (
-      typeof import.meta !== "undefined" &&
-      import.meta.env &&
-      import.meta.env.VITE_API_SPORTS_KEY
-    ) {
-      return import.meta.env.VITE_API_SPORTS_KEY;
+    // Vite statically replaces import.meta.env.VITE_* in production
+    // In dev, import.meta.env exists; in prod, only the specific property access is replaced
+    const viteKey = import.meta.env.VITE_API_SPORTS_KEY;
+    if (viteKey) {
+      return viteKey;
     }
     // Check for process.env (Node/Tests)
     if (
@@ -21,7 +19,7 @@ const getEnvVar = (): string => {
       return process.env.VITE_API_SPORTS_KEY;
     }
   } catch {
-    // Fallback if process or import.meta is not defined
+    // Fallback if access fails
   }
 
   return "";
