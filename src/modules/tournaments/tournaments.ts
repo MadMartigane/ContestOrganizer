@@ -447,8 +447,14 @@ export class Tournaments {
     );
   }
 
-  onUpdate(callback: (num?: number) => void) {
+  onUpdate(callback: (num?: number) => void): () => void {
     this.callbackCollector.push(callback);
+    return () => {
+      const index = this.callbackCollector.indexOf(callback);
+      if (index > -1) {
+        this.callbackCollector.splice(index, 1);
+      }
+    };
   }
 
   getTournamentTypeLabel(type: TournamentType): string {

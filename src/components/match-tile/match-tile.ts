@@ -19,6 +19,7 @@ export class MatchTile extends BaseElement {
   private declare _hostSignal: Signal<TeamRow | null>;
   private declare _visitorSignal: Signal<TeamRow | null>;
   private _fetchPending = false;
+  private _tournamentUpdateHandler: (() => void) | null = null;
 
   static get observedAttributes(): string[] {
     return [
@@ -94,6 +95,17 @@ export class MatchTile extends BaseElement {
   connectedCallback(): void {
     super.connectedCallback();
     this._fetchTeamsFromAttributes();
+
+    // Subscribe to tournament updates to refresh team data when teams change
+    this._tournamentUpdateHandler = () => {
+      this._fetchTeamsFromAttributes();
+    };
+    tournaments.onUpdate(this._tournamentUpdateHandler);
+  }
+
+  disconnectedCallback(): void {
+    this._tournamentUpdateHandler = null;
+    super.disconnectedCallback();
   }
 
   private async _fetchTeam(
