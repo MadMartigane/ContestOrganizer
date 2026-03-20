@@ -541,11 +541,6 @@ export class SelectTeam extends BaseElement {
       }
     }
 
-    // Update search input disabled state
-    if (this.domInputSearch) {
-      this.domInputSearch.disabled = this._isLoading.value;
-    }
-
     // Update results container
     if (this.domResultsContainer) {
       this.domResultsContainer.innerHTML = `
