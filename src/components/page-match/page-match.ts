@@ -47,11 +47,7 @@ export class PageMatch extends BaseElement {
   private declare _matchNumber: Signal<number>;
   private declare _currentMatch: Signal<Match | null>;
 
-  private declare _scrollNavVisible: Signal<boolean>;
   private declare _matchRefs: Signal<HTMLElement[]>;
-
-  // Scroll threshold
-  private _scrollThreshold = 0;
 
   // DOM references
   private readonly matchRefs: Map<number, HTMLElement> = new Map();
@@ -127,7 +123,6 @@ export class PageMatch extends BaseElement {
     this._teamToSelect = new Signal<Row[] | null>(null);
     this._matchNumber = new Signal<number>(0);
     this._currentMatch = new Signal<Match | null>(null);
-    this._scrollNavVisible = new Signal<boolean>(false);
     this._matchRefs = new Signal<HTMLElement[]>([]);
 
     // Initialize from attributes
@@ -141,7 +136,6 @@ export class PageMatch extends BaseElement {
     this._trackSignal(this._teamToSelect);
     this._trackSignal(this._matchNumber);
     this._trackSignal(this._currentMatch);
-    this._trackSignal(this._scrollNavVisible);
     this._trackSignal(this._matchRefs);
 
     // Initialize tournaments
@@ -504,8 +498,6 @@ export class PageMatch extends BaseElement {
    * Setup scroll navigation
    */
   private _setupScrollNavigation(): void {
-    // Calculate threshold: 1.5x viewport height
-    this._scrollThreshold = window.innerHeight * 1.5;
     window.addEventListener("scroll", this._handleScroll, { passive: true });
   }
 
@@ -514,10 +506,16 @@ export class PageMatch extends BaseElement {
    */
   private readonly _handleScroll = (): void => {
     const scrollY = window.scrollY;
-    const shouldShow = scrollY > this._scrollThreshold;
+    const hasTargetMatch = this.targetMatchIndex !== null;
+    const reducedThreshold = window.innerHeight * 0.75;
+    const shouldShow = hasTargetMatch
+      ? scrollY > 0
+      : scrollY > reducedThreshold;
 
-    if (shouldShow !== this._scrollNavVisible.value) {
-      this._scrollNavVisible.value = shouldShow;
+    // Direct DOM manipulation - bypass Signal for performance
+    const scrollNav = this.querySelector(".scroll-nav");
+    if (scrollNav) {
+      scrollNav.classList.toggle("visible", shouldShow);
     }
   };
 
@@ -548,10 +546,10 @@ export class PageMatch extends BaseElement {
   /**
    * Scroll to current match
    */
-  private _scrollToCurrentMatch(): void {
+  private readonly _scrollToCurrentMatch = (): void => {
     // Reuse existing autoScrollToMatch logic
     this._autoScrollToMatch();
-  }
+  };
 
   /**
    * Render action buttons for a match
@@ -972,13 +970,14 @@ export class PageMatch extends BaseElement {
   private _renderScrollNavigation(): string {
     const hasTargetMatch =
       calculateTargetMatchIndex(this._tournament.value) !== null;
-    const isVisible = this._scrollNavVisible.value;
+    // Visibility is controlled by scroll handler via direct DOM manipulation
+    // Initial state is hidden (no 'visible' class)
 
     return `
-    <div class="scroll-nav ${isVisible ? "visible" : ""}"
+    <div class="scroll-nav"
          role="navigation"
          aria-label="Raccourcis de navigation">
-      <sl-button-group label="Navigation rapide">
+      <div class="scroll-nav-buttons">
         <sl-tooltip content="Aller en haut (Alt+T)" placement="left">
           <sl-button size="medium"
                      variant="default"
@@ -1006,7 +1005,7 @@ export class PageMatch extends BaseElement {
             <sl-icon name="chevron-down" aria-hidden="true"></sl-icon>
           </sl-button>
         </sl-tooltip>
-      </sl-button-group>
+      </div>
     </div>
     <div class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
   `;
@@ -1052,6 +1051,16 @@ export class PageMatch extends BaseElement {
         .scroll-nav sl-button:focus-visible {
           outline: 2px solid var(--sl-color-primary-600);
           outline-offset: 2px;
+        }
+
+        .scroll-nav-buttons {
+          display: flex;
+          flex-direction: column;
+          gap: var(--sl-spacing-2x-small);
+        }
+
+        .scroll-nav-buttons sl-button {
+          width: 100%;
         }
 
         .sr-only {
