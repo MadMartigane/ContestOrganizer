@@ -63,6 +63,13 @@ if ! pnpm run build; then
 fi
 print_success "Build completed."
 
+# Step 1b: Generate config for production
+if [ "$ENV" == "prod" ]; then
+    print_step "Generating production config..."
+    echo "window.APP_CONFIG = { API_SPORTS_KEY: '${PROD_API_SPORTS_KEY}' };" > www/config.js
+    print_success "Production config generated."
+fi
+
 # Step 2: Backup existing API data if exists
 print_step "Backing up existing API data..."
 if [ -d "$TARGET_PATH/api/data" ]; then

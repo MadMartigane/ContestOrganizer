@@ -1,7 +1,29 @@
 import path from "node:path";
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
+
+function serveConfigPlugin() {
+  return {
+    name: "serve-config",
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        if (req.url?.split("?")[0] !== "/config.js") {
+          return next();
+        }
+
+        const env = loadEnv(server.config.mode, process.cwd(), "");
+        const configStr = JSON.stringify({
+          API_SPORTS_KEY: env.VITE_API_SPORTS_KEY,
+        });
+
+        res.setHeader("Content-Type", "application/javascript");
+        res.end(`window.APP_CONFIG = ${configStr};`);
+      });
+    },
+  };
+}
 
 const config = defineConfig({
+  plugins: [serveConfigPlugin()],
   root: "src",
   // envDir is resolved from the vite.config.ts LOCATION, NOT from root.
   // "." means project root where vite.config.ts lives.

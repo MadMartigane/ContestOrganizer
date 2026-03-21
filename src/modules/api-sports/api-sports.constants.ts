@@ -13,4 +13,25 @@ export const URLS = {
   FOOT: "https://v3.football.api-sports.io/",
 };
 
-export const API_SPORTS_KEY = import.meta.env.VITE_API_SPORTS_KEY ?? "";
+interface AppConfig {
+  API_SPORTS_KEY?: string;
+}
+
+declare global {
+  interface Window {
+    APP_CONFIG?: AppConfig;
+  }
+}
+
+const getApiKey = (): string => {
+  const apiKey = window.APP_CONFIG?.API_SPORTS_KEY;
+
+  if (!apiKey) {
+    console.warn("[API-SPORTS] API_SPORTS_KEY is missing in window.APP_CONFIG");
+    return "";
+  }
+
+  return apiKey;
+};
+
+export const API_SPORTS_KEY = getApiKey();
