@@ -1,9 +1,27 @@
 import path from "node:path";
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
+
+// Validate required env vars at build time
+const envValidationPlugin = {
+  name: "validate-env",
+  buildStart() {
+    const env = loadEnv(".", process.cwd(), "");
+    if (!env.VITE_API_SPORTS_KEY) {
+      throw new Error(
+        "[vite] VITE_API_SPORTS_KEY is not set in .env file. Build aborted."
+      );
+    }
+  },
+};
 
 const config = defineConfig({
   root: "src",
-  envDir: "../", // Serve from src/
+  // envDir is resolved from the vite.config.ts LOCATION, NOT from root.
+  // "." means project root where vite.config.ts lives.
+  // ".env" file must exist here with VITE_API_SPORTS_KEY defined.
+  envDir: ".",
+
+  plugins: [envValidationPlugin],
   publicDir: "../www", // Serve www/ at root (relative to src/)
 
   build: {
