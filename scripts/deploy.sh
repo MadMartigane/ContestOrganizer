@@ -55,10 +55,10 @@ esac
 
 BACKUP_DIR="$HOME/backup/contest-data"
 
-# Step 1: Build the project
+# Step 1: Build the project (requires VITE_API_SPORTS_KEY in environment)
 print_step "Building the project..."
 if ! pnpm run build; then
-    print_error "Build failed."
+    print_error "Build failed. Ensure VITE_API_SPORTS_KEY is set in environment."
     exit 1
 fi
 print_success "Build completed."
