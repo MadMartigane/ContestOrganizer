@@ -71,7 +71,7 @@ export class MadScorerBasket {
     return (
       <Host>
         {this.readonly ? null : (
-          <div class="my-4 grid grid-rows-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div class="my-4 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
             <sl-button
               onclick={() => {
                 this.onIncrementNumber(2);

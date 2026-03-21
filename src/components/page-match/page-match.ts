@@ -420,7 +420,7 @@ export class PageMatch extends BaseElement {
       return;
     }
 
-    actionsContainer.innerHTML = this.renderActionButtons(match);
+    actionsContainer.innerHTML = this.renderActionButtonsContent(match);
 
     // Re-attach event listeners for new buttons
     const playBtn = actionsContainer.querySelector(".play-btn");
@@ -703,35 +703,44 @@ export class PageMatch extends BaseElement {
   };
 
   /**
+   * Render action buttons content (buttons only, no wrapper div)
+   */
+  private renderActionButtonsContent(match: Match): string {
+    const isDoing = match.status === MatchStatus.DOING;
+    return `
+      <sl-button
+        class="delete-btn w-full"
+        data-match-id="${match.id || ""}"
+        role="button"
+        size="large"
+        variant="warning"
+      >
+        <sl-icon name="trash"></sl-icon>
+      </sl-button>
+
+      ${
+        isDoing
+          ? `<sl-button class="stop-btn w-full" data-match-id="${
+              match.id || ""
+            }" role="button" size="large" variant="primary">
+          <sl-icon name="stop-circle"></sl-icon>
+        </sl-button>`
+          : `<sl-button class="play-btn w-full" data-match-id="${
+              match.id || ""
+            }" role="button" size="large" variant="primary">
+          <sl-icon name="play-circle"></sl-icon>
+        </sl-button>`
+      }
+    `;
+  }
+
+  /**
    * Render action buttons for a match
    */
   private renderActionButtons(match: Match): string {
-    const isDoing = match.status === MatchStatus.DOING;
     return `
       <div class="flex justify-center gap-8 py-4">
-        <sl-button
-          class="delete-btn w-full"
-          data-match-id="${match.id || ""}"
-          role="button"
-          size="large"
-          variant="warning"
-        >
-          <sl-icon name="trash"></sl-icon>
-        </sl-button>
-
-        ${
-          isDoing
-            ? `<sl-button class="stop-btn w-full" data-match-id="${
-                match.id || ""
-              }" role="button" size="large" variant="primary">
-            <sl-icon name="stop-circle"></sl-icon>
-          </sl-button>`
-            : `<sl-button class="play-btn w-full" data-match-id="${
-                match.id || ""
-              }" role="button" size="large" variant="primary">
-            <sl-icon name="play-circle"></sl-icon>
-          </sl-button>`
-        }
+        ${this.renderActionButtonsContent(match)}
       </div>
     `;
   }
