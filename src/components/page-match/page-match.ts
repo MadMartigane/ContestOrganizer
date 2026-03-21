@@ -1,5 +1,6 @@
 import { BaseElement } from "@core/base-element.js";
 import { Signal } from "@core/signal.js";
+import { getTournaments } from "../../modules/init";
 import Matchs, {
   Match,
   MatchStatus,
@@ -11,9 +12,7 @@ import {
   getNBAMissingMatchCount,
   validateNBAScheduleGeneration,
 } from "../../modules/nba/nba.scheduler";
-import tournaments, {
-  Tournaments,
-} from "../../modules/tournaments/tournaments";
+import { Tournaments } from "../../modules/tournaments/tournaments";
 import type { Tournament } from "../../modules/tournaments/tournaments.types";
 import {
   TournamentType,
@@ -187,7 +186,8 @@ export class PageMatch extends BaseElement {
    * Initialize tournaments
    */
   private async initTournaments(): Promise<number> {
-    const tournament = await tournaments.get(this._tournamentId);
+    // Migration: Using getTournaments() to get singleton instance shared between Stencil and Vanilla bundles
+    const tournament = await getTournaments().get(this._tournamentId);
 
     if (!tournament) {
       this._uiError.value = `Tournois #${this._tournamentId} non trouvé.`;
@@ -210,7 +210,7 @@ export class PageMatch extends BaseElement {
       return Promise.resolve(0);
     }
 
-    return tournaments.update(tournament);
+    return getTournaments().update(tournament);
   }
 
   /**
@@ -314,6 +314,149 @@ export class PageMatch extends BaseElement {
     if (matchTile) {
       matchTile.setAttribute("host-score", String(match.goals.host));
       matchTile.setAttribute("visitor-score", String(match.goals.visitor));
+    }
+  }
+
+  /**
+   * Update only the match status (badge, buttons, scorer state) without full re-render.
+   * Follows the same incremental update pattern as updateMatchScore().
+   */
+  private updateMatchStatus(index: number, match: Match): void {
+    const matchItem = this.querySelector(
+      `.match-item[data-match-index="${index}"]`
+    );
+    if (!matchItem) {
+      return;
+    }
+
+    this.updateMatchStatusBadge(matchItem, match);
+    this.updateMatchActionButtons(matchItem, match);
+    this.updateMatchScorerState(matchItem, match);
+  }
+
+  /**
+   * Update status badge content and variant for a match item
+   */
+  private updateMatchStatusBadge(matchItem: Element, match: Match): void {
+    const statusBadge = matchItem.querySelector("sl-tag");
+    if (!statusBadge) {
+      return;
+    }
+
+    const textSpan = statusBadge.querySelector("span.container");
+    if (!textSpan) {
+      return;
+    }
+
+    if (match.status === MatchStatus.PENDING) {
+      statusBadge.setAttribute("variant", "primary");
+      textSpan.textContent = "Match programmé";
+      this.replaceStatusIconWithIcon(statusBadge, "calendar-check");
+    } else if (match.status === MatchStatus.DOING) {
+      statusBadge.setAttribute("variant", "success");
+      textSpan.textContent = "Match en cours";
+      this.replaceStatusIconWithSpinner(statusBadge);
+    } else if (match.status === MatchStatus.DONE) {
+      statusBadge.setAttribute("variant", "warning");
+      textSpan.textContent = "Match terminé";
+      this.replaceStatusSpinnerWithIcon(statusBadge);
+    }
+  }
+
+  /**
+   * Replace status icon (used for PENDING state) with spinner (for DOING state)
+   */
+  private replaceStatusIconWithIcon(
+    statusBadge: Element,
+    iconName: string
+  ): void {
+    const existingSpinner = statusBadge.querySelector("sl-spinner");
+    if (existingSpinner) {
+      const icon = document.createElement("sl-icon");
+      icon.classList.add("text-3xl", "text-warning");
+      icon.setAttribute("name", iconName);
+      existingSpinner.replaceWith(icon);
+    } else {
+      const existingIcon = statusBadge.querySelector("sl-icon");
+      if (existingIcon) {
+        existingIcon.setAttribute("name", iconName);
+      }
+    }
+  }
+
+  /**
+   * Replace status icon with spinner for active match
+   */
+  private replaceStatusIconWithSpinner(statusBadge: Element): void {
+    const icon = statusBadge.querySelector("sl-icon");
+    if (icon) {
+      const spinner = document.createElement("sl-spinner");
+      spinner.classList.add("text-2xl");
+      icon.replaceWith(spinner);
+    }
+  }
+
+  /**
+   * Replace status spinner with icon for completed match
+   */
+  private replaceStatusSpinnerWithIcon(statusBadge: Element): void {
+    const spinner = statusBadge.querySelector("sl-spinner");
+    if (spinner) {
+      const icon = document.createElement("sl-icon");
+      icon.classList.add("text-3xl", "text-warning");
+      icon.setAttribute("name", "check2-square");
+      spinner.replaceWith(icon);
+    }
+  }
+
+  /**
+   * Update action buttons for a match item
+   */
+  private updateMatchActionButtons(matchItem: Element, match: Match): void {
+    const actionsContainer = matchItem.querySelector(
+      ".flex.justify-center.gap-8.py-4"
+    );
+    if (!actionsContainer) {
+      return;
+    }
+
+    actionsContainer.innerHTML = this.renderActionButtons(match);
+
+    // Re-attach event listeners for new buttons
+    const playBtn = actionsContainer.querySelector(".play-btn");
+    const stopBtn = actionsContainer.querySelector(".stop-btn");
+
+    playBtn?.addEventListener("click", () => {
+      const matchId = (playBtn as HTMLElement).dataset.matchId;
+      const tournament = this._tournament.value;
+      const m = tournament?.matchs?.find((m) => m.id === Number(matchId));
+      if (m) {
+        this.playMatch(m);
+      }
+    });
+
+    stopBtn?.addEventListener("click", () => {
+      const matchId = (stopBtn as HTMLElement).dataset.matchId;
+      const tournament = this._tournament.value;
+      const m = tournament?.matchs?.find((m) => m.id === Number(matchId));
+      if (m) {
+        this.stopMatch(m);
+      }
+    });
+  }
+
+  /**
+   * Update scorer readonly state based on match status
+   */
+  private updateMatchScorerState(matchItem: Element, match: Match): void {
+    const isDoing = match.status === MatchStatus.DOING;
+    const scorers = matchItem.querySelectorAll(".host-scorer, .visitor-scorer");
+    for (const scorer of Array.from(scorers)) {
+      if (isDoing) {
+        scorer.removeAttribute("readonly");
+      } else {
+        scorer.setAttribute("readonly", "");
+      }
     }
   }
 
@@ -459,7 +602,11 @@ export class PageMatch extends BaseElement {
   private async playMatch(match: Match): Promise<void> {
     match.status = MatchStatus.DOING;
     await this.updateTournament();
-    this.refreshUI();
+    const matchIndex =
+      this._tournament.value?.matchs?.findIndex((m) => m.id === match.id) ?? -1;
+    if (matchIndex >= 0) {
+      this.updateMatchStatus(matchIndex, match);
+    }
   }
 
   /**
@@ -468,7 +615,11 @@ export class PageMatch extends BaseElement {
   private async stopMatch(match: Match): Promise<void> {
     match.status = MatchStatus.DONE;
     await this.updateTournament();
-    this.refreshUI();
+    const matchIndex =
+      this._tournament.value?.matchs?.findIndex((m) => m.id === match.id) ?? -1;
+    if (matchIndex >= 0) {
+      this.updateMatchStatus(matchIndex, match);
+    }
   }
 
   /**

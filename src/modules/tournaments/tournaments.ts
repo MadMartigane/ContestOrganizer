@@ -1,3 +1,14 @@
+/**
+ * MIGRATION NOTE:
+ * This module exports the Tournaments CLASS, not a singleton instance.
+ *
+ * During Stencil→Vanilla migration, both bundles were creating separate instances
+ * at module load time, causing state synchronization issues.
+ *
+ * Use `getTournaments()` from `./init` instead of importing this directly.
+ * This file will become the simple singleton export again when migration completes.
+ */
+
 import { HttpRequest } from "../http-request/http-request";
 import type { Match } from "../matchs/matchs";
 import { MatchStatus } from "../matchs/matchs";
@@ -491,5 +502,5 @@ export class Tournaments {
   }
 }
 
-const tournaments = new Tournaments();
-export default tournaments;
+// No singleton at module level - use getTournaments() from ../init instead
+export default Tournaments;

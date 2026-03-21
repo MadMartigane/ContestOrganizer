@@ -1,8 +1,8 @@
 import { BaseElement } from "../../core/base-element.js";
 import { Signal } from "../../core/signal.js";
+import { getTournaments } from "../../modules/init.js";
 import type { GenericTeam } from "../../modules/team-row/team-row.d.js";
 import type TeamRow from "../../modules/team-row/team-row.js";
-import tournaments from "../../modules/tournaments/tournaments.js";
 import type { Tournament } from "../../modules/tournaments/tournaments.types.js";
 
 interface MadTeamTileElement extends HTMLElement {
@@ -100,7 +100,8 @@ export class MatchTile extends BaseElement {
     this._tournamentUpdateHandler = () => {
       this._fetchTeamsFromAttributes();
     };
-    tournaments.onUpdate(this._tournamentUpdateHandler);
+    // Migration: Using getTournaments() to get singleton instance shared between Stencil and Vanilla bundles
+    getTournaments().onUpdate(this._tournamentUpdateHandler);
   }
 
   disconnectedCallback(): void {
@@ -128,12 +129,13 @@ export class MatchTile extends BaseElement {
     }
 
     const tid = Number.parseInt(tournamentId, 10);
-    const tournament = await tournaments.get(tid);
+    // Migration: Using getTournaments() to get singleton instance shared between Stencil and Vanilla bundles
+    const tournament = await getTournaments().get(tid);
     if (!tournament) {
       return;
     }
 
-    const team = await tournaments.getTournamentTeam(
+    const team = await getTournaments().getTournamentTeam(
       tournament as Tournament,
       teamId
     );

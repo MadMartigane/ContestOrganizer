@@ -8,7 +8,7 @@ import {
   State,
 } from "@stencil/core";
 import type { GridTeamOnUpdateDetail } from "../../modules/grid-common/grid-common.types";
-import tournaments from "../../modules/tournaments/tournaments";
+import { getTournaments } from "../../modules/init";
 import type {
   Tournament,
   TournamentUpdateEvent,
@@ -20,7 +20,8 @@ import type {
   shadow: false,
 })
 export class GridDefault {
-  private readonly tournaments: typeof tournaments;
+  // Migration: Using getTournaments() to get singleton instance shared between Stencil and Vanilla bundles
+  private readonly tournaments = getTournaments();
 
   @State() private tournament: Tournament | null;
 
@@ -29,7 +30,7 @@ export class GridDefault {
   @Event() gridTournamentChange: EventEmitter<TournamentUpdateEvent>;
 
   constructor() {
-    this.tournaments = tournaments;
+    // Migration: tournaments instance is now obtained via field initializer (getTournaments)
 
     this.forceGridRender();
     this.tournaments.onUpdate(() => this.onExternalTournamentUpdate());

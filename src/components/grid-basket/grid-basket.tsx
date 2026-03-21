@@ -9,9 +9,9 @@ import {
 } from "@stencil/core";
 import Basket from "../../modules/data-basket/data-basket";
 import type { GridTeamOnUpdateDetail } from "../../modules/grid-common/grid-common.types";
+import { getTournaments } from "../../modules/init";
 import TeamRow from "../../modules/team-row/team-row";
 import theSportsDbService from "../../modules/thesportsdb/thesportsdb.service";
-import tournaments from "../../modules/tournaments/tournaments";
 import type {
   Tournament,
   TournamentType,
@@ -26,7 +26,8 @@ import "../action-bar/action-bar"; // Register custom element
   shadow: false,
 })
 export class GridBasket {
-  private readonly tournaments: typeof tournaments;
+  // Migration: Using getTournaments() to get singleton instance shared between Stencil and Vanilla bundles
+  private readonly tournaments = getTournaments();
 
   @State() private tournament: Tournament | null;
 
@@ -42,7 +43,7 @@ export class GridBasket {
     this.tournament = null;
     this.tournamentId = null;
 
-    this.tournaments = tournaments;
+    // Migration: tournaments instance is now obtained via field initializer (getTournaments)
 
     this.forceGridRender();
     this.tournaments.onUpdate(() => this.onExternalTournamentUpdate());

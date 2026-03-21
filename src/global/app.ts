@@ -1,3 +1,10 @@
+/*
+ * TEMPORARY MIGRATION: Initialize the shared Tournaments singleton for the Stencil bundle.
+ * This ensures both Stencil and Vanilla bundles use the same instance via window.__tournaments.
+ * This initialization runs at global script load time before any component code executes.
+ */
+import { getTournaments } from "../modules/init";
+
 /* ########### SHOELACE IMPORT ############### */
 
 import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path.js";
@@ -40,6 +47,10 @@ import setting from "../modules/global-setting/global-setting";
  * exported by the global script. Ensure all of the code in the global script
  * is wrapped in the function() that is exported.
  */
+
+// Initialize the shared Tournaments singleton for the Stencil bundle.
+// This ensures both Stencil and Vanilla bundles use the same instance.
+getTournaments();
 
 export default () => {
   setting.init();

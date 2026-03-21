@@ -1,10 +1,9 @@
 import type SlInput from "@shoelace-style/shoelace/dist/components/input/input.component";
 import { Component, Host, h, Prop, State } from "@stencil/core";
 import type { GenericTeam } from "../../components.d";
+import { getTournaments } from "../../modules/init";
 import { TeamRow } from "../../modules/team-row/team-row";
-import tournaments, {
-  Tournaments,
-} from "../../modules/tournaments/tournaments";
+import { Tournaments } from "../../modules/tournaments/tournaments";
 import {
   type Tournament,
   TournamentType,
@@ -28,7 +27,8 @@ export interface PageConfConstants {
   shadow: false,
 })
 export class PageTournament {
-  private readonly tournaments: typeof tournaments;
+  // Migration: Using getTournaments() to get singleton instance shared between Stencil and Vanilla bundles
+  private readonly tournaments = getTournaments();
   private readonly conf: PageConfConstants;
   private readonly basketGridCompliants: TournamentType[] = [
     TournamentType.NBA,
@@ -58,7 +58,7 @@ export class PageTournament {
       pointMin: 0,
       inputDebounce: 300,
     };
-    this.tournaments = tournaments;
+    // Migration: tournaments instance is now obtained via field initializer (getTournaments)
 
     this.uiError = null;
     this.isEditTournamentName = false;
@@ -76,25 +76,40 @@ export class PageTournament {
 
     this.teamNumber =
       this.tournament.grid.length || this.conf.teamNumberDefault;
-    return this.updateTournament();
+    return this.resizeGrid();
   }
 
   private onTeamNumberChange(detail?: { value: string }): void {
     this.teamNumber = Number(detail?.value || this.conf.teamNumberDefault);
-    this.updateTournament();
+    this.resizeGrid();
   }
 
   private getVirginTeamRow(type: TournamentType): TeamRow {
     return new TeamRow({ type });
   }
 
-  private async updateTournament(tournamentId?: number): Promise<number> {
-    if (tournamentId) {
-      this.tournament = await this.tournaments.get(tournamentId);
+  /**
+   * Refreshes tournament state from an external source (e.g., gridTournamentChange event from Magic fill-up).
+   * Fetches the latest tournament data from store and updates local state.
+   * Does NOT persist to store - this is a read-only refresh operation.
+   */
+  private async refreshTournament(tournamentId: number): Promise<void> {
+    const tournament = await this.tournaments.get(tournamentId);
+    if (!tournament) {
+      return;
     }
 
+    this.tournament = tournament;
+    this.teamNumber = tournament.grid.length;
+  }
+
+  /**
+   * Resizes the tournament grid based on current teamNumber state and persists to store.
+   * Used when user manually changes team count via UI controls.
+   */
+  private async resizeGrid(): Promise<number> {
     if (!this.tournament) {
-      return Promise.resolve(0);
+      return 0;
     }
 
     const oldGrid = this.tournament.grid;
@@ -112,20 +127,20 @@ export class PageTournament {
         oldGrid[i] || this.getVirginTeamRow(this.tournament.type);
     }
 
-    return this.tournaments.update(this.tournament);
+    return await this.tournaments.update(this.tournament);
   }
 
   onTeamTeamChange(detail: GenericTeam, team: TeamRow): void {
     team.team = detail;
 
-    this.updateTournament();
+    this.resizeGrid();
   }
 
   onTeamChange(detail: { value: string }, team: TeamRow, key: string): void {
     team.set(key, String(detail.value));
     team.goalAverage = team.scoredGoals - team.concededGoals;
 
-    this.updateTournament();
+    this.resizeGrid();
   }
 
   private goRanking(): void {
@@ -135,7 +150,7 @@ export class PageTournament {
 
     this.tournament.grid = Tournaments.sortGrid(this.tournament.grid);
 
-    this.updateTournament();
+    this.resizeGrid();
   }
 
   private resetGrid(): void {
@@ -146,7 +161,7 @@ export class PageTournament {
     this.tournament.grid = [];
     this.tournament.matchs = [];
     this.teamNumber = this.conf.teamNumberDefault;
-    this.updateTournament();
+    this.resizeGrid();
   }
 
   private async confirmResetGrid(): Promise<void> {
@@ -179,7 +194,7 @@ export class PageTournament {
     this.tournament.name = newName;
 
     this.isEditTournamentName = false;
-    this.updateTournament();
+    this.resizeGrid();
   }
 
   private goMatch(tournamentId?: number) {
@@ -207,7 +222,8 @@ export class PageTournament {
       return (
         <grid-basket
           onGridTournamentChange={(ev) => {
-            this.updateTournament(ev.detail.tournamentId);
+            ev.detail?.tournamentId &&
+              this.refreshTournament(ev.detail.tournamentId);
           }}
           tournamentId={this.tournament.id}
         />
@@ -217,7 +233,8 @@ export class PageTournament {
     return (
       <grid-default
         onGridTournamentChange={(ev) => {
-          this.updateTournament(ev.detail.tournamentId);
+          ev.detail?.tournamentId &&
+            this.refreshTournament(ev.detail.tournamentId);
         }}
         tournamentId={this.tournament.id}
       />

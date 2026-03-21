@@ -3,7 +3,7 @@ import type SlMenu from "@shoelace-style/shoelace/dist/components/menu/menu.comp
 import type SlMenuItem from "@shoelace-style/shoelace/dist/components/menu-item/menu-item.component";
 import type SlSelect from "@shoelace-style/shoelace/dist/components/select/select.component";
 import { Component, Host, h, State } from "@stencil/core";
-import tournaments from "../../modules/tournaments/tournaments";
+import { getTournaments } from "../../modules/init";
 import {
   type Tournament,
   TournamentType,
@@ -17,7 +17,8 @@ import Utils from "../../modules/utils/utils";
   shadow: false,
 })
 export class PageTournamentSelect {
-  private readonly tournaments: typeof tournaments;
+  // Migration: Using getTournaments() to get singleton instance shared between Stencil and Vanilla bundles
+  private readonly tournaments = getTournaments();
 
   private domSelect: SlSelect;
   private domTournamentList: SlMenu;
@@ -29,7 +30,7 @@ export class PageTournamentSelect {
   @State() private isNewTournamentNameReady: boolean;
 
   constructor() {
-    this.tournaments = tournaments;
+    // Migration: tournaments instance is now obtained via field initializer (getTournaments)
 
     this.uiAddingTournament = false;
 
