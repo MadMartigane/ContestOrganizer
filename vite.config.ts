@@ -1,6 +1,12 @@
 import path from "node:path";
 import { defineConfig, loadEnv } from "vite";
 
+/**
+ * @LLM-WARNING: CONFIGURATION PARITY REQUIRED
+ * This middleware simulates the production config.js generation.
+ * Any changes here MUST be mirrored in scripts/deploy.sh.
+ * Read docs/CONFIG_MANAGEMENT.md before modifying.
+ */
 function serveConfigPlugin() {
   return {
     name: "serve-config",

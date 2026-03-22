@@ -1,5 +1,17 @@
 #!/bin/bash
 
+# =====================================================================
+# @LLM-WARNING: CONFIGURATION PARITY REQUIRED
+# If you add, remove, or modify environment variables here, you MUST:
+# 1. Make the exact same change in the Vite middleware (vite.config.ts)
+# Read docs/CONFIG_MANAGEMENT.md before modifying this section.
+# =====================================================================
+
+# Load .env if it exists
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | xargs)
+fi
+
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
