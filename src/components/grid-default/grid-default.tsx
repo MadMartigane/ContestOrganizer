@@ -52,13 +52,19 @@ export class GridDefault {
     }
   }
 
-  private onTeamTeamChange(detail: GridTeamOnUpdateDetail): void {
+  private async onTeamTeamChange(
+    detail: GridTeamOnUpdateDetail
+  ): Promise<void> {
     const gridRaw = this.tournament?.grid.find(
       (grid) => grid.id === detail.tournamentGridId
     );
 
     if (gridRaw) {
       gridRaw.team = detail.genericTeam;
+    }
+
+    if (this.tournament) {
+      await this.tournaments.update(this.tournament);
     }
 
     this.updateTournament();
