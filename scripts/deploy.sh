@@ -27,12 +27,23 @@ print_error() {
 }
 
 # Check argument
-if [ $# -ne 1 ]; then
-    print_error "Usage: $0 {prod|pre-prod|backup}"
+if [[ "$1" != "prod" && "$1" != "pre-prod" ]]; then
+    print_error "Usage: $0 {prod|pre-prod}"
     exit 1
 fi
 
 ENV=$1
+
+# Define REQUIRED_KEYS
+REQUIRED_KEYS=("VITE_API_SPORTS_KEY")
+
+# Verify REQUIRED_KEYS
+for key in "${REQUIRED_KEYS[@]}"; do
+    if [ -z "${!key}" ]; then
+        print_error "Environment variable $key is not set."
+        exit 1
+    fi
+done
 
 case $ENV in
     prod)
@@ -42,14 +53,6 @@ case $ENV in
     pre-prod)
         TARGET_PATH="/var/www/marius.click/html/contest-preprod"
         BASE_PATH="/contest-preprod"
-        ;;
-    backup)
-        TARGET_PATH="/var/www/marius.click/html/contest2"
-        BASE_PATH="/contest2"
-        ;;
-    *)
-        print_error "Invalid environment: $ENV. Use prod, pre-prod, or backup."
-        exit 1
         ;;
 esac
 
@@ -63,12 +66,16 @@ if ! pnpm run build; then
 fi
 print_success "Build completed."
 
-# Step 1b: Generate config for production
-if [ "$ENV" == "prod" ]; then
-    print_step "Generating production config..."
-    echo "window.APP_CONFIG = { API_SPORTS_KEY: '${PROD_API_SPORTS_KEY}' };" > www/config.js
-    print_success "Production config generated."
-fi
+# Step 1b: Generate config
+print_step "Generating config..."
+echo "window.APP_CONFIG = {" > www/config.js
+for key in "${REQUIRED_KEYS[@]}"; do
+    # Strip VITE_ prefix
+    config_key=${key#VITE_}
+    echo "  $config_key: '${!key}'," >> www/config.js
+done
+echo "};" >> www/config.js
+print_success "Config generated."
 
 # Step 2: Backup existing API data if exists
 print_step "Backing up existing API data..."
