@@ -303,6 +303,53 @@ describe("NBA Scheduler", () => {
         expect(teamStats?.totalGames).toBe(82);
       }
     });
+
+    it("should prevent consecutive games for tournaments with 4+ teams", () => {
+      const tournament = createTestTournament(4);
+
+      const result = generateNBASchedule(tournament);
+
+      for (let i = 1; i < result.matches.length; i++) {
+        const prevMatch = result.matches[i - 1];
+        const currMatch = result.matches[i];
+
+        const prevTeams = new Set([prevMatch.hostId, prevMatch.visitorId]);
+        const currTeams = [currMatch.hostId, currMatch.visitorId];
+
+        for (const teamId of currTeams) {
+          expect(prevTeams.has(teamId)).toBe(false);
+        }
+      }
+    });
+
+    it("should maintain even distribution of games across teams", () => {
+      const tournament = createTestTournament(4);
+
+      const result = generateNBASchedule(tournament);
+
+      const gamesPlayed = new Map<number, number>();
+      for (const team of tournament.grid) {
+        gamesPlayed.set(team.id, 0);
+      }
+
+      for (const match of result.matches) {
+        if (match.hostId === null || match.visitorId === null) {
+          continue;
+        }
+
+        gamesPlayed.set(match.hostId, (gamesPlayed.get(match.hostId) ?? 0) + 1);
+        gamesPlayed.set(
+          match.visitorId,
+          (gamesPlayed.get(match.visitorId) ?? 0) + 1
+        );
+
+        const counts = Array.from(gamesPlayed.values());
+        const maxGames = Math.max(...counts);
+        const minGames = Math.min(...counts);
+
+        expect(maxGames - minGames).toBeLessThanOrEqual(2);
+      }
+    });
   });
 
   describe("getNBAMissingMatchCount", () => {
