@@ -84,6 +84,8 @@ export class PageHome extends BaseElement {
           />
         </div>
 
+        <app-status-news></app-status-news>
+
         <div class="footer">
           <div class="grid-300">
             <sl-button href="#/config" size="large" variant="primary">

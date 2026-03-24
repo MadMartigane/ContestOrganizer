@@ -10,39 +10,36 @@ Le projet migre progressivement les composants Stencil vers des Web Components V
 
 ---
 
-## NFL CORS Issue (TODO)
+## 🐛 Bugs
 
-### Bug Description
+### BUG-001 : Alignement des scores dans les matchs FOOT
 
-Team search for NFL tournaments fails due to CORS restrictions.
+**Gravité** : Mineur  
+**Contexte** : Dans les matchs de type FOOT, les scores des deux équipes sont affichés l'un sous l'autre, tous deux alignés à gauche.  
+**Comportement actuel** : Les deux scores apparaissent groupés sur la gauche, non alignés sous leur équipe respective.  
+**Comportement attendu** : Chaque score doit être aligné sous l'équipe dont il est le score (score de l'équipe à domicile aligné à droite sous l'équipe domicile, score visiteur aligné à gauche sous l'équipe visiteur).  
+**Fichiers concernés** : `src/components/match-tile/match-tile.ts`
 
-### Technical Details
+---
 
-- **File:** `src/modules/api-sports/api-sports.ts:84-85`
-- **API Endpoint:** `https://v1.americanfootball.api-sports.io/`
-- **Error:** Browser blocks cross-origin requests
+## ✨ Features
 
-### Root Cause
+### FEAT-001 : Type de tournoi par défaut NBA
 
-The NFL API endpoint may not return proper CORS headers:
+**Priorité** : Élevée  
+**Contexte** : Lors de la création d'un nouveau tournoi, le type de sport est actuellement FOOT.  
+**Comportement actuel** : Le sélecteur de type de tournoi propose FOOT comme valeur par défaut.  
+**Comportement attendu** : Le type par défaut doit être NBA.  
+**Fichiers concernés** : `src/components/page-tournament-select/page-tournament-select.tsx`
 
-- Missing `Access-Control-Allow-Origin` header
-- Missing `Access-Control-Allow-Methods` header
-- Missing `Access-Control-Allow-Headers` header
+---
 
-### Potential Solutions
+## 🔧 Améliorations
 
-1. **Proxy Server:** Route NFL requests through a backend proxy
-2. **API Key Configuration:** Verify API key is correctly configured for NFL
-3. **Alternative API:** Use a different NFL data source with CORS support
-4. **Backend Integration:** Move API calls to server-side
+### IMPROV-001 : Équilibrage en temps réel de la génération aléatoire NBA
 
-### Files to Modify
-
-- `src/modules/api-sports/api-sports.ts`
-- `src/modules/api-sports/api-sports.constants.ts`
-- Potentially: Backend proxy configuration
-
-### Priority
-
-Medium - Feature works for other tournament types (FOOT, NBA, BASKET, RUGBY)
+**Priorité** : Moyenne  
+**Contexte** : La génération automatique de matchs pour les tournois NBA crée des combinaisons aléatoires, mais l'algorithme actuel produit souvent des séries déséquilibrées.  
+**Problème identifié** : L'algorithme sélectionne l'équipe avec le plus de matchs restants puis cherche un adversaire, créant parfois des longues séries avec la même équipe pendant que d'autres équipes n'ont aucun match. L'équilibre n'est vérifié qu'après coup, pas à chaque itération.  
+**Amélioration attendue** : À chaque génération de match, l'algorithme doit tendre vers l'équilibre global. Avant de créer un match, vérifier que la sélection ne crée pas de déséquilibre temporaire (ex : même équipe jouée 3 fois de suite alors que d'autres n'ont pas joué). L'équilibre doit être vérifié et appliqué à chaque itération, pas uniquement lors du résultat final.  
+**Fichiers concernés** : `src/modules/nba/nba.scheduler.ts`
