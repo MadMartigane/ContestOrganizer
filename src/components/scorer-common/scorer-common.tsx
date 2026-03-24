@@ -60,30 +60,28 @@ export class MadScorerCommon {
 
   private renderEditingState() {
     return (
-      <span class="container-xl">
-        <sl-button-group label="Plus/minus action buttons">
-          <sl-button
-            disabled={Boolean(this.readonly)}
-            onclick={() => {
-              this.decrementNumber();
-            }}
-            pill
-            size="large"
-          >
-            <sl-icon class="text-warning" name="dash-lg" />
-          </sl-button>
-          <sl-button
-            disabled={Boolean(this.readonly)}
-            onclick={() => {
-              this.incrementNumber();
-            }}
-            pill
-            size="large"
-          >
-            <sl-icon class="text-primary" name="plus-lg" />
-          </sl-button>
-        </sl-button-group>
-      </span>
+      <div class="my-4 flex gap-4">
+        <sl-button
+          disabled={Boolean(this.readonly)}
+          onclick={() => {
+            this.decrementNumber();
+          }}
+          pill
+          size="large"
+        >
+          <sl-icon class="text-warning" name="dash-lg" />
+        </sl-button>
+        <sl-button
+          disabled={Boolean(this.readonly)}
+          onclick={() => {
+            this.incrementNumber();
+          }}
+          pill
+          size="large"
+        >
+          <sl-icon class="text-primary" name="plus-lg" />
+        </sl-button>
+      </div>
     );
   }
 
