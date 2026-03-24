@@ -1,6 +1,15 @@
 /// <reference types="vite/client" />
 
 /**
+ * JSON modules generated at build time
+ */
+declare module "@generated/status-data.json" {
+  import type { StatusData } from "@core/types/status.js";
+  const statusData: StatusData;
+  export default statusData;
+}
+
+/**
  * Environment variables exposed to the client via import.meta.env
  */
 interface ImportMetaEnv {

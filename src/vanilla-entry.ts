@@ -7,6 +7,7 @@
  */
 
 // Import all vanilla web components - side effects register them
+import "./components/app-status-news/app-status-news";
 import "./components/page-home/page-home";
 import "./components/page-404/page-404";
 import "./components/error-message/error-message";

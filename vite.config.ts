@@ -62,6 +62,7 @@ const config = defineConfig({
       "@modules": path.resolve(import.meta.dirname, "./src/modules"),
       "@components": path.resolve(import.meta.dirname, "./src/components"),
       "@core": path.resolve(import.meta.dirname, "./src/core"),
+      "@generated": path.resolve(import.meta.dirname, "./src/generated"),
     },
   },
 
