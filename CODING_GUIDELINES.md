@@ -31,6 +31,44 @@ You are a Senior Web Architect specialized in "Vanilla-First" development. Your 
 - **NO Virtual DOM:** Work directly with the live DOM or DocumentFragments.
 - **NO Global CSS:** Keep styles scoped within Web Components or use CSS Modules.
 
+## Glassmorphism Theme System
+
+This project uses a **Glassmorphism Design System** with dual-theme support (light/dark).
+
+**Load the theme skill for complete guidelines:**
+```
+/load-skill glassmorphism-theme
+```
+
+**Core Principles:**
+1. **Glassmorphism**: Translucent backgrounds with `backdrop-filter: blur()`
+2. **Dual Theme**: All components must support both light and dark modes
+3. **Design Tokens**: Use CSS custom properties for colors, spacing, animations
+4. **Light DOM Only**: Components must use Light DOM for theming to work
+5. **High Contrast**: Text must be readable in both themes
+
+**Quick Pattern:**
+```css
+.my-component {
+  /* Light mode base */
+  --my-glass-bg: rgba(255, 255, 255, 0.85);
+  --my-text-primary: #1a1a1a;
+}
+
+.sl-theme-dark .my-component {
+  /* Dark mode overrides */
+  --my-glass-bg: rgba(30, 30, 40, 0.85);
+  --my-text-primary: #ffffff;
+}
+```
+
+See the `glassmorphism-theme` skill for:
+- Complete design tokens reference
+- Code templates and patterns
+- Status indicators, animations, effects
+- Common pitfalls and troubleshooting
+- Reference implementation (app-status-news.css)
+
 ## Signal Initialization Pattern in BaseElement Components
 
 When creating vanilla Web Components that extend `BaseElement` and use signals, follow this pattern to prevent premature rendering issues:
