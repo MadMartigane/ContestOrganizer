@@ -28,10 +28,20 @@ interface StatusData {
   projectName: string;
   sections: Section[];
   technology: string;
+  version: string; // e.g., "1.2.3-dev", "1.3.0-preprod", "2.0.0-prod"
 }
 
 type StatusType = Section["type"];
 type BadgeVariant = Section["badgeVariant"];
+
+type IncrementType = "patch" | "minor" | "major";
+type VersionContext = "manual" | "preprod" | "prod";
+
+interface VersionResult {
+  baseVersion: string;
+  displayVersion: string;
+  incrementType: IncrementType;
+}
 
 const H1_REGEX = /^#\s+(.+)$/m;
 const TECH_REGEX = /\*\*Technologie\*\*\s*:\s*(.+)/i;
@@ -113,6 +123,93 @@ function generateId(title: string): string {
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "");
+}
+
+function parseVersion(versionString: string): {
+  major: number;
+  minor: number;
+  patch: number;
+} {
+  const parts = versionString.split(".").map(Number);
+  return {
+    major: parts[0] ?? 0,
+    minor: parts[1] ?? 0,
+    patch: parts[2] ?? 0,
+  };
+}
+
+function incrementVersion(
+  version: string,
+  incrementType: IncrementType
+): string {
+  const { major, minor, patch } = parseVersion(version);
+
+  switch (incrementType) {
+    case "major":
+      return `${major + 1}.0.0`;
+    case "minor":
+      return `${major}.${minor + 1}.0`;
+    case "patch":
+      return `${major}.${minor}.${patch + 1}`;
+    default: {
+      const _exhaustiveCheck: never = incrementType;
+      return _exhaustiveCheck;
+    }
+  }
+}
+
+function getVersionContext(): VersionContext {
+  const envContext = process.env.VERSION_CONTEXT;
+  if (envContext === "preprod") {
+    return "preprod";
+  }
+  if (envContext === "prod") {
+    return "prod";
+  }
+  return "manual";
+}
+
+function getVersionSuffix(context: VersionContext): string {
+  switch (context) {
+    case "preprod":
+      return "-preprod";
+    case "prod":
+      return "-prod";
+    default:
+      return "-dev";
+  }
+}
+
+function validateIncrementArg(arg: string | undefined): IncrementType {
+  if (arg === undefined) {
+    return "patch";
+  }
+  if (arg !== "major" && arg !== "minor" && arg !== "patch") {
+    console.error(
+      `Error: Invalid version increment '${arg}'. Expected: patch, minor, or major.`
+    );
+    process.exit(1);
+  }
+  return arg as IncrementType;
+}
+
+function readPackageVersion(): string {
+  const packageJsonPath = path.join(PROJECT_ROOT, "package.json");
+  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
+  return packageJson.version ?? "0.0.0";
+}
+
+function processVersion(incrementType: IncrementType): VersionResult {
+  const context = getVersionContext();
+  const baseVersion = readPackageVersion();
+  const newBaseVersion = incrementVersion(baseVersion, incrementType);
+  const suffix = getVersionSuffix(context);
+
+  return {
+    baseVersion: newBaseVersion,
+    displayVersion: `${newBaseVersion}${suffix}`,
+    incrementType,
+  };
 }
 
 function parseTable(tableBlock: string): TableData | null {
@@ -204,6 +301,7 @@ function generateDtsOutput(_data: StatusData): string {
   lastUpdated: string;
   projectName: string;
   technology: string;
+  version: string;
   sections: Array<{
     id: string;
     title: string;
@@ -221,12 +319,15 @@ export default statusData;
 `;
 }
 
-function generateStatusData(): StatusData {
+function generateStatusData(incrementType: IncrementType): StatusData {
+  const versionResult = processVersion(incrementType);
+
   const baseData: StatusData = {
     lastUpdated: new Date().toISOString(),
     projectName: "Unknown Project",
     technology: "Not specified",
     sections: [],
+    version: versionResult.displayVersion,
   };
 
   if (!fs.existsSync(TODO_MD_PATH)) {
@@ -268,9 +369,13 @@ function generateStatusData(): StatusData {
 }
 
 function main(): void {
+  const incrementArg = process.argv[2];
+  const incrementType = validateIncrementArg(incrementArg);
+  const versionResult = processVersion(incrementType);
+
   ensureDir(OUTPUT_DIR);
 
-  const data = generateStatusData();
+  const data = generateStatusData(incrementType);
 
   const jsonOutput = generateJsonOutput(data);
   fs.writeFileSync(JSON_OUTPUT_PATH, jsonOutput, "utf-8");
@@ -278,9 +383,21 @@ function main(): void {
   const dtsOutput = generateDtsOutput(data);
   fs.writeFileSync(DTS_OUTPUT_PATH, dtsOutput, "utf-8");
 
+  const packageJsonPath = path.join(PROJECT_ROOT, "package.json");
+  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
+  packageJson.version = versionResult.baseVersion;
+  fs.writeFileSync(
+    packageJsonPath,
+    `${JSON.stringify(packageJson, null, 2)}\n`,
+    "utf-8"
+  );
+
   console.log("Generated:");
   console.log(`  - ${JSON_OUTPUT_PATH}`);
   console.log(`  - ${DTS_OUTPUT_PATH}`);
+  console.log(
+    `Version: ${versionResult.displayVersion} (${versionResult.incrementType})`
+  );
 }
 
 main();

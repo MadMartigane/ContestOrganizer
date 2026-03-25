@@ -58,6 +58,8 @@ export interface StatusData {
   sections: StatusSection[];
   /** Technology stack identifier */
   technology: string;
+  /** Application version string (e.g., "1.2.3-dev") */
+  version: string;
 }
 
 /**
