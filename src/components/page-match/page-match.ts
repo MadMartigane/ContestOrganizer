@@ -799,7 +799,7 @@ export class PageMatch extends BaseElement {
     const visitorScore = match.goals.visitor;
 
     return `
-      <div class="grid grid-cols-2 gap-4">
+      <div class="grid grid-cols-5 gap-4">
         ${
           isBasketType
             ? `<mad-scorer-basket
@@ -817,7 +817,7 @@ export class PageMatch extends BaseElement {
           isFootType
             ? `<mad-scorer-common
             min="${minGoal}"
-            class="host-scorer"
+            class="host-scorer col-span-2"
             data-match-id="${match.id || ""}"
             data-team-type="host"
             ${readonlyAttr}
@@ -856,7 +856,7 @@ export class PageMatch extends BaseElement {
           tournamentType === TournamentType.FOOT
             ? `<mad-scorer-common
             min="${minGoal}"
-            class="visitor-scorer"
+            class="visitor-scorer col-span-2"
             data-match-id="${match.id || ""}"
             data-team-type="visitor"
             ${readonlyAttr}
