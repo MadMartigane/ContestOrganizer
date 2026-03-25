@@ -8,7 +8,7 @@ import Matchs, {
   type Row,
 } from "../../modules/matchs/matchs";
 import {
-  generateNBASchedule,
+  generateNBAScheduleMinimax,
   getNBAMissingMatchCount,
   validateNBAScheduleGeneration,
 } from "../../modules/nba/nba.scheduler";
@@ -282,7 +282,7 @@ export class PageMatch extends BaseElement {
       return;
     }
 
-    const result = generateNBASchedule(tournament);
+    const result = generateNBAScheduleMinimax(tournament);
 
     if (result.warnings.length > 0) {
       console.warn("NBA Schedule warnings:", result.warnings);

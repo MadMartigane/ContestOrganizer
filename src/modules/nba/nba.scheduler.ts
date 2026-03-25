@@ -2,92 +2,277 @@ import { Match, MatchStatus } from "../matchs/matchs";
 import type { Tournament } from "../tournaments/tournaments.types";
 import { NBA_MAX_GAMES_PER_TEAM, NBA_MIN_TEAMS } from "./nba.constants";
 import type {
+  NBABalanceContext,
+  NBABalanceScore,
   NBAScheduleConfig,
   NBAScheduleResult,
   NBATeamStats,
 } from "./nba.types";
 
-const DEFAULT_CONFIG: Required<NBAScheduleConfig> = {
-  maxGamesPerTeam: 82,
-  respectHomeAwayBalance: true,
-};
+export const createBalanceContext = (
+  config?: NBAScheduleConfig
+): NBABalanceContext => ({
+  balanceWindowSize: config?.balanceWindowSize ?? 5,
+  maxConsecutiveAppearances: config?.maxConsecutiveAppearances ?? 2,
+  recentMatches: new Map<number, number[]>(),
+});
 
-function getRest(
-  lastMatchIndexMap: Map<number, number>,
+export const getConsecutiveAppearanceCount = (
   teamId: number,
-  currentIndex: number
-): number {
-  const lastMatch = lastMatchIndexMap.get(teamId) ?? -1;
-  return lastMatch === -1 ? Number.MAX_SAFE_INTEGER : currentIndex - lastMatch;
-}
+  context: NBABalanceContext
+): number => {
+  const recentMatchArray = context.recentMatches.get(teamId);
+  if (!recentMatchArray || recentMatchArray.length === 0) {
+    return 0;
+  }
 
-function findAlternativeTeamWithGoodRest(
-  stats: Map<number, NBATeamStats>,
-  lastMatchIndexMap: Map<number, number>,
-  currentIndex: number,
-  maxRemaining: number,
-  excludeTeamId: number
-): number | null {
-  for (const [teamId, teamStats] of stats) {
-    if (teamId === excludeTeamId) {
-      continue;
-    }
-    if (teamStats.remainingGames < maxRemaining) {
-      continue;
-    }
-    if (getRest(lastMatchIndexMap, teamId, currentIndex) > 1) {
-      return teamId;
+  if (recentMatchArray.length === 1) {
+    return 1;
+  }
+
+  let count = 1;
+  const lastOpponent = recentMatchArray.at(-1);
+
+  for (let i = recentMatchArray.length - 2; i >= 0; i--) {
+    if (recentMatchArray[i] === lastOpponent) {
+      count++;
+    } else {
+      break;
     }
   }
-  return null;
-}
+  return count;
+};
 
-function getTeamWithMostRemainingGames(
+export const recordMatchInContext = (
+  context: NBABalanceContext,
+  hostId: number,
+  visitorId: number
+): void => {
+  const hostRecent = context.recentMatches.get(hostId) ?? [];
+  const visitorRecent = context.recentMatches.get(visitorId) ?? [];
+
+  hostRecent.push(visitorId);
+  visitorRecent.push(hostId);
+
+  if (hostRecent.length > context.balanceWindowSize) {
+    hostRecent.shift();
+  }
+  if (visitorRecent.length > context.balanceWindowSize) {
+    visitorRecent.shift();
+  }
+
+  context.recentMatches.set(hostId, hostRecent);
+  context.recentMatches.set(visitorId, visitorRecent);
+};
+
+export const calculateBalanceScore = (
+  teamId: number,
   stats: Map<number, NBATeamStats>,
-  lastMatchIndexMap: Map<number, number>,
-  currentIndex: number
-): number | null {
-  let bestTeam: number | null = null;
-  let maxRemaining = -1;
-  let maxRest = -1;
+  context: NBABalanceContext
+): NBABalanceScore => {
+  const teamStats = stats.get(teamId);
+  const consecutiveAppearances = getConsecutiveAppearanceCount(teamId, context);
+
+  const remainingGames = teamStats?.remainingGames ?? 0;
+  const totalGames = teamStats?.totalGames ?? 0;
+
+  const score = remainingGames * 10 - consecutiveAppearances * 15;
+
+  return {
+    teamId,
+    score,
+    remainingGames,
+    totalGames,
+    consecutiveAppearances,
+  };
+};
+
+/**
+ * Select the team with the best balance score for the next match.
+ * Replaces getTeamWithMostRemainingGames as the primary team selector.
+ */
+export const selectTeamForMatch = (
+  stats: Map<number, NBATeamStats>,
+  context: NBABalanceContext
+): number | null => {
+  let bestTeamId: number | null = null;
+  let bestScore = Number.NEGATIVE_INFINITY;
+  let bestTotalGames = Number.POSITIVE_INFINITY;
 
   for (const [teamId, teamStats] of stats) {
     if (teamStats.remainingGames <= 0) {
       continue;
     }
 
-    const rest = getRest(lastMatchIndexMap, teamId, currentIndex);
+    const balanceScore = calculateBalanceScore(teamId, stats, context);
 
-    if (teamStats.remainingGames > maxRemaining) {
-      maxRemaining = teamStats.remainingGames;
-      maxRest = rest;
-      bestTeam = teamId;
-    } else if (teamStats.remainingGames === maxRemaining && rest > maxRest) {
-      maxRest = rest;
-      bestTeam = teamId;
+    if (
+      balanceScore.score > bestScore ||
+      (balanceScore.score === bestScore &&
+        balanceScore.totalGames < bestTotalGames)
+    ) {
+      bestScore = balanceScore.score;
+      bestTeamId = teamId;
+      bestTotalGames = balanceScore.totalGames;
     }
   }
 
-  // If bestTeam has rest=1, try to find alternative with rest>1 and same remaining
-  if (bestTeam !== null) {
-    const bestTeamRest = getRest(lastMatchIndexMap, bestTeam, currentIndex);
+  return bestTeamId;
+};
 
-    if (bestTeamRest === 1) {
-      const alternative = findAlternativeTeamWithGoodRest(
-        stats,
-        lastMatchIndexMap,
-        currentIndex,
-        maxRemaining,
-        bestTeam
-      );
-      if (alternative !== null) {
-        return alternative;
-      }
-    }
-  }
-
-  return bestTeam;
+interface EligibleOpponent {
+  gamesAgainstTeam: number;
+  opponentId: number;
+  totalGames: number;
 }
+
+const buildTemporaryContextWithOpponent = (
+  teamId: number,
+  opponentId: number,
+  context: NBABalanceContext
+): NBABalanceContext => {
+  const tempContext: NBABalanceContext = {
+    balanceWindowSize: context.balanceWindowSize,
+    maxConsecutiveAppearances: context.maxConsecutiveAppearances,
+    recentMatches: new Map(),
+  };
+
+  for (const [tid, recentArr] of context.recentMatches) {
+    tempContext.recentMatches.set(tid, [...recentArr]);
+  }
+
+  const opponentRecent = tempContext.recentMatches.get(opponentId) ?? [];
+  opponentRecent.push(teamId);
+  if (opponentRecent.length > tempContext.balanceWindowSize) {
+    opponentRecent.shift();
+  }
+  tempContext.recentMatches.set(opponentId, opponentRecent);
+
+  return tempContext;
+};
+
+const findEligibleOpponents = (
+  teamId: number,
+  stats: Map<number, NBATeamStats>,
+  context: NBABalanceContext
+): EligibleOpponent[] => {
+  const teamStats = stats.get(teamId);
+  if (!teamStats) {
+    return [];
+  }
+
+  const eligible: EligibleOpponent[] = [];
+
+  for (const [opponentId, opponentStats] of stats) {
+    if (opponentId === teamId) {
+      continue;
+    }
+    if (opponentStats.remainingGames <= 0) {
+      continue;
+    }
+
+    const tempContext = buildTemporaryContextWithOpponent(
+      teamId,
+      opponentId,
+      context
+    );
+
+    const consecutiveAfterAdd = getConsecutiveAppearanceCount(
+      opponentId,
+      tempContext
+    );
+
+    if (consecutiveAfterAdd > context.maxConsecutiveAppearances) {
+      continue;
+    }
+
+    const gamesAgainstTeam = teamStats.gamesByOpponent.get(opponentId) || 0;
+    eligible.push({
+      opponentId,
+      gamesAgainstTeam,
+      totalGames: opponentStats.totalGames,
+    });
+  }
+
+  return eligible;
+};
+
+const findFallbackOpponent = (
+  teamId: number,
+  stats: Map<number, NBATeamStats>,
+  context: NBABalanceContext
+): number | null => {
+  let fallbackOpponentId: number | null = null;
+  let lowestConsecutive = Number.POSITIVE_INFINITY;
+
+  for (const [opponentId, opponentStats] of stats) {
+    if (opponentId === teamId) {
+      continue;
+    }
+    if (opponentStats.remainingGames <= 0) {
+      continue;
+    }
+
+    const consecutive = getConsecutiveAppearanceCount(opponentId, context);
+    if (consecutive < lowestConsecutive) {
+      lowestConsecutive = consecutive;
+      fallbackOpponentId = opponentId;
+    }
+  }
+
+  return fallbackOpponentId;
+};
+
+const selectBestOpponentFromEligible = (
+  eligible: EligibleOpponent[]
+): number | null => {
+  let bestOpponentId: number | null = null;
+  let bestGamesAgainst = Number.POSITIVE_INFINITY;
+  let bestTotalGames = Number.POSITIVE_INFINITY;
+
+  for (const opp of eligible) {
+    if (
+      opp.gamesAgainstTeam < bestGamesAgainst ||
+      (opp.gamesAgainstTeam === bestGamesAgainst &&
+        opp.totalGames < bestTotalGames)
+    ) {
+      bestGamesAgainst = opp.gamesAgainstTeam;
+      bestTotalGames = opp.totalGames;
+      bestOpponentId = opp.opponentId;
+    }
+  }
+
+  return bestOpponentId;
+};
+
+/**
+ * Select the best opponent for a team respecting consecutive appearance limits.
+ */
+export const selectOpponentForTeam = (
+  teamId: number,
+  stats: Map<number, NBATeamStats>,
+  context: NBABalanceContext
+): number | null => {
+  const teamStats = stats.get(teamId);
+  if (!teamStats) {
+    return null;
+  }
+
+  const eligibleOpponents = findEligibleOpponents(teamId, stats, context);
+
+  if (eligibleOpponents.length === 0) {
+    return findFallbackOpponent(teamId, stats, context);
+  }
+
+  return selectBestOpponentFromEligible(eligibleOpponents);
+};
+
+const DEFAULT_CONFIG: Required<NBAScheduleConfig> = {
+  balanceWindowSize: 5,
+  maxConsecutiveAppearances: 2,
+  maxGamesPerTeam: 82,
+  respectHomeAwayBalance: true,
+};
 
 function createMatch(hostId: number, visitorId: number): Match {
   const match = new Match();
@@ -199,6 +384,191 @@ export function calculateTeamStats(
   return stats;
 }
 
+/**
+ * Find the best opponent for a team based on games played against each opponent
+ */
+export function findBestOpponent(
+  teamId: number,
+  stats: Map<number, NBATeamStats>,
+  excludeTeamIds: Set<number>
+): number | null {
+  const teamStats = stats.get(teamId);
+  if (!teamStats) {
+    return null;
+  }
+
+  let bestOpponentId: number | null = null;
+  let bestScore = Number.NEGATIVE_INFINITY;
+
+  for (const [opponentId, opponentStats] of stats) {
+    if (opponentId === teamId) {
+      continue;
+    }
+    if (excludeTeamIds.has(opponentId)) {
+      continue;
+    }
+    if (opponentStats.remainingGames <= 0) {
+      continue;
+    }
+
+    const gamesAgainstOpponent = teamStats.gamesByOpponent.get(opponentId) || 0;
+    const opponentGamesAgainstTeam =
+      opponentStats.gamesByOpponent.get(teamId) || 0;
+    const totalGamesBetween = gamesAgainstOpponent + opponentGamesAgainstTeam;
+
+    const score = 1000 - totalGamesBetween * 100;
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestOpponentId = opponentId;
+    }
+  }
+
+  return bestOpponentId;
+}
+
+/**
+ * Determine if a team should be the host based on home/away balance
+ */
+export function shouldTeamBeHost(teamStats: NBATeamStats): boolean {
+  return teamStats.homeGames <= teamStats.awayGames;
+}
+
+/**
+ * Get the total number of matches needed to complete the NBA schedule
+ */
+export function getNBAMissingMatchCount(tournament: Tournament): number {
+  const stats = calculateTeamStats(tournament);
+
+  let totalRemaining = 0;
+  for (const [, teamStats] of stats) {
+    totalRemaining += Math.max(0, teamStats.remainingGames);
+  }
+
+  return Math.floor(totalRemaining / 2);
+}
+
+/**
+ * Validate the tournament for NBA schedule generation
+ */
+export function validateNBAScheduleGeneration(tournament: Tournament): {
+  valid: boolean;
+  warnings: string[];
+} {
+  const warnings: string[] = [];
+
+  if (tournament.grid.length < NBA_MIN_TEAMS) {
+    warnings.push(`Need at least ${NBA_MIN_TEAMS} teams for NBA schedule`);
+    return { valid: false, warnings };
+  }
+
+  const stats = calculateTeamStats(tournament);
+
+  let teamsOverLimit = 0;
+  let teamsNeedGames = 0;
+
+  for (const [, teamStats] of stats) {
+    if (teamStats.totalGames > NBA_MAX_GAMES_PER_TEAM) {
+      teamsOverLimit++;
+      warnings.push(
+        `Team ${teamStats.teamId} has ${teamStats.totalGames} games (exceeds ${NBA_MAX_GAMES_PER_TEAM})`
+      );
+    }
+    if (teamStats.remainingGames > 0) {
+      teamsNeedGames++;
+    }
+  }
+
+  if (teamsOverLimit > 0) {
+    return { valid: false, warnings };
+  }
+
+  if (teamsNeedGames < NBA_MIN_TEAMS) {
+    warnings.push("Not enough teams need games to generate a schedule");
+    return { valid: false, warnings };
+  }
+
+  return { valid: true, warnings };
+}
+
+// ============ GREEDY REST-BASED ALGORITHM (MINIMAX) ============
+
+function getRest(
+  lastMatchIndexMap: Map<number, number>,
+  teamId: number,
+  currentIndex: number
+): number {
+  const lastMatch = lastMatchIndexMap.get(teamId) ?? -1;
+  return lastMatch === -1 ? Number.MAX_SAFE_INTEGER : currentIndex - lastMatch;
+}
+
+function findAlternativeTeamWithGoodRest(
+  stats: Map<number, NBATeamStats>,
+  lastMatchIndexMap: Map<number, number>,
+  currentIndex: number,
+  maxRemaining: number,
+  excludeTeamId: number
+): number | null {
+  for (const [teamId, teamStats] of stats) {
+    if (teamId === excludeTeamId) {
+      continue;
+    }
+    if (teamStats.remainingGames < maxRemaining) {
+      continue;
+    }
+    if (getRest(lastMatchIndexMap, teamId, currentIndex) > 1) {
+      return teamId;
+    }
+  }
+  return null;
+}
+
+function getTeamWithMostRemainingGames(
+  stats: Map<number, NBATeamStats>,
+  lastMatchIndexMap: Map<number, number>,
+  currentIndex: number
+): number | null {
+  let bestTeam: number | null = null;
+  let maxRemaining = -1;
+  let maxRest = -1;
+
+  for (const [teamId, teamStats] of stats) {
+    if (teamStats.remainingGames <= 0) {
+      continue;
+    }
+
+    const rest = getRest(lastMatchIndexMap, teamId, currentIndex);
+
+    if (teamStats.remainingGames > maxRemaining) {
+      maxRemaining = teamStats.remainingGames;
+      maxRest = rest;
+      bestTeam = teamId;
+    } else if (teamStats.remainingGames === maxRemaining && rest > maxRest) {
+      maxRest = rest;
+      bestTeam = teamId;
+    }
+  }
+
+  if (bestTeam !== null) {
+    const bestTeamRest = getRest(lastMatchIndexMap, bestTeam, currentIndex);
+
+    if (bestTeamRest === 1) {
+      const alternative = findAlternativeTeamWithGoodRest(
+        stats,
+        lastMatchIndexMap,
+        currentIndex,
+        maxRemaining,
+        bestTeam
+      );
+      if (alternative !== null) {
+        return alternative;
+      }
+    }
+  }
+
+  return bestTeam;
+}
+
 function calculateOpponentScore(
   opponentStats: NBATeamStats,
   totalGamesBetween: number,
@@ -221,51 +591,6 @@ function calculateOpponentScore(
   }
 
   return score;
-}
-
-/**
- * Find the best opponent for a team based on games played against each opponent
- */
-export function findBestOpponent(
-  teamId: number,
-  stats: Map<number, NBATeamStats>,
-  excludeTeamIds: Set<number>,
-  lastMatchIndexMap?: Map<number, number>,
-  currentIndex?: number
-): number | null {
-  const teamStats = stats.get(teamId);
-  if (!teamStats) {
-    return null;
-  }
-
-  // Always prefer opponents with rest > 1, fall back to rest=1 only if necessary
-  const goodRestOpponents = collectOpponentsWithGoodRest(
-    teamId,
-    stats,
-    excludeTeamIds,
-    lastMatchIndexMap,
-    currentIndex
-  );
-
-  if (goodRestOpponents.length > 0) {
-    return findBestScoringOpponent(
-      teamId,
-      teamStats,
-      goodRestOpponents,
-      lastMatchIndexMap,
-      currentIndex
-    );
-  }
-
-  // Fall back to rest=1 opponents
-  const allOpponents = collectAllOpponents(teamId, stats, excludeTeamIds);
-  return findBestScoringOpponent(
-    teamId,
-    teamStats,
-    allOpponents,
-    lastMatchIndexMap,
-    currentIndex
-  );
 }
 
 function collectOpponentsWithGoodRest(
@@ -360,16 +685,53 @@ function findBestScoringOpponent(
 }
 
 /**
- * Determine if a team should be the host based on home/away balance
+ * Find the best opponent for a team based on games played against each opponent (greedy algorithm)
  */
-export function shouldTeamBeHost(teamStats: NBATeamStats): boolean {
-  return teamStats.homeGames <= teamStats.awayGames;
+function findBestOpponentGreedy(
+  teamId: number,
+  stats: Map<number, NBATeamStats>,
+  excludeTeamIds: Set<number>,
+  lastMatchIndexMap: Map<number, number>,
+  currentIndex: number
+): number | null {
+  const teamStats = stats.get(teamId);
+  if (!teamStats) {
+    return null;
+  }
+
+  const goodRestOpponents = collectOpponentsWithGoodRest(
+    teamId,
+    stats,
+    excludeTeamIds,
+    lastMatchIndexMap,
+    currentIndex
+  );
+
+  if (goodRestOpponents.length > 0) {
+    return findBestScoringOpponent(
+      teamId,
+      teamStats,
+      goodRestOpponents,
+      lastMatchIndexMap,
+      currentIndex
+    );
+  }
+
+  const allOpponents = collectAllOpponents(teamId, stats, excludeTeamIds);
+  return findBestScoringOpponent(
+    teamId,
+    teamStats,
+    allOpponents,
+    lastMatchIndexMap,
+    currentIndex
+  );
 }
 
 /**
- * Generate the NBA schedule for the tournament
+ * Generate the NBA schedule using the greedy rest-based algorithm (minimax).
+ * Prioritizes teams with most remaining games and best rest between matches.
  */
-export function generateNBASchedule(
+export function generateNBAScheduleMinimax(
   tournament: Tournament,
   config?: NBAScheduleConfig
 ): NBAScheduleResult {
@@ -413,7 +775,7 @@ export function generateNBASchedule(
     }
 
     const excludeSet = new Set<number>([teamWithMostRemaining]);
-    const opponentId = findBestOpponent(
+    const opponentId = findBestOpponentGreedy(
       teamWithMostRemaining,
       stats,
       excludeSet,
@@ -448,59 +810,9 @@ export function generateNBASchedule(
   return { matches, stats, warnings };
 }
 
-/**
- * Get the total number of matches needed to complete the NBA schedule
- */
-export function getNBAMissingMatchCount(tournament: Tournament): number {
-  const stats = calculateTeamStats(tournament);
-
-  let totalRemaining = 0;
-  for (const [, teamStats] of stats) {
-    totalRemaining += Math.max(0, teamStats.remainingGames);
-  }
-
-  return Math.floor(totalRemaining / 2);
-}
-
-/**
- * Validate the tournament for NBA schedule generation
- */
-export function validateNBAScheduleGeneration(tournament: Tournament): {
-  valid: boolean;
-  warnings: string[];
-} {
-  const warnings: string[] = [];
-
-  if (tournament.grid.length < NBA_MIN_TEAMS) {
-    warnings.push(`Need at least ${NBA_MIN_TEAMS} teams for NBA schedule`);
-    return { valid: false, warnings };
-  }
-
-  const stats = calculateTeamStats(tournament);
-
-  let teamsOverLimit = 0;
-  let teamsNeedGames = 0;
-
-  for (const [, teamStats] of stats) {
-    if (teamStats.totalGames > NBA_MAX_GAMES_PER_TEAM) {
-      teamsOverLimit++;
-      warnings.push(
-        `Team ${teamStats.teamId} has ${teamStats.totalGames} games (exceeds ${NBA_MAX_GAMES_PER_TEAM})`
-      );
-    }
-    if (teamStats.remainingGames > 0) {
-      teamsNeedGames++;
-    }
-  }
-
-  if (teamsOverLimit > 0) {
-    return { valid: false, warnings };
-  }
-
-  if (teamsNeedGames < NBA_MIN_TEAMS) {
-    warnings.push("Not enough teams need games to generate a schedule");
-    return { valid: false, warnings };
-  }
-
-  return { valid: true, warnings };
-}
+export const minimaxAlgorithm = {
+  name: "minimax" as const,
+  fn: generateNBAScheduleMinimax,
+  description:
+    "Greedy rest-based algorithm selecting team with most remaining games",
+};
