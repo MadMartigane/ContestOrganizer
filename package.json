@@ -1,7 +1,7 @@
 {
   "name": "contest-organizer",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.0.9",
   "description": "Tool to organize & enjoy your sport contest.",
   "type": "module",
   "scripts": {
@@ -20,6 +20,8 @@
     "biome:format": "biome format --write .",
     "deploy:prod": "bash scripts/deploy.sh prod",
     "deploy:preprod": "bash scripts/deploy.sh pre-prod",
+    "deploy:prod:dry-run": "bash scripts/deploy.sh prod --dry-run",
+    "deploy:preprod:dry-run": "bash scripts/deploy.sh pre-prod --dry-run",
     "deploy:backup": "bash scripts/deploy.sh backup",
     "check": "ultracite check",
     "fix": "ultracite fix",
@@ -51,6 +53,7 @@
     "rollup": "^4.28.0",
     "stencil-tailwind-plugin": "^1.8.0",
     "tailwindcss": "^3.4.17",
+    "tsx": "^4.21.0",
     "ultracite": "^7.2.3",
     "vite": "^6.0.0",
     "vitest": "^2.0.0"

@@ -16,6 +16,8 @@ import statusData from "@generated/status-data.json";
 import styles from "./app-status-news.css?inline";
 import { renderMarkdown as MarkdownRenderer } from "./markdown-renderer.js";
 
+const VERSION_LABEL = "Version de l'application : ";
+
 type ComponentState = "loading" | "ready" | "empty" | "error";
 
 export class AppStatusNews extends BaseElement {
@@ -159,6 +161,9 @@ export class AppStatusNews extends BaseElement {
    */
   private _renderReadyState(): string {
     return `
+      <!-- Version Badge (Top Center) -->
+      ${this._renderVersionBadge()}
+      
       <!-- Header -->
       <header class="status-header">
         <h2>📋 ${statusData.projectName}</h2>
@@ -431,6 +436,21 @@ export class AppStatusNews extends BaseElement {
       hour: "2-digit",
       minute: "2-digit",
     }).format(date);
+  }
+
+  /**
+   * Renders the version badge with glassmorphism styling
+   * @returns HTML string of the version badge
+   */
+  private _renderVersionBadge(): string {
+    return `
+      <div class="status-version" role="status" aria-label="Application version">
+        <span class="status-version-badge">
+          <span class="status-version-label">${VERSION_LABEL}</span>
+          <span class="status-version-number">${statusData.version}</span>
+        </span>
+      </div>
+    `;
   }
 
   /** Cleans up event listeners when component is disconnected */
