@@ -369,7 +369,11 @@ function generateStatusData(incrementType: IncrementType): StatusData {
 }
 
 function main(): void {
-  const incrementArg = process.argv[2];
+  const args = process.argv.slice(2);
+  const skipVersion = args.includes("--skip-version");
+  const incrementArg = args.find(
+    (arg) => arg === "patch" || arg === "minor" || arg === "major"
+  );
   const incrementType = validateIncrementArg(incrementArg);
   const versionResult = processVersion(incrementType);
 
@@ -383,21 +387,29 @@ function main(): void {
   const dtsOutput = generateDtsOutput(data);
   fs.writeFileSync(DTS_OUTPUT_PATH, dtsOutput, "utf-8");
 
-  const packageJsonPath = path.join(PROJECT_ROOT, "package.json");
-  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
-  packageJson.version = versionResult.baseVersion;
-  fs.writeFileSync(
-    packageJsonPath,
-    `${JSON.stringify(packageJson, null, 2)}\n`,
-    "utf-8"
-  );
-
-  console.log("Generated:");
-  console.log(`  - ${JSON_OUTPUT_PATH}`);
-  console.log(`  - ${DTS_OUTPUT_PATH}`);
-  console.log(
-    `Version: ${versionResult.displayVersion} (${versionResult.incrementType})`
-  );
+  if (skipVersion) {
+    console.log("Generated:");
+    console.log(`  - ${JSON_OUTPUT_PATH}`);
+    console.log(`  - ${DTS_OUTPUT_PATH}`);
+    console.log(
+      `Version: ${versionResult.displayVersion} (${versionResult.incrementType}) [skipped]`
+    );
+  } else {
+    const packageJsonPath = path.join(PROJECT_ROOT, "package.json");
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
+    packageJson.version = versionResult.baseVersion;
+    fs.writeFileSync(
+      packageJsonPath,
+      `${JSON.stringify(packageJson, null, 2)}\n`,
+      "utf-8"
+    );
+    console.log("Generated:");
+    console.log(`  - ${JSON_OUTPUT_PATH}`);
+    console.log(`  - ${DTS_OUTPUT_PATH}`);
+    console.log(
+      `Version: ${versionResult.displayVersion} (${versionResult.incrementType})`
+    );
+  }
 }
 
 main();

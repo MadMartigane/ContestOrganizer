@@ -117,9 +117,16 @@ BACKUP_DIR="$HOME/backup/contest-data"
 
 # Step 0: Generate status data from TODO.md with version increment
 print_step "Generating status data..."
-if ! pnpm exec tsx scripts/generate-status.ts "$VERSION_INCREMENT"; then
-    print_error "Status generation failed."
-    exit 1
+if [ "$DRY_RUN" = true ]; then
+    if ! pnpm exec tsx scripts/generate-status.ts "$VERSION_INCREMENT" --skip-version; then
+        print_error "Status generation failed."
+        exit 1
+    fi
+else
+    if ! pnpm exec tsx scripts/generate-status.ts "$VERSION_INCREMENT"; then
+        print_error "Status generation failed."
+        exit 1
+    fi
 fi
 print_success "Status data generated."
 
