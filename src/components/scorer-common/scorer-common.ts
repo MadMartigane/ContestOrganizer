@@ -191,12 +191,13 @@ export class MadScorerCommon extends BaseElement {
   private _step = 1;
   private _value?: number;
   private _readonly = false;
+  private _hidden = false;
 
   // Event emitter
   private readonly _emitChange: (value: string) => void;
 
   static get observedAttributes(): string[] {
-    return ["min", "max", "step", "value", "readonly"];
+    return ["min", "max", "step", "value", "readonly", "hidden"];
   }
 
   constructor() {
@@ -250,6 +251,9 @@ export class MadScorerCommon extends BaseElement {
       case "readonly":
         this._readonly = newValue !== null;
         break;
+      case "hidden":
+        this._hidden = newValue !== null;
+        break;
       default:
         // Unknown attribute - ignore
         break;
@@ -268,6 +272,16 @@ export class MadScorerCommon extends BaseElement {
   // Public getter for current value (useful for testing/debugging)
   get value(): number {
     return this._number.value;
+  }
+
+  // Hidden property
+  get hidden(): boolean {
+    return this._hidden;
+  }
+
+  set hidden(value: boolean) {
+    this._hidden = value;
+    this._requestRender();
   }
 
   // Internal methods
@@ -301,8 +315,52 @@ export class MadScorerCommon extends BaseElement {
     const isReadonly = this._readonly;
 
     this.innerHTML = `
-      <style>${styles}</style>
-      <div class="scorer-wrapper">
+      <style>${styles}
+.scorer-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.scorer-wrapper.hidden {
+  display: none !important;
+}
+
+/* Enhanced button glassmorphism */
+.scorer-button {
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.6) 40%,
+    rgba(240, 248, 255, 0.4) 100%
+  );
+  box-shadow: 
+    0 8px 32px rgba(31, 38, 135, 0.15),
+    0 2px 8px rgba(31, 38, 135, 0.1),
+    inset 0 1px 1px rgba(255, 255, 255, 0.8),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.scorer-button::before {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+}
+
+.scorer-button:hover:not(:disabled) {
+  box-shadow: 
+    0 16px 48px rgba(31, 38, 135, 0.2),
+    0 4px 16px rgba(31, 38, 135, 0.15),
+    inset 0 1px 2px rgba(255, 255, 255, 0.9),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.08);
+  transform: scale(1.08);
+}
+</style>
+      <div class="scorer-wrapper${this._hidden ? " hidden" : ""}">
         <div class="scorer-container">
         <button
           type="button"

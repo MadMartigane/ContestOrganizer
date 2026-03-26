@@ -457,6 +457,12 @@ export class PageMatch extends BaseElement {
       } else {
         scorer.setAttribute("readonly", "");
       }
+
+      if (isDoing) {
+        scorer.removeAttribute("hidden");
+      } else {
+        scorer.setAttribute("hidden", "");
+      }
     }
   }
 
@@ -794,6 +800,7 @@ export class PageMatch extends BaseElement {
       tournamentType === TournamentType.RUGBY;
     const isDoing = match.status === MatchStatus.DOING;
     const readonlyAttr = isDoing ? "" : "readonly";
+    const hiddenAttr = isDoing ? "" : "hidden";
     const minGoal = this.config.minGoal;
     const hostScore = match.goals.host;
     const visitorScore = match.goals.visitor;
@@ -821,6 +828,7 @@ export class PageMatch extends BaseElement {
             data-match-id="${match.id || ""}"
             data-team-type="host"
             ${readonlyAttr}
+            ${hiddenAttr}
             value="${hostScore}"
           ></mad-scorer-common>`
             : ""
@@ -860,6 +868,7 @@ export class PageMatch extends BaseElement {
             data-match-id="${match.id || ""}"
             data-team-type="visitor"
             ${readonlyAttr}
+            ${hiddenAttr}
             value="${visitorScore}"
           ></mad-scorer-common>`
             : ""
