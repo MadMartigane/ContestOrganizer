@@ -197,6 +197,122 @@ private _getRank(attr: string): number | undefined {
 
 ---
 
+### Trap 5: Light DOM vs Shadow DOM - The :host Problem
+
+**The Problem:**
+
+The `:host` CSS selector **only works in Shadow DOM**. When using Light DOM (`_createRenderRoot() { return this; }`), `:host` styles have no effect, causing layout issues.
+
+**Example of Bug:**
+
+```typescript
+// Light DOM component (NO Shadow DOM)
+export class MyComponent extends BaseElement {
+  protected _createRenderRoot(): Element {
+    return this; // Light DOM
+  }
+
+  protected _render(): void {
+    this.innerHTML = `
+      <style>
+        :host {
+          display: block;
+          width: 100%;
+        }
+        .content {
+          padding: 1rem;
+        }
+      </style>
+      <div class="content">Content</div>
+    `;
+    // ❌ :host styles do NOTHING in Light DOM!
+    // The component remains display: inline and width: auto
+  }
+}
+```
+
+**Real Bug from Codebase:**
+
+```typescript
+// scorer-common.ts - Light DOM component
+export class MadScorerCommon extends BaseElement {
+  protected _createRenderRoot(): Element {
+    return this; // Light DOM - no shadow root
+  }
+
+  protected _render(): void {
+    this.innerHTML = `
+      <style>
+        :host {
+          display: block;
+          width: 100%;
+        }
+      </style>
+      <div class="scorer-container">...</div>
+    `;
+    // ❌ Layout broken because :host has no effect
+  }
+}
+```
+
+**Why It Fails:**
+1. Light DOM components render directly to the page (no ShadowRoot)
+2. `:host` selector targets the ShadowRoot's host element
+3. Without Shadow DOM, there is no `:host` context
+4. Styles silently fail - no console errors
+5. Grid/Flex layouts break because component doesn't fill space
+
+**The Solution - Use Wrapper Element:**
+
+Replace `:host` with a wrapper div + CSS class:
+
+```typescript
+export class MadScorerCommon extends BaseElement {
+  protected _createRenderRoot(): Element {
+    return this; // Light DOM
+  }
+
+  protected _render(): void {
+    this.innerHTML = `
+      <style>
+        .scorer-wrapper {
+          display: block;
+          width: 100%;
+        }
+        .scorer-container {
+          display: flex;
+          justify-content: center;
+          gap: 1rem;
+        }
+      </style>
+      <div class="scorer-wrapper">
+        <div class="scorer-container">
+          <button>-</button>
+          <button>+</button>
+        </div>
+      </div>
+    `;
+    // ✅ Wrapper div achieves same effect as :host
+  }
+}
+```
+
+**Comparison Table:**
+
+| Approach | Shadow DOM | Light DOM | Recommendation |
+|----------|-----------|-----------|----------------|
+| `:host` | ✅ Works | ❌ Fails silently | Don't use in Light DOM |
+| Wrapper div | ✅ Works | ✅ Works | **Use this for all components** |
+| `* { ... }` | ⚠️ Risky | ✅ Works | Avoid - affects children |
+
+**Checklist:**
+- [ ] If using Light DOM, verify no `:host` selectors in styles
+- [ ] Replace `:host` with a wrapper div + class
+- [ ] Test layout in browser DevTools to verify component fills space
+- [ ] Check Grid/Flex layouts work correctly with wrapper approach
+
+---
+
 ## Type-Safe Best Practices
 
 ### Define Component Property Interfaces
@@ -356,6 +472,33 @@ Before marking a component migration as complete, verify:
 - [ ] Use type guards before property assignment
 - [ ] Never use `any` - use `unknown` with type narrowing
 - [ ] Import types from `.d.ts` files, not `.ts` files
+
+### CRITICAL: Component Registration (MOST COMMON ERROR)
+
+⚠️ **THIS STEP IS MANDATORY - DO NOT SKIP**
+
+After creating the vanilla component file, you MUST add the import to the entry point:
+
+```typescript
+// File: src/vanilla-entry.ts
+// Add this line with other component imports:
+import "./components/your-component/your-component";
+```
+
+**Why this matters:**
+- Without this import, `customElements.define()` never executes
+- The browser treats your component as `HTMLUnknownElement`
+- Component renders as empty/blank with NO console errors (silent failure)
+
+**Verification:**
+```javascript
+// In browser console:
+customElements.get('your-component-name');
+// Should return the component class, NOT undefined
+```
+
+- [ ] **MANDATORY**: Import added to `src/vanilla-entry.ts`
+- [ ] Verified via browser console: `customElements.get('tag-name')` returns constructor
 
 ### Post-Migration Testing
 

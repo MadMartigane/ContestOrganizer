@@ -4,13 +4,18 @@ This guide provides comprehensive instructions for migrating Stencil components 
 
 ## Prerequisites
 
-Before starting any migration work, you **MUST** load the `stencil-migration` skill:
+### ⚠️ MANDATORY: Load the Migration Skill
+
+**BEFORE starting ANY migration work, you MUST load the `stencil-migration` skill:**
 
 ```
 /load-skill stencil-migration
 ```
 
-This skill contains critical patterns and traps to avoid during migration, including:
+**Why this is mandatory:**
+The skill contains **critical patterns and traps** that will cause silent failures if ignored. The most common error is forgetting to register the component in `vanilla-entry.ts` after migration.
+
+**Key content in the skill:**
 - **Trap 1**: Property vs Attribute (Object Props) - How to pass complex objects to Stencil children
 - **Trap 2**: Promise vs String (Async Props) - Handling async data correctly
 - **Trap 3**: Boolean Attribute Coercion - Why `reverse="true"` doesn't work as expected

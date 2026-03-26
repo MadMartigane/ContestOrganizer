@@ -72,6 +72,7 @@ const config = defineConfig({
   },
 
   css: {
+    postcss: "./postcss.config.js",
     modules: {
       localsConvention: "camelCase",
     },

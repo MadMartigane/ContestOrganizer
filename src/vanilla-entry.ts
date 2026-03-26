@@ -6,6 +6,9 @@
  * side effects into a single file for the application.
  */
 
+// Import Tailwind CSS first - must be before component imports
+import "./global/tailwind.css";
+
 // Import all vanilla web components - side effects register them
 import "./components/app-status-news/app-status-news";
 import "./components/page-home/page-home";
@@ -14,3 +17,4 @@ import "./components/error-message/error-message";
 import "./components/select-team/select-team";
 import "./components/page-match/page-match";
 import "./components/match-tile/match-tile";
+import "./components/scorer-common/scorer-common";

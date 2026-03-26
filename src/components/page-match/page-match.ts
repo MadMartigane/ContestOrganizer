@@ -8,7 +8,7 @@ import Matchs, {
   type Row,
 } from "../../modules/matchs/matchs";
 import {
-  generateNBASchedule,
+  generateNBAScheduleMinimax,
   getNBAMissingMatchCount,
   validateNBAScheduleGeneration,
 } from "../../modules/nba/nba.scheduler";
@@ -282,7 +282,7 @@ export class PageMatch extends BaseElement {
       return;
     }
 
-    const result = generateNBASchedule(tournament);
+    const result = generateNBAScheduleMinimax(tournament);
 
     if (result.warnings.length > 0) {
       console.warn("NBA Schedule warnings:", result.warnings);
@@ -456,6 +456,12 @@ export class PageMatch extends BaseElement {
         scorer.removeAttribute("readonly");
       } else {
         scorer.setAttribute("readonly", "");
+      }
+
+      if (isDoing) {
+        scorer.removeAttribute("hidden");
+      } else {
+        scorer.setAttribute("hidden", "");
       }
     }
   }
@@ -794,12 +800,13 @@ export class PageMatch extends BaseElement {
       tournamentType === TournamentType.RUGBY;
     const isDoing = match.status === MatchStatus.DOING;
     const readonlyAttr = isDoing ? "" : "readonly";
+    const hiddenAttr = isDoing ? "" : "hidden";
     const minGoal = this.config.minGoal;
     const hostScore = match.goals.host;
     const visitorScore = match.goals.visitor;
 
     return `
-      <div class="grid grid-cols-2 gap-4">
+      <div class="grid grid-cols-5 gap-4">
         ${
           isBasketType
             ? `<mad-scorer-basket
@@ -817,10 +824,11 @@ export class PageMatch extends BaseElement {
           isFootType
             ? `<mad-scorer-common
             min="${minGoal}"
-            class="host-scorer"
+            class="host-scorer col-span-2"
             data-match-id="${match.id || ""}"
             data-team-type="host"
             ${readonlyAttr}
+            ${hiddenAttr}
             value="${hostScore}"
           ></mad-scorer-common>`
             : ""
@@ -856,10 +864,11 @@ export class PageMatch extends BaseElement {
           tournamentType === TournamentType.FOOT
             ? `<mad-scorer-common
             min="${minGoal}"
-            class="visitor-scorer"
+            class="visitor-scorer col-span-2"
             data-match-id="${match.id || ""}"
             data-team-type="visitor"
             ${readonlyAttr}
+            ${hiddenAttr}
             value="${visitorScore}"
           ></mad-scorer-common>`
             : ""
