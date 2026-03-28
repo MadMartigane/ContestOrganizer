@@ -1,16 +1,31 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-@layer components {
-  .flex-center {
-    @apply flex w-full justify-center items-center;
-  }
+/*
+ * Safelist: grid classes used via dynamic rendering that auto-detection may miss.
+ * Replaces the v3 `safelist` array from tailwind.config.js.
+ */
+@source inline("grid-cols-5 grid-cols-11 col-span-1 col-span-2 col-span-3 col-span-5 gap-4 grid items-center grid-cols-1");
+
+/*
+ * Custom utility: centered flex container.
+ * Replaces v3 `@layer components { .flex-center { @apply ... } }`.
+ * In v4, custom utilities use the @utility directive instead of @layer components.
+ */
+@utility flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 
+/*
+ * Base element styles using @apply.
+ * These work because they are in the same CSS file as @import "tailwindcss".
+ */
 h1 {
   @apply text-2xl my-2;
 }
+
 h2 {
   @apply text-xl my-2;
 }
@@ -25,6 +40,7 @@ th {
   border-color: var(--sl-color-neutral-300);
   @apply border min-w-10;
 }
+
 td {
   border-color: var(--sl-color-neutral-200);
   @apply border min-w-10;

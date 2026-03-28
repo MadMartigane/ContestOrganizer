@@ -1,5 +1,6 @@
 allowBuilds:
   esbuild: true
+  postcss-combine-duplicated-selectors: true
   puppeteer: true
 patchedDependencies:
-  stencil-tailwind-plugin@1.8.0: patches/stencil-tailwind-plugin@1.8.0.patch
+  stencil-tailwind-plugin@2.0.5: patches/stencil-tailwind-plugin@2.0.5.patch

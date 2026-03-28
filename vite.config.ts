@@ -1,4 +1,5 @@
 import path from "node:path";
+import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, loadEnv } from "vite";
 
 /**
@@ -29,7 +30,7 @@ function serveConfigPlugin() {
 }
 
 const config = defineConfig({
-  plugins: [serveConfigPlugin()],
+  plugins: [tailwindcss(), serveConfigPlugin()],
   root: "src",
   // envDir is resolved from the vite.config.ts LOCATION, NOT from root.
   // "." means project root where vite.config.ts lives.
@@ -72,7 +73,6 @@ const config = defineConfig({
   },
 
   css: {
-    postcss: "./postcss.config.js",
     modules: {
       localsConvention: "camelCase",
     },
