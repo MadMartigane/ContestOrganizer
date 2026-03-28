@@ -1,8 +1,13 @@
 // https://stenciljs.com/docs/config
 
 import type { Config } from "@stencil/core";
-import tailwind, { tailwindGlobal, tailwindHMR } from "stencil-tailwind-plugin";
-import tailwindConfig from "./tailwind.config.js";
+import tailwind, {
+  setPluginConfigurationDefaults,
+  tailwindGlobal,
+  tailwindHMR,
+} from "stencil-tailwind-plugin";
+
+setPluginConfigurationDefaults({ tailwindCssPath: "src/global/tailwind.css" });
 
 export const config: Config = {
   globalStyle: "src/global/app.css",
@@ -21,11 +26,7 @@ export const config: Config = {
       "<rootDir>/src/components/select-team/select-team.spec.ts", // Vanilla component tests
     ],
   },
-  plugins: [
-    tailwindGlobal({ tailwindConf: tailwindConfig }),
-    tailwind({ tailwindConf: tailwindConfig }),
-    tailwindHMR({ tailwindConf: tailwindConfig }),
-  ],
+  plugins: [tailwindGlobal(), tailwind(), tailwindHMR()],
   outputTargets: [
     {
       type: "www",
