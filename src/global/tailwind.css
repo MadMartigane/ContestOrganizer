@@ -1,10 +1,13 @@
 @import "tailwindcss";
 
 /*
- * Safelist: grid classes used via dynamic rendering that auto-detection may miss.
+ * Safelist: Tailwind utility classes used throughout the application.
  * Replaces the v3 `safelist` array from tailwind.config.js.
+ * 
+ * This ensures all classes are generated in production builds where
+ * auto-detection may miss classes inside TypeScript template literals.
  */
-@source inline("grid-cols-5 grid-cols-11 col-span-1 col-span-2 col-span-3 col-span-5 gap-4 grid items-center grid-cols-1");
+@source inline("grid-cols-1 grid-cols-2 grid-cols-5 grid-cols-11 grid-cols-3 grid grid-300 col-span-1 col-span-2 col-span-3 col-span-5 gap-4 gap-8 text-2xl text-3xl text-xl text-sm text-xs text-center text-success text-primary text-warning text-neutral text-danger text-balance w-full w-fill flex inline-block justify-center items-center align-middle py-4 px-1 my-2 my-4 my-6 mx-1 mt-2 mx-2 rounded border border-sky border-solid block hidden relative overflow-x-auto md:grid-cols-3 md:hidden lg:grid-cols-4 hidden md:block table-auto text-wrap sr-only caption-bottom block-primary card-common container container-s page-content can-be-clicked");
 
 /*
  * Custom utility: centered flex container.
