@@ -806,12 +806,12 @@ export class PageMatch extends BaseElement {
     const visitorScore = match.goals.visitor;
 
     return `
-      <div class="grid grid-cols-5 gap-4">
+      <div class="grid grid-cols-11 gap-4">
         ${
           isBasketType
             ? `<mad-scorer-basket
             min="${minGoal}"
-            class="host-scorer"
+            class="host-scorer col-span-5"
             data-match-id="${match.id || ""}"
             data-team-type="host"
             ${readonlyAttr}
@@ -824,7 +824,7 @@ export class PageMatch extends BaseElement {
           isFootType
             ? `<mad-scorer-common
             min="${minGoal}"
-            class="host-scorer col-span-2"
+            class="host-scorer col-span-5"
             data-match-id="${match.id || ""}"
             data-team-type="host"
             ${readonlyAttr}
@@ -838,7 +838,7 @@ export class PageMatch extends BaseElement {
           isRugbyType
             ? `<mad-scorer-rugby
             min="${minGoal}"
-            class="host-scorer"
+            class="host-scorer col-span-5"
             data-match-id="${match.id || ""}"
             data-team-type="host"
             ${readonlyAttr}
@@ -847,11 +847,13 @@ export class PageMatch extends BaseElement {
             : ""
         }
 
+        <div class="col-span-1"></div>
+
         ${
           isBasketType
             ? `<mad-scorer-basket
             min="${minGoal}"
-            class="visitor-scorer"
+            class="visitor-scorer col-span-5"
             data-match-id="${match.id || ""}"
             data-team-type="visitor"
             ${readonlyAttr}
@@ -864,7 +866,7 @@ export class PageMatch extends BaseElement {
           tournamentType === TournamentType.FOOT
             ? `<mad-scorer-common
             min="${minGoal}"
-            class="visitor-scorer col-span-2"
+            class="visitor-scorer col-span-5"
             data-match-id="${match.id || ""}"
             data-team-type="visitor"
             ${readonlyAttr}
@@ -878,7 +880,7 @@ export class PageMatch extends BaseElement {
           isRugbyType
             ? `<mad-scorer-rugby
             min="${minGoal}"
-            class="visitor-scorer"
+            class="visitor-scorer col-span-5"
             data-match-id="${match.id || ""}"
             data-team-type="visitor"
             ${readonlyAttr}
@@ -956,10 +958,10 @@ export class PageMatch extends BaseElement {
    */
   private renderMatchListHeader(): string {
     return `
-      <div class="block-primary grid grid-cols-5 items-center py-2">
-        <div class="col-span-2">Locaux</div>
-        <div class="text-2xl">${this.renderTournamentTypeLabel()}</div>
-        <div class="col-span-2">Visiteurs</div>
+      <div class="block-primary grid grid-cols-11 items-center py-2">
+        <div class="col-span-3">Locaux</div>
+        <div class="col-span-5 text-2xl text-center">${this.renderTournamentTypeLabel()}</div>
+        <div class="col-span-3">Visiteurs</div>
       </div>
     `;
   }
@@ -1248,6 +1250,18 @@ export class PageMatch extends BaseElement {
           .scroll-nav {
             bottom: calc(var(--sl-spacing-large) + env(safe-area-inset-bottom, 0px));
           }
+        }
+
+        .host-scorer, .visitor-scorer {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          justify-self: center;
+        }
+
+        .host-scorer mad-scorer-common,
+        .visitor-scorer mad-scorer-common {
+          width: 100%;
         }
       </style>
 
