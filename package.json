@@ -1,7 +1,7 @@
 {
   "name": "contest-organizer",
   "private": true,
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "Tool to organize & enjoy your sport contest.",
   "type": "module",
   "scripts": {
