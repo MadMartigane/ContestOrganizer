@@ -9,7 +9,11 @@ declare const statusData: {
     content: string;
     type: 'info' | 'bug' | 'task' | 'note' | 'warning';
     badgeVariant: 'primary' | 'success' | 'neutral' | 'warning' | 'danger';
-    tables?: Array<{ headers: string[]; rows: string[][]; }>;
+    tables?: Array<{
+      headers: string[];
+      rows: string[][];
+    }>;
   }>;
 };
+
 export default statusData;

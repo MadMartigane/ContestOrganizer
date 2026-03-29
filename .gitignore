@@ -2,8 +2,8 @@ dist/
 !www/favicon.ico
 www/
 
-# Generated files
-src/generated/
+# Generated files (versioned by release script)
+# src/generated/
 
 *~
 *.sw[mnpcod]

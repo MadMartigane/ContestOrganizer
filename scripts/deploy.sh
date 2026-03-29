@@ -56,9 +56,6 @@ should_skip() {
     return 1
 }
 
-# Validate version increment argument
-VALID_INCREMENTS=("patch" "minor" "major")
-VERSION_INCREMENT="patch"  # Default
 DRY_RUN=false
 
 # Detect --dry-run flag (order-independent)
@@ -74,18 +71,9 @@ set -- "${@//--dry-run/}"
 # Clean up any resulting empty arguments
 set -- $(echo "$@" | xargs)
 
-if [ -n "$2" ]; then
-    VERSION_INCREMENT="$2"
-    # Check if the provided value is in the valid list
-    if [[ ! " ${VALID_INCREMENTS[@]} " =~ " ${VERSION_INCREMENT} " ]]; then
-        print_error "Error: Invalid version increment '${VERSION_INCREMENT}'. Expected: patch, minor, or major."
-        exit 1
-    fi
-fi
-
 # Check argument
 if [[ "$1" != "prod" && "$1" != "pre-prod" ]]; then
-    print_error "Usage: $0 {prod|pre-prod}"
+    print_error "Usage: $0 {prod|pre-prod} [--dry-run]"
     exit 1
 fi
 
@@ -115,18 +103,11 @@ esac
 
 BACKUP_DIR="$HOME/backup/contest-data"
 
-# Step 0: Generate status data from TODO.md with version increment
+# Step 0: Generate status data from TODO.md
 print_step "Generating status data..."
-if [ "$DRY_RUN" = true ]; then
-    if ! pnpm exec tsx scripts/generate-status.ts "$VERSION_INCREMENT" --skip-version; then
-        print_error "Status generation failed."
-        exit 1
-    fi
-else
-    if ! pnpm exec tsx scripts/generate-status.ts "$VERSION_INCREMENT"; then
-        print_error "Status generation failed."
-        exit 1
-    fi
+if ! pnpm exec tsx scripts/generate-status.ts --skip-version; then
+    print_error "Status generation failed."
+    exit 1
 fi
 print_success "Status data generated."
 
