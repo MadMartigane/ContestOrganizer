@@ -1,7 +1,7 @@
 {
   "name": "contest-organizer",
   "private": true,
-  "version": "0.0.11",
+  "version": "0.2.3",
   "description": "Tool to organize & enjoy your sport contest.",
   "type": "module",
   "scripts": {
@@ -23,6 +23,8 @@
     "deploy:prod:dry-run": "bash scripts/deploy.sh prod --dry-run",
     "deploy:preprod:dry-run": "bash scripts/deploy.sh pre-prod --dry-run",
     "deploy:backup": "bash scripts/deploy.sh backup",
+    "release": "tsx scripts/release.ts",
+    "release:dry-run": "tsx scripts/release.ts --skip-git --skip-push",
     "check": "ultracite check",
     "fix": "ultracite fix",
     "prepare": "husky",
