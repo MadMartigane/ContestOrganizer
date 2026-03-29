@@ -31,16 +31,6 @@ This will:
 - Generate status-data files
 - Skip all git operations
 
-### With environment context
-
-```bash
-# Release for pre-production (adds -preprod suffix)
-VERSION_CONTEXT=preprod pnpm run release minor
-
-# Release for production (adds -prod suffix)
-VERSION_CONTEXT=prod pnpm run release patch
-```
-
 ## Workflow
 
 1. **Release first**: Run `pnpm run release <patch|minor|major>`
@@ -60,10 +50,7 @@ The deployment script uses the version already set by the release command.
 
 ## Environment Variables
 
-- `VERSION_CONTEXT`: Controls the version suffix
-  - `manual` or unset: adds `-dev` suffix
-  - `preprod`: adds `-preprod` suffix
-  - `prod`: adds `-prod` suffix
+> **Note**: `VERSION_CONTEXT` is no longer used. Releases now use pure version numbers (e.g., v1.2.3) without any environment suffixes.
 
 ## Git Operations
 
@@ -128,6 +115,6 @@ pnpm run deploy:prod
 ### Pre-production release
 
 ```bash
-VERSION_CONTEXT=preprod pnpm run release minor
+pnpm run release minor
 pnpm run deploy:preprod
 ```

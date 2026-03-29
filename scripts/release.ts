@@ -9,11 +9,9 @@ const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const PROJECT_ROOT = resolve(__dirname, "..");
 
 type IncrementType = "patch" | "minor" | "major";
-type VersionContext = "manual" | "preprod" | "prod";
 
 interface VersionResult {
   baseVersion: string;
-  displayVersion: string;
   incrementType: IncrementType;
 }
 
@@ -47,28 +45,6 @@ function incrementVersion(
   }
 }
 
-function getVersionContext(): VersionContext {
-  const ctx = process.env.VERSION_CONTEXT;
-  if (ctx === "preprod") {
-    return "preprod";
-  }
-  if (ctx === "prod") {
-    return "prod";
-  }
-  return "manual";
-}
-
-function getVersionSuffix(context: VersionContext): string {
-  switch (context) {
-    case "preprod":
-      return "-preprod";
-    case "prod":
-      return "-prod";
-    default:
-      return "-dev";
-  }
-}
-
 function readPackageVersion(): string {
   const pkg = JSON.parse(
     readFileSync(join(PROJECT_ROOT, "package.json"), "utf-8")
@@ -77,12 +53,10 @@ function readPackageVersion(): string {
 }
 
 function processVersion(incrementType: IncrementType): VersionResult {
-  const context = getVersionContext();
   const baseVersion = readPackageVersion();
   const newBaseVersion = incrementVersion(baseVersion, incrementType);
   return {
     baseVersion: newBaseVersion,
-    displayVersion: `${newBaseVersion}${getVersionSuffix(context)}`,
     incrementType,
   };
 }
@@ -154,7 +128,7 @@ function main(): void {
 
   // 1. Process version
   const versionResult = processVersion(increment);
-  console.log(`   Version: ${versionResult.displayVersion}`);
+  console.log(`   Version: ${versionResult.baseVersion}`);
 
   // 2. Generate status data files (using generate-status.ts which parses TODO.md)
   generateStatusData();

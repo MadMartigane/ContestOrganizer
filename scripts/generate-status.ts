@@ -28,18 +28,16 @@ interface StatusData {
   projectName: string;
   sections: Section[];
   technology: string;
-  version: string; // e.g., "1.2.3-dev", "1.3.0-preprod", "2.0.0-prod"
+  version: string;
 }
 
 type StatusType = Section["type"];
 type BadgeVariant = Section["badgeVariant"];
 
 type IncrementType = "patch" | "minor" | "major";
-type VersionContext = "manual" | "preprod" | "prod";
 
 interface VersionResult {
   baseVersion: string;
-  displayVersion: string;
   incrementType: IncrementType;
 }
 
@@ -158,28 +156,6 @@ function incrementVersion(
   }
 }
 
-function getVersionContext(): VersionContext {
-  const envContext = process.env.VERSION_CONTEXT;
-  if (envContext === "preprod") {
-    return "preprod";
-  }
-  if (envContext === "prod") {
-    return "prod";
-  }
-  return "manual";
-}
-
-function getVersionSuffix(context: VersionContext): string {
-  switch (context) {
-    case "preprod":
-      return "-preprod";
-    case "prod":
-      return "-prod";
-    default:
-      return "-dev";
-  }
-}
-
 function validateIncrementArg(arg: string | undefined): IncrementType {
   if (arg === undefined) {
     return "patch";
@@ -200,14 +176,11 @@ function readPackageVersion(): string {
 }
 
 function processVersion(incrementType: IncrementType): VersionResult {
-  const context = getVersionContext();
   const baseVersion = readPackageVersion();
   const newBaseVersion = incrementVersion(baseVersion, incrementType);
-  const suffix = getVersionSuffix(context);
 
   return {
     baseVersion: newBaseVersion,
-    displayVersion: `${newBaseVersion}${suffix}`,
     incrementType,
   };
 }
@@ -327,7 +300,7 @@ function generateStatusData(incrementType: IncrementType): StatusData {
     projectName: "Unknown Project",
     technology: "Not specified",
     sections: [],
-    version: versionResult.displayVersion,
+    version: versionResult.baseVersion,
   };
 
   if (!fs.existsSync(TODO_MD_PATH)) {
@@ -392,7 +365,7 @@ function main(): void {
     console.log(`  - ${JSON_OUTPUT_PATH}`);
     console.log(`  - ${DTS_OUTPUT_PATH}`);
     console.log(
-      `Version: ${versionResult.displayVersion} (${versionResult.incrementType}) [skipped]`
+      `Version: ${versionResult.baseVersion} (${versionResult.incrementType}) [skipped]`
     );
   } else {
     const packageJsonPath = path.join(PROJECT_ROOT, "package.json");
@@ -407,7 +380,7 @@ function main(): void {
     console.log(`  - ${JSON_OUTPUT_PATH}`);
     console.log(`  - ${DTS_OUTPUT_PATH}`);
     console.log(
-      `Version: ${versionResult.displayVersion} (${versionResult.incrementType})`
+      `Version: ${versionResult.baseVersion} (${versionResult.incrementType})`
     );
   }
 }
