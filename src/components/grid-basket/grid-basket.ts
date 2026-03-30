@@ -242,7 +242,7 @@ export class GridBasket extends BaseElement {
           <tr class="">
             <td>
               <span class="counter">
-                ${rowNumber > 9 ? null : "0"}
+                ${rowNumber > 9 ? "" : "0"}
                 ${rowNumber}
               </span>
             </td>
