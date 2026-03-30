@@ -64,7 +64,7 @@ export class GridBasket extends BaseElement {
   private async forceGridRender(): Promise<void> {
     const tournamentIdStr = this.getAttribute("tournament-id");
     const tournamentId =
-      tournamentIdStr !== null ? Number(tournamentIdStr) : null;
+      tournamentIdStr === null ? null : Number(tournamentIdStr);
 
     this._tournament.value = null;
     this._tournament.value = await this._tournaments.get(tournamentId);

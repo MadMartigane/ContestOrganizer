@@ -126,10 +126,10 @@ export class SelectTeam extends BaseElement {
   }
 
   set tournamentGridId(val: number | null) {
-    if (val !== null) {
-      this.setAttribute("tournament-grid-id", String(val));
-    } else {
+    if (val === null) {
       this.removeAttribute("tournament-grid-id");
+    } else {
+      this.setAttribute("tournament-grid-id", String(val));
     }
   }
 
@@ -303,13 +303,13 @@ export class SelectTeam extends BaseElement {
       const tournamentType = this._type.value;
       if (tournamentType === TournamentType.NBA) {
         results = await theSportsDbService.searchTeams(this.searchValue);
-      } else if (tournamentType !== null) {
+      } else if (tournamentType === null) {
+        results = [];
+      } else {
         results = await this.apiSports.searchTeam(
           tournamentType,
           this.searchValue
         );
-      } else {
-        results = [];
       }
 
       if (requestId === this.searchRequestId) {

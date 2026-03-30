@@ -233,16 +233,16 @@ export class MadScorerCommon extends BaseElement {
 
     switch (name) {
       case "min":
-        this._min = newValue !== null ? Number(newValue) : 0;
+        this._min = newValue === null ? 0 : Number(newValue);
         break;
       case "max":
-        this._max = newValue !== null ? Number(newValue) : undefined;
+        this._max = newValue === null ? undefined : Number(newValue);
         break;
       case "step":
-        this._step = newValue !== null ? Number(newValue) : 1;
+        this._step = newValue === null ? 1 : Number(newValue);
         break;
       case "value":
-        this._value = newValue !== null ? Number(newValue) : undefined;
+        this._value = newValue === null ? undefined : Number(newValue);
         // Initialize number from value attribute
         if (this._value !== undefined) {
           this._number.value = this._value;

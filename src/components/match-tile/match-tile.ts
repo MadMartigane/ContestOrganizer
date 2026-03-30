@@ -113,7 +113,7 @@ export class MatchTile extends BaseElement {
     side: "host" | "visitor",
     value: string | null
   ): Promise<void> {
-    const teamId = value !== null ? Number.parseInt(value, 10) : null;
+    const teamId = value === null ? null : Number.parseInt(value, 10);
     if (!teamId) {
       if (side === "host") {
         this._hostSignal.value = null;
@@ -149,17 +149,17 @@ export class MatchTile extends BaseElement {
 
   private _getHostScore(): number | null {
     const value = this.getAttribute("host-score");
-    return value !== null ? Number.parseInt(value, 10) : null;
+    return value === null ? null : Number.parseInt(value, 10);
   }
 
   private _getVisitorScore(): number | null {
     const value = this.getAttribute("visitor-score");
-    return value !== null ? Number.parseInt(value, 10) : null;
+    return value === null ? null : Number.parseInt(value, 10);
   }
 
   private _getRank(attr: string): number | undefined {
     const value = this.getAttribute(attr);
-    return value !== null ? Number.parseInt(value, 10) : undefined;
+    return value === null ? undefined : Number.parseInt(value, 10);
   }
 
   /**

@@ -43,13 +43,13 @@ export class MadScorerRugby extends BaseElement {
 
     switch (name) {
       case "min":
-        this._min = newValue !== null ? Number(newValue) : undefined;
+        this._min = newValue === null ? undefined : Number(newValue);
         break;
       case "max":
-        this._max = newValue !== null ? Number(newValue) : undefined;
+        this._max = newValue === null ? undefined : Number(newValue);
         break;
       case "value":
-        this._value = newValue !== null ? Number(newValue) : undefined;
+        this._value = newValue === null ? undefined : Number(newValue);
         this._number.value = this._value ?? this._min ?? 0;
         break;
       case "readonly":

@@ -33,19 +33,19 @@ export class MadInputNumber extends BaseElement {
     this._placeholder = this.getAttribute("placeholder") || "";
     this._label = this.getAttribute("label") || undefined;
     this._min =
-      this.getAttribute("min") !== null ? Number(this.getAttribute("min")) : 0;
+      this.getAttribute("min") === null ? 0 : Number(this.getAttribute("min"));
     this._max =
-      this.getAttribute("max") !== null
-        ? Number(this.getAttribute("max"))
-        : undefined;
+      this.getAttribute("max") === null
+        ? undefined
+        : Number(this.getAttribute("max"));
     this._step =
-      this.getAttribute("step") !== null
-        ? Number(this.getAttribute("step"))
-        : undefined;
+      this.getAttribute("step") === null
+        ? undefined
+        : Number(this.getAttribute("step"));
     this._value =
-      this.getAttribute("value") !== null
-        ? Number(this.getAttribute("value"))
-        : undefined;
+      this.getAttribute("value") === null
+        ? undefined
+        : Number(this.getAttribute("value"));
     this._readonly = this.hasAttribute("readonly");
 
     this._number = new Signal<number>(this._value || this._min || 0);
@@ -57,20 +57,20 @@ export class MadInputNumber extends BaseElement {
   protected _onAttributeChange(name: string, value: string | null): void {
     switch (name) {
       case "value": {
-        this._value = value !== null ? Number(value) : undefined;
+        this._value = value === null ? undefined : Number(value);
         this._number.value = this._value || 0;
         break;
       }
       case "min": {
-        this._min = value !== null ? Number(value) : 0;
+        this._min = value === null ? 0 : Number(value);
         break;
       }
       case "max": {
-        this._max = value !== null ? Number(value) : undefined;
+        this._max = value === null ? undefined : Number(value);
         break;
       }
       case "step": {
-        this._step = value !== null ? Number(value) : undefined;
+        this._step = value === null ? undefined : Number(value);
         break;
       }
       case "placeholder": {
@@ -104,13 +104,13 @@ export class MadInputNumber extends BaseElement {
             autofocus
             id="${inputId}"
             label="${this._label || ""}"
-            max="${this._max !== undefined ? this._max : ""}"
+            max="${this._max === undefined ? "" : this._max}"
             min="${this._min}"
             no-spin-buttons
             placeholder="${this._placeholder || "Score"}"
             ${this._readonly ? "readonly" : ""}
             size="large"
-            step="${this._step !== undefined ? this._step : ""}"
+            step="${this._step === undefined ? "" : this._step}"
             type="number"
             value="${numberValue}"
           ></sl-input>
