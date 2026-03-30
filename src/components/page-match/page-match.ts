@@ -12,6 +12,7 @@ import {
   getNBAMissingMatchCount,
   validateNBAScheduleGeneration,
 } from "../../modules/nba/nba.scheduler";
+import type { GenericTeam } from "../../modules/team-row/team-row.d";
 import { Tournaments } from "../../modules/tournaments/tournaments";
 import type { Tournament } from "../../modules/tournaments/tournaments.types";
 import {
@@ -983,7 +984,7 @@ export class PageMatch extends BaseElement {
           }
         </td>
         <td>
-          <mad-team-tile team="${row.team.team}"></mad-team-tile>
+          <mad-team-tile data-team-row-id="${row.team.id}"></mad-team-tile>
         </td>
         <td>${row.totalMatchs}</td>
         <td>${row.doneMatchs}</td>
@@ -1337,6 +1338,9 @@ export class PageMatch extends BaseElement {
     // Setup event handlers after render
     this._setupEvents();
 
+    // Populate team tiles with team data (cannot be passed as HTML attributes)
+    this._populateTeamTiles();
+
     // Store match refs after render
     this.updateMatchRefs();
   }
@@ -1348,6 +1352,30 @@ export class PageMatch extends BaseElement {
     const matchElements = Array.from(this.querySelectorAll(".match-item"));
     for (const [index, el] of matchElements.entries()) {
       this.matchRefs.set(index, el as HTMLElement);
+    }
+  }
+
+  /**
+   * Populate team tiles in the team selector with team data.
+   * This must be called after render because team data cannot be passed
+   * as HTML attributes (objects are converted to "[object Object]").
+   */
+  private _populateTeamTiles(): void {
+    const teamToSelect = this._teamToSelect.value;
+    if (!teamToSelect) {
+      return;
+    }
+
+    const teamTiles = Array.from(
+      this.querySelectorAll("mad-team-tile[data-team-row-id]")
+    );
+    for (const tile of teamTiles) {
+      const teamRowId = Number((tile as HTMLElement).dataset.teamRowId);
+      const rowData = teamToSelect.find((row) => row.team.id === teamRowId);
+
+      if (rowData?.team?.team && "team" in tile) {
+        (tile as HTMLElement & { team: GenericTeam }).team = rowData.team.team;
+      }
     }
   }
 
