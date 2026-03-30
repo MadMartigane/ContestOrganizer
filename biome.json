@@ -40,22 +40,6 @@
           }
         }
       }
-    },
-    {
-      "includes": ["**/components.d.ts"],
-      "linter": {
-        "enabled": false
-      },
-      "formatter": {
-        "enabled": false
-      },
-      "assist": {
-        "actions": {
-          "source": {
-            "useSortedInterfaceMembers": "off"
-          }
-        }
-      }
     }
   ],
   "extends": ["ultracite/biome/core"]

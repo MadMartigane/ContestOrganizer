@@ -1,6 +1,7 @@
 import path from "node:path";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, loadEnv } from "vite";
+import { viteStaticCopy } from "vite-plugin-static-copy";
 
 /**
  * @LLM-WARNING: CONFIGURATION PARITY REQUIRED
@@ -30,7 +31,25 @@ function serveConfigPlugin() {
 }
 
 const config = defineConfig({
-  plugins: [tailwindcss(), serveConfigPlugin()],
+  plugins: [
+    tailwindcss(),
+    serveConfigPlugin(),
+    viteStaticCopy({
+      targets: [
+        {
+          src: path.resolve(
+            import.meta.dirname,
+            "./node_modules/@shoelace-style/shoelace/dist/assets/"
+          ),
+          dest: "shoelace",
+        },
+        {
+          src: path.resolve(import.meta.dirname, "./src/index.html"),
+          dest: ".",
+        },
+      ],
+    }),
+  ],
   root: "src",
   // envDir is resolved from the vite.config.ts LOCATION, NOT from root.
   // "." means project root where vite.config.ts lives.

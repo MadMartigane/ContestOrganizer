@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-03-29T07:25:53.006Z",
+  "lastUpdated": "2026-03-29T13:11:57.686Z",
   "projectName": "TODO - État de la Session de Développement",
   "technology": "Migration Stencil → Vanilla Web Components",
   "sections": [
@@ -30,11 +30,120 @@
     {
       "id": "amliorations",
       "title": "🔧 Améliorations",
-      "content": "### IMPROV-001 : Équilibrage en temps réel de la génération aléatoire NBA\n\n**Priorité** : Moyenne  \n**Contexte** : La génération automatique de matchs pour les tournois NBA crée des combinaisons aléatoires, mais l'algorithme actuel produit souvent des séries déséquilibrées.  \n**Problème identifié** : L'algorithme sélectionne l'équipe avec le plus de matchs restants puis cherche un adversaire, créant parfois des longues séries avec la même équipe pendant que d'autres équipes n'ont aucun match. L'équilibre n'est vérifié qu'après coup, pas à chaque itération.  \n**Amélioration attendue** : À chaque génération de match, l'algorithme doit tendre vers l'équilibre global. Avant de créer un match, vérifier que la sélection ne crée pas de déséquilibre temporaire (ex : même équipe jouée 3 fois de suite alors que d'autres n'ont pas joué). L'équilibre doit être vérifié et appliqué à chaque itération, pas uniquement lors du résultat final.  \n**Fichiers concernés** : `src/modules/nba/nba.scheduler.ts`",
+      "content": "### IMPROV-001 : Équilibrage en temps réel de la génération aléatoire NBA\n\n**Priorité** : Moyenne  \n**Contexte** : La génération automatique de matchs pour les tournois NBA crée des combinaisons aléatoires, mais l'algorithme actuel produit souvent des séries déséquilibrées.  \n**Problème identifié** : L'algorithme sélectionne l'équipe avec le plus de matchs restants puis cherche un adversaire, créant parfois des longues séries avec la même équipe pendant que d'autres équipes n'ont aucun match. L'équilibre n'est vérifié qu'après coup, pas à chaque itération.  \n**Amélioration attendue** : À chaque génération de match, l'algorithme doit tendre vers l'équilibre global. Avant de créer un match, vérifier que la sélection ne crée pas de déséquilibre temporaire (ex : même équipe jouée 3 fois de suite alors que d'autres n'ont pas joué). L'équilibre doit être vérifié et appliqué à chaque itération, pas uniquement lors du résultat final.  \n**Fichiers concernés** : `src/modules/nba/nba.scheduler.ts`\n\n---",
       "type": "info",
       "badgeVariant": "primary",
       "tables": []
+    },
+    {
+      "id": "migration-stencil-vanilla",
+      "title": "🚀 Migration Stencil → Vanilla",
+      "content": "### Documentation du Format TODO.md\n\nCe fichier est parsé par le script `scripts/generate-status.ts` pour générer les données affichées dans le composant `<app-status-news>`.\n\n**Format attendu :**\n- **Sections** : Définies par `## [emoji] Titre` (🐛 Bugs, ✨ Features, 🔧 Améliorations, 🚀 Migration)\n- **Items** : Définis par `### [ID] : Titre` (ex: `BUG-001`, `MIG-001`)\n- **Métadonnées** : Champs en gras `**Champ** : Valeur`\n- **Fichiers** : Chemins entre backticks `` `path/to/file` ``\n\n**Exécution du script :**\n```bash\npnpm exec tsx scripts/generate-status.ts [patch|minor|major] [--skip-version]\n```\n\nLe script génère :\n- `src/generated/status-data.json` - Données JSON pour le composant\n- `src/generated/status-data.d.ts` - Types TypeScript\n- Met à jour `package.json` version (sauf avec `--skip-version`)\n\n---\n\n### Statut de la Migration\n\n**Composants Migrés ✅** (9/20) :\n- `action-bar`, `app-status-news`, `error-message`, `mad-match-tile`, `mad-scorer-common`, `mad-select-team`, `page-404`, `page-config`, `page-home`, `page-match`\n\n**Composants à Migrer ⏳** (11/20) :\n\n---\n\n### MIG-001 : Migration de page-config\n\n**Priorité** : Élevée  \n**Ordre** : 1  \n**Composant** : `page-config`  \n**Tag** : `page-config`  \n**Fichier source** : `src/components/page-config/page-config.tsx`  \n**Fichier cible** : `src/components/page-config/page-config.ts`  \n**Complexité** : Low  \n**Dépendances** : Aucune (composant standalone)  \n**Description** : Page de configuration simple, affiche les paramètres de l'application. Bon candidat pour démarrer la migration.  \n**Status** : ✅ Terminé\n\n---\n\n### MIG-002 : Migration de page-tournament-select\n\n**Priorité** : Élevée  \n**Ordre** : 2  \n**Composant** : `page-tournament-select`  \n**Tag** : `page-tournament-select`  \n**Fichier source** : `src/components/page-tournament-select/page-tournament-select.tsx`  \n**Fichier cible** : `src/components/page-tournament-select/page-tournament-select.ts`  \n**Complexité** : Low  \n**Dépendances** : Aucune  \n**Description** : Page de sélection des tournois, affiche la liste des tournois existants.  \n**Status** : ✅ Terminé\n\n---\n\n### MIG-003 : Migration de input-number\n\n**Priorité** : Élevée  \n**Ordre** : 3  \n**Composant** : `input-number`  \n**Tag** : `mad-input-number`  \n**Fichier source** : `src/components/input-number/input-number.tsx`  \n**Fichier cible** : `src/components/input-number/input-number.ts`  \n**Complexité** : Low  \n**Dépendances** : Aucune  \n**Description** : Composant input numérique, utilisé par les grilles et pages de tournoi.  \n**Status** : ✅ Terminé\n\n---\n\n### MIG-004 : Migration de team-tile\n\n**Priorité** : Élevée  \n**Ordre** : 4  \n**Composant** : `team-tile`  \n**Tag** : `mad-team-tile`  \n**Fichier source** : `src/components/team-tile/team-tile.tsx`  \n**Fichier cible** : `src/components/team-tile/team-tile.ts`  \n**Complexité** : Low  \n**Dépendances** : Aucune  \n**Description** : Tuile d'affichage d'une équipe avec image.  \n**Status** : ✅ Terminé\n\n---\n\n### MIG-005 : Migration de scorer-basket\n\n**Priorité** : Moyenne  \n**Ordre** : 5  \n**Composant** : `scorer-basket`  \n**Tag** : `mad-scorer-basket`  \n**Fichier source** : `src/components/scorer-basket/scorer-basket.tsx`  \n**Fichier cible** : `src/components/scorer-basket/scorer-basket.ts`  \n**Complexité** : Low  \n**Dépendances** : Aucune  \n**Description** : Composant de score pour matchs de basket.  \n**Status** : ✅ Terminé\n\n---\n\n### MIG-006 : Migration de scorer-rugby\n\n**Priorité** : Moyenne  \n**Ordre** : 6  \n**Composant** : `scorer-rugby`  \n**Tag** : `mad-scorer-rugby`  \n**Fichier source** : `src/components/scorer-rugby/scorer-rugby.tsx`  \n**Fichier cible** : `src/components/scorer-rugby/scorer-rugby.ts`  \n**Complexité** : Low  \n**Dépendances** : Aucune  \n**Description** : Composant de score pour matchs de rugby.  \n**Status** : ✅ Terminé\n\n---\n\n### MIG-007 : Migration de grid-default\n\n**Priorité** : Moyenne  \n**Ordre** : 7  \n**Composant** : `grid-default`  \n**Tag** : `grid-default`  \n**Fichier source** : `src/components/grid-default/grid-default.tsx`  \n**Fichier cible** : `src/components/grid-default/grid-default.ts`  \n**Complexité** : Medium  \n**Dépendances** : `mad-select-team` ✅ (déjà migré)  \n**Description** : Grille d'affichage par défaut pour les tournois.  \n**Status** : ✅ Terminé\n\n---\n\n### MIG-008 : Migration de grid-basket\n\n**Priorité** : Moyenne  \n**Ordre** : 8  \n**Composant** : `grid-basket`  \n**Tag** : `grid-basket`  \n**Fichier source** : `src/components/grid-basket/grid-basket.tsx`  \n**Fichier cible** : `src/components/grid-basket/grid-basket.ts`  \n**Complexité** : Medium  \n**Dépendances** : `mad-select-team` ✅, `action-bar` ✅ (déjà migrés)  \n**Description** : Grille d'affichage spécifique NBA avec classement.  \n**Status** : ✅ Terminé\n\n---\n\n### MIG-009 : Migration de page-tournament\n\n**Priorité** : Moyenne  \n**Ordre** : 9  \n**Composant** : `page-tournament`  \n**Tag** : `page-tournament`  \n**Fichier source** : `src/components/page-tournament/page-tournament.tsx`  \n**Fichier cible** : `src/components/page-tournament/page-tournament.ts`  \n**Complexité** : High  \n**Dépendances** : `grid-basket` ✅, `grid-default` ✅, `input-number` ✅, `error-message` ✅  \n**Description** : Page d'édition d'un tournoi, composant complexe avec génération de matchs.  \n**Status** : ✅ Terminé\n\n---\n\n### MIG-010 : Migration de mad-route\n\n**Priorité** : Basse  \n**Ordre** : 10  \n**Composant** : `mad-route`  \n**Tag** : `mad-route`  \n**Fichier source** : `src/components/mad-route/mad-route.tsx`  \n**Fichier cible** : `src/components/mad-route/mad-route.ts`  \n**Complexité** : Medium  \n**Dépendances** : Router module  \n**Description** : Composant de routing, essentiel pour app-root.  \n**Status** : ✅ Terminé\n\n---\n\n### MIG-011 : Migration de app-root\n\n**Priorité** : Basse  \n**Ordre** : 11  \n**Composant** : `app-root`  \n**Tag** : `app-root`  \n**Fichier source** : `src/components/app-root/app-root.tsx`  \n**Fichier cible** : `src/components/app-root/app-root.ts`  \n**Complexité** : High  \n**Dépendances** : `mad-route` ✅, toutes les pages ✅  \n**Description** : Composant racine, routeur principal de l'application. À faire en dernier.  \n**Status** : ✅ Terminé",
+      "type": "info",
+      "badgeVariant": "primary",
+      "tables": [
+        {
+          "headers": [
+            "Priorité",
+            "Composant",
+            "Tag",
+            "Complexité",
+            "Dépendances",
+            "Status"
+          ],
+          "rows": [
+            [
+              "1",
+              "page-config",
+              "`page-config`",
+              "Low",
+              "Aucune",
+              "✅"
+            ],
+            [
+              "2",
+              "page-tournament-select",
+              "`page-tournament-select`",
+              "Low",
+              "Aucune",
+              "✅"
+            ],
+            [
+              "3",
+              "input-number",
+              "`mad-input-number`",
+              "Low",
+              "Aucune",
+              "✅"
+            ],
+            [
+              "4",
+              "team-tile",
+              "`mad-team-tile`",
+              "Low",
+              "Aucune",
+              "✅"
+            ],
+            [
+              "5",
+              "scorer-basket",
+              "`mad-scorer-basket`",
+              "Low",
+              "Aucune",
+              "✅"
+            ],
+            [
+              "6",
+              "scorer-rugby",
+              "`mad-scorer-rugby`",
+              "Low",
+              "Aucune",
+              "✅"
+            ],
+            [
+              "7",
+              "grid-default",
+              "`grid-default`",
+              "Medium",
+              "mad-select-team ✅",
+              "✅"
+            ],
+            [
+              "8",
+              "grid-basket",
+              "`grid-basket`",
+              "Medium",
+              "mad-select-team ✅, action-bar ✅",
+              "✅"
+            ],
+            [
+              "9",
+              "page-tournament",
+              "`page-tournament`",
+              "High",
+              "grid-basket ✅, grid-default ✅, input-number ✅, error-message ✅",
+              "✅"
+            ],
+            [
+              "10",
+              "mad-route",
+              "`mad-route`",
+              "Medium",
+              "Aucune (router)",
+              "✅"
+            ],
+            [
+              "11",
+              "app-root",
+              "`app-root`",
+              "High",
+              "mad-route ✅, toutes les pages ✅",
+              "✅"
+            ]
+          ]
+        }
+      ]
     }
   ],
-  "version": "0.2.4"
+  "version": "0.4.0"
 }
