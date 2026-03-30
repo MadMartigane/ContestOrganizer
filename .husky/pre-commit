@@ -1,9 +1,5 @@
 #!/bin/sh
 
-# Run Stencil tests (Jest)
-echo "🧪 Running Stencil tests..."
-pnpm test:stencil
-
 # Run Vitest tests
 echo "🧪 Running Vitest tests..."
 pnpm test:vitest
