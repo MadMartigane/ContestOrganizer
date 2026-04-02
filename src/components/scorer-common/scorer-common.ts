@@ -24,19 +24,19 @@ const styles = `/* ========================================
   --scorer-glass-blur: 16px;
 
   /* Accent Colors */
-  --scorer-accent-warning: var(--sl-color-warning-500, #e8a61d);
-  --scorer-accent-primary: var(--sl-color-primary-500, #4263eb);
+  --scorer-accent-warning: var(--wa-color-warning-500, #e8a61d);
+  --scorer-accent-primary: var(--wa-color-brand-500, #4263eb);
   
   /* Text */
-  --scorer-text-primary: var(--sl-color-neutral-900);
-  --scorer-text-secondary: var(--sl-color-neutral-600);
+  --scorer-text-primary: var(--wa-color-neutral-900);
+  --scorer-text-secondary: var(--wa-color-neutral-600);
 
   /* Animation */
   --scorer-transition-fast: 150ms ease;
   --scorer-transition-normal: 250ms ease;
 
   /* Focus Ring */
-  --scorer-focus-ring: 0 0 0 2px var(--sl-color-primary-200);
+  --scorer-focus-ring: 0 0 0 2px var(--wa-color-brand-200);
 
   /* Spacing */
   --scorer-space-xs: 0.25rem;
@@ -59,7 +59,7 @@ const styles = `/* ========================================
     0 4px 16px rgba(0, 0, 0, 0.4);
   --scorer-text-primary: #ffffff;
   --scorer-text-secondary: #e0e0e0;
-  --scorer-focus-ring: 0 0 0 2px var(--sl-color-primary-400);
+  --scorer-focus-ring: 0 0 0 2px var(--wa-color-brand-400);
 }
 
 /* ========================================

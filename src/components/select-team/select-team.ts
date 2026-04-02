@@ -251,7 +251,7 @@ export class SelectTeam extends BaseElement {
 
     // Handle search input with debounce
     if (this.domInputSearch) {
-      this.domInputSearch.addEventListener("sl-input", (ev: Event) => {
+      this.domInputSearch.addEventListener("wa-input", (ev: Event) => {
         const target = ev.target as HTMLInputElement;
         Utils.debounce("select-team-input-search", () => {
           this.onSearchChange(target.value);
@@ -264,8 +264,8 @@ export class SelectTeam extends BaseElement {
    * Open the drawer
    */
   private openDrawer(): void {
-    if (this.domDrawer?.show) {
-      this.domDrawer.show();
+    if (this.domDrawer) {
+      this.domDrawer.setAttribute("open", "");
       if (this.domInputSearch) {
         Utils.setFocus(this.domInputSearch);
       }
@@ -276,8 +276,8 @@ export class SelectTeam extends BaseElement {
    * Close the drawer
    */
   private closeDrawer(): void {
-    if (this.domDrawer?.hide) {
-      this.domDrawer.hide();
+    if (this.domDrawer) {
+      this.domDrawer.removeAttribute("open");
     }
   }
 
@@ -385,18 +385,18 @@ export class SelectTeam extends BaseElement {
     }
 
     const retryButton = error.retryable
-      ? `<sl-button id="retry-btn" size="small" variant="primary">
-           <sl-icon name="arrow-clockwise" slot="prefix"></sl-icon>
+      ? `<wa-button id="retry-btn" size="small" variant="brand">
+           <wa-icon name="arrow-clockwise" slot="start"></wa-icon>
            Réessayer
-         </sl-button>`
+         </wa-button>`
       : "";
 
-    return `<sl-alert class="my-2" open variant="danger">
-      <sl-icon name="exclamation-triangle" slot="icon"></sl-icon>
+    return `<wa-callout class="my-2" open variant="danger">
+      <wa-icon name="exclamation-triangle" slot="start"></wa-icon>
       <strong>${error.title}</strong>
       <p class="text-sm">${error.message}</p>
       ${retryButton}
-    </sl-alert>`;
+    </wa-callout>`;
   }
 
   /**
@@ -410,16 +410,16 @@ export class SelectTeam extends BaseElement {
 
     const items = teams
       .map(
-        (team) => `<sl-menu-item data-team-id="${team.id}">
+        (team) => `<wa-menu-item data-team-id="${team.id}">
           <mad-team-tile></mad-team-tile>
-          <span slot="suffix">
-            <sl-icon class="text-4xl text-neutral" name="arrow-right-circle"></sl-icon>
+          <span slot="end">
+            <wa-icon class="text-4xl text-neutral" name="arrow-right-circle"></wa-icon>
           </span>
-        </sl-menu-item>`
+        </wa-menu-item>`
       )
       .join("");
 
-    return `<sl-menu>${items}</sl-menu>`;
+    return `<wa-menu>${items}</wa-menu>`;
   }
 
   /**
@@ -429,7 +429,7 @@ export class SelectTeam extends BaseElement {
     if (this._isLoading.value) {
       return `<div class="flex flex-col items-center justify-center py-8">
         <div class="mb-3">
-          <sl-spinner class="text-4xl"></sl-spinner>
+          <wa-spinner class="text-4xl"></wa-spinner>
         </div>
         <span class="text-neutral">Chargement des équipes…</span>
       </div>`;
@@ -440,10 +440,10 @@ export class SelectTeam extends BaseElement {
     }
 
     if (this.searchValue?.length > 2) {
-      return `<sl-alert open variant="warning">
-        <sl-icon class="text-6xl text-warning" name="emoji-frown" slot="icon"></sl-icon>
+      return `<wa-callout open variant="warning">
+        <wa-icon class="text-6xl text-warning" name="emoji-frown" slot="start"></wa-icon>
         <span class="mx-2 text-2xl">Aucun résultat</span>
-      </sl-alert>`;
+      </wa-callout>`;
     }
 
     return "";
@@ -454,28 +454,28 @@ export class SelectTeam extends BaseElement {
    */
   private renderTeamSelection(): string {
     return `<div class="footer">
-      <sl-card>
+      <wa-card>
         <div slot="header">
           <h3>Recherche ton équipe. (${this.minNumberSearchLetter} lettres min)</h3>
         </div>
         <div>
           <div class="my-4">
-            <sl-input
+            <wa-input
               autocomplete="off"
               autofocus
               placeholder="nom d'équipe"
               size="medium"
               type="text"
             >
-              <sl-icon name="search" slot="prefix"></sl-icon>
-            </sl-input>
+              <wa-icon name="magnifying-glass" slot="start"></wa-icon>
+            </wa-input>
           </div>
           <div id="results-container">
             ${this.renderErrorAlert()}
             ${this.renderResultsContent()}
           </div>
         </div>
-      </sl-card>
+      </wa-card>
     </div>`;
   }
 
@@ -489,25 +489,24 @@ export class SelectTeam extends BaseElement {
 
     // 1. Initialize basic structure if it doesn't exist
     if (!this.domDrawer) {
-      this.innerHTML = `<sl-drawer no-header placement="start">
+      this.innerHTML = `<wa-drawer no-header placement="start">
         ${this.renderTeamSelection()}
         <div class="grid-300" slot="footer">
-          <sl-button id="cancel-btn" variant="primary">
+          <wa-button id="cancel-btn" variant="brand">
             Annuler
-          </sl-button>
+          </wa-button>
         </div>
-      </sl-drawer>
+      </wa-drawer>
       <div class="cursor-pointer">
         <div id="selected-team-container"></div>
       </div>`;
 
-      this.domDrawer = this.querySelector("sl-drawer") as HTMLElement & {
-        show?: () => void;
-        hide?: () => void;
-      };
+      this.domDrawer = this.querySelector(
+        "wa-drawer"
+      ) as unknown as HTMLElement;
       this.domDivBody = this.querySelector(".cursor-pointer");
       this.domInputSearch = this.querySelector(
-        "sl-input"
+        "wa-input"
       ) as unknown as HTMLElement & {
         value: string;
         disabled: boolean;
@@ -559,9 +558,9 @@ export class SelectTeam extends BaseElement {
       });
 
       // Re-attach menu events if menu exists
-      const menu = this.domResultsContainer.querySelector("sl-menu");
+      const menu = this.domResultsContainer.querySelector("wa-menu");
       if (menu) {
-        menu.addEventListener("sl-select", (ev: Event) => {
+        menu.addEventListener("wa-select", (ev: Event) => {
           ev.stopPropagation();
           this.onTeamRadioChange(ev as CustomEvent);
         });

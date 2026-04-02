@@ -1,6 +1,6 @@
+import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
 import { BaseElement } from "@core/base-element.js";
 import { Signal } from "@core/signal.js";
-import type SlSwitch from "@shoelace-style/shoelace/dist/components/switch/switch.js";
 import setting, {
   type GlobalSetting,
 } from "../../modules/global-setting/global-setting.js";
@@ -13,7 +13,7 @@ const API_SPORTS_CACHE_KEY = "API_SPORTS_CACHE_TEAMS";
  */
 export class PageConfig extends BaseElement {
   private declare globalSetting: GlobalSetting;
-  private darkModeSwitch: SlSwitch | null = null;
+  private darkModeSwitch: WaSwitch | null = null;
 
   private declare _isDarkModeActive: Signal<boolean>;
   private declare _cacheCleared: Signal<boolean>;
@@ -58,25 +58,19 @@ export class PageConfig extends BaseElement {
     const cacheCleared = this._cacheCleared.value;
 
     this.innerHTML = `
-      <sl-breadcrumb>
-        <sl-breadcrumb-item>
-          <sl-icon class="text-2xl" name="gear"></sl-icon>
-        </sl-breadcrumb-item>
-      </sl-breadcrumb>
-
       <div class="page-content">
         <h1>Configuration</h1>
 
-        <sl-switch
+        <wa-switch
           id="dark-mode-switch"
           ${isDarkModeActive ? "checked" : ""}
           size="large"
         >
           <span class="container">Mode sombre</span>
-          <sl-icon name="highlights"></sl-icon>
-        </sl-switch>
+          <wa-icon name="highlights"></wa-icon>
+        </wa-switch>
 
-        <sl-divider></sl-divider>
+        <wa-divider></wa-divider>
 
         <div class="my-4">
           <h3>Cache des équipes</h3>
@@ -84,22 +78,22 @@ export class PageConfig extends BaseElement {
             Vide le cache des équipes si vous rencontrez des problèmes de
             recherche.
           </p>
-          <sl-button
+          <wa-button
             id="clear-cache-btn"
             class="mt-2"
             size="medium"
             variant="warning"
           >
-            <sl-icon name="trash" slot="prefix"></sl-icon>
+            <wa-icon name="trash" slot="start"></wa-icon>
             Vider le cache
-          </sl-button>
+          </wa-button>
           ${
             cacheCleared
               ? `
-            <sl-alert class="mt-2" open variant="success">
-              <sl-icon name="check2-circle" slot="icon"></sl-icon>
+            <wa-callout class="mt-2" open variant="success">
+              <wa-icon name="check2-circle" slot="start"></wa-icon>
               Le cache des équipes a été vidé.
-            </sl-alert>
+            </wa-callout>
           `
               : ""
           }
@@ -107,15 +101,15 @@ export class PageConfig extends BaseElement {
 
         <div class="footer">
           <div class="grid-300">
-            <sl-button href="#/home" size="large" variant="primary">
-              <sl-icon name="house" slot="prefix"></sl-icon>
-              <span slot="suffix">Acceuil</span>
-            </sl-button>
+            <wa-button href="#/home" size="large" variant="brand">
+              <wa-icon name="house" slot="start"></wa-icon>
+              <span slot="end">Acceuil</span>
+            </wa-button>
 
-            <sl-button href="#/tournaments" size="large" variant="primary">
-              <sl-icon name="trophy" slot="prefix"></sl-icon>
-              <span slot="suffix">Tournois</span>
-            </sl-button>
+            <wa-button href="#/tournaments" size="large" variant="brand">
+              <wa-icon name="trophy" slot="start"></wa-icon>
+              <span slot="end">Tournois</span>
+            </wa-button>
           </div>
         </div>
       </div>
@@ -127,7 +121,7 @@ export class PageConfig extends BaseElement {
 
     // Setup event listeners
     if (this.darkModeSwitch) {
-      this.darkModeSwitch.addEventListener("sl-change", () => {
+      this.darkModeSwitch.addEventListener("wa-change", () => {
         this._onDarkModeChange();
       });
     }

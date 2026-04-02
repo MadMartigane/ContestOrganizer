@@ -9,43 +9,36 @@
 // Import Tailwind CSS first - must be before component imports
 import "./global/tailwind.css";
 
-// Import Shoelace theme and global styles (defines --sl-* variables)
-import "./global/app.css";
+// Import Web Awesome styles
+import "@awesome.me/webawesome/dist/styles/webawesome.css";
 
-// Initialize global state and Shoelace
+// Initialize global state
 import { getTournaments } from "./modules/init";
 
 getTournaments();
 
-import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path.js";
-
-setBasePath("vanilla/shoelace");
-
-// Import all Shoelace components
-import "@shoelace-style/shoelace/dist/components/alert/alert.js";
-import "@shoelace-style/shoelace/dist/components/badge/badge.js";
-import "@shoelace-style/shoelace/dist/components/breadcrumb/breadcrumb.js";
-import "@shoelace-style/shoelace/dist/components/breadcrumb-item/breadcrumb-item.js";
-import "@shoelace-style/shoelace/dist/components/button/button.js";
-import "@shoelace-style/shoelace/dist/components/button-group/button-group.js";
-import "@shoelace-style/shoelace/dist/components/card/card.js";
-import "@shoelace-style/shoelace/dist/components/carousel/carousel.js";
-import "@shoelace-style/shoelace/dist/components/carousel-item/carousel-item.js";
-import "@shoelace-style/shoelace/dist/components/dialog/dialog.js";
-import "@shoelace-style/shoelace/dist/components/divider/divider.js";
-import "@shoelace-style/shoelace/dist/components/drawer/drawer.js";
-import "@shoelace-style/shoelace/dist/components/icon/icon.js";
-import "@shoelace-style/shoelace/dist/components/input/input.js";
-import "@shoelace-style/shoelace/dist/components/menu/menu.js";
-import "@shoelace-style/shoelace/dist/components/menu-item/menu-item.js";
-import "@shoelace-style/shoelace/dist/components/option/option.js";
-import "@shoelace-style/shoelace/dist/components/radio/radio.js";
-import "@shoelace-style/shoelace/dist/components/radio-button/radio-button.js";
-import "@shoelace-style/shoelace/dist/components/radio-group/radio-group.js";
-import "@shoelace-style/shoelace/dist/components/select/select.js";
-import "@shoelace-style/shoelace/dist/components/spinner/spinner.js";
-import "@shoelace-style/shoelace/dist/components/switch/switch.js";
-import "@shoelace-style/shoelace/dist/components/tag/tag.js";
+// Import all Web Awesome components
+import "@awesome.me/webawesome/dist/components/callout/callout.js";
+import "@awesome.me/webawesome/dist/components/badge/badge.js";
+import "@awesome.me/webawesome/dist/components/breadcrumb/breadcrumb.js";
+import "@awesome.me/webawesome/dist/components/breadcrumb-item/breadcrumb-item.js";
+import "@awesome.me/webawesome/dist/components/button/button.js";
+import "@awesome.me/webawesome/dist/components/button-group/button-group.js";
+import "@awesome.me/webawesome/dist/components/card/card.js";
+import "@awesome.me/webawesome/dist/components/carousel/carousel.js";
+import "@awesome.me/webawesome/dist/components/carousel-item/carousel-item.js";
+import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
+import "@awesome.me/webawesome/dist/components/divider/divider.js";
+import "@awesome.me/webawesome/dist/components/drawer/drawer.js";
+import "@awesome.me/webawesome/dist/components/icon/icon.js";
+import "@awesome.me/webawesome/dist/components/input/input.js";
+import "@awesome.me/webawesome/dist/components/option/option.js";
+import "@awesome.me/webawesome/dist/components/radio/radio.js";
+import "@awesome.me/webawesome/dist/components/radio-group/radio-group.js";
+import "@awesome.me/webawesome/dist/components/select/select.js";
+import "@awesome.me/webawesome/dist/components/spinner/spinner.js";
+import "@awesome.me/webawesome/dist/components/switch/switch.js";
+import "@awesome.me/webawesome/dist/components/tag/tag.js";
 
 import setting from "./modules/global-setting/global-setting";
 
@@ -68,5 +61,13 @@ import "./components/scorer-rugby/scorer-rugby";
 import "./components/grid-default/grid-default";
 import "./components/grid-basket/grid-basket";
 import "./components/page-tournament/page-tournament";
-import "./components/mad-route/mad-route";
 import "./components/app-root/app-root";
+import "./components/zone-container/zone-container.js";
+import "./components/command-palette/command-palette.js";
+import "./components/gesture-overlay/gesture-overlay.js";
+import "./components/zones/home-zone.js";
+import "./components/zones/config-zone.js";
+import "./components/zones/tournaments-zone.js";
+import "./components/zones/matchs-zone.js";
+import "./components/match/live-match-card.js";
+import "./components/match/gesture-scoring.js";

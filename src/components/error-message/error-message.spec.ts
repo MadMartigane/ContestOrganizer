@@ -20,7 +20,7 @@ describe("ErrorMessage", () => {
     document.body.appendChild(element);
 
     expect(element.innerHTML).toContain("Test error message");
-    expect(element.innerHTML).toContain("sl-alert");
+    expect(element.innerHTML).toContain("wa-callout");
   });
 
   it("should show home button by default", () => {

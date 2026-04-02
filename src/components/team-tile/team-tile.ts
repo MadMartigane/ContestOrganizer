@@ -216,13 +216,13 @@ export class MadTeamTile extends BaseElement {
         justify-content: center;
         width: 64px;
         height: 64px;
-        background-color: var(--sl-color-neutral-200);
-        border-radius: var(--sl-border-radius-small);
+        background-color: var(--wa-color-neutral-200);
+        border-radius: var(--wa-border-radius-small);
       }
       .team-image-fallback svg {
         width: 40px;
         height: 40px;
-        color: var(--sl-color-neutral-400);
+        color: var(--wa-color-neutral-400);
         animation: basketball-pulse 1.5s ease-in-out infinite;
         will-change: transform, opacity;
       }
@@ -259,7 +259,7 @@ export class MadTeamTile extends BaseElement {
         line-height: 1;
       }
       .text-neutral {
-        color: var(--sl-color-neutral);
+        color: var(--wa-color-neutral);
       }
       .w-16 {
         width: 4rem;
@@ -331,11 +331,11 @@ export class MadTeamTile extends BaseElement {
     let imageHtml: string;
     if (imageError) {
       imageHtml = `
-        <sl-icon
+        <wa-icon
           class="${reverse ? "float-right text-6xl text-neutral" : "float-left text-6xl text-neutral"}"
           name="shield-x"
           style="width: 64px; height: 64px;"
-        ></sl-icon>
+        ></wa-icon>
       `;
     } else if (imgSrc) {
       imageHtml = `

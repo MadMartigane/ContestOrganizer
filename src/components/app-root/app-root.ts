@@ -1,34 +1,100 @@
 import { BaseElement } from "@core/base-element.js";
-import router, { type Router } from "../../modules/router/router.js";
+import "./app-root.css";
+import { NavigationOrchestrator } from "@core/navigation-orchestrator.js";
+import { RouteSync } from "@core/route-sync.js";
+import "../zones/home-zone.js";
+import "../zones/config-zone.js";
+import "../zones/tournaments-zone.js";
+import "../zones/matchs-zone.js";
 
 export class AppRoot extends BaseElement {
-  private readonly router: Router = router;
+  private _layoutClass = "layout-mobile";
+  private orchestrator: NavigationOrchestrator | null = null;
+  private routeSync: RouteSync | null = null;
 
   constructor() {
     super();
-    this.router.setRedirection({
-      from: "/app/:anything",
-      to: "/home",
+    this._handleResize = this._handleResize.bind(this);
+  }
+
+  connectedCallback(): void {
+    super.connectedCallback();
+
+    // Global navigate event listener
+    this.addEventListener("navigate", (e: Event) => {
+      const detail = (e as CustomEvent<{ hash: string }>).detail;
+      window.location.hash = detail.hash;
     });
 
-    this.router.setDefaultUrl("/home");
-    this.router.setNotFoundUrl("/404");
+    window.addEventListener("resize", this._handleResize);
+    this._handleResize();
+
+    // Initialize orchestrator after DOM is rendered
+    queueMicrotask(() => {
+      const container = this.querySelector(".app-container");
+      if (container instanceof HTMLElement) {
+        this.orchestrator = new NavigationOrchestrator(container);
+        this.orchestrator.enable();
+
+        // Wire RouteSync for URL ↔ orchestrator sync
+        this.routeSync = new RouteSync(this.orchestrator);
+        this.routeSync.enable();
+      }
+    });
+  }
+
+  disconnectedCallback(): void {
+    window.removeEventListener("resize", this._handleResize);
+    this.routeSync?.disable();
+    this.routeSync = null;
+    this.orchestrator?.destroy();
+    this.orchestrator = null;
+    super.disconnectedCallback();
   }
 
   protected _setupProperties(): void {
-    // No reactive properties needed
+    this._initialized = true;
   }
 
   protected _render(): void {
     this.innerHTML = `
-			<mad-route component="page-home" url="/home"></mad-route>
-			<mad-route component="page-tournament-select" url="/tournaments"></mad-route>
-			<mad-route component="mad-select-team" url="/team-select/:teamId/:teamType"></mad-route>
-			<mad-route component="page-tournament" url="/tournament/:tournamentId"></mad-route>
-			<mad-route component="page-match" url="/match/:tournamentId"></mad-route>
-			<mad-route component="page-404" url="/404"></mad-route>
-			<mad-route component="page-config" url="/config"></mad-route>
-		`;
+      <div class="app-container ${this._layoutClass}">
+        <home-zone class="zone home"></home-zone>
+        <config-zone class="zone config"></config-zone>
+        <tournaments-zone class="zone tournaments"></tournaments-zone>
+        <matchs-zone class="zone matchs"></matchs-zone>
+      </div>
+
+      <command-palette></command-palette>
+      <gesture-overlay></gesture-overlay>
+    `;
+  }
+
+  private _handleResize(): void {
+    const newClass = this.getLayoutClass();
+    if (newClass !== this._layoutClass) {
+      this._layoutClass = newClass;
+
+      // Instead of full re-render, update the container class in-place
+      // to avoid destroying SpatialLayout's zone element references
+      const container = this.querySelector(".app-container");
+      if (container instanceof HTMLElement) {
+        container.className = `app-container ${this._layoutClass}`;
+      }
+    }
+
+    // Always notify orchestrator of current viewport state
+    this.orchestrator?.getLayout().handleResize();
+  }
+
+  private getLayoutClass(): string {
+    if (window.innerWidth >= 1024) {
+      return "layout-desktop";
+    }
+    if (window.innerWidth >= 768) {
+      return "layout-tablet";
+    }
+    return "layout-mobile";
   }
 }
 

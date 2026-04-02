@@ -19,8 +19,7 @@ describe("Page404", () => {
     document.body.appendChild(element);
 
     expect(element.innerHTML).toContain("404");
-    expect(element.innerHTML).toContain("sl-breadcrumb");
-    expect(element.innerHTML).toContain("sl-carousel");
+    expect(element.innerHTML).toContain("wa-carousel");
   });
 
   it("should render navigation buttons", () => {

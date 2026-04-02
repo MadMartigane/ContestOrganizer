@@ -97,9 +97,15 @@ export class MadInputNumber extends BaseElement {
     const numberValue = this._number.value;
 
     this.innerHTML = `
+      <style>
+        .button-group {
+          display: flex;
+          gap: 0.5rem;
+        }
+      </style>
       <span class="container-xl">
         <span class="container-xl">
-          <sl-input
+          <wa-input
             autocomplete="off"
             autofocus
             id="${inputId}"
@@ -113,34 +119,36 @@ export class MadInputNumber extends BaseElement {
             step="${this._step === undefined ? "" : this._step}"
             type="number"
             value="${numberValue}"
-          ></sl-input>
+          ></wa-input>
         </span>
         <span class="container-xl">
-          <sl-button-group label="Plus/minus action buttons">
-            <sl-button
+          <div class="button-group">
+            <wa-button
               class="decrement-btn"
+              variant="default"
               ${this._readonly ? "disabled" : ""}
               pill
               size="large"
             >
-              <sl-icon class="text-warning" name="dash-lg"></sl-icon>
-            </sl-button>
-            <sl-button
+              <wa-icon class="text-warning" name="minus"></wa-icon>
+            </wa-button>
+            <wa-button
               class="increment-btn"
+              variant="default"
               ${this._readonly ? "disabled" : ""}
               pill
               size="large"
             >
-              <sl-icon class="text-primary" name="plus-lg"></sl-icon>
-            </sl-button>
-          </sl-button-group>
+              <wa-icon class="text-primary" name="plus"></wa-icon>
+            </wa-button>
+          </div>
         </span>
       </span>
     `;
 
     this.domInput = this.querySelector(`#${inputId}`) as HTMLInputElement;
     if (this.domInput) {
-      this.domInput.addEventListener("sl-change", () => {
+      this.domInput.addEventListener("change", () => {
         this._onNumberChange();
       });
     }

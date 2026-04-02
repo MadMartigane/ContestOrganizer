@@ -18,37 +18,29 @@ export class Page404 extends BaseElement {
    */
   protected _render(): void {
     this.innerHTML = `
-      <sl-breadcrumb>
-        <sl-breadcrumb-item>
-          <sl-icon class="text-2xl" name="4-circle"></sl-icon>
-          <sl-icon class="text-2xl" name="0-circle"></sl-icon>
-          <sl-icon class="text-2xl" name="4-circle"></sl-icon>
-        </sl-breadcrumb-item>
-      </sl-breadcrumb>
-
       <div class="page-content">
         <h1>404 - La page demandée n'existe pas.</h1>
 
-        <sl-carousel autoplay loop pagination>
-          <sl-carousel-item>
+        <wa-carousel autoplay loop pagination>
+          <wa-carousel-item>
             <img alt="404 - Not found" height="300" src="/assets/img/undraw_page_not_found.svg" width="400" />
-          </sl-carousel-item>
-          <sl-carousel-item>
+          </wa-carousel-item>
+          <wa-carousel-item>
             <img alt="404 - Page abducted" height="300" src="/assets/img/undraw_taken.svg" width="400" />
-          </sl-carousel-item>
-        </sl-carousel>
+          </wa-carousel-item>
+        </wa-carousel>
 
         <div class="footer">
           <div class="grid-300">
-            <sl-button href="#/home" size="large" variant="primary">
-              <sl-icon name="house" slot="prefix"></sl-icon>
+            <wa-button href="#/home" size="large" variant="brand">
+              <wa-icon name="house" slot="start"></wa-icon>
               <span slot="suffix">Accueil</span>
-            </sl-button>
+            </wa-button>
 
-            <sl-button href="#/tournaments" size="large" variant="primary">
-              <sl-icon name="trophy" slot="prefix"></sl-icon>
+            <wa-button href="#/tournaments" size="large" variant="brand">
+              <wa-icon name="trophy" slot="start"></wa-icon>
               <span slot="suffix">Tournois</span>
-            </sl-button>
+            </wa-button>
           </div>
         </div>
       </div>

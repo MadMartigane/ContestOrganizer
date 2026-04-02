@@ -502,5 +502,38 @@ export class Tournaments {
   }
 }
 
+// Helper functions for tournament operations
+// These wrap the Tournaments class instance from getTournaments()
+
+/**
+ * Returns all tournaments as an array.
+ */
+export function getAllTournaments(): Tournament[] {
+  return (window.__tournaments?.map((t) => t) as Tournament[]) ?? [];
+}
+
+/**
+ * Navigates to tournament creation page.
+ */
+export function createTournament(): void {
+  document.dispatchEvent(
+    new CustomEvent("navigate", {
+      detail: { hash: "#/zone/planning/tournaments" },
+      bubbles: true,
+      composed: true,
+    })
+  );
+}
+
+/**
+ * Deletes a tournament by ID.
+ */
+export function deleteTournament(id: number): Promise<number> {
+  return (
+    window.__tournaments?.remove(id) ??
+    Promise.reject(new Error("Tournaments not initialized"))
+  );
+}
+
 // No singleton at module level - use getTournaments() from ../init instead
 export default Tournaments;

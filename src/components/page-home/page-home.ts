@@ -65,12 +65,6 @@ export class PageHome extends BaseElement {
    */
   protected _render(): void {
     this.innerHTML = `
-      <sl-breadcrumb>
-        <sl-breadcrumb-item>
-          <sl-icon class="text-2xl" name="house"></sl-icon>
-        </sl-breadcrumb-item>
-      </sl-breadcrumb>
-
       <div class="page-content">
         <h1>Contest Tournament</h1>
 
@@ -88,15 +82,15 @@ export class PageHome extends BaseElement {
 
         <div class="footer">
           <div class="grid-300">
-            <sl-button href="#/config" size="large" variant="primary">
-              <sl-icon name="gear" slot="prefix"></sl-icon>
-              <span slot="suffix">Configuration</span>
-            </sl-button>
+            <wa-button href="#/config" size="large" variant="brand">
+              <wa-icon name="gear" slot="start"></wa-icon>
+              <span slot="end">Configuration</span>
+            </wa-button>
 
-            <sl-button href="#/tournaments" size="large" variant="primary">
-              <sl-icon name="trophy" slot="prefix"></sl-icon>
-              <span slot="suffix">Tournois</span>
-            </sl-button>
+            <wa-button href="#/tournaments" size="large" variant="brand">
+              <wa-icon name="trophy" slot="start"></wa-icon>
+              <span slot="end">Tournois</span>
+            </wa-button>
           </div>
         </div>
       </div>

@@ -49,14 +49,6 @@ rm -rf www
 mkdir -p www
 print_success "Build directories cleaned."
 
-# Step 2: Build Stencil
-print_step "Building Stencil..."
-if ! pnpm exec stencil build; then
-    print_error "Stencil build failed."
-    exit 1
-fi
-print_success "Stencil build completed."
-
 # Step 3: Build Vite
 print_step "Building Vite..."
 if ! pnpm run vite:build; then
@@ -89,18 +81,6 @@ echo ""
 echo "========================================"
 print_success "Build completed successfully!"
 echo "========================================"
-echo ""
-
-# Count and list files in www/build/
-if [ -d "www/build" ]; then
-    BUILD_COUNT=$(find www/build -type f | wc -l)
-    print_info "Stencil output (www/build/): $BUILD_COUNT files"
-    echo ""
-    ls -la www/build/ 2>/dev/null || true
-else
-    print_info "Stencil output (www/build/): not found"
-fi
-
 echo ""
 
 # Count and list files in www/vanilla/

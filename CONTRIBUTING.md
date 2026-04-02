@@ -27,12 +27,15 @@ This project follows a code of conduct to ensure a welcoming environment for all
 
 1. Fork the repository on GitHub
 2. Clone your fork locally:
+
    ```bash
    git clone https://github.com/your-username/contest-organizer.git
    cd contest-organizer
    ```
+
 3. Set up the development environment (see below)
 4. Create a new branch for your changes:
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
@@ -41,38 +44,39 @@ This project follows a code of conduct to ensure a welcoming environment for all
 
 ### Prerequisites
 
-- Node.js >= 18.x
-- npm >= 8.x
+- Node.js >= 20.x
+- pnpm >= 8.x
 - Git
 
 ### Installation
 
 1. Install dependencies:
+
    ```bash
-   npm install
+   pnpm install
    ```
 
 2. Start the development server:
+
    ```bash
-   npm start
+   pnpm dev
    ```
 
-3. Open `http://localhost:3333` in your browser
+3. Open `http://localhost:5173` in your browser
 
 ### Available Scripts
 
-- `npm start` - Development server with hot reload
-- `npm run build` - Production build
-- `npm test` - Run tests once
-- `npm run test.watch` - Run tests in watch mode
-- `npm run lint` - Check code style and fix issues
-- `npm run format` - Format code with Biome
+- `pnpm dev` - Development server with hot reload
+- `pnpm run build` - Production build
+- `pnpm test` - Run tests once
+- `pnpm run lint` - Check code style and fix issues
+- `pnpm run format` - Format code with Biome
 
 ## 🏗️ Project Structure
 
 ```
 src/
-├── components/          # Stencil components
+├── components/          # Vanilla Web Components (BaseElement)
 │   ├── page-match/      # Match management page
 │   ├── page-tournament/ # Tournament management
 │   ├── team-tile/       # Team display component
@@ -82,6 +86,7 @@ src/
 │   ├── matchs/          # Match logic
 │   ├── teams/           # Team handling
 │   └── ...
+├── core/                # Core framework (BaseElement, Signals)
 ├── global/              # Global styles and app setup
 └── assets/              # Static assets
 ```
@@ -108,6 +113,7 @@ type(scope): description
 ```
 
 Types:
+
 - `feat`: New features
 - `fix`: Bug fixes
 - `docs`: Documentation
@@ -117,6 +123,7 @@ Types:
 - `chore`: Maintenance
 
 Examples:
+
 ```
 feat: add live scoring for basketball matches
 fix: correct ranking calculation for tied teams
@@ -133,13 +140,13 @@ docs: update installation instructions
 - Add JSDoc comments for public APIs
 - Prefer `const` over `let`, avoid `var`
 
-### Components (Stencil)
+### Components (Vanilla Web Components)
 
-- Use functional components where possible
+- Use `BaseElement` as the base class for all components
 - Follow the component naming convention: `mad-*`
 - Keep components small and focused
-- Use `@Prop()` for inputs, `@State()` for internal state
-- Handle lifecycle properly
+- Use Signals for reactive state management
+- Handle lifecycle properly via `connectedCallback` and `disconnectedCallback`
 
 ### CSS/Styling
 
@@ -150,17 +157,14 @@ docs: update installation instructions
 
 ## 🧪 Testing
 
-We use Jest for testing:
+We use Vitest for testing:
 
 ```bash
 # Run all tests
-npm test
-
-# Run tests in watch mode
-npm run test.watch
+pnpm test
 
 # Run specific test file
-npm test -- src/components/my-component/my-component.test.ts
+pnpm test -- src/components/my-component/my-component.test.ts
 ```
 
 ### Writing Tests
@@ -173,9 +177,9 @@ npm test -- src/components/my-component/my-component.test.ts
 
 ## 📝 Submitting Changes
 
-1. Ensure all tests pass: `npm test`
-2. Run linting: `npm run lint`
-3. Format code: `npm run format`
+1. Ensure all tests pass: `pnpm test`
+2. Run linting: `pnpm run lint`
+3. Format code: `pnpm run format`
 4. Update documentation if needed
 5. Commit with conventional commit message
 6. Push to your fork
@@ -190,6 +194,7 @@ npm test -- src/components/my-component/my-component.test.ts
 ### Bug Reports
 
 Please include:
+
 - Clear title and description
 - Steps to reproduce
 - Expected vs actual behavior
@@ -200,6 +205,7 @@ Please include:
 ### Feature Requests
 
 Please include:
+
 - Clear description of the feature
 - Use case and benefits
 - Mockups or examples if possible
@@ -215,6 +221,7 @@ Please include:
 ## 🎯 Recognition
 
 Contributors will be recognized in:
+
 - Repository contributors list
 - Release notes
 - Special mentions for significant contributions

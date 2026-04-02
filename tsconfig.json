@@ -3,7 +3,6 @@
     "strict": false,
     "allowSyntheticDefaultImports": true,
     "declaration": false,
-    "experimentalDecorators": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
     "lib": ["dom", "es2023"],
@@ -18,8 +17,6 @@
     "types": ["vite/client", "jest"],
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "jsx": "react",
-    "jsxFactory": "h",
     "skipLibCheck": true
   },
   "include": ["src"],

@@ -22,16 +22,20 @@ We want to test CYBERCORE CSS (a pure CSS cyberpunk design framework) on the exi
 ## Resources
 
 ### Official Documentation
-- **GitHub:** https://github.com/sebyx07/cybercore-css
-- **Live Demo:** https://sebyx07.github.io/cybercore-css
-- **Docs:** https://sebyx07.github.io/cybercore-css/#/docs
+
+- **GitHub:** <https://github.com/sebyx07/cybercore-css>
+- **Live Demo:** <https://sebyx07.github.io/cybercore-css>
+- **Docs:** <https://sebyx07.github.io/cybercore-css/#/docs>
 - **npm:** `cybercore-css`
 
 ### LLM-Specific Documentation
+
 CYBERCORE CSS includes a `CLAUDE.md` file for AI agents:
-- https://raw.githubusercontent.com/sebyx07/cybercore-css/main/CLAUDE.md
+
+- <https://raw.githubusercontent.com/sebyx07/cybercore-css/main/CLAUDE.md>
 
 Key points from CLAUDE.md:
+
 - Uses CSS `@layer` for cascade control
 - All classes use `cyber-` prefix with BEM-style modifiers
 - Color palette: Cyan (#00f0ff), Magenta (#ff2a6d), Yellow (#fcee0a), Green (#05ffa1), Void (#0a0a0f)
@@ -74,6 +78,7 @@ pnpm add cybercore-css
 ## Target Component: page-match
 
 ### File Location
+
 - **TypeScript:** `src/components/page-match/page-match.ts`
 - **Current UI Kit:** Shoelace (`sl-button`, `sl-tag`, `sl-icon`, `sl-spinner`, `sl-breadcrumb`, etc.)
 
@@ -157,11 +162,13 @@ page-match {
 ### Phase 2: Add CYBERCORE Visual Effects
 
 **Glitch Text Effect:**
+
 ```html
 <h1 class="cyber-glitch" data-text="TOURNOI">TOURNOI</h1>
 ```
 
 **Neon Borders:**
+
 ```html
 <div class="cyber-neon-border cyber-neon-border--magenta">
   <!-- Match content -->
@@ -169,6 +176,7 @@ page-match {
 ```
 
 **Scanlines Overlay:**
+
 ```html
 <div class="cyber-scanlines">
   <!-- Entire page or section -->
@@ -176,6 +184,7 @@ page-match {
 ```
 
 **Terminal-style Status:**
+
 ```html
 <div class="cyber-terminal">
   <div class="cyber-terminal__body">
@@ -287,9 +296,11 @@ sl-button.cyber-btn--magenta {
 ## Testing the Integration
 
 ### 1. Verify CSS is loaded
+
 Open browser DevTools → Elements → Check for `cyber-` classes in computed styles.
 
 ### 2. Test key visual elements
+
 - [ ] Match cards have neon borders
 - [ ] Status badges glow or glitch
 - [ ] Hover effects work on buttons
@@ -297,10 +308,12 @@ Open browser DevTools → Elements → Check for `cyber-` classes in computed st
 - [ ] No CSS conflicts with existing styles
 
 ### 3. Check responsive behavior
+
 - [ ] Mobile: Effects don't break layout
 - [ ] Desktop: Full cyberpunk aesthetic visible
 
 ### 4. Verify no JS errors
+
 CYBERCORE is CSS-only, so no JS dependencies to check.
 
 ---
@@ -327,7 +340,9 @@ const terminalIcon = renderIcon('terminal', { size: 24, color: 'cyan' });
 ## Troubleshooting
 
 ### CSS Cascade Issues
+
 CYBERCORE uses `@layer` for cascade control. If Shoelace styles override CYBERCORE:
+
 ```css
 /* Increase specificity */
 .page-match .cyber-btn {
@@ -336,7 +351,9 @@ CYBERCORE uses `@layer` for cascade control. If Shoelace styles override CYBERCO
 ```
 
 ### Glow Effects Not Visible
+
 Ensure the parent element has a dark background:
+
 ```css
 page-match {
   background: var(--cyber-void-900);
@@ -344,6 +361,7 @@ page-match {
 ```
 
 ### Z-Index Issues
+
 CYBERCORE effects use high z-index values. Check for conflicts with Shoelace z-index tokens (`--sl-z-index-*`).
 
 ---
@@ -364,14 +382,17 @@ After integration, the `page-match` component should display:
 ## Files to Create/Modify
 
 ### Create
+
 - `src/global/cybercore-override.css` — Custom overrides for Shoelace
 - (Optional) `src/global/cybercore-theme.css` — Theme variable mappings
 
 ### Modify
+
 - `src/global/shoelace.css` — Add CYBERCORE import at top
 - `src/components/page-match/page-match.ts` — Add `cyber-*` classes to render methods
 
 ### Package
+
 - `package.json` — Add `cybercore-css` dependency
 
 ---

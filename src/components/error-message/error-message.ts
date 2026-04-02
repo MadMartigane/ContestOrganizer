@@ -90,18 +90,18 @@ export class ErrorMessage extends BaseElement {
   protected _render(): void {
     const homeButtonHtml = this._goHomeButton
       ? `<div class="grid-300">
-          <sl-button href="#/home" size="large" variant="primary">
-            <sl-icon name="house" slot="prefix"></sl-icon>
+          <wa-button href="#/home" size="large" variant="brand">
+            <wa-icon name="house" slot="start"></wa-icon>
             <span>Retour à l'accueil</span>
-          </sl-button>
+          </wa-button>
         </div>`
       : "";
 
-    this.innerHTML = `<sl-alert class="my-8" open variant="danger">
-      <sl-icon class="text-5xl" name="bug" slot="icon"></sl-icon>
+    this.innerHTML = `<wa-callout class="my-8" open variant="danger">
+      <wa-icon class="text-5xl" name="triangle-exclamation" slot="start"></wa-icon>
       <h1 class="text-danger">Erreur</h1>
       <strong class="container">${this._message}</strong>
-    </sl-alert>
+    </wa-callout>
     ${homeButtonHtml}`;
   }
 }

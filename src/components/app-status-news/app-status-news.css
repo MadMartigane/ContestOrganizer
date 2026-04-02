@@ -10,23 +10,23 @@
   --status-glass-blur: 16px;
 
   /* Status Accents (mapped to Shoelace) */
-  --status-accent-info: var(--sl-color-primary-500);
-  --status-accent-bug: var(--sl-color-danger-500);
-  --status-accent-task: var(--sl-color-neutral-500);
-  --status-accent-note: var(--sl-color-success-500);
-  --status-accent-warning: var(--sl-color-warning-500);
+  --status-accent-info: var(--wa-color-brand-500);
+  --status-accent-bug: var(--wa-color-danger-500);
+  --status-accent-task: var(--wa-color-neutral-500);
+  --status-accent-note: var(--wa-color-success-500);
+  --status-accent-warning: var(--wa-color-warning-500);
 
   /* RGB versions for rgba() */
-  --status-accent-info-rgb: var(--sl-color-primary-500-rgb, 66, 99, 235);
-  --status-accent-bug-rgb: var(--sl-color-danger-500-rgb, 217, 51, 51);
-  --status-accent-task-rgb: var(--sl-color-neutral-500-rgb, 112, 118, 128);
-  --status-accent-note-rgb: var(--sl-color-success-500-rgb, 43, 174, 102);
-  --status-accent-warning-rgb: var(--sl-color-warning-500-rgb, 232, 166, 29);
+  --status-accent-info-rgb: var(--wa-color-brand-500-rgb, 66, 99, 235);
+  --status-accent-bug-rgb: var(--wa-color-danger-500-rgb, 217, 51, 51);
+  --status-accent-task-rgb: var(--wa-color-neutral-500-rgb, 112, 118, 128);
+  --status-accent-note-rgb: var(--wa-color-success-500-rgb, 43, 174, 102);
+  --status-accent-warning-rgb: var(--wa-color-warning-500-rgb, 232, 166, 29);
 
   /* Text Hierarchy */
-  --status-text-primary: var(--sl-color-neutral-900);
-  --status-text-secondary: var(--sl-color-neutral-600);
-  --status-text-muted: var(--sl-color-neutral-500);
+  --status-text-primary: var(--wa-color-neutral-900);
+  --status-text-secondary: var(--wa-color-neutral-600);
+  --status-text-muted: var(--wa-color-neutral-500);
 
   /* Animation Timings */
   --status-transition-fast: 150ms ease;
@@ -42,7 +42,7 @@
   --status-space-2xl: 2rem;
 
   /* Focus Ring */
-  --status-focus-ring: 0 0 0 2px var(--sl-color-primary-200);
+  --status-focus-ring: 0 0 0 2px var(--wa-color-brand-200);
 }
 
 /* Main Container */
@@ -56,7 +56,7 @@
 /* ================================
    DARK MODE SUPPORT
    ================================ */
-.sl-theme-dark .status-news {
+.wa-dark .status-news {
   /* Glassmorphism - Dark translucent backgrounds */
   --status-glass-border: rgba(255, 255, 255, 0.15);
   --status-glass-shadow:
@@ -73,7 +73,7 @@
   --status-glass-bg: rgba(35, 35, 45, 0.9);
 
   /* Focus ring - lighter for visibility on dark */
-  --status-focus-ring: 0 0 0 2px var(--sl-color-primary-400);
+  --status-focus-ring: 0 0 0 2px var(--wa-color-brand-400);
 }
 
 /* Project Info Section */
@@ -105,7 +105,7 @@
   padding: var(--status-space-xs) var(--status-space-md);
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--sl-color-neutral-700);
+  color: var(--wa-color-neutral-700);
   letter-spacing: 0.025em;
   background: linear-gradient(
     135deg,
@@ -113,7 +113,7 @@
     rgba(255, 255, 255, 0.6) 100%
   );
   border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: var(--sl-border-radius-pill);
+  border-radius: var(--wa-border-radius-pill);
   box-shadow:
     0 4px 16px rgba(31, 38, 135, 0.15),
     0 2px 4px rgba(31, 38, 135, 0.1),
@@ -127,9 +127,9 @@
   width: 6px;
   height: 6px;
   content: "";
-  background: var(--sl-color-success-500);
+  background: var(--wa-color-success-500);
   border-radius: 50%;
-  box-shadow: 0 0 8px var(--sl-color-success-500);
+  box-shadow: 0 0 8px var(--wa-color-success-500);
   animation: status-version-pulse 2s ease-in-out infinite;
 }
 
@@ -145,8 +145,8 @@
 }
 
 /* Dark mode version badge */
-.sl-theme-dark .status-version-badge {
-  color: var(--sl-color-neutral-200);
+.wa-dark .status-version-badge {
+  color: var(--wa-color-neutral-200);
   background: linear-gradient(
     135deg,
     rgba(50, 50, 65, 0.9) 0%,
@@ -159,17 +159,17 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-.sl-theme-dark .status-version-badge::before {
-  background: var(--sl-color-success-400);
-  box-shadow: 0 0 8px var(--sl-color-success-400);
+.wa-dark .status-version-badge::before {
+  background: var(--wa-color-success-400);
+  box-shadow: 0 0 8px var(--wa-color-success-400);
 }
 
-.sl-theme-dark .status-version-label {
-  color: var(--sl-color-neutral-400);
+.wa-dark .status-version-label {
+  color: var(--wa-color-neutral-400);
 }
 
-.sl-theme-dark .status-version-number {
-  color: var(--sl-color-neutral-100);
+.wa-dark .status-version-number {
+  color: var(--wa-color-neutral-100);
 }
 
 @keyframes status-version-pulse {
@@ -200,13 +200,13 @@
   font-size: 0.75rem;
   font-weight: 500;
   color: var(--status-accent-info);
-  background: rgba(var(--sl-color-primary-500-rgb), 0.1);
-  border-radius: var(--sl-border-radius-pill);
+  background: rgba(var(--wa-color-brand-500-rgb), 0.1);
+  border-radius: var(--wa-border-radius-pill);
 }
 
 /* Dark mode tech badge */
-.sl-theme-dark .status-tech {
-  background: rgba(var(--sl-color-primary-500-rgb), 0.2);
+.wa-dark .status-tech {
+  background: rgba(var(--wa-color-brand-500-rgb), 0.2);
 }
 
 .status-date {
@@ -231,7 +231,7 @@
     rgba(255, 255, 255, 0.7) 100%
   );
   border: 1px solid var(--status-glass-border);
-  border-radius: var(--sl-border-radius-large);
+  border-radius: var(--wa-border-radius-large);
   box-shadow: var(--status-glass-shadow);
   -webkit-backdrop-filter: blur(var(--status-glass-blur));
   backdrop-filter: blur(var(--status-glass-blur));
@@ -242,7 +242,7 @@
 }
 
 /* Dark mode card gradient override */
-.sl-theme-dark .status-card {
+.wa-dark .status-card {
   background: linear-gradient(
     135deg,
     rgba(40, 40, 55, 0.9) 0%,
@@ -273,7 +273,7 @@
 }
 
 /* Dark mode card border gradient */
-.sl-theme-dark .status-card::before {
+.wa-dark .status-card::before {
   background: linear-gradient(
     135deg,
     rgba(255, 255, 255, 0.15),
@@ -298,7 +298,7 @@
 }
 
 /* Dark mode shimmer effect */
-.sl-theme-dark .status-card::after {
+.wa-dark .status-card::after {
   background: linear-gradient(
     90deg,
     transparent,
@@ -339,7 +339,7 @@
 }
 
 /* Dark mode status indicators glow adjustment */
-.sl-theme-dark .status-indicator {
+.wa-dark .status-indicator {
   box-shadow: 0 0 8px currentColor;
 }
 
@@ -394,7 +394,7 @@
 /* Focus Visible for Keyboard Navigation */
 .status-card-header:focus-visible {
   outline: none;
-  border-radius: var(--sl-border-radius-medium);
+  border-radius: var(--wa-border-radius-medium);
   box-shadow: var(--status-focus-ring);
 }
 
@@ -446,8 +446,8 @@
 }
 
 /* Dark mode list markers */
-.sl-theme-dark .status-content ul,
-.sl-theme-dark .status-content ol {
+.wa-dark .status-content ul,
+.wa-dark .status-content ol {
   color: var(--status-text-primary);
 }
 
@@ -456,51 +456,51 @@
 }
 
 /* Dark mode content text */
-.sl-theme-dark .status-content p {
+.wa-dark .status-content p {
   line-height: 1.7;
   color: #e8e8e8;
 }
 
-.sl-theme-dark .status-content li {
+.wa-dark .status-content li {
   color: #e0e0e0;
 }
 
-.sl-theme-dark .status-content a {
-  color: var(--sl-color-primary-400);
+.wa-dark .status-content a {
+  color: var(--wa-color-brand-400);
 }
 
 .status-content code {
   padding: 0.125rem 0.375rem;
   font-size: 0.875em;
   color: var(--status-accent-info);
-  background: var(--sl-color-neutral-100);
-  border-radius: var(--sl-border-radius-small);
+  background: var(--wa-color-neutral-100);
+  border-radius: var(--wa-border-radius-small);
 }
 
 /* Dark mode code blocks */
-.sl-theme-dark .status-content code {
-  color: var(--sl-color-primary-700);
-  background: var(--sl-color-neutral-100);
+.wa-dark .status-content code {
+  color: var(--wa-color-brand-700);
+  background: var(--wa-color-neutral-100);
 }
 
 .status-content pre {
   padding: var(--status-space-md);
   margin: 0 0 var(--status-space-md);
   overflow-x: auto;
-  background: var(--sl-color-neutral-900);
-  border-radius: var(--sl-border-radius-medium);
+  background: var(--wa-color-neutral-900);
+  border-radius: var(--wa-border-radius-medium);
 }
 
 /* Dark mode pre blocks */
-.sl-theme-dark .status-content pre {
-  color: var(--sl-color-neutral-200);
-  background: var(--sl-color-neutral-900);
+.wa-dark .status-content pre {
+  color: var(--wa-color-neutral-200);
+  background: var(--wa-color-neutral-900);
 }
 
 .status-content pre code {
   padding: 0;
   font-size: 0.875rem;
-  color: var(--sl-color-neutral-100);
+  color: var(--wa-color-neutral-100);
   background: transparent;
 }
 
@@ -509,7 +509,7 @@
 }
 
 /* Dark mode strong and em */
-.sl-theme-dark .status-content strong {
+.wa-dark .status-content strong {
   color: var(--status-text-primary);
 }
 
@@ -518,7 +518,7 @@
 }
 
 /* Dark mode strong and em */
-.sl-theme-dark .status-content em {
+.wa-dark .status-content em {
   color: var(--status-text-secondary);
 }
 
@@ -540,25 +540,25 @@
   font-weight: 600;
   color: var(--status-text-primary);
   text-align: left;
-  background: var(--sl-color-neutral-50);
-  border-bottom: 1px solid var(--sl-color-neutral-200);
+  background: var(--wa-color-neutral-50);
+  border-bottom: 1px solid var(--wa-color-neutral-200);
 }
 
 /* Dark mode table header */
-.sl-theme-dark .status-table th {
-  background: var(--sl-color-neutral-900);
-  border-bottom-color: var(--sl-color-neutral-700);
+.wa-dark .status-table th {
+  background: var(--wa-color-neutral-900);
+  border-bottom-color: var(--wa-color-neutral-700);
 }
 
 .status-table td {
   padding: var(--status-space-sm) var(--status-space-md);
   color: var(--status-text-secondary);
-  border-bottom: 1px solid var(--sl-color-neutral-100);
+  border-bottom: 1px solid var(--wa-color-neutral-100);
 }
 
 /* Dark mode table rows */
-.sl-theme-dark .status-table td {
-  border-bottom-color: var(--sl-color-neutral-800);
+.wa-dark .status-table td {
+  border-bottom-color: var(--wa-color-neutral-800);
 }
 
 .status-table tr:last-child td {
@@ -566,16 +566,16 @@
 }
 
 .status-table tr:hover td {
-  background: var(--sl-color-neutral-50);
+  background: var(--wa-color-neutral-50);
 }
 
 /* Dark mode table rows */
-.sl-theme-dark .status-table tr:hover td {
-  background: var(--sl-color-neutral-900);
+.wa-dark .status-table tr:hover td {
+  background: var(--wa-color-neutral-900);
 }
 
 /* Dark mode table text */
-.sl-theme-dark .status-table {
+.wa-dark .status-table {
   color: #e0e0e0;
 }
 
@@ -593,7 +593,7 @@
 }
 
 /* Dark mode empty state */
-.sl-theme-dark .status-empty {
+.wa-dark .status-empty {
   color: var(--status-text-secondary);
 }
 
@@ -621,11 +621,11 @@
   text-align: center;
   background: rgba(var(--status-accent-bug-rgb), 0.05);
   border: 1px solid rgba(var(--status-accent-bug-rgb), 0.2);
-  border-radius: var(--sl-border-radius-large);
+  border-radius: var(--wa-border-radius-large);
 }
 
 /* Dark mode error state */
-.sl-theme-dark .status-error {
+.wa-dark .status-error {
   background: rgba(var(--status-accent-bug-rgb), 0.15);
   border-color: rgba(var(--status-accent-bug-rgb), 0.4);
 }
@@ -647,16 +647,16 @@
   padding: var(--status-space-sm) var(--status-space-lg);
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--sl-color-neutral-0);
+  color: var(--wa-color-neutral-0);
   cursor: pointer;
-  background: var(--sl-color-neutral-600);
+  background: var(--wa-color-neutral-600);
   border: none;
-  border-radius: var(--sl-border-radius-medium);
+  border-radius: var(--wa-border-radius-medium);
   transition: background var(--status-transition-fast);
 }
 
 .status-retry:hover {
-  background: var(--sl-color-neutral-700);
+  background: var(--wa-color-neutral-700);
 }
 
 .status-retry:focus-visible {
@@ -665,7 +665,7 @@
 }
 
 .status-retry:active {
-  background: var(--sl-color-neutral-800);
+  background: var(--wa-color-neutral-800);
 }
 
 /* ================================
@@ -681,12 +681,12 @@
   height: 4rem;
   background: linear-gradient(
     90deg,
-    var(--sl-color-neutral-100) 0%,
-    var(--sl-color-neutral-50) 50%,
-    var(--sl-color-neutral-100) 100%
+    var(--wa-color-neutral-100) 0%,
+    var(--wa-color-neutral-50) 50%,
+    var(--wa-color-neutral-100) 100%
   );
   background-size: 200% 100%;
-  border-radius: var(--sl-border-radius-medium);
+  border-radius: var(--wa-border-radius-medium);
   animation: skeleton-shimmer 1.5s ease-in-out infinite;
 }
 
@@ -694,23 +694,23 @@
   height: 5rem;
   background: linear-gradient(
     90deg,
-    var(--sl-color-neutral-100) 0%,
-    var(--sl-color-neutral-50) 50%,
-    var(--sl-color-neutral-100) 100%
+    var(--wa-color-neutral-100) 0%,
+    var(--wa-color-neutral-50) 50%,
+    var(--wa-color-neutral-100) 100%
   );
   background-size: 200% 100%;
-  border-radius: var(--sl-border-radius-large);
+  border-radius: var(--wa-border-radius-large);
   animation: skeleton-shimmer 1.5s ease-in-out infinite;
 }
 
 /* Dark mode skeleton loading */
-.sl-theme-dark .skeleton-header,
-.sl-theme-dark .skeleton-card {
+.wa-dark .skeleton-header,
+.wa-dark .skeleton-card {
   background: linear-gradient(
     90deg,
-    var(--sl-color-neutral-800) 0%,
-    var(--sl-color-neutral-900) 50%,
-    var(--sl-color-neutral-800) 100%
+    var(--wa-color-neutral-800) 0%,
+    var(--wa-color-neutral-900) 50%,
+    var(--wa-color-neutral-800) 100%
   );
 }
 

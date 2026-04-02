@@ -1,5 +1,5 @@
-import type SlButton from "@shoelace-style/shoelace/dist/components/button/button.component";
-import type SlDialog from "@shoelace-style/shoelace/dist/components/dialog/dialog.component";
+import type WaButton from "@awesome.me/webawesome/dist/components/button/button.js";
+import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
 
 const debounceCollector: { [index: string]: number } = {};
 
@@ -42,7 +42,7 @@ function confirmChoice(
     resolve = res;
   });
 
-  const dialog = document.createElement("sl-dialog") as unknown as SlDialog;
+  const dialog = document.createElement("wa-dialog") as unknown as WaDialog;
   const paramElement: HTMLParagraphElement = document.createElement("p");
   paramElement.innerText = message;
   dialog.append(paramElement);
@@ -54,11 +54,11 @@ function confirmChoice(
   dialog.append(titleElement);
 
   const cancelButton = document.createElement(
-    "sl-button"
-  ) as unknown as SlButton;
+    "wa-button"
+  ) as unknown as WaButton;
   const confirmButton = document.createElement(
-    "sl-button"
-  ) as unknown as SlButton;
+    "wa-button"
+  ) as unknown as WaButton;
 
   cancelButton.innerText = cancel;
   cancelButton.variant = "warning";
@@ -66,7 +66,7 @@ function confirmChoice(
   cancelButton.size = "large";
 
   confirmButton.innerText = confirm;
-  confirmButton.variant = "primary";
+  confirmButton.variant = "brand";
   confirmButton.slot = "footer";
   confirmButton.size = "large";
 
@@ -74,22 +74,22 @@ function confirmChoice(
   dialog.append(confirmButton);
 
   document.body.appendChild(dialog as unknown as HTMLElement);
-  dialog.show();
+  dialog.setAttribute("open", "");
 
   cancelButton.addEventListener("click", () => {
-    dialog.hide();
+    dialog.removeAttribute("open");
     unmount(dialog as unknown as HTMLElement);
     resolve(false);
   });
 
   confirmButton.addEventListener("click", () => {
-    dialog.hide();
+    dialog.removeAttribute("open");
     unmount(dialog as unknown as HTMLElement);
     resolve(true);
   });
 
   // Prevent the dialog from closing when the user clicks on the overlay
-  dialog.addEventListener("sl-request-close", (event: CustomEvent) => {
+  dialog.addEventListener("wa-request-close", (event: CustomEvent) => {
     if (event.detail.source === "overlay") {
       event.preventDefault();
     }
@@ -143,7 +143,7 @@ function alertChoice(message = "Attention", close = "Fermer"): Promise<void> {
     resolve = res;
   });
 
-  const dialog = document.createElement("sl-dialog") as unknown as SlDialog;
+  const dialog = document.createElement("wa-dialog") as unknown as WaDialog;
   const paramElement: HTMLParagraphElement = document.createElement("p");
   paramElement.innerText = message;
   dialog.append(paramElement);
@@ -155,26 +155,26 @@ function alertChoice(message = "Attention", close = "Fermer"): Promise<void> {
   dialog.append(titleElement);
 
   const closeButton = document.createElement(
-    "sl-button"
-  ) as unknown as SlButton;
+    "wa-button"
+  ) as unknown as WaButton;
   closeButton.innerText = close;
-  closeButton.variant = "primary";
+  closeButton.variant = "brand";
   closeButton.slot = "footer";
   closeButton.size = "large";
 
   dialog.append(closeButton);
 
   document.body.appendChild(dialog as unknown as HTMLElement);
-  dialog.show();
+  dialog.setAttribute("open", "");
 
   closeButton.addEventListener("click", () => {
-    dialog.hide();
+    dialog.removeAttribute("open");
     unmount(dialog as unknown as HTMLElement);
     resolve();
   });
 
   // Prevent the dialog from closing when the user clicks on the overlay
-  dialog.addEventListener("sl-request-close", (event: CustomEvent) => {
+  dialog.addEventListener("wa-request-close", (event: CustomEvent) => {
     if (event.detail.source === "overlay") {
       event.preventDefault();
     }

@@ -134,7 +134,7 @@ export class GridDefault extends BaseElement {
       <table class="table-auto">
         <thead class="block-primary align-middle">
           <th>
-            <sl-icon class="text-2xl" name="sort-numeric-down"></sl-icon>
+            <wa-icon class="text-2xl" name="sort-numeric-down"></wa-icon>
           </th>
           <th>
             <span>Équipes</span>
@@ -144,17 +144,17 @@ export class GridDefault extends BaseElement {
           </th>
           <th>
             <span class="text-success">Buts</span>
-            <sl-icon class="text-2xl text-success" name="plus-lg"></sl-icon>
+            <wa-icon class="text-2xl text-success" name="plus"></wa-icon>
           </th>
           <th>
             <span class="text-warning">Buts</span>
-            <sl-icon class="text-2xl text-warning" name="dash-lg"></sl-icon>
+            <wa-icon class="text-2xl text-warning" name="minus"></wa-icon>
           </th>
           <th>
             <span>Goal average</span>
           </th>
           <th class="text-center">
-            <sl-icon class="inline-block text-2xl" name="calendar-event"></sl-icon>
+            <wa-icon class="inline-block text-2xl" name="calendar-event"></wa-icon>
           </th>
         </thead>
         <tbody>

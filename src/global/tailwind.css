@@ -40,11 +40,11 @@ table {
 }
 
 th {
-  border-color: var(--sl-color-neutral-300);
+  border-color: var(--wa-color-neutral-300);
   @apply border min-w-10;
 }
 
 td {
-  border-color: var(--sl-color-neutral-200);
+  border-color: var(--wa-color-neutral-200);
   @apply border min-w-10;
 }

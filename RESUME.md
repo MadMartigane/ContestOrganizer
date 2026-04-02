@@ -1,70 +1,113 @@
-# Résumé de Session - Migration Tailwind v4
+# Session Technical Resume - SpatialLayout Bug Fix & Zone Architecture Transformation
 
-**Date** : 28 mars 2026  
-**État actuel** : Bloqué sur un bug de compatibilité upstream (stencil-tailwind-plugin)
+## Session Overview
 
-## Résumé des actions réalisées
+This session accomplished two main objectives:
 
-1. **Exploration initiale** : Analyse complète de la configuration Tailwind v3 (package.json, tailwind.config.js, postcss.config.js, stencil.config.ts, vite.config.ts, app.css, tailwind.css, etc.).
-2. **Planification** : Délégation à l'agent `architect` qui a produit un plan d'implémentation complet et validé par l'utilisateur.
-3. **Exécution du plan** :
-   - Mise à jour de `package.json` (passage à Tailwind v4, @tailwindcss/vite, stencil-tailwind-plugin v2.0.5)
-   - Réécriture complète de `src/global/tailwind.css` avec la nouvelle syntaxe CSS-first (`@import "tailwindcss"`, `@source inline`, `@utility flex-center`, `@apply`)
-   - Mise à jour de `vite.config.ts` (ajout du plugin `@tailwindcss/vite`, suppression de postcss)
-   - Mise à jour de `stencil.config.ts` (suppression de l'import de config JS)
-   - Suppression des fichiers `tailwind.config.js` et `postcss.config.js`
-   - `pnpm install` (après correction de `pnpm-workspace.yaml` pour autoriser `postcss-combine-duplicated-selectors`)
-4. **Validation** : 
-   - Build Vite → ✅
-   - Build Stencil → ❌ (2 erreurs successives)
+1. **Fixed SpatialLayout display bug** - Tablet and desktop now behave like mobile (one zone visible at 100% width), fixing the broken zone display on larger screens.
 
-## Dernière analyse complète de bugfinder
-
-**Bug Analysis Report (dernière version)**
-
-Le build Stencil échoue avec l'erreur :
-```js
-TypeError: Cannot read properties of undefined (reading 'text')
-    at stringStyleRewriter (.../stencil-tailwind-plugin/dist/index.js:420:34)
-```
-
-**Cause racine** : Incompatibilité entre `stencil-tailwind-plugin@2.0.5` et `@stencil/core >= 4.39.0`.
-
-Stencil a changé le format de sortie CSS-to-ESM via la PR #6211 (décembre 2025) : passage de `const css = "..."` (StringLiteral) à `const css = () => \`...\`` (ArrowFunction + TemplateLiteral). Le plugin attend toujours l'ancien format AST et plante.
-
-**État actuel du patch** :
-- Un patch est préparé dans `/tmp/stencil-tailwind-patch`
-- `pnpm-workspace.yaml` a été mis à jour
-- `src/global/app.css` a été nettoyé (import tailwind retiré)
-- `stencil.config.ts` configure `tailwindCssPath: "src/global/tailwind.css"`
-
-## Instructions pour reprendre la session
-
-**Pour reprendre exactement là où on en était :**
-
-1. Appliquer le patch :
-   ```bash
-   pnpm patch-commit '/tmp/stencil-tailwind-patch'
-   ```
-
-2. Relancer le build Stencil :
-   ```bash
-   pnpm exec stencil build
-   ```
-
-3. Si le build passe :
-   - Exécuter `pnpm run build`
-   - Exécuter `pnpm run check`
-   - Vérifier visuellement les styles (grilles, `flex-center`, typographie, bordures de tableau)
-
-**Fichiers critiques** :
-- `stencil.config.ts`
-- `src/global/app.css`
-- `src/global/tailwind.css`
-- `pnpm-workspace.yaml`
-- Le patch `patches/stencil-tailwind-plugin@2.0.5.patch` (sera créé après `patch-commit`)
-
-**Prochaines étapes recommandées** : Appliquer le patch du plugin pour contourner le bug d'AST dans `configuredTransform()` (ignorer les fichiers CSS dans le plugin `tailwind()`).
+2. **Transformed zone architecture from 3 to 4 zones** - Migrated from hardcoded content zones to dynamic page-rendering zones.
 
 ---
-*Ce résumé a été généré automatiquement lors de la session de migration Tailwind v4.*
+
+## Architecture Change
+
+### BEFORE (3 hardcoded zones)
+
+```typescript
+type ZoneType = "planning" | "live" | "archive";
+// Each zone had hardcoded HTML content
+```
+
+### AFTER (4 dynamic zones)
+
+```typescript
+type ZoneType = "home" | "config" | "tournaments" | "matchs";
+// Each zone renders its corresponding page-* component
+```
+
+---
+
+## Files Modified
+
+| File | Changes |
+|------|---------|
+| `src/core/spatial-layout.ts` | ZoneType changed to union of 4 types; `rebalanceTablet` and `rebalanceDesktop` now delegate to `rebalanceMobile` |
+| `src/core/navigation-orchestrator.ts` | ZoneOrder array updated to `["home", "config", "tournaments", "matchs"]` |
+| `src/core/route-sync.ts` | Legacy route mappings updated for new zone types |
+| `src/core/accessibility-layer.ts` | Zone selectors updated to new zone names |
+| `src/components/app-root/app-root.ts` | Template and imports updated for 4 zones |
+| `src/components/app-root/app-root.css` | Tablet/desktop absolute positioning styles added |
+| `src/components/zone-container/zone-container.ts` | Default zoneType changed to `"home"` |
+| `src/vanilla-entry.ts` | Import statements updated |
+
+---
+
+## Files Created
+
+| File | Purpose |
+|------|---------|
+| `src/components/zones/home-zone.ts` | Renders `page-home` component |
+| `src/components/zones/config-zone.ts` | Renders `page-config` component |
+| `src/components/zones/tournaments-zone.ts` | Renders `page-tournament` component |
+| `src/components/zones/matchs-zone.ts` | Renders `page-match` component |
+
+---
+
+## Key Technical Details
+
+### SpatialLayout Bug Fix
+
+The tablet and desktop breakpoints were causing zones to display incorrectly. The fix makes both breakpoints delegate to the mobile behavior:
+
+```typescript
+private rebalanceTablet() {
+  this.rebalanceMobile();
+}
+
+private rebalanceDesktop() {
+  this.rebalanceMobile();
+}
+```
+
+This ensures one zone at 100% width on all breakpoints, matching mobile behavior.
+
+### Zone Component Pattern
+
+Each zone component follows the same pattern:
+
+- Extends `BaseElement`
+- Sets `zoneType` property to its type
+- Renders its corresponding page component in shadow DOM
+- Uses Light DOM for zone container styling
+
+### Zone Order
+
+```typescript
+const ZoneOrder: ZoneType[] = ["home", "config", "tournaments", "matchs"];
+```
+
+---
+
+## State for Next Agent
+
+- **Build status**: Unknown (verify with `pnpm build`)
+- **Zone architecture**: Complete migration to 4-zone system
+- **Bug fix**: SpatialLayout tablet/desktop display fixed
+- **All zone components**: Created and should render their respective pages
+
+### Commands for Next Agent
+
+```bash
+# Verify build works
+pnpm build
+
+# Check for lint/format issues
+pnpm exec ultracite check
+```
+
+### Notes for Continuation
+
+- If zones don't display correctly, verify zoneType property is set on each zone element
+- Check console for component rendering errors
+- Confirm page-* components are properly imported in vanilla-entry.ts

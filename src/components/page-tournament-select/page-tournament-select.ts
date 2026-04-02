@@ -85,7 +85,7 @@ export class PageTournamentSelect extends BaseElement {
     // Tournament selection handler
     Utils.installEventHandler(
       this.domTournamentList,
-      "sl-select",
+      "wa-select",
       (ev: CustomEvent) => {
         this.goPageTournament(ev);
       }
@@ -110,7 +110,7 @@ export class PageTournamentSelect extends BaseElement {
     });
 
     // Name input keydown event
-    const nameInput = this.querySelector(".add-tournament-form sl-input");
+    const nameInput = this.querySelector(".add-tournament-form wa-input");
     if (nameInput) {
       nameInput.addEventListener("keydown", (ev: Event) => {
         this.onKeyPressNewName(ev as KeyboardEvent);
@@ -149,7 +149,13 @@ export class PageTournamentSelect extends BaseElement {
       );
     }
 
-    window.location.hash = `#/tournament/${tournamentId}`;
+    this.dispatchEvent(
+      new CustomEvent("navigate", {
+        detail: { hash: `#/zone/planning/tournament/${tournamentId}` },
+        bubbles: true,
+        composed: true,
+      })
+    );
   }
 
   /**
@@ -265,32 +271,23 @@ export class PageTournamentSelect extends BaseElement {
     const numberOfTournaments = this._numberOfTournaments.value;
 
     this.innerHTML = `
-      <sl-breadcrumb>
-        <sl-breadcrumb-item href="#/home">
-          <sl-icon class="text-2xl" name="house"></sl-icon>
-        </sl-breadcrumb-item>
-        <sl-breadcrumb-item>
-          <sl-icon class="text-2xl" name="trophy"></sl-icon>
-        </sl-breadcrumb-item>
-      </sl-breadcrumb>
-
       <div class="page-content">
         ${numberOfTournaments > 0 ? this.renderTournamentList() : this.renderNoTournamentInfo()}
 
-        <sl-divider></sl-divider>
+        <wa-divider></wa-divider>
 
         ${uiAddingTournament ? this.renderAddTournament() : this.renderNewTournamentButton()}
       </div>
     `;
 
     // Query DOM elements after render
-    this.domTournamentList = this.querySelector("sl-menu");
+    this.domTournamentList = this.querySelector("wa-menu");
     const addForm = this.querySelector(".add-tournament-form");
     if (addForm) {
       this.domTournamentName = addForm.querySelector(
-        "sl-input"
+        "wa-input"
       ) as HTMLElement | null;
-      this.domSelect = addForm.querySelector("sl-select") as HTMLElement | null;
+      this.domSelect = addForm.querySelector("wa-select") as HTMLElement | null;
     }
 
     // Setup event handlers after render
@@ -304,8 +301,8 @@ export class PageTournamentSelect extends BaseElement {
     const isNewTournamentNameReady = this._isNewTournamentNameReady.value;
 
     return `
-      <sl-card class="card-common add-tournament-form">
-        <sl-input
+      <wa-card class="card-common add-tournament-form">
+        <wa-input
           autofocus
           class="my-4"
           label="Nom du tournois"
@@ -314,44 +311,44 @@ export class PageTournamentSelect extends BaseElement {
           placeholder="Playoff"
           role="textbox"
           size="large"
-        ></sl-input>
+        ></wa-input>
 
         <div>
-          <sl-select
+          <wa-select
             help-text="(defaut: Foot ⚽️)"
             label="Quel sport ? "
             placeholder="Basket, NBA, Foot, …"
             size="large"
           >
-            <sl-option value="${TournamentType.NBA}">${TournamentTypeLabel.NBA}</sl-option>
-            <sl-option value="${TournamentType.RUGBY}">${TournamentTypeLabel.RUGBY}</sl-option>
-            <sl-option value="${TournamentType.NFL}">${TournamentTypeLabel.NFL}</sl-option>
-            <sl-option value="${TournamentType.BASKET}">${TournamentTypeLabel.BASKET}</sl-option>
-            <sl-option value="${TournamentType.FOOT}">${TournamentTypeLabel.FOOT}</sl-option>
-          </sl-select>
+            <wa-option value="${TournamentType.NBA}">${TournamentTypeLabel.NBA}</wa-option>
+            <wa-option value="${TournamentType.RUGBY}">${TournamentTypeLabel.RUGBY}</wa-option>
+            <wa-option value="${TournamentType.NFL}">${TournamentTypeLabel.NFL}</wa-option>
+            <wa-option value="${TournamentType.BASKET}">${TournamentTypeLabel.BASKET}</wa-option>
+            <wa-option value="${TournamentType.FOOT}">${TournamentTypeLabel.FOOT}</wa-option>
+          </wa-select>
         </div>
 
         <div slot="footer">
-          <sl-button
+          <wa-button
             class="cancel-add-btn"
             size="large"
             variant="warning"
           >
-            <sl-icon class="text-2xl" name="dash-lg" slot="prefix"></sl-icon>
+            <wa-icon class="text-2xl" name="minus" slot="start"></wa-icon>
             Annuler
-          </sl-button>
+          </wa-button>
 
-          <sl-button
+          <wa-button
             class="confirm-add-btn"
             ${isNewTournamentNameReady ? "" : "disabled"}
             size="large"
-            variant="primary"
+            variant="brand"
           >
-            <sl-icon class="text-2xl" name="plus-lg" slot="prefix"></sl-icon>
+            <wa-icon class="text-2xl" name="plus" slot="start"></wa-icon>
             Ajouter
-          </sl-button>
+          </wa-button>
         </div>
-      </sl-card>
+      </wa-card>
     `;
   }
 
@@ -360,16 +357,16 @@ export class PageTournamentSelect extends BaseElement {
    */
   private renderNewTournamentButton(): string {
     return `
-      <sl-card class="card-common">
-        <sl-button
+      <wa-card class="card-common">
+        <wa-button
           class="new-tournament-btn"
           size="large"
-          variant="primary"
+          variant="brand"
         >
-          <sl-icon class="text-2xl" name="plus-lg" slot="prefix"></sl-icon>
+          <wa-icon class="text-2xl" name="plus" slot="start"></wa-icon>
           Nouveau tournoi
-        </sl-button>
-      </sl-card>
+        </wa-button>
+      </wa-card>
     `;
   }
 
@@ -378,37 +375,37 @@ export class PageTournamentSelect extends BaseElement {
    */
   private renderTournamentList(): string {
     return `
-      <sl-menu>
+      <wa-menu>
         ${this.tournaments
           .map(
             (tournament: Tournament) => `
-          <sl-menu-item data-tournament-id="${tournament.id}">
-            <span slot="prefix">
+          <wa-menu-item data-tournament-id="${tournament.id}">
+            <span slot="start">
               <span class="container-s">
                 ${tournament.name} -
                 ${this.tournaments.getTournamentTypeLabel(tournament.type)}
               </span>
-              <sl-badge pill variant="neutral">
+              <wa-tag pill variant="neutral">
                 ${tournament.grid.length}
-              </sl-badge>
+              </wa-tag>
             </span>
 
             <span slot="suffix">
-              <sl-icon
+              <wa-icon
                 class="delete-tournament-icon container-s text-2xl text-warning"
                 data-tournament-id="${tournament.id}"
                 name="trash3"
-              ></sl-icon>
-              <sl-icon
+              ></wa-icon>
+              <wa-icon
                 class="container-s text-2xl text-neutral"
                 name="arrow-right-circle"
-              ></sl-icon>
+              ></wa-icon>
             </span>
-          </sl-menu-item>
+          </wa-menu-item>
         `
           )
           .join("")}
-      </sl-menu>
+      </wa-menu>
     `;
   }
 
@@ -417,11 +414,11 @@ export class PageTournamentSelect extends BaseElement {
    */
   private renderNoTournamentInfo(): string {
     return `
-      <div class="sl-text-center">
+      <div class="text-center">
         <h1>
-          <sl-icon class="text-3xl text-warning" name="trophy"></sl-icon>
+          <wa-icon class="text-3xl text-warning" name="trophy"></wa-icon>
           Pas encore de tournois
-          <sl-icon class="text-2xl text-success" name="dribbble"></sl-icon>
+          <wa-icon class="text-2xl text-success" name="dribbble"></wa-icon>
         </h1>
       </div>
     `;

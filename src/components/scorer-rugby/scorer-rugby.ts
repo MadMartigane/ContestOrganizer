@@ -102,47 +102,47 @@ export class MadScorerRugby extends BaseElement {
     }
 
     const minusMode = this._minusMode.value;
-    const iconName = minusMode ? "dash-lg" : "plus-lg";
-    const variant = minusMode ? "warning" : "primary";
+    const iconName = minusMode ? "minus" : "plus";
+    const variant = minusMode ? "warning" : "brand";
 
     this.innerHTML = `
       <div class="my-4 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
         ${POINTS.map(
           (points) => `
-          <sl-button
+          <wa-button
             data-points="${points}"
             size="large"
             variant="${variant}"
           >
-            <sl-icon
+            <wa-icon
               class="xl"
               name="${iconName}"
-              slot="prefix"
-            ></sl-icon>
-            <span slot="suffix">${points}</span>
-          </sl-button>
+              slot="start"
+            ></wa-icon>
+            <span slot="end">${points}</span>
+          </wa-button>
         `
         ).join("")}
-        <sl-switch
+        <wa-switch
           id="plus-minus-switch"
           checked="${!minusMode}"
           help-text="Ajouter/Supprimer des points"
           size="large"
         >
-          <sl-icon class="xl" name="plus-slash-minus"></sl-icon>
-        </sl-switch>
+          <wa-icon class="xl" name="plus-slash-minus"></wa-icon>
+        </wa-switch>
       </div>
     `;
 
     // Attach event listeners after render
-    const buttons = Array.from(this.querySelectorAll("sl-button[data-points]"));
+    const buttons = Array.from(this.querySelectorAll("wa-button[data-points]"));
     for (const btn of buttons) {
       const points = Number(btn.getAttribute("data-points"));
       btn.addEventListener("click", () => this._onIncrement(points));
     }
 
     const switchEl = this.querySelector("#plus-minus-switch");
-    switchEl?.addEventListener("sl-change", () => this._onSwitchToggle());
+    switchEl?.addEventListener("wa-change", () => this._onSwitchToggle());
   }
 }
 

@@ -1,0 +1,655 @@
+import { BaseElement } from "@core/base-element.js";
+import { Signal } from "@core/signal.js";
+
+interface TutorialStep {
+  description: string;
+  desktopHint?: string;
+  gesture: string;
+  icon: string;
+  isPractice?: boolean;
+  practiceGesture?: string;
+  title: string;
+}
+
+const TUTORIAL_SECTIONS = {
+  GESTURES: "gestures",
+  DESKTOP: "desktop",
+  PRACTICE: "practice",
+} as const;
+
+/**
+ * GestureOverlay - Interactive tutorial overlay for first-time users.
+ * @element gesture-overlay
+ */
+export class GestureOverlay extends BaseElement {
+  private declare _isVisible: Signal<boolean>;
+  private declare _currentStep: Signal<number>;
+  private declare _section: Signal<
+    (typeof TUTORIAL_SECTIONS)[keyof typeof TUTORIAL_SECTIONS]
+  >;
+  private declare _isPracticing: Signal<boolean>;
+  private declare _practiceCompleted: Signal<boolean>;
+
+  private readonly _gestureSteps: TutorialStep[] = [
+    {
+      title: "Swipe Left / Right",
+      description: "Navigate between tournaments",
+      gesture: "swipe",
+      icon: "arrows-left-right",
+    },
+    {
+      title: "Swipe Up",
+      description: "Open planning zone",
+      gesture: "swipe-up",
+      icon: "arrow-up",
+    },
+    {
+      title: "Swipe Down",
+      description: "Open archive zone",
+      gesture: "swipe-down",
+      icon: "arrow-down",
+    },
+    {
+      title: "Long Press",
+      description: "Open context menu",
+      gesture: "long-press",
+      icon: "hand-pointer",
+    },
+    {
+      title: "Double Tap",
+      description: "Quick action (+3 points)",
+      gesture: "double-tap",
+      icon: "computer-mouse",
+    },
+    {
+      title: "Shake",
+      description: "Undo last action",
+      gesture: "shake",
+      icon: "rotate-left",
+    },
+  ];
+
+  private readonly _desktopSteps: TutorialStep[] = [
+    {
+      title: "Arrow Keys",
+      description: "Navigate instead of swiping",
+      gesture: "arrow-keys",
+      icon: "keyboard",
+      desktopHint: "Use arrow keys to navigate",
+    },
+    {
+      title: "Right-Click",
+      description: "Open context menu",
+      gesture: "right-click",
+      icon: "hand-pointer",
+      desktopHint: "Right-click for context menu",
+    },
+    {
+      title: "Command Palette",
+      description: "Quick access to all actions",
+      gesture: "shortcut",
+      icon: "command",
+      desktopHint: "Press ⌘K to open command palette",
+    },
+  ];
+
+  private readonly _practiceStep: TutorialStep = {
+    title: "Try it!",
+    description: "Perform any gesture to continue",
+    gesture: "any",
+    icon: "sparkle",
+    isPractice: true,
+  };
+
+  private readonly _gestureHandler = (_event: Event): void => {
+    if (!(this._isVisible.value && this._isPracticing.value)) {
+      return;
+    }
+    this._practiceCompleted.value = true;
+    setTimeout(() => this._completePractice(), 500);
+  };
+
+  private readonly _keyboardHandler = (_event: KeyboardEvent): void => {
+    if (_event.key === "Enter" || _event.key === " ") {
+      const nextBtn = this.querySelector("#next-btn") as HTMLButtonElement;
+      if (nextBtn && !nextBtn.disabled) {
+        nextBtn.click();
+      }
+    }
+    if (_event.key === "Escape") {
+      this._skipTutorial();
+    }
+  };
+
+  /** @inheritdoc */
+  protected _setupProperties(): void {
+    this._isVisible = new Signal<boolean>(false);
+    this._currentStep = new Signal<number>(0);
+    this._section = new Signal<
+      (typeof TUTORIAL_SECTIONS)[keyof typeof TUTORIAL_SECTIONS]
+    >(TUTORIAL_SECTIONS.GESTURES);
+    this._isPracticing = new Signal<boolean>(false);
+    this._practiceCompleted = new Signal<boolean>(false);
+
+    this._trackSignal(this._isVisible);
+    this._trackSignal(this._currentStep);
+    this._trackSignal(this._section);
+    this._trackSignal(this._isPracticing);
+    this._trackSignal(this._practiceCompleted);
+    this._initialized = true;
+  }
+
+  /** @inheritdoc */
+  connectedCallback(): void {
+    super.connectedCallback();
+    this._setupGestureListeners();
+    this._checkFirstVisit();
+  }
+
+  /** @inheritdoc */
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this._removeGestureListeners();
+    document.removeEventListener("keydown", this._keyboardHandler);
+  }
+
+  private _setupGestureListeners(): void {
+    document.addEventListener("gesture-detected", this._gestureHandler);
+    document.addEventListener("gesture-triggered", this._gestureHandler);
+  }
+
+  private _removeGestureListeners(): void {
+    document.removeEventListener("gesture-detected", this._gestureHandler);
+    document.removeEventListener("gesture-triggered", this._gestureHandler);
+  }
+
+  private _checkFirstVisit(): void {
+    const hasSeenTutorial = localStorage.getItem("gesture-tutorial-seen");
+    if (!hasSeenTutorial) {
+      this.show();
+    }
+  }
+
+  show(): void {
+    this._isVisible.value = true;
+    this._currentStep.value = 0;
+    this._section.value = TUTORIAL_SECTIONS.GESTURES;
+    this._isPracticing.value = false;
+    this._practiceCompleted.value = false;
+  }
+
+  hide(): void {
+    this._isVisible.value = false;
+    localStorage.setItem("gesture-tutorial-seen", "true");
+  }
+
+  replay(): void {
+    localStorage.removeItem("gesture-tutorial-seen");
+    this.show();
+  }
+
+  private _getCurrentSteps(): TutorialStep[] {
+    const section = this._section.value;
+    if (section === TUTORIAL_SECTIONS.GESTURES) {
+      return this._gestureSteps;
+    }
+    if (section === TUTORIAL_SECTIONS.DESKTOP) {
+      return this._desktopSteps;
+    }
+    if (section === TUTORIAL_SECTIONS.PRACTICE) {
+      return [this._practiceStep];
+    }
+    return this._gestureSteps;
+  }
+
+  private _getTotalSteps(): number {
+    return this._gestureSteps.length + this._desktopSteps.length + 1;
+  }
+
+  private _getGlobalStepIndex(): number {
+    const gestureSteps = this._currentStep.value;
+    if (this._section.value === TUTORIAL_SECTIONS.GESTURES) {
+      return gestureSteps;
+    }
+    if (this._section.value === TUTORIAL_SECTIONS.DESKTOP) {
+      return this._gestureSteps.length + gestureSteps;
+    }
+    return this._gestureSteps.length + this._desktopSteps.length;
+  }
+
+  private _nextStep(): void {
+    const steps = this._getCurrentSteps();
+
+    if (this._currentStep.value < steps.length - 1) {
+      this._currentStep.value++;
+    } else {
+      this._advanceSection();
+    }
+  }
+
+  private _advanceSection(): void {
+    const section = this._section.value;
+    if (section === TUTORIAL_SECTIONS.GESTURES) {
+      this._section.value = TUTORIAL_SECTIONS.DESKTOP;
+      this._currentStep.value = 0;
+    } else if (section === TUTORIAL_SECTIONS.DESKTOP) {
+      this._startPractice();
+    } else {
+      this.hide();
+    }
+  }
+
+  private _startPractice(): void {
+    this._section.value = TUTORIAL_SECTIONS.PRACTICE;
+    this._currentStep.value = 0;
+    this._isPracticing.value = true;
+    this._practiceCompleted.value = false;
+  }
+
+  private _completePractice(): void {
+    this._isPracticing.value = false;
+    this._advanceSection();
+  }
+
+  private _skipTutorial(): void {
+    this.hide();
+  }
+
+  private _renderStepIndicators(): string {
+    const totalSteps = this._getTotalSteps();
+    const currentGlobal = this._getGlobalStepIndex();
+    const indicators: string[] = [];
+
+    for (let i = 0; i < totalSteps; i++) {
+      const isActive = i === currentGlobal;
+      const isCompleted = i < currentGlobal;
+      let sectionClass = "";
+      if (isCompleted) {
+        sectionClass = "completed";
+      } else if (isActive) {
+        sectionClass = "active";
+      }
+      indicators.push(`<span class="${sectionClass}"></span>`);
+    }
+
+    return indicators.join("");
+  }
+
+  private _renderSectionLabel(): string {
+    const section = this._section.value;
+    if (section === TUTORIAL_SECTIONS.GESTURES) {
+      return "Touch Gestures";
+    }
+    if (section === TUTORIAL_SECTIONS.DESKTOP) {
+      return "Desktop Shortcuts";
+    }
+    if (section === TUTORIAL_SECTIONS.PRACTICE) {
+      return "Practice Mode";
+    }
+    return "";
+  }
+
+  private _renderPracticeArea(completed: boolean): string {
+    const iconName = completed ? "check-circle" : "hand";
+    const message = completed ? "Great job!" : "Perform any gesture here";
+    return `
+      <div class="practice-area ${completed ? "completed" : ""}">
+        <div class="practice-zone">
+          <wa-icon name="${iconName}" size="large"></wa-icon>
+          <p>${message}</p>
+        </div>
+      </div>
+    `;
+  }
+
+  private _renderGesturePrompt(): string {
+    return `
+      <div class="gesture-prompt">
+        <span class="prompt-text">Swipe, tap, or shake!</span>
+      </div>
+    `;
+  }
+
+  /** @inheritdoc */
+  protected _render(): void {
+    const isVisible = this._isVisible.value;
+
+    if (!isVisible) {
+      this.innerHTML = "";
+      return;
+    }
+
+    const steps = this._getCurrentSteps();
+    const currentStep = this._currentStep.value;
+    const step = steps[currentStep];
+    const isPractice = this._isPracticing.value;
+    const practiceCompleted = this._practiceCompleted.value;
+    const globalStepIndex = this._getGlobalStepIndex();
+    const totalSteps = this._getTotalSteps();
+    const isLastStep =
+      this._section.value === TUTORIAL_SECTIONS.PRACTICE &&
+      currentStep === steps.length - 1;
+
+    let buttonText: string;
+    let buttonClass: string;
+    if (isLastStep) {
+      buttonText = "Finish!";
+      buttonClass = "primary finish";
+    } else {
+      buttonText = "Next";
+      buttonClass = "primary";
+    }
+
+    const nextButtonDisabled =
+      isPractice && !practiceCompleted ? "disabled" : "";
+
+    this.innerHTML = `
+      <div class="gesture-overlay">
+        <div class="gesture-card ${isPractice ? "practice" : ""}">
+          ${isPractice ? this._renderPracticeArea(practiceCompleted) : ""}
+          
+          <div class="gesture-animation">
+            <wa-icon name="${step.icon}" size="large"></wa-icon>
+            ${isPractice ? this._renderGesturePrompt() : ""}
+          </div>
+          
+          <span class="section-label">${this._renderSectionLabel()}</span>
+          <h3>${step.title}</h3>
+          <p>${step.description}</p>
+          
+          ${step.desktopHint ? `<p class="desktop-hint">${step.desktopHint}</p>` : ""}
+          
+          <div class="step-indicator">
+            ${this._renderStepIndicators()}
+          </div>
+          
+          <span class="step-counter">Step ${globalStepIndex + 1} of ${totalSteps}</span>
+          
+          <div class="actions">
+            <button id="skip-btn" class="secondary">Skip Tutorial</button>
+            <button id="replay-btn" class="secondary" title="Replay Tutorial">
+              <wa-icon name="arrow-counterclockwise" size="small"></wa-icon>
+            </button>
+            <button id="next-btn" class="${buttonClass}" ${nextButtonDisabled}>
+              ${buttonText}
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    this._attachEventListeners(isPractice, isLastStep);
+  }
+
+  private _attachEventListeners(
+    isPractice: boolean,
+    isLastStep: boolean
+  ): void {
+    const skipBtn = this.querySelector("#skip-btn");
+    const replayBtn = this.querySelector("#replay-btn");
+    const nextBtn = this.querySelector("#next-btn");
+
+    skipBtn?.addEventListener("click", () => {
+      this._skipTutorial();
+    });
+
+    replayBtn?.addEventListener("click", () => {
+      this.replay();
+    });
+
+    nextBtn?.addEventListener("click", () => {
+      if (isLastStep) {
+        this.hide();
+        return;
+      }
+      if (isPractice && !this._practiceCompleted.value) {
+        return;
+      }
+      this._nextStep();
+    });
+
+    document.addEventListener("keydown", this._keyboardHandler);
+  }
+
+  /** @inheritdoc */
+  protected _adoptedStyle(): string {
+    return `
+      <style>
+        .gesture-overlay {
+          display: block;
+          font-family: var(--font-sans, system-ui, sans-serif);
+        }
+
+        .gesture-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.6);
+          backdrop-filter: blur(4px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 9999;
+          animation: fadeIn 300ms ease-out;
+        }
+
+        .gesture-card {
+          background: var(--surface-1, #1a1a2e);
+          border-radius: 16px;
+          padding: 32px;
+          max-width: 400px;
+          width: 90%;
+          text-align: center;
+          box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+          animation: slideUp 400ms cubic-bezier(0.16, 1, 0.3, 1);
+          position: relative;
+        }
+
+        .gesture-card.practice {
+          padding-bottom: 200px;
+        }
+
+        .section-label {
+          display: inline-block;
+          background: var(--accent-primary, #6366f1);
+          color: white;
+          padding: 4px 12px;
+          border-radius: 12px;
+          font-size: 12px;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          margin-bottom: 16px;
+        }
+
+        .gesture-animation {
+          width: 80px;
+          height: 80px;
+          margin: 0 auto 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: var(--surface-2, #252542);
+          border-radius: 50%;
+          position: relative;
+        }
+
+        .gesture-animation wa-icon {
+          color: var(--accent-primary, #6366f1);
+        }
+
+        h3 {
+          margin: 0 0 8px;
+          font-size: 24px;
+          font-weight: 700;
+          color: var(--text-primary, #f1f1f1);
+        }
+
+        p {
+          margin: 0 0 16px;
+          color: var(--text-secondary, #a1a1aa);
+          font-size: 16px;
+          line-height: 1.5;
+        }
+
+        .desktop-hint {
+          background: var(--surface-2, #252542);
+          padding: 8px 16px;
+          border-radius: 8px;
+          font-family: monospace;
+          font-size: 14px;
+          margin-bottom: 16px;
+        }
+
+        .step-indicator {
+          display: flex;
+          justify-content: center;
+          gap: 8px;
+          margin-bottom: 12px;
+        }
+
+        .step-indicator span {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: var(--surface-3, #3a3a5c);
+          transition: all 200ms ease;
+        }
+
+        .step-indicator span.active {
+          background: var(--accent-primary, #6366f1);
+          transform: scale(1.25);
+        }
+
+        .step-indicator span.completed {
+          background: var(--success, #22c55e);
+        }
+
+        .step-counter {
+          display: block;
+          font-size: 12px;
+          color: var(--text-tertiary, #71717a);
+          margin-bottom: 20px;
+        }
+
+        .actions {
+          display: flex;
+          gap: 12px;
+          justify-content: center;
+        }
+
+        button {
+          padding: 12px 24px;
+          border-radius: 8px;
+          font-size: 14px;
+          font-weight: 600;
+          cursor: pointer;
+          border: none;
+          transition: all 150ms ease;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        button.primary {
+          background: var(--accent-primary, #6366f1);
+          color: white;
+        }
+
+        button.primary:hover:not(:disabled) {
+          background: var(--accent-primary-hover, #4f46e5);
+          transform: translateY(-1px);
+        }
+
+        button.primary:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        button.primary.finish {
+          background: var(--success, #22c55e);
+        }
+
+        button.secondary {
+          background: transparent;
+          color: var(--text-secondary, #a1a1aa);
+          border: 1px solid var(--surface-3, #3a3a5c);
+        }
+
+        button.secondary:hover {
+          background: var(--surface-2, #252542);
+          color: var(--text-primary, #f1f1f1);
+        }
+
+        .practice-area {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 180px;
+          background: var(--surface-2, #252542);
+          border-radius: 0 0 16px 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+        }
+
+        .practice-zone {
+          text-align: center;
+          padding: 20px;
+        }
+
+        .practice-zone wa-icon {
+          color: var(--text-tertiary, #71717a);
+          margin-bottom: 8px;
+        }
+
+        .practice-area.completed .practice-zone wa-icon {
+          color: var(--success, #22c55e);
+        }
+
+        .practice-zone p {
+          margin: 0;
+          font-size: 14px;
+        }
+
+        .gesture-prompt {
+          position: absolute;
+          bottom: -40px;
+          left: 50%;
+          transform: translateX(-50%);
+          animation: bounce 1s infinite;
+        }
+
+        .prompt-text {
+          font-size: 12px;
+          color: var(--text-tertiary, #71717a);
+          white-space: nowrap;
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes bounce {
+          0%, 100% { transform: translateX(-50%) translateY(0); }
+          50% { transform: translateX(-50%) translateY(-5px); }
+        }
+      </style>
+    `;
+  }
+}
+
+customElements.define("gesture-overlay", GestureOverlay);

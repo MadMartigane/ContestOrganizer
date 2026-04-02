@@ -51,14 +51,14 @@
   justify-content: center;
   width: 64px;
   height: 64px;
-  background-color: var(--sl-color-neutral-200);
-  border-radius: var(--sl-border-radius-small);
+  background-color: var(--wa-color-neutral-200);
+  border-radius: var(--wa-border-radius-small);
 }
 
 .team-image-fallback svg {
   width: 40px;
   height: 40px;
-  color: var(--sl-color-neutral-400);
+  color: var(--wa-color-neutral-400);
   animation: basketball-pulse 1.5s ease-in-out infinite;
   will-change: transform, opacity;
 }

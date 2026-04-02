@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A modern web application to organize and enjoy your sport contests. Built with Stencil.js, this tool helps you manage tournaments, matches, teams, and rankings with an intuitive interface.
+A modern web application to organize and enjoy your sport contests. Built with Vanilla Web Components, Vite, and Signals, this tool helps you manage tournaments, matches, teams, and rankings with an intuitive interface.
 
 ## ✨ Features
 
@@ -17,28 +17,31 @@ A modern web application to organize and enjoy your sport contests. Built with S
 
 ### Prerequisites
 
-- Node.js >= 18.x
-- npm >= 8.x
+- Node.js >= 20.x
+- pnpm >= 8.x
 
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/your-username/contest-organizer.git
    cd contest-organizer
    ```
 
 2. Install dependencies:
+
    ```bash
-   npm install
+   pnpm install
    ```
 
 3. Start the development server:
+
    ```bash
-   npm start
+   pnpm dev
    ```
 
-4. Open your browser to `http://localhost:3333`
+4. Open your browser to `http://localhost:5173`
 
 ## 📖 Usage
 
@@ -51,25 +54,28 @@ A modern web application to organize and enjoy your sport contests. Built with S
 ## 🛠️ Build & Deploy
 
 ### Development
+
 ```bash
-npm start  # Dev server with hot reload
+pnpm dev  # Dev server with hot reload
 ```
 
 ### Production Build
+
 ```bash
-npm run build
+pnpm run build
 ```
 
 ### Testing
+
 ```bash
-npm test              # Run tests
-npm run test.watch    # Watch mode
+pnpm test              # Run tests
 ```
 
 ### Deployment
+
 ```bash
-npm run deploy:prod   # Deploy to production
-npm run deploy:preprod  # Deploy to pre-production
+pnpm run deploy:prod   # Deploy to production
+pnpm run deploy:preprod  # Deploy to pre-production
 ```
 
 ## 🤝 Contributing
@@ -82,7 +88,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- Built with [Stencil.js](https://stenciljs.com/)
-- UI components from [Shoelace](https://shoelace.style/)
+- Built with [Vanilla Web Components](https://developer.mozilla.org/en-US/docs/Web/API/Web_components) & [BaseElement](src/core/BaseElement.ts)
+- Powered by [Vite](https://vitejs.dev/) and [Signals](https://github.com/preactjs/signals)
+- UI components from [Web Awesome](https://webawesome.org/)
 - Styling with [Tailwind CSS](https://tailwindcss.com/)
 - Data from [API-Sports](https://api-sports.io/)

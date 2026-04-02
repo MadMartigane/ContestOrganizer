@@ -9,7 +9,6 @@
     "test": "vitest run",
     "test:vitest": "vitest run",
     "proxy": "node ./scripts/proxy.js",
-    "clean-build": "rm -rf www/build/svg",
     "lint": "biome check .",
     "format": "biome format --write .",
     "biome:check": "biome check .",
@@ -35,7 +34,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.4.9",
     "@rollup/plugin-replace": "^6.0.3",
-    "@shoelace-style/shoelace": "^2.20.1",
+    "@awesome.me/webawesome": "latest",
     "@types/jest": "^29.5.14",
     "@types/node": "^25.0.0",
     "concurrently": "^9.2.1",

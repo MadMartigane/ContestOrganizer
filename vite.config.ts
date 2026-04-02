@@ -37,13 +37,6 @@ const config = defineConfig({
     viteStaticCopy({
       targets: [
         {
-          src: path.resolve(
-            import.meta.dirname,
-            "./node_modules/@shoelace-style/shoelace/dist/assets/"
-          ),
-          dest: "shoelace",
-        },
-        {
           src: path.resolve(import.meta.dirname, "./src/index.html"),
           dest: ".",
         },
@@ -106,8 +99,6 @@ const config = defineConfig({
         moduleResolution: "bundler",
         lib: ["ES2015", "DOM", "DOM.Iterable"],
         jsx: "preserve",
-        jsxFactory: "h",
-        jsxFragmentFactory: "Fragment",
         downlevelIteration: true,
       },
     }),

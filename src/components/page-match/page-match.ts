@@ -339,7 +339,7 @@ export class PageMatch extends BaseElement {
    * Update status badge content and variant for a match item
    */
   private updateMatchStatusBadge(matchItem: Element, match: Match): void {
-    const statusBadge = matchItem.querySelector("sl-tag");
+    const statusBadge = matchItem.querySelector("wa-tag");
     if (!statusBadge) {
       return;
     }
@@ -350,7 +350,7 @@ export class PageMatch extends BaseElement {
     }
 
     if (match.status === MatchStatus.PENDING) {
-      statusBadge.setAttribute("variant", "primary");
+      statusBadge.setAttribute("variant", "brand");
       textSpan.textContent = "Match programmé";
       this.replaceStatusIconWithIcon(statusBadge, "calendar-check");
     } else if (match.status === MatchStatus.DOING) {
@@ -371,14 +371,14 @@ export class PageMatch extends BaseElement {
     statusBadge: Element,
     iconName: string
   ): void {
-    const existingSpinner = statusBadge.querySelector("sl-spinner");
+    const existingSpinner = statusBadge.querySelector("wa-spinner");
     if (existingSpinner) {
-      const icon = document.createElement("sl-icon");
+      const icon = document.createElement("wa-icon");
       icon.classList.add("text-3xl", "text-warning");
       icon.setAttribute("name", iconName);
       existingSpinner.replaceWith(icon);
     } else {
-      const existingIcon = statusBadge.querySelector("sl-icon");
+      const existingIcon = statusBadge.querySelector("wa-icon");
       if (existingIcon) {
         existingIcon.setAttribute("name", iconName);
       }
@@ -389,9 +389,9 @@ export class PageMatch extends BaseElement {
    * Replace status icon with spinner for active match
    */
   private replaceStatusIconWithSpinner(statusBadge: Element): void {
-    const icon = statusBadge.querySelector("sl-icon");
+    const icon = statusBadge.querySelector("wa-icon");
     if (icon) {
-      const spinner = document.createElement("sl-spinner");
+      const spinner = document.createElement("wa-spinner");
       spinner.classList.add("text-2xl");
       icon.replaceWith(spinner);
     }
@@ -401,9 +401,9 @@ export class PageMatch extends BaseElement {
    * Replace status spinner with icon for completed match
    */
   private replaceStatusSpinnerWithIcon(statusBadge: Element): void {
-    const spinner = statusBadge.querySelector("sl-spinner");
+    const spinner = statusBadge.querySelector("wa-spinner");
     if (spinner) {
-      const icon = document.createElement("sl-icon");
+      const icon = document.createElement("wa-icon");
       icon.classList.add("text-3xl", "text-warning");
       icon.setAttribute("name", "check2-square");
       spinner.replaceWith(icon);
@@ -715,28 +715,28 @@ export class PageMatch extends BaseElement {
   private renderActionButtonsContent(match: Match): string {
     const isDoing = match.status === MatchStatus.DOING;
     return `
-      <sl-button
+      <wa-button
         class="delete-btn w-full"
         data-match-id="${match.id || ""}"
         role="button"
         size="large"
         variant="warning"
       >
-        <sl-icon name="trash"></sl-icon>
-      </sl-button>
+        <wa-icon name="trash"></wa-icon>
+      </wa-button>
 
       ${
         isDoing
-          ? `<sl-button class="stop-btn w-full" data-match-id="${
+          ? `<wa-button class="stop-btn w-full" data-match-id="${
               match.id || ""
-            }" role="button" size="large" variant="primary">
-          <sl-icon name="stop-circle"></sl-icon>
-        </sl-button>`
-          : `<sl-button class="play-btn w-full" data-match-id="${
+            }" role="button" size="large" variant="brand">
+          <wa-icon name="stop-circle"></wa-icon>
+        </wa-button>`
+          : `<wa-button class="play-btn w-full" data-match-id="${
               match.id || ""
-            }" role="button" size="large" variant="primary">
-          <sl-icon name="play-circle"></sl-icon>
-        </sl-button>`
+            }" role="button" size="large" variant="brand">
+          <wa-icon name="play-circle"></wa-icon>
+        </wa-button>`
       }
     `;
   }
@@ -758,28 +758,28 @@ export class PageMatch extends BaseElement {
   private renderMatchStatus(match: Match): string {
     if (match.status === MatchStatus.PENDING) {
       return `
-        <sl-tag variant="primary">
+        <wa-tag variant="brand">
           <span class="container">Match programmé</span>
-          <sl-icon class="text-3xl text-primary" name="calendar-check"></sl-icon>
-        </sl-tag>
+          <wa-icon class="text-3xl text-primary" name="calendar-check"></wa-icon>
+        </wa-tag>
       `;
     }
 
     if (match.status === MatchStatus.DOING) {
       return `
-        <sl-tag variant="success">
+        <wa-tag variant="success">
           <span class="container">Match en cours</span>
-          <sl-spinner class="text-2xl"></sl-spinner>
-        </sl-tag>
+          <wa-spinner class="text-2xl"></wa-spinner>
+        </wa-tag>
       `;
     }
 
     if (match.status === MatchStatus.DONE) {
       return `
-        <sl-tag variant="warning">
+        <wa-tag variant="warning">
           <span class="container">Match terminé</span>
-          <sl-icon class="text-3xl text-warning" name="check2-square"></sl-icon>
-        </sl-tag>
+          <wa-icon class="text-3xl text-warning" name="check2-square"></wa-icon>
+        </wa-tag>
       `;
     }
 
@@ -979,8 +979,8 @@ export class PageMatch extends BaseElement {
         <td>
           ${
             row.selected
-              ? `<sl-icon class="text-2xl text-success" name="check-square"></sl-icon>`
-              : `<sl-icon class="text-2xl text-success" name="square"></sl-icon>`
+              ? `<wa-icon class="text-2xl text-success" name="check-square"></wa-icon>`
+              : `<wa-icon class="text-2xl text-success" name="square"></wa-icon>`
           }
         </td>
         <td>
@@ -1014,7 +1014,7 @@ export class PageMatch extends BaseElement {
             <thead class="block-primary">
               <tr>
                 <th>
-                  <sl-icon class="text-2xl" name="list-check"></sl-icon>
+                  <wa-icon class="text-2xl" name="list-check"></wa-icon>
                 </th>
                 <th>
                   <span>Équipes</span>
@@ -1040,16 +1040,16 @@ export class PageMatch extends BaseElement {
 
         <div class="footer">
           <div class="grid-300">
-            <sl-button
+            <wa-button
               class="cancel-btn"
               role="button"
               size="large"
               variant="warning"
             >
-              <sl-icon name="ban" slot="prefix"></sl-icon>
-              <span slot="suffix">Annuler</span>
-            </sl-button>
-            <sl-button
+              <wa-icon name="ban" slot="start"></wa-icon>
+              <span slot="end">Annuler</span>
+            </wa-button>
+            <wa-button
               class="validate-btn"
               ${
                 currentMatch && !(currentMatch.visitorId && currentMatch.hostId)
@@ -1058,11 +1058,11 @@ export class PageMatch extends BaseElement {
               }
               role="button"
               size="large"
-              variant="primary"
+              variant="brand"
             >
-              <span slot="prefix">Valider</span>
-              <sl-icon name="arrow-right" slot="suffix"></sl-icon>
-            </sl-button>
+              <span slot="start">Valider</span>
+              <wa-icon name="arrow-right" slot="end"></wa-icon>
+            </wa-button>
           </div>
         </div>
       </div>
@@ -1081,23 +1081,23 @@ export class PageMatch extends BaseElement {
     const missingCount = getNBAMissingMatchCount(tournament);
     if (missingCount === 0) {
       return `
-        <sl-button disabled size="large" variant="success">
-          <sl-icon name="check-circle" slot="prefix"></sl-icon>
-          <span slot="suffix">Season Complete (82 games)</span>
-        </sl-button>
+        <wa-button disabled size="large" variant="success">
+          <wa-icon name="check-circle" slot="start"></wa-icon>
+          <span slot="end">Season Complete (82 games)</span>
+        </wa-button>
       `;
     }
 
     return `
-      <sl-button
+      <wa-button
         class="generate-nba-btn"
         role="button"
         size="large"
         variant="success"
       >
-        <sl-icon name="calendar-plus" slot="prefix"></sl-icon>
-        <span slot="suffix">Generate All Missing (${missingCount})</span>
-      </sl-button>
+        <wa-icon name="calendar-plus" slot="start"></wa-icon>
+        <span slot="end">Generate All Missing (${missingCount})</span>
+      </wa-button>
     `;
   }
 
@@ -1110,26 +1110,26 @@ export class PageMatch extends BaseElement {
     return `
       <div class="footer">
         <div class="grid-300 gap-4">
-          <sl-button
+          <wa-button
             class="new-match-btn"
             ${isNBAComplete ? "disabled" : ""}
             role="button"
             size="large"
-            variant="primary"
+            variant="brand"
           >
-            <sl-icon name="plus-lg" slot="prefix"></sl-icon>
-            <span slot="suffix">Nouveau match</span>
-          </sl-button>
-          <sl-button
+            <wa-icon name="plus" slot="start"></wa-icon>
+            <span slot="end">Nouveau match</span>
+          </wa-button>
+          <wa-button
             class="auto-match-btn"
             ${isNBAComplete ? "disabled" : ""}
             role="button"
             size="large"
             variant="success"
           >
-            <sl-icon name="robot" slot="prefix"></sl-icon>
-            <span slot="suffix">Auto-Match</span>
-          </sl-button>
+            <wa-icon name="robot" slot="start"></wa-icon>
+            <span slot="end">Auto-Match</span>
+          </wa-button>
           ${this.renderNBAGenerateButton()}
         </div>
       </div>
@@ -1150,33 +1150,33 @@ export class PageMatch extends BaseElement {
          role="navigation"
          aria-label="Raccourcis de navigation">
       <div class="scroll-nav-buttons">
-        <sl-tooltip content="Aller en haut (Alt+T)" placement="left">
-          <sl-button size="medium"
+        <wa-tooltip content="Aller en haut (Alt+T)" placement="left">
+          <wa-button size="medium"
                      variant="default"
                      class="nav-btn-top"
                      aria-label="Aller en haut de la page">
-            <sl-icon name="chevron-up" aria-hidden="true"></sl-icon>
-          </sl-button>
-        </sl-tooltip>
+            <wa-icon name="chevron-up" aria-hidden="true"></wa-icon>
+          </wa-button>
+        </wa-tooltip>
 
-        <sl-tooltip content="Aller au match actuel (Alt+M)" placement="left">
-          <sl-button size="medium"
-                     variant="primary"
+        <wa-tooltip content="Aller au match actuel (Alt+M)" placement="left">
+          <wa-button size="medium"
+                     variant="brand"
                      class="nav-btn-current"
                      ${hasTargetMatch ? "" : "disabled"}
                      aria-label="Aller au match en cours ou dernier match joué">
-            <sl-icon name="crosshair" aria-hidden="true"></sl-icon>
-          </sl-button>
-        </sl-tooltip>
+            <wa-icon name="crosshair" aria-hidden="true"></wa-icon>
+          </wa-button>
+        </wa-tooltip>
 
-        <sl-tooltip content="Aller en bas (Alt+B)" placement="left">
-          <sl-button size="medium"
+        <wa-tooltip content="Aller en bas (Alt+B)" placement="left">
+          <wa-button size="medium"
                      variant="default"
                      class="nav-btn-bottom"
                      aria-label="Aller en bas de la page">
-            <sl-icon name="chevron-down" aria-hidden="true"></sl-icon>
-          </sl-button>
-        </sl-tooltip>
+            <wa-icon name="chevron-down" aria-hidden="true"></wa-icon>
+          </wa-button>
+        </wa-tooltip>
       </div>
     </div>
     <div class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
@@ -1205,9 +1205,9 @@ export class PageMatch extends BaseElement {
       <style>
         .scroll-nav {
           position: fixed;
-          bottom: calc(var(--sl-spacing-medium) + env(safe-area-inset-bottom, 0px));
-          right: var(--sl-spacing-medium);
-          z-index: var(--sl-z-index-drawer);
+          bottom: calc(var(--wa-spacing-medium) + env(safe-area-inset-bottom, 0px));
+          right: var(--wa-spacing-medium);
+          z-index: var(--wa-z-index-drawer);
           opacity: 0;
           transform: translateY(100%);
           transition: opacity 0.3s ease, transform 0.3s ease;
@@ -1220,18 +1220,18 @@ export class PageMatch extends BaseElement {
           pointer-events: auto;
         }
 
-        .scroll-nav sl-button:focus-visible {
-          outline: 2px solid var(--sl-color-primary-600);
+        .scroll-nav wa-button:focus-visible {
+          outline: 2px solid var(--wa-color-brand-600);
           outline-offset: 2px;
         }
 
         .scroll-nav-buttons {
           display: flex;
           flex-direction: column;
-          gap: var(--sl-spacing-2x-small);
+          gap: var(--wa-spacing-2x-small);
         }
 
-        .scroll-nav-buttons sl-button {
+        .scroll-nav-buttons wa-button {
           width: 100%;
         }
 
@@ -1249,7 +1249,7 @@ export class PageMatch extends BaseElement {
 
         @media (max-height: 600px) {
           .scroll-nav {
-            bottom: calc(var(--sl-spacing-large) + env(safe-area-inset-bottom, 0px));
+            bottom: calc(var(--wa-spacing-large) + env(safe-area-inset-bottom, 0px));
           }
         }
 
@@ -1265,21 +1265,6 @@ export class PageMatch extends BaseElement {
           width: 100%;
         }
       </style>
-
-      <sl-breadcrumb>
-        <sl-breadcrumb-item href="#/home">
-          <sl-icon class="text-2xl" name="house"></sl-icon>
-        </sl-breadcrumb-item>
-        <sl-breadcrumb-item href="#/tournaments">
-          <sl-icon class="text-2xl" name="trophy"></sl-icon>
-        </sl-breadcrumb-item>
-        <sl-breadcrumb-item href="#/tournament/${tournament?.id || ""}">
-          <sl-icon class="text-2xl" name="card-list"></sl-icon>
-        </sl-breadcrumb-item>
-        <sl-breadcrumb-item>
-          <sl-icon class="text-2xl" name="controller"></sl-icon>
-        </sl-breadcrumb-item>
-      </sl-breadcrumb>
 
       <div class="page-content">
         ${

@@ -258,7 +258,13 @@ export class PageTournament extends BaseElement {
 
   private goMatch(tournamentId?: number): void {
     if (tournamentId) {
-      window.location.hash = `/match/${tournamentId}`;
+      this.dispatchEvent(
+        new CustomEvent("navigate", {
+          detail: { hash: `#/zone/live/match/${tournamentId}` },
+          bubbles: true,
+          composed: true,
+        })
+      );
     }
   }
 
@@ -273,17 +279,6 @@ export class PageTournament extends BaseElement {
 
     if (uiError) {
       this.innerHTML = `
-        <sl-breadcrumb>
-          <sl-breadcrumb-item href="#/home">
-            <sl-icon class="text-2xl" name="house"></sl-icon>
-          </sl-breadcrumb-item>
-          <sl-breadcrumb-item href="#/tournaments">
-            <sl-icon class="text-2xl" name="trophy"></sl-icon>
-          </sl-breadcrumb-item>
-          <sl-breadcrumb-item>
-            <sl-icon class="text-2xl" name="card-list"></sl-icon>
-          </sl-breadcrumb-item>
-        </sl-breadcrumb>
         <div class="page-content">
           <error-message message="${uiError}"></error-message>
         </div>
@@ -294,14 +289,14 @@ export class PageTournament extends BaseElement {
     const tournamentNameHtml = isEditTournamentName
       ? `
         <div class="my-4 grid grid-cols-1 items-center text-center">
-          <sl-input
+          <wa-input
             autocomplete="off"
             autofocus
             id="tournamentName"
             name="tournamentName"
             type="text"
             value="${tournament?.name ?? ""}"
-          ></sl-input>
+          ></wa-input>
         </div>
       `
       : `
@@ -334,18 +329,6 @@ export class PageTournament extends BaseElement {
         `;
 
     this.innerHTML = `
-      <sl-breadcrumb>
-        <sl-breadcrumb-item href="#/home">
-          <sl-icon class="text-2xl" name="house"></sl-icon>
-        </sl-breadcrumb-item>
-        <sl-breadcrumb-item href="#/tournaments">
-          <sl-icon class="text-2xl" name="trophy"></sl-icon>
-        </sl-breadcrumb-item>
-        <sl-breadcrumb-item>
-          <sl-icon class="text-2xl" name="card-list"></sl-icon>
-        </sl-breadcrumb-item>
-      </sl-breadcrumb>
-
       <div class="page-content">
         <div>
           ${tournamentNameHtml}
@@ -381,7 +364,7 @@ export class PageTournament extends BaseElement {
         // Focus the input after render
         setTimeout(() => {
           const input = this.querySelector(
-            'sl-input[name="tournamentName"]'
+            'wa-input[name="tournamentName"]'
           )?.querySelector("input");
           if (input) {
             (input as HTMLInputElement).focus();
@@ -392,7 +375,7 @@ export class PageTournament extends BaseElement {
 
     // Setup tournament name input
     const tournamentNameInput = this.querySelector(
-      'sl-input[name="tournamentName"]'
+      'wa-input[name="tournamentName"]'
     ) as HTMLElement & { focus: () => void };
     if (tournamentNameInput) {
       this.domInputTournamentName = tournamentNameInput.querySelector(
@@ -491,40 +474,40 @@ export class PageTournament extends BaseElement {
     }
 
     return `
-      <sl-button
+      <wa-button
         id="rankingBtn"
         size="large"
         variant="secondary"
       >
-        <sl-icon name="sort-numeric-down" slot="prefix"></sl-icon>
-        <span slot="suffix">Classement !</span>
-      </sl-button>
+        <wa-icon name="sort-numeric-down" slot="start"></wa-icon>
+        <span slot="end">Classement !</span>
+      </wa-button>
     `;
   }
 
   private renderFooterActions(): string {
     return `
       <div class="grid-300 my-4">
-        <sl-button
+        <wa-button
           id="resetBtn"
           size="large"
           variant="warning"
         >
-          <sl-icon name="trash" slot="prefix"></sl-icon>
-          <span slot="suffix">Effacer</span>
-        </sl-button>
+          <wa-icon name="trash" slot="start"></wa-icon>
+          <span slot="end">Effacer</span>
+        </wa-button>
 
         ${this.renderSortingButton()}
 
-        <sl-button
+        <wa-button
           id="matchBtn"
           size="large"
-          variant="primary"
+          variant="brand"
         >
-          <sl-icon name="trophy" slot="prefix"></sl-icon>
+          <wa-icon name="trophy" slot="start"></wa-icon>
           <span>Go Match</span>
-          <sl-icon name="forward" slot="suffix"></sl-icon>
-        </sl-button>
+          <wa-icon name="forward" slot="end"></wa-icon>
+        </wa-button>
       </div>
     `;
   }

@@ -187,14 +187,14 @@ export class GridBasket extends BaseElement {
     return `
       <thead class="block-primary align-middle">
         <th>
-          <sl-icon class="text-2xl" name="sort-numeric-down"></sl-icon>
+          <wa-icon class="text-2xl" name="sort-numeric-down"></wa-icon>
         </th>
         <th>
           <span>Équipes</span>
         </th>
         <th>
           <span class="block text-xl">
-            <sl-icon name="percent"></sl-icon>
+            <wa-icon name="percent"></wa-icon>
           </span>
         </th>
         <th>
@@ -211,18 +211,18 @@ export class GridBasket extends BaseElement {
         </th>
         <th>
           <span class="block text-success text-xl md:hidden">
-            <sl-icon name="plus-lg"></sl-icon>
+            <wa-icon name="plus"></wa-icon>
           </span>
           <span class="hidden text-success md:block">Marqués</span>
         </th>
         <th>
           <span class="block text-warning text-xl md:hidden">
-            <sl-icon name="dash-lg"></sl-icon>
+            <wa-icon name="minus"></wa-icon>
           </span>
           <span class="hidden text-warning md:block">Encaissés</span>
         </th>
         <th class="text-center">
-          <sl-icon class="inline-block text-2xl" name="calendar-event"></sl-icon>
+          <wa-icon class="inline-block text-2xl" name="calendar-event"></wa-icon>
         </th>
       </thead>
     `;
@@ -290,19 +290,19 @@ export class GridBasket extends BaseElement {
         <caption class="caption-bottom md:hidden">
           <div class="text-wrap text-left text-neutral text-xs">
             <span class="mx-1 text-primary">
-              <sl-icon name="percent"></sl-icon>: pourcentage de match gagnés.
+              <wa-icon name="percent"></wa-icon>: pourcentage de match gagnés.
             </span>
             <span class="mx-1">J: total de match joués</span>
             <span class="mx-1 text-success">G: match gagnés</span>
             <span class="mx-1 text-warning">P: match perdus</span>
             <span class="mx-1 text-success">
-              <sl-icon name="plus-lg"></sl-icon>: points marqués
+              <wa-icon name="plus"></wa-icon>: points marqués
             </span>
             <span class="mx-1 text-warning">
-              <sl-icon name="dash-lg"></sl-icon>: points encaissés
+              <wa-icon name="minus"></wa-icon>: points encaissés
             </span>
             <span class="mx-1">
-              <sl-icon name="calendar-event"></sl-icon>: match programmés
+              <wa-icon name="calendar-event"></wa-icon>: match programmés
             </span>
           </div>
         </caption>
@@ -314,15 +314,14 @@ export class GridBasket extends BaseElement {
       ${
         tournament?.type === "NBA"
           ? `
-        <action-bar>
-          <sl-button
+          <wa-button
             class="magic-fill-btn"
             size="medium"
-            variant="primary"
+            variant="brand"
           >
-            <sl-icon name="magic" slot="prefix"></sl-icon>
+            <wa-icon name="magic" slot="start"></wa-icon>
             Magic fill-up
-          </sl-button>
+          </wa-button>
           ${
             magicFillError
               ? `
@@ -330,7 +329,6 @@ export class GridBasket extends BaseElement {
           `
               : ""
           }
-        </action-bar>
       `
           : ""
       }
