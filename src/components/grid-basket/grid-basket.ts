@@ -11,6 +11,16 @@ import type {
   TournamentUpdateEvent,
 } from "../../modules/tournaments/tournaments.types.js";
 
+const template = document.createElement("template");
+template.innerHTML = `
+  <style>
+    :host { display: block; }
+  </style>
+  <div part="base">
+    <slot></slot>
+  </div>
+`;
+
 /**
  * GridBasket - Displays basketball/NBA tournament grid with team selections
  * @element grid-basket
@@ -20,6 +30,10 @@ export class GridBasket extends BaseElement {
   private declare _tournament: Signal<Tournament | null>;
   private declare _isLoadingNbaTeams: Signal<boolean>;
   private _tournamentUpdateHandler: (() => void) | null = null;
+  private _tournamentUnsubscribe: (() => void) | null = null;
+
+  // Bound handlers for cleanup
+  private _boundSelectChangeHandlers: Array<() => void> = [];
 
   static get observedAttributes(): string[] {
     return ["tournament-id"];
@@ -43,13 +57,27 @@ export class GridBasket extends BaseElement {
     this._tournamentUpdateHandler = () => {
       this.forceGridRender();
     };
-    this._tournaments.onUpdate(this._tournamentUpdateHandler);
+    this._tournamentUnsubscribe = this._tournaments.onUpdate(
+      this._tournamentUpdateHandler
+    );
     this.forceGridRender();
   }
 
   disconnectedCallback(): void {
+    this._cleanupEventListeners();
+    if (this._tournamentUnsubscribe) {
+      this._tournamentUnsubscribe();
+      this._tournamentUnsubscribe = null;
+    }
     this._tournamentUpdateHandler = null;
     super.disconnectedCallback();
+  }
+
+  private _cleanupEventListeners(): void {
+    for (const cleanup of this._boundSelectChangeHandlers) {
+      cleanup();
+    }
+    this._boundSelectChangeHandlers = [];
   }
 
   protected _onAttributeChange(name: string, _value: string | null): void {
@@ -276,10 +304,18 @@ export class GridBasket extends BaseElement {
   }
 
   protected _render(): void {
+    this._cleanupEventListeners();
+
+    const root = this._renderRoot;
+    if (!root.firstChild) {
+      root.appendChild(template.content.cloneNode(true));
+    }
+
     const tournament = this._tournament.value;
 
-    this.innerHTML = `
-      <table class="my-6">
+    const table = root.querySelector("table");
+    if (table) {
+      table.innerHTML = `
         <caption class="caption-bottom md:hidden">
           <div class="text-wrap text-left text-neutral-400 text-xs">
             <span class="mx-1 text-orange-600">
@@ -303,8 +339,8 @@ export class GridBasket extends BaseElement {
         <tbody>
           ${tournament ? this._renderGridBody() : ""}
         </tbody>
-      </table>
-    `;
+      `;
+    }
 
     // Two-pass rendering: setup mad-select-team elements
     this._setupTeamSelectors();
@@ -312,7 +348,9 @@ export class GridBasket extends BaseElement {
 
   private _setupTeamSelectors(): void {
     const tournament = this._tournament.value;
-    const selectors = Array.from(this.querySelectorAll("mad-select-team"));
+    const selectors = Array.from(
+      this._renderRoot.querySelectorAll("mad-select-team")
+    );
 
     for (const selector of selectors) {
       const gridIdStr = selector.getAttribute("data-grid-id");
@@ -335,11 +373,12 @@ export class GridBasket extends BaseElement {
           element.setAttribute("value", JSON.stringify(gridRow.team));
         }
 
-        selector.addEventListener(
-          "madSelectChange",
-          (ev: CustomEvent<GridTeamOnUpdateDetail>) => {
-            this.onTeamTeamChange(ev.detail);
-          }
+        const handler = ((ev: CustomEvent<GridTeamOnUpdateDetail>) => {
+          this.onTeamTeamChange(ev.detail);
+        }) as EventListener;
+        selector.addEventListener("madSelectChange", handler);
+        this._boundSelectChangeHandlers.push(() =>
+          selector.removeEventListener("madSelectChange", handler)
         );
       }
     }

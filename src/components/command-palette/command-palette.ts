@@ -7,6 +7,103 @@ import { Signal } from "../../core/signal.js";
  * Provides quick access to application commands via keyboard shortcut.
  * @element command-palette
  */
+const template = document.createElement("template");
+template.innerHTML = `
+  <style>
+    :host { display: block; }
+    .palette-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 15vh;
+      z-index: 9999;
+    }
+    .palette {
+      background: var(--wa-color-neutral-900, #171717);
+      border-radius: 12px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: var(--wa-shadow-x-large, 0 25px 50px -12px rgba(0, 0, 0, 0.25));
+      overflow: hidden;
+    }
+    .search-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid var(--wa-color-neutral-700, #404040);
+    }
+    .search-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--wa-color-neutral-100, #f5f5f5);
+      font-size: 18px;
+      outline: none;
+    }
+    .search-input:focus-visible {
+      outline: 2px solid #6366f1;
+      outline-offset: 2px;
+    }
+    .search-input::placeholder {
+      color: var(--wa-color-neutral-500, #737373);
+    }
+    .command-list {
+      list-style: none;
+      margin: 0;
+      padding: 8px 0;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .command-list li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: background 150ms ease;
+    }
+    .command-list li:hover,
+    .command-list li.selected {
+      background: var(--wa-color-neutral-800, #262626);
+    }
+    .command-list li:focus-visible {
+      outline: 2px solid #6366f1;
+      outline-offset: -2px;
+    }
+    .command-list li.selected {
+      background: var(--wa-color-brand, #6366f1);
+    }
+    .command-list .label {
+      flex: 1;
+      color: var(--wa-color-neutral-100, #f5f5f5);
+    }
+    .command-list .shortcut {
+      color: var(--wa-color-neutral-400, #a3a3a3);
+      font-size: 12px;
+      font-family: monospace;
+    }
+  </style>
+  <div class="palette-overlay" role="dialog" aria-label="Command Palette" aria-modal="true">
+    <div class="palette" role="document">
+      <div class="search-container">
+        <mad-icon name="magnifying-glass"></mad-icon>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Type a command or search..."
+          autocomplete="off"
+          aria-label="Search commands"
+        />
+      </div>
+      <ul class="command-list" role="listbox" aria-label="Commands"></ul>
+    </div>
+  </div>
+`;
+
 export class CommandPalette extends BaseElement {
   private static readonly shortcutKey = "k";
   private static readonly modifierKeys = ["metaKey", "ctrlKey"];
@@ -23,6 +120,12 @@ export class CommandPalette extends BaseElement {
   private domInput: HTMLInputElement | null = null;
   private domCommandList: HTMLUListElement | null = null;
 
+  // Bound handlers for cleanup
+  private _boundGlobalKeydown: ((e: KeyboardEvent) => void) | null = null;
+  private _boundInputHandler: ((e: Event) => void) | null = null;
+  private _boundOverlayClick: (() => void) | null = null;
+  private _boundPaletteClick: ((e: Event) => void) | null = null;
+
   protected _setupProperties(): void {
     this._isOpen = new Signal<boolean>(false);
     this._query = new Signal<string>("");
@@ -35,32 +138,51 @@ export class CommandPalette extends BaseElement {
     this._initialized = true;
   }
 
+  protected _createRenderRoot(): Element {
+    return this;
+  }
+
   connectedCallback(): void {
     super.connectedCallback();
-    document.addEventListener("keydown", this.handleGlobalKeydown);
-    this.setupDefaultCommands();
+    this._boundGlobalKeydown = this._handleGlobalKeydown.bind(this);
+    document.addEventListener("keydown", this._boundGlobalKeydown);
+    this._setupDefaultCommands();
   }
 
   disconnectedCallback(): void {
     super.disconnectedCallback();
-    document.removeEventListener("keydown", this.handleGlobalKeydown);
+    if (this._boundGlobalKeydown) {
+      document.removeEventListener("keydown", this._boundGlobalKeydown);
+      this._boundGlobalKeydown = null;
+    }
+    this._cleanupEventListeners();
+  }
+
+  private _cleanupEventListeners(): void {
+    if (this.domInput && this._boundInputHandler) {
+      this.domInput.removeEventListener("input", this._boundInputHandler);
+      this.domInput = null;
+    }
+    this._boundInputHandler = null;
+    this._boundOverlayClick = null;
+    this._boundPaletteClick = null;
   }
 
   /**
    * Handle global keyboard shortcuts
    */
-  private readonly handleGlobalKeydown = (e: KeyboardEvent): void => {
+  private _handleGlobalKeydown(e: KeyboardEvent): void {
     // Open palette with Cmd+K (Mac) or Ctrl+K (Windows/Linux)
-    if (this.isModifierKeyPressed(e) && e.key === CommandPalette.shortcutKey) {
+    if (this._isModifierKeyPressed(e) && e.key === CommandPalette.shortcutKey) {
       e.preventDefault();
-      this.toggle();
+      this._toggle();
       return;
     }
 
     // Close on Escape when open
     if (e.key === "Escape" && this._isOpen.value) {
       e.preventDefault();
-      this.close();
+      this._close();
       return;
     }
 
@@ -71,20 +193,20 @@ export class CommandPalette extends BaseElement {
 
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      this.navigateDown();
+      this._navigateDown();
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      this.navigateUp();
+      this._navigateUp();
     } else if (e.key === "Enter") {
       e.preventDefault();
-      this.executeSelected();
+      this._executeSelected();
     }
-  };
+  }
 
   /**
    * Check if modifier key is pressed (Cmd on Mac, Ctrl on Windows/Linux)
    */
-  private isModifierKeyPressed(e: KeyboardEvent): boolean {
+  private _isModifierKeyPressed(e: KeyboardEvent): boolean {
     return CommandPalette.modifierKeys.some(
       (key) => e[key as keyof KeyboardEvent]
     );
@@ -93,18 +215,18 @@ export class CommandPalette extends BaseElement {
   /**
    * Toggle palette open/closed state
    */
-  private toggle(): void {
+  private _toggle(): void {
     if (this._isOpen.value) {
-      this.close();
+      this._close();
     } else {
-      this.open();
+      this._open();
     }
   }
 
   /**
    * Open the command palette
    */
-  private open(): void {
+  private _open(): void {
     this._isOpen.value = true;
     this._selectedIndex.value = 0;
     this._query.value = "";
@@ -121,7 +243,7 @@ export class CommandPalette extends BaseElement {
   /**
    * Close the command palette
    */
-  private close(): void {
+  private _close(): void {
     this._isOpen.value = false;
     this._query.value = "";
     this._requestRender();
@@ -130,33 +252,33 @@ export class CommandPalette extends BaseElement {
   /**
    * Navigate selection down
    */
-  private navigateDown(): void {
-    const filtered = this.filteredCommands;
+  private _navigateDown(): void {
+    const filtered = this._filteredCommands;
     if (filtered.length === 0) {
       return;
     }
     const nextIndex = this._selectedIndex.value + 1;
     this._selectedIndex.value = nextIndex >= filtered.length ? 0 : nextIndex;
-    this.scrollSelectedIntoView();
+    this._scrollSelectedIntoView();
   }
 
   /**
    * Navigate selection up
    */
-  private navigateUp(): void {
-    const filtered = this.filteredCommands;
+  private _navigateUp(): void {
+    const filtered = this._filteredCommands;
     if (filtered.length === 0) {
       return;
     }
     const prevIndex = this._selectedIndex.value - 1;
     this._selectedIndex.value = prevIndex < 0 ? filtered.length - 1 : prevIndex;
-    this.scrollSelectedIntoView();
+    this._scrollSelectedIntoView();
   }
 
   /**
    * Scroll the selected item into view
    */
-  private scrollSelectedIntoView(): void {
+  private _scrollSelectedIntoView(): void {
     requestAnimationFrame(() => {
       if (!this.domCommandList) {
         return;
@@ -171,38 +293,38 @@ export class CommandPalette extends BaseElement {
   /**
    * Execute the currently selected command
    */
-  private executeSelected(): void {
-    const filtered = this.filteredCommands;
+  private _executeSelected(): void {
+    const filtered = this._filteredCommands;
     if (filtered.length === 0) {
       return;
     }
     const command = filtered[this._selectedIndex.value];
     if (command) {
-      this.execute(command);
+      this._execute(command);
     }
   }
 
   /**
    * Execute a specific command
    */
-  private execute(command: Command): void {
+  private _execute(command: Command): void {
     command.execute();
-    this.close();
+    this._close();
   }
 
   /**
    * Handle input changes from the search field
    */
-  private readonly handleInput = (e: Event): void => {
+  private _handleInput(e: Event): void {
     const target = e.target as HTMLInputElement;
     this._query.value = target.value;
     this._selectedIndex.value = 0;
-  };
+  }
 
   /**
    * Set up default application commands
    */
-  private setupDefaultCommands(): void {
+  private _setupDefaultCommands(): void {
     this._commands = [
       {
         id: "new-tournament",
@@ -268,7 +390,7 @@ export class CommandPalette extends BaseElement {
   /**
    * Get filtered commands based on search query
    */
-  private get filteredCommands(): Command[] {
+  private get _filteredCommands(): Command[] {
     const query = this._query.value.toLowerCase().trim();
     if (!query) {
       return this._commands;
@@ -284,16 +406,16 @@ export class CommandPalette extends BaseElement {
   /**
    * Handle overlay click to close palette
    */
-  private readonly handleOverlayClick = (): void => {
-    this.close();
-  };
+  private _handleOverlayClick(): void {
+    this._close();
+  }
 
   /**
    * Stop propagation on palette click
    */
-  private readonly handlePaletteClick = (e: Event): void => {
+  private _handlePaletteClick(e: Event): void {
     e.stopPropagation();
-  };
+  }
 
   /**
    * Render the command palette
@@ -304,13 +426,13 @@ export class CommandPalette extends BaseElement {
       return;
     }
 
-    const filtered = this.filteredCommands;
+    const filtered = this._filteredCommands;
     const selectedIndex = this._selectedIndex.value;
 
     const commandItems = filtered
       .map(
         (cmd, index) => `
-      <li class="${index === selectedIndex ? "selected" : ""}" data-index="${index}">
+      <li class="${index === selectedIndex ? "selected" : ""}" data-index="${index}" role="option" aria-selected="${index === selectedIndex}">
         <mad-icon name="${cmd.icon ?? "command"}"></mad-icon>
         <span class="label">${cmd.label}</span>
         <span class="shortcut">${cmd.shortcut ?? ""}</span>
@@ -331,9 +453,10 @@ export class CommandPalette extends BaseElement {
               value="${this._query.value}"
               autocomplete="off"
               autofocus
+              aria-label="Search commands"
             />
           </div>
-          <ul class="command-list">
+          <ul class="command-list" role="listbox" aria-label="Commands" aria-live="polite">
             ${commandItems}
           </ul>
         </div>
@@ -346,18 +469,21 @@ export class CommandPalette extends BaseElement {
 
     // Attach event listeners
     if (this.domInput) {
-      this.domInput.addEventListener("input", this.handleInput);
+      this._boundInputHandler = this._handleInput.bind(this);
+      this.domInput.addEventListener("input", this._boundInputHandler);
     }
 
     const overlay = this.querySelector(".palette-overlay");
     const palette = this.querySelector(".palette");
 
     if (overlay) {
-      overlay.addEventListener("click", this.handleOverlayClick);
+      this._boundOverlayClick = this._handleOverlayClick.bind(this);
+      overlay.addEventListener("click", this._boundOverlayClick);
     }
 
     if (palette) {
-      palette.addEventListener("click", this.handlePaletteClick);
+      this._boundPaletteClick = this._handlePaletteClick.bind(this);
+      palette.addEventListener("click", this._boundPaletteClick);
     }
 
     // Attach click handlers to command items
@@ -368,7 +494,7 @@ export class CommandPalette extends BaseElement {
           const index = Number(item.dataset.index);
           const command = filtered[index];
           if (command) {
-            this.execute(command);
+            this._execute(command);
           }
         });
       }

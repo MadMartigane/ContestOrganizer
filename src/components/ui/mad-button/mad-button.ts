@@ -1,86 +1,323 @@
 import { BaseElement } from "@core/base-element.js";
 
+/**
+ * MadButton - A button component with variants, sizes, and accessibility support
+ * @element mad-button
+ * @fires mad-click - Fired when the button is activated (click or keyboard)
+ */
+const template = document.createElement("template");
+template.innerHTML = `
+  <style>
+    :host {
+      display: inline-block;
+    }
+
+    :host([hidden]) {
+      display: none !important;
+    }
+
+    :host([disabled]) {
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-family: inherit;
+      font-weight: 500;
+      transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+      cursor: pointer;
+      border: none;
+      outline: none;
+      text-decoration: none;
+    }
+
+    /* Focus visible styles */
+    .button:focus-visible {
+      outline: 2px solid #f97316;
+      outline-offset: 2px;
+    }
+
+    /* Variant: default */
+    :host([variant="default"]) .button,
+    :host(:not([variant])) .button {
+      background-color: #f3f4f6;
+      color: #111827;
+    }
+
+    :host([variant="default"]) .button:hover,
+    :host(:not([variant])) .button:hover {
+      background-color: #e5e7eb;
+    }
+
+    :host([variant="default"]) .button:focus-visible,
+    :host(:not([variant])) .button:focus-visible {
+      outline-color: #f97316;
+    }
+
+    /* Variant: brand */
+    :host([variant="brand"]) .button {
+      background-color: #ea580c;
+      color: #ffffff;
+    }
+
+    :host([variant="brand"]) .button:hover {
+      background-color: #c2410c;
+    }
+
+    /* Variant: success */
+    :host([variant="success"]) .button {
+      background-color: #16a34a;
+      color: #ffffff;
+    }
+
+    :host([variant="success"]) .button:hover {
+      background-color: #15803d;
+    }
+
+    :host([variant="success"]) .button:focus-visible {
+      outline-color: #16a34a;
+    }
+
+    /* Variant: warning */
+    :host([variant="warning"]) .button {
+      background-color: #eab308;
+      color: #111827;
+    }
+
+    :host([variant="warning"]) .button:hover {
+      background-color: #ca8a04;
+    }
+
+    :host([variant="warning"]) .button:focus-visible {
+      outline-color: #eab308;
+    }
+
+    /* Variant: danger */
+    :host([variant="danger"]) .button {
+      background-color: #dc2626;
+      color: #ffffff;
+    }
+
+    :host([variant="danger"]) .button:hover {
+      background-color: #b91c1c;
+    }
+
+    :host([variant="danger"]) .button:focus-visible {
+      outline-color: #dc2626;
+    }
+
+    /* Variant: secondary */
+    :host([variant="secondary"]) .button {
+      background-color: #e5e7eb;
+      color: #111827;
+    }
+
+    :host([variant="secondary"]) .button:hover {
+      background-color: #d1d5db;
+    }
+
+    /* Size: small */
+    :host([size="small"]) .button {
+      padding: 0.375rem 0.75rem;
+      font-size: 0.875rem;
+    }
+
+    /* Size: medium (default) */
+    :host([size="medium"]) .button,
+    :host(:not([size])) .button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+    }
+
+    /* Size: large */
+    :host([size="large"]) .button {
+      padding: 0.75rem 1.5rem;
+      font-size: 1.125rem;
+    }
+
+    /* Border radius */
+    :host([pill]) .button {
+      border-radius: 9999px;
+    }
+
+    :host(:not([pill])) .button {
+      border-radius: 0.5rem;
+    }
+
+    /* Disabled styles */
+    :host([disabled]) .button {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    /* Slot styles */
+    ::slotted(*) {
+      pointer-events: none;
+    }
+  </style>
+
+  <button class="button" type="button">
+    <slot name="start"></slot>
+    <slot></slot>
+    <slot name="end"></slot>
+  </button>
+`;
+
+/**
+ * MadButton - A button component with variants, sizes, and accessibility
+ * @element mad-button
+ * @fires mad-click - Fired when button is activated
+ */
 export class MadButton extends BaseElement {
+  static formAssociated = false;
+
   static get observedAttributes(): string[] {
     return ["variant", "size", "disabled", "pill", "href"];
   }
 
+  private _buttonElement: HTMLButtonElement | null = null;
+  private readonly _internals: ElementInternals | null;
+
+  constructor() {
+    super();
+
+    // Set up ElementInternals for ARIA
+    try {
+      this._internals = this.attachInternals();
+    } catch {
+      this._internals = null;
+    }
+  }
+
   protected _setupProperties(): void {
-    this._initialized = true;
+    // Properties handled via getters/setters
+  }
+
+  connectedCallback(): void {
+    super.connectedCallback();
+
+    const root = this._renderRoot;
+    if (root instanceof ShadowRoot) {
+      root.appendChild(template.content.cloneNode(true));
+    } else {
+      this.appendChild(template.content.cloneNode(true));
+    }
+
+    this._cacheElements();
+    this._setupEventListeners();
+    this._updateAccessibility();
+
+    // Set ARIA role via ElementInternals
+    if (this._internals) {
+      this._internals.role = "button";
+    }
+  }
+
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this.removeEventListener("keydown", this._handleKeydown);
+  }
+
+  private _cacheElements(): void {
+    const root = this._renderRoot;
+    if (!root) {
+      return;
+    }
+
+    if (root instanceof ShadowRoot) {
+      this._buttonElement = root.querySelector("button");
+    } else {
+      this._buttonElement = this.querySelector("button");
+    }
+  }
+
+  private _setupEventListeners(): void {
+    this.addEventListener("keydown", this._handleKeydown);
+  }
+
+  private readonly _handleKeydown = (event: KeyboardEvent): void => {
+    if (this.disabled) {
+      return;
+    }
+
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      this._activate();
+    }
+  };
+
+  private _activate(): void {
+    // Dispatch custom event
+    this._emit("mad-click", {});
+  }
+
+  private _updateAccessibility(): void {
+    // Reflect disabled to ARIA
+    if (this._buttonElement) {
+      this._buttonElement.disabled = this.disabled;
+    }
   }
 
   get variant(): string {
     return this.getAttribute("variant") ?? "default";
   }
-  set variant(v: string) {
-    v ? this.setAttribute("variant", v) : this.removeAttribute("variant");
+
+  set variant(value: string) {
+    value
+      ? this.setAttribute("variant", value)
+      : this.removeAttribute("variant");
   }
 
   get size(): string {
     return this.getAttribute("size") ?? "medium";
   }
-  set size(v: string) {
-    v ? this.setAttribute("size", v) : this.removeAttribute("size");
+
+  set size(value: string) {
+    value ? this.setAttribute("size", value) : this.removeAttribute("size");
   }
 
   get disabled(): boolean {
     return this.hasAttribute("disabled");
   }
-  set disabled(v: boolean) {
-    v ? this.setAttribute("disabled", "") : this.removeAttribute("disabled");
+
+  set disabled(value: boolean) {
+    value
+      ? this.setAttribute("disabled", "")
+      : this.removeAttribute("disabled");
   }
 
   get pill(): boolean {
     return this.hasAttribute("pill");
   }
-  set pill(v: boolean) {
-    v ? this.setAttribute("pill", "") : this.removeAttribute("pill");
+
+  set pill(value: boolean) {
+    value ? this.setAttribute("pill", "") : this.removeAttribute("pill");
   }
 
   get href(): string | null {
     return this.getAttribute("href");
   }
-  set href(v: string | null) {
-    v ? this.setAttribute("href", v) : this.removeAttribute("href");
+
+  set href(value: string | null) {
+    value ? this.setAttribute("href", value) : this.removeAttribute("href");
   }
 
   protected _render(): void {
-    const variant = this.variant;
-    const size = this.size;
-    const disabled = this.disabled;
-    const pill = this.pill;
-    const href = this.href;
+    this._updateAccessibility();
+  }
 
-    const variantClasses: Record<string, string> = {
-      default:
-        "bg-neutral-100 text-neutral-900 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-100 dark:hover:bg-neutral-700",
-      brand:
-        "bg-orange-600 text-white hover:bg-orange-700 dark:bg-orange-500 dark:hover:bg-orange-600",
-      success:
-        "bg-green-600 text-white hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600",
-      warning:
-        "bg-yellow-500 text-neutral-900 hover:bg-yellow-600 dark:bg-yellow-400 dark:text-neutral-900",
-      danger:
-        "bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600",
-      secondary:
-        "bg-neutral-200 text-neutral-900 hover:bg-neutral-300 dark:bg-neutral-700 dark:text-neutral-100 dark:hover:bg-neutral-600",
-    };
-
-    const sizeClasses: Record<string, string> = {
-      small: "px-3 py-1.5 text-sm",
-      medium: "px-4 py-2 text-base",
-      large: "px-6 py-3 text-lg",
-    };
-
-    const baseClasses =
-      "inline-flex items-center justify-center gap-2 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none";
-    const borderRadius = pill ? "rounded-full" : "rounded-lg";
-    const classes = `${baseClasses} ${variantClasses[variant] ?? variantClasses.default} ${sizeClasses[size] ?? sizeClasses.medium} ${borderRadius}`;
-
-    if (href) {
-      this.innerHTML = `<a href="${href}" class="${classes}" ${disabled ? 'aria-disabled="true" tabindex="-1"' : ""}><slot name="start"></slot><slot></slot><slot name="end"></slot></a>`;
-    } else {
-      this.innerHTML = `<button class="${classes}" ${disabled ? "disabled" : ""}><slot name="start"></slot><slot></slot><slot name="end"></slot></button>`;
+  protected _onAttributeChange(name: string, _value: string | null): void {
+    if (
+      name === "disabled" ||
+      name === "variant" ||
+      name === "size" ||
+      name === "pill"
+    ) {
+      this._updateAccessibility();
     }
   }
 }

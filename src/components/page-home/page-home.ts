@@ -1,6 +1,35 @@
 import { BaseElement } from "@core/base-element.js";
 import "./page-home.css";
 
+const template = document.createElement("template");
+template.innerHTML = `
+  <style>
+    :host { display: block; }
+  </style>
+  <div part="base">
+    <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 dark:bg-neutral-800 rounded-lg shadow-md">
+      <h1>Contest Tournament</h1>
+
+      <div class="carousel-container">
+        <img
+          alt="Greek freak basketball"
+          class="carousel-image"
+          src="assets/img/undraw_greek_freak.svg"
+        />
+      </div>
+
+      <slot name="status-news"></slot>
+
+      <div class="footer">
+        <div class="grid-300">
+          <slot name="config-button"></slot>
+          <slot name="tournaments-button"></slot>
+        </div>
+      </div>
+    </div>
+  </div>
+`;
+
 /**
  * PageHome - Home page component with rotating image carousel
  * @extends BaseElement
@@ -65,38 +94,13 @@ export class PageHome extends BaseElement {
    * Renders the component's DOM
    */
   protected _render(): void {
-    this.innerHTML = `
-      <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 dark:bg-neutral-800 rounded-lg shadow-md">
-        <h1>Contest Tournament</h1>
-
-        <div class="carousel-container">
-          <img
-            alt="Greek freak basketball"
-            class="carousel-image"
-            src="assets/img/undraw_greek_freak.svg"
-          />
-        </div>
-
-        <app-status-news></app-status-news>
-
-        <div class="footer">
-          <div class="grid-300">
-            <mad-button href="#/config" size="large" variant="brand">
-              <mad-icon name="gear" slot="start"></mad-icon>
-              <span slot="end">Configuration</span>
-            </mad-button>
-
-            <mad-button href="#/tournaments" size="large" variant="brand">
-              <mad-icon name="trophy" slot="start"></mad-icon>
-              <span slot="end">Tournois</span>
-            </mad-button>
-          </div>
-        </div>
-      </div>
-    `;
+    const root = this._renderRoot;
+    if (!root.firstChild) {
+      root.appendChild(template.content.cloneNode(true));
+    }
 
     // Query DOM for image element after render
-    this.domImg = this.querySelector("img");
+    this.domImg = root.querySelector("img");
   }
 }
 

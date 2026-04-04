@@ -1,6 +1,13 @@
 import { BaseElement } from "@core/base-element.js";
+import { createComponentSheet } from "@core/styles.js";
 
-// Map WA icon names to Phosphor icon names (kebab-case)
+const iconSheet = createComponentSheet(":host { display: inline-block; }");
+
+const template = document.createElement("template");
+template.innerHTML = `
+  <ph-icon part="base"></ph-icon>
+`;
+
 const ICON_MAP: Record<string, string> = {
   house: "house",
   gear: "gear",
@@ -160,13 +167,37 @@ export class MadIcon extends BaseElement {
     this._initialized = true;
   }
 
+  protected _createRenderRoot(): Element | ShadowRoot {
+    const root = super._createRenderRoot();
+    if (root instanceof ShadowRoot) {
+      root.adoptedStyleSheets = [...root.adoptedStyleSheets, iconSheet];
+    }
+    return root;
+  }
+
   protected _render(): void {
+    const root = this._renderRoot;
+    if (!root.firstChild) {
+      root.appendChild(template.content.cloneNode(true));
+    }
+
     const name = this.getAttribute("name") ?? "";
     const label = this.getAttribute("label");
     const phName = ICON_MAP[name] ?? name;
-    const tagName = `ph-${phName}`;
 
-    this.innerHTML = `<${tagName} ${label ? `aria-label="${label}"` : 'aria-hidden="true"'}></${tagName}>`;
+    const iconEl = root.querySelector('[part="base"]');
+    if (!iconEl) {
+      return;
+    }
+
+    iconEl.setAttribute("name", phName);
+    if (label) {
+      iconEl.setAttribute("aria-label", label);
+      iconEl.removeAttribute("aria-hidden");
+    } else {
+      iconEl.setAttribute("aria-hidden", "true");
+      iconEl.removeAttribute("aria-label");
+    }
   }
 }
 

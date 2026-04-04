@@ -97,9 +97,9 @@ function installEventHandler(
     return;
   }
 
-  domElement.addEventListener(eventName, (event: CustomEvent) => {
+  domElement.addEventListener(eventName, ((event: CustomEvent) => {
     callback(event);
-  });
+  }) as EventListener);
   domElement.dataset.madHook = "true";
 }
 

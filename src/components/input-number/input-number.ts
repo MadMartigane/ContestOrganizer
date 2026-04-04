@@ -18,6 +18,11 @@ export class MadInputNumber extends BaseElement {
   private _value: number | undefined;
   private _readonly = false;
 
+  // Bound handlers for cleanup
+  private _boundChangeHandler: (() => void) | null = null;
+  private _boundDecrementHandler: (() => void) | null = null;
+  private _boundIncrementHandler: (() => void) | null = null;
+
   private declare _number: Signal<number>;
 
   constructor() {
@@ -52,6 +57,10 @@ export class MadInputNumber extends BaseElement {
     this._trackSignal(this._number);
 
     this._initialized = true;
+  }
+
+  protected _createRenderRoot(): Element {
+    return this;
   }
 
   protected _onAttributeChange(name: string, value: string | null): void {
@@ -92,7 +101,24 @@ export class MadInputNumber extends BaseElement {
     this._requestRender();
   }
 
+  disconnectedCallback(): void {
+    this._cleanupEventListeners();
+    super.disconnectedCallback();
+  }
+
+  private _cleanupEventListeners(): void {
+    if (this.domInput && this._boundChangeHandler) {
+      this.domInput.removeEventListener("change", this._boundChangeHandler);
+      this.domInput = null;
+    }
+    this._boundChangeHandler = null;
+    this._boundDecrementHandler = null;
+    this._boundIncrementHandler = null;
+  }
+
   protected _render(): void {
+    this._cleanupEventListeners();
+
     const inputId = this.itemId;
     const numberValue = this._number.value;
 
@@ -101,6 +127,13 @@ export class MadInputNumber extends BaseElement {
         .button-group {
           display: flex;
           gap: 0.5rem;
+        }
+        :host {
+          display: block;
+        }
+        :host(:focus-within) {
+          outline: 2px solid #f97316;
+          outline-offset: 2px;
         }
       </style>
       <span class="m-6">
@@ -119,6 +152,7 @@ export class MadInputNumber extends BaseElement {
             step="${this._step === undefined ? "" : this._step}"
             type="number"
             value="${numberValue}"
+            aria-label="${this._label || "Number input"}"
           ></mad-input>
         </span>
         <span class="m-6">
@@ -129,6 +163,7 @@ export class MadInputNumber extends BaseElement {
               ${this._readonly ? "disabled" : ""}
               pill
               size="large"
+              aria-label="Decrease value"
             >
               <mad-icon class="text-yellow-600" name="minus"></mad-icon>
             </mad-button>
@@ -138,6 +173,7 @@ export class MadInputNumber extends BaseElement {
               ${this._readonly ? "disabled" : ""}
               pill
               size="large"
+              aria-label="Increase value"
             >
               <mad-icon class="text-orange-600" name="plus"></mad-icon>
             </mad-button>
@@ -146,24 +182,23 @@ export class MadInputNumber extends BaseElement {
       </span>
     `;
 
-    this.domInput = this.querySelector(`#${inputId}`) as HTMLInputElement;
+    this.domInput = this._renderRoot.querySelector(
+      `#${inputId}`
+    ) as HTMLInputElement;
     if (this.domInput) {
-      this.domInput.addEventListener("change", () => {
-        this._onNumberChange();
-      });
+      this._boundChangeHandler = this._onNumberChange.bind(this);
+      this.domInput.addEventListener("change", this._boundChangeHandler);
     }
 
     // Setup button event handlers
-    const decrementBtn = this.querySelector(".decrement-btn");
-    const incrementBtn = this.querySelector(".increment-btn");
+    const decrementBtn = this._renderRoot.querySelector(".decrement-btn");
+    const incrementBtn = this._renderRoot.querySelector(".increment-btn");
 
-    decrementBtn?.addEventListener("click", () => {
-      this._decrementNumber();
-    });
+    this._boundDecrementHandler = this._decrementNumber.bind(this);
+    decrementBtn?.addEventListener("click", this._boundDecrementHandler);
 
-    incrementBtn?.addEventListener("click", () => {
-      this._incrementNumber();
-    });
+    this._boundIncrementHandler = this._incrementNumber.bind(this);
+    incrementBtn?.addEventListener("click", this._boundIncrementHandler);
   }
 
   private _incrementNumber(): void {

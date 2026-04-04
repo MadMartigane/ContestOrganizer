@@ -17,7 +17,7 @@ import Utils from "../../modules/utils/utils";
 export class SelectTeam extends BaseElement {
   private readonly apiSports = apiSports;
 
-  private domDrawer: HTMLElement & { show?: () => void; hide?: () => void };
+  private domDrawer!: HTMLElement & { show?: () => void; hide?: () => void };
   private domDivBody: HTMLDivElement | null = null;
   private domInputSearch:
     | (HTMLElement & { value: string; disabled: boolean })
@@ -26,6 +26,13 @@ export class SelectTeam extends BaseElement {
   private searchValue = "";
   private searchRequestId = 0;
   private readonly minNumberSearchLetter = 3;
+
+  // Bound handlers for cleanup
+  private _boundBodyClickHandler: ((ev: Event) => void) | null = null;
+  private _boundSearchInputHandler: ((ev: Event) => void) | null = null;
+  private _boundCancelClickHandler: ((ev: Event) => void) | null = null;
+  private _boundMenuSelectHandler: ((ev: Event) => void) | null = null;
+  private _boundRetryClickHandler: (() => void) | null = null;
 
   // Props as signals (initialized in _setupProperties to run after parent constructor)
   private declare _color: Signal<string>;
@@ -172,6 +179,10 @@ export class SelectTeam extends BaseElement {
     this._initialized = true;
   }
 
+  protected _createRenderRoot(): Element {
+    return this;
+  }
+
   /**
    * Parse team value from attribute safely
    */
@@ -238,32 +249,70 @@ export class SelectTeam extends BaseElement {
   }
 
   /**
-   * Sets up event handlers
+   * Cleans up event listeners
    */
-  protected _setupEvents(): void {
-    // Handle body click to open drawer
-    if (this.domDivBody) {
-      this.domDivBody.addEventListener("click", (ev: Event) => {
-        ev.stopPropagation();
-        this.openDrawer();
-      });
+  private _cleanupEventListeners(): void {
+    if (this.domDivBody && this._boundBodyClickHandler) {
+      this.domDivBody.removeEventListener("click", this._boundBodyClickHandler);
+      this._boundBodyClickHandler = null;
     }
+    if (this.domInputSearch && this._boundSearchInputHandler) {
+      this.domInputSearch.removeEventListener(
+        "input",
+        this._boundSearchInputHandler
+      );
+      this._boundSearchInputHandler = null;
+    }
+    if (this.domDrawer && this._boundCancelClickHandler) {
+      this.domDrawer.removeEventListener(
+        "click",
+        this._boundCancelClickHandler
+      );
+      this._boundCancelClickHandler = null;
+    }
+    if (this.domResultsContainer && this._boundMenuSelectHandler) {
+      this.domResultsContainer.removeEventListener(
+        "mad-select",
+        this._boundMenuSelectHandler
+      );
+      this._boundMenuSelectHandler = null;
+    }
+    if (this.domResultsContainer && this._boundRetryClickHandler) {
+      const retryBtn = this.domResultsContainer.querySelector("#retry-btn");
+      if (retryBtn) {
+        retryBtn.removeEventListener("click", this._boundRetryClickHandler);
+      }
+      this._boundRetryClickHandler = null;
+    }
+  }
 
-    // Handle search input with debounce
-    if (this.domInputSearch) {
-      this.domInputSearch.addEventListener("input", (ev: Event) => {
-        const target = ev.target as HTMLInputElement;
-        Utils.debounce("select-team-input-search", () => {
-          this.onSearchChange(target.value);
-        });
-      });
-    }
+  disconnectedCallback(): void {
+    this._cleanupEventListeners();
+    super.disconnectedCallback();
+  }
+
+  /**
+   * Handle body click to open drawer
+   */
+  private _handleBodyClick(ev: Event): void {
+    ev.stopPropagation();
+    this._openDrawer();
+  }
+
+  /**
+   * Handle search input with debounce
+   */
+  private _handleSearchInput(ev: Event): void {
+    const target = ev.target as HTMLInputElement;
+    Utils.debounce("select-team-input-search", () => {
+      this._onSearchChange(target.value);
+    });
   }
 
   /**
    * Open the drawer
    */
-  private openDrawer(): void {
+  private _openDrawer(): void {
     if (this.domDrawer) {
       this.domDrawer.setAttribute("open", "");
       if (this.domInputSearch) {
@@ -275,7 +324,7 @@ export class SelectTeam extends BaseElement {
   /**
    * Close the drawer
    */
-  private closeDrawer(): void {
+  private _closeDrawer(): void {
     if (this.domDrawer) {
       this.domDrawer.removeAttribute("open");
     }
@@ -284,7 +333,7 @@ export class SelectTeam extends BaseElement {
   /**
    * Handle search input change
    */
-  private async onSearchChange(value: string): Promise<void> {
+  private async _onSearchChange(value: string): Promise<void> {
     this.searchValue = value;
 
     if (this.searchValue.length < this.minNumberSearchLetter) {
@@ -314,7 +363,7 @@ export class SelectTeam extends BaseElement {
 
       if (requestId === this.searchRequestId) {
         this._suggested.value = results;
-        this.scrollOnSearchResult();
+        this._scrollOnSearchResult();
       }
     } catch (error) {
       if (requestId === this.searchRequestId) {
@@ -331,14 +380,14 @@ export class SelectTeam extends BaseElement {
   /**
    * Retry search after error
    */
-  private retrySearch(): void {
-    this.onSearchChange(this.searchValue);
+  private _retrySearch(): void {
+    this._onSearchChange(this.searchValue);
   }
 
   /**
    * Scroll to search results
    */
-  private scrollOnSearchResult(): void {
+  private _scrollOnSearchResult(): void {
     if (this.domResultsContainer) {
       Utils.scrollIntoView(this.domResultsContainer);
     }
@@ -347,19 +396,19 @@ export class SelectTeam extends BaseElement {
   /**
    * Handle team selection
    */
-  private onTeamSelected(team: GenericTeam): void {
+  private _onTeamSelected(team: GenericTeam): void {
     this._team.value = team;
     this._emit<GridTeamOnUpdateDetail>("madSelectChange", {
       genericTeam: team,
       tournamentGridId: this._tournamentGridId.value ?? null,
     });
-    this.closeDrawer();
+    this._closeDrawer();
   }
 
   /**
    * Handle team radio change event
    */
-  private onTeamRadioChange(ev: CustomEvent): void {
+  private _onTeamRadioChange(ev: CustomEvent): void {
     ev.stopPropagation();
 
     const detail = ev.detail as { item: HTMLElement };
@@ -370,7 +419,7 @@ export class SelectTeam extends BaseElement {
         (candidate) => candidate.id === Number(teamId)
       );
       if (team) {
-        this.onTeamSelected(team);
+        this._onTeamSelected(team);
       }
     }
   }
@@ -378,7 +427,7 @@ export class SelectTeam extends BaseElement {
   /**
    * Render the error alert
    */
-  private renderErrorAlert(): string {
+  private _renderErrorAlert(): string {
     const error = this._searchError.value;
     if (!error) {
       return "";
@@ -391,7 +440,7 @@ export class SelectTeam extends BaseElement {
          </mad-button>`
       : "";
 
-    return `<mad-callout class="my-2" open variant="danger">
+    return `<mad-callout class="my-2" open variant="danger" role="alert" aria-live="polite">
       <mad-icon name="exclamation-triangle" slot="start"></mad-icon>
       <strong>${error.title}</strong>
       <p class="text-sm">${error.message}</p>
@@ -402,7 +451,7 @@ export class SelectTeam extends BaseElement {
   /**
    * Render the team result list
    */
-  private renderTeamResultList(): string {
+  private _renderTeamResultList(): string {
     const teams = this._suggested.value;
     if (!teams.length) {
       return "";
@@ -425,9 +474,9 @@ export class SelectTeam extends BaseElement {
   /**
    * Render the results content
    */
-  private renderResultsContent(): string {
+  private _renderResultsContent(): string {
     if (this._isLoading.value) {
-      return `<div class="flex flex-col items-center justify-center py-8">
+      return `<div class="flex flex-col items-center justify-center py-8" role="status" aria-label="Loading teams">
         <div class="mb-3">
           <mad-spinner class="text-4xl"></mad-spinner>
         </div>
@@ -436,11 +485,11 @@ export class SelectTeam extends BaseElement {
     }
 
     if (this._suggested.value.length) {
-      return this.renderTeamResultList();
+      return this._renderTeamResultList();
     }
 
     if (this.searchValue?.length > 2) {
-      return `<mad-callout open variant="warning">
+      return `<mad-callout open variant="warning" role="status">
         <mad-icon class="text-6xl text-yellow-600" name="emoji-frown" slot="start"></mad-icon>
         <span class="mx-2 text-2xl">Aucun résultat</span>
       </mad-callout>`;
@@ -452,7 +501,7 @@ export class SelectTeam extends BaseElement {
   /**
    * Render the team selection drawer content
    */
-  private renderTeamSelection(): string {
+  private _renderTeamSelection(): string {
     return `<div class="footer">
       <mad-card>
         <div slot="header">
@@ -471,8 +520,8 @@ export class SelectTeam extends BaseElement {
             </mad-input>
           </div>
           <div id="results-container">
-            ${this.renderErrorAlert()}
-            ${this.renderResultsContent()}
+            ${this._renderErrorAlert()}
+            ${this._renderResultsContent()}
           </div>
         </div>
       </mad-card>
@@ -483,6 +532,8 @@ export class SelectTeam extends BaseElement {
    * Main render method
    */
   protected _render(): void {
+    this._cleanupEventListeners();
+
     const team = this._team.value;
     const label = this._label.value;
     const placeholder = this._placeholder.value;
@@ -490,36 +541,37 @@ export class SelectTeam extends BaseElement {
     // 1. Initialize basic structure if it doesn't exist
     if (!this.domDrawer) {
       this.innerHTML = `<mad-drawer no-header placement="start">
-        ${this.renderTeamSelection()}
+        ${this._renderTeamSelection()}
         <div class="grid-300" slot="footer">
           <mad-button id="cancel-btn" variant="brand">
             Annuler
           </mad-button>
         </div>
       </mad-drawer>
-      <div class="cursor-pointer">
+      <div class="cursor-pointer" role="button" tabindex="0" aria-label="Select team, opens team selection dialog">
         <div id="selected-team-container"></div>
       </div>`;
 
-      this.domDrawer = this.querySelector(
+      this.domDrawer = this._renderRoot.querySelector(
         "mad-drawer"
       ) as unknown as HTMLElement;
-      this.domDivBody = this.querySelector(".cursor-pointer");
-      this.domInputSearch = this.querySelector(
+      this.domDivBody = this._renderRoot.querySelector(".cursor-pointer");
+      this.domInputSearch = this._renderRoot.querySelector(
         "mad-input"
       ) as unknown as HTMLElement & {
         value: string;
         disabled: boolean;
       };
-      this.domResultsContainer = this.querySelector("#results-container");
+      this.domResultsContainer =
+        this._renderRoot.querySelector("#results-container");
 
-      this.setupButtonEvents();
+      this._setupButtonEvents();
       this._setupEvents();
     }
 
     // 2. Update dynamic parts
     // Update selected team display
-    const selectedTeamContainer = this.querySelector(
+    const selectedTeamContainer = this._renderRoot.querySelector(
       "#selected-team-container"
     );
     if (selectedTeamContainer) {
@@ -543,8 +595,8 @@ export class SelectTeam extends BaseElement {
     // Update results container
     if (this.domResultsContainer) {
       this.domResultsContainer.innerHTML = `
-        ${this.renderErrorAlert()}
-        ${this.renderResultsContent()}
+        ${this._renderErrorAlert()}
+        ${this._renderResultsContent()}
       `;
 
       // Set team property on result tiles
@@ -560,19 +612,50 @@ export class SelectTeam extends BaseElement {
       // Re-attach menu events if menu exists
       const menu = this.domResultsContainer.querySelector("mad-menu");
       if (menu) {
-        menu.addEventListener("mad-select", (ev: Event) => {
+        this._boundMenuSelectHandler = (ev: Event) => {
           ev.stopPropagation();
-          this.onTeamRadioChange(ev as CustomEvent);
-        });
+          this._onTeamRadioChange(ev as CustomEvent);
+        };
+        menu.addEventListener("mad-select", this._boundMenuSelectHandler);
       }
 
       // Re-attach retry button event if it exists
       const retryBtn = this.domResultsContainer.querySelector("#retry-btn");
       if (retryBtn) {
-        retryBtn.addEventListener("click", () => {
-          this.retrySearch();
-        });
+        this._boundRetryClickHandler = () => {
+          this._retrySearch();
+        };
+        retryBtn.addEventListener("click", this._boundRetryClickHandler);
       }
+    }
+  }
+
+  /**
+   * Sets up event handlers
+   */
+  private _setupEvents(): void {
+    // Handle body click to open drawer
+    if (this.domDivBody) {
+      this._boundBodyClickHandler = this._handleBodyClick.bind(this);
+      this.domDivBody.addEventListener("click", this._boundBodyClickHandler);
+
+      // Add keyboard handler for Enter/Space to open drawer
+      this.domDivBody.addEventListener("keydown", (ev: Event) => {
+        const keyboardEvent = ev as KeyboardEvent;
+        if (keyboardEvent.key === "Enter" || keyboardEvent.key === " ") {
+          ev.preventDefault();
+          this._openDrawer();
+        }
+      });
+    }
+
+    // Handle search input with debounce
+    if (this.domInputSearch) {
+      this._boundSearchInputHandler = this._handleSearchInput.bind(this);
+      this.domInputSearch.addEventListener(
+        "input",
+        this._boundSearchInputHandler
+      );
     }
   }
 
@@ -581,14 +664,15 @@ export class SelectTeam extends BaseElement {
    * Uses event delegation on the drawer element to handle clicks
    * even on cloned/re-rendered buttons
    */
-  private setupButtonEvents(): void {
+  private _setupButtonEvents(): void {
     if (this.domDrawer) {
-      this.domDrawer.addEventListener("click", (ev: Event) => {
+      this._boundCancelClickHandler = (ev: Event) => {
         const target = ev.target as HTMLElement;
         if (target.closest("#cancel-btn")) {
-          this.closeDrawer();
+          this._closeDrawer();
         }
-      });
+      };
+      this.domDrawer.addEventListener("click", this._boundCancelClickHandler);
     }
   }
 }

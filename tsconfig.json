@@ -1,23 +1,24 @@
 {
   "compilerOptions": {
-    "strict": false,
-    "allowSyntheticDefaultImports": true,
-    "declaration": false,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "lib": ["dom", "es2023"],
+    "strict": true,
+    "useDefineForClassFields": true,
+    "target": "ES2022",
+    "lib": ["ES2022", "ES2023", "DOM", "DOM.Iterable"],
+    "module": "ES2020",
     "moduleResolution": "node",
+    "declaration": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
       "@core/*": ["./src/core/*"]
     },
-    "module": "ES2020",
-    "target": "ES2023",
+    "allowSyntheticDefaultImports": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
     "downlevelIteration": true,
-    "types": ["vite/client", "jest"],
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "skipLibCheck": true
+    "types": ["vite/client", "jest"]
   },
   "include": ["src"],
   "exclude": ["node_modules"]

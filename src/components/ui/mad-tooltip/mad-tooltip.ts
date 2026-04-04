@@ -1,29 +1,196 @@
 import { BaseElement } from "@core/base-element.js";
+import { createComponentSheet } from "@core/styles.js";
 
+const tooltipBaseSheet = createComponentSheet(`
+  :host {
+    display: inline-block;
+  }
+
+  :host([hidden]) {
+    display: none !important;
+  }
+`);
+
+const tooltipStylesSheet = createComponentSheet(`
+  .tooltip-container {
+    position: relative;
+    display: inline-block;
+  }
+
+  .tooltip-trigger {
+    display: inline-block;
+  }
+
+  .tooltip-content {
+    position: absolute;
+    z-index: 50;
+    display: none;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: white;
+    background-color: #111827;
+    border-radius: 0.25rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+    transform: translateX(-50%);
+    left: 50%;
+  }
+
+  :host([placement="top"]) .tooltip-content {
+    bottom: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  :host([placement="bottom"]) .tooltip-content {
+    top: 100%;
+    margin-top: 0.5rem;
+  }
+
+  :host([placement="left"]) .tooltip-content {
+    right: 100%;
+    margin-right: 0.5rem;
+    left: auto;
+    transform: translateY(-50%);
+  }
+
+  :host([placement="right"]) .tooltip-content {
+    left: 100%;
+    margin-left: 0.5rem;
+    left: auto;
+    transform: translateY(-50%);
+  }
+
+  /* Show on hover and focus-within */
+  .tooltip-container:hover .tooltip-content,
+  .tooltip-container:focus-within .tooltip-content {
+    display: block;
+  }
+
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    .tooltip-content {
+      background-color: #374151;
+    }
+  }
+
+  /* Slot styles */
+  ::slotted(*) {
+    display: inline-block;
+  }
+`);
+
+const template = document.createElement("template");
+template.innerHTML = `
+  <span class="tooltip-container">
+    <span class="tooltip-trigger" tabindex="0">
+      <slot></slot>
+    </span>
+    <span class="tooltip-content" role="tooltip"></span>
+  </span>
+`;
+
+/**
+ * MadTooltip - A tooltip component with keyboard accessibility
+ * @element mad-tooltip
+ * @fires mad-tooltip-show - Fired when tooltip becomes visible
+ * @fires mad-tooltip-hide - Fired when tooltip becomes hidden
+ */
 export class MadTooltip extends BaseElement {
   static get observedAttributes(): string[] {
     return ["content", "placement"];
   }
 
+  private _tooltipContent: HTMLElement | null = null;
+  private _tooltipTrigger: HTMLElement | null = null;
+  private _tooltipId = "";
+
   protected _setupProperties(): void {
-    this._initialized = true;
+    // Generate unique ID for aria-describedby
+    this._tooltipId = `tooltip-${Math.random().toString(36).slice(2, 9)}`;
+  }
+
+  protected _createRenderRoot(): Element | ShadowRoot {
+    const root = super._createRenderRoot();
+    if (root instanceof ShadowRoot) {
+      root.adoptedStyleSheets = [
+        ...root.adoptedStyleSheets,
+        tooltipBaseSheet,
+        tooltipStylesSheet,
+      ];
+    }
+    return root;
+  }
+
+  connectedCallback(): void {
+    super.connectedCallback();
+
+    const root = this._renderRoot;
+    if (root instanceof ShadowRoot) {
+      root.appendChild(template.content.cloneNode(true));
+    } else {
+      this.appendChild(template.content.cloneNode(true));
+    }
+
+    this._cacheElements();
+    this._setupAccessibility();
+  }
+
+  private _cacheElements(): void {
+    const root = this._renderRoot;
+    if (!root) {
+      return;
+    }
+
+    if (root instanceof ShadowRoot) {
+      this._tooltipContent = root.querySelector(".tooltip-content");
+      this._tooltipTrigger = root.querySelector(".tooltip-trigger");
+    } else {
+      this._tooltipContent = this.querySelector(".tooltip-content");
+      this._tooltipTrigger = this.querySelector(".tooltip-trigger");
+    }
+  }
+
+  private _setupAccessibility(): void {
+    // Set up aria-describedby on trigger element
+    if (this._tooltipTrigger) {
+      this._tooltipTrigger.setAttribute("aria-describedby", this._tooltipId);
+    }
+
+    // Set the id on tooltip content
+    if (this._tooltipContent) {
+      this._tooltipContent.id = this._tooltipId;
+    }
   }
 
   get content(): string {
     return this.getAttribute("content") ?? "";
   }
+
   set content(v: string) {
     v ? this.setAttribute("content", v) : this.removeAttribute("content");
   }
 
+  get placement(): string {
+    return this.getAttribute("placement") ?? "top";
+  }
+
+  set placement(v: string) {
+    v ? this.setAttribute("placement", v) : this.removeAttribute("placement");
+  }
+
   protected _render(): void {
     const content = this.content;
-    this.innerHTML = `
-      <span class="relative inline-block group">
-        <slot></slot>
-        <span class="absolute z-50 hidden group-hover:block px-2 py-1 text-xs font-medium text-white bg-neutral-900 rounded shadow-lg dark:bg-neutral-700 whitespace-nowrap bottom-full left-1/2 -translate-x-1/2 mb-2">${content}</span>
-      </span>
-    `;
+
+    if (this._tooltipContent) {
+      this._tooltipContent.textContent = content;
+    }
+  }
+
+  protected _onAttributeChange(name: string, _value: string | null): void {
+    if (name === "content") {
+      this._render();
+    }
   }
 }
 

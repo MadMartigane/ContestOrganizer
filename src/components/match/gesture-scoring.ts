@@ -36,7 +36,7 @@ export class GestureScoring extends BaseElement {
   }
 
   protected _createRenderRoot(): Element {
-    return this; // Light DOM
+    return this;
   }
 
   connectedCallback(): void {
@@ -258,12 +258,12 @@ export class GestureScoring extends BaseElement {
         }
       </style>
 
-      <div class="gesture-scoring gesture-overlay">
+      <div class="gesture-scoring gesture-overlay" role="dialog" aria-label="Scoring Overlay" aria-modal="true">
         <div class="score-display">
           <div class="team host">
             <span class="score">${hostScore}</span>
           </div>
-          <div class="timer">${this._formatTime()}</div>
+          <div class="timer" aria-live="polite">${this._formatTime()}</div>
           <div class="team visitor">
             <span class="score">${visitorScore}</span>
           </div>
@@ -271,7 +271,7 @@ export class GestureScoring extends BaseElement {
 
         ${
           lastAction
-            ? `<div class="last-action">+${lastAction.points} ${lastAction.team}<span class="undo-hint">Shake to undo</span></div>`
+            ? `<div class="last-action" aria-live="polite">+${lastAction.points} ${lastAction.team}<span class="undo-hint">Shake to undo</span></div>`
             : ""
         }
       </div>

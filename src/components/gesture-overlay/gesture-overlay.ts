@@ -30,6 +30,12 @@ export class GestureOverlay extends BaseElement {
   private declare _isPracticing: Signal<boolean>;
   private declare _practiceCompleted: Signal<boolean>;
 
+  // Bound handlers for cleanup
+  private _boundGestureHandler: ((_event: Event) => void) | null = null;
+  private _boundKeyboardHandler: ((_event: KeyboardEvent) => void) | null =
+    null;
+  private _boundClickHandlers: Array<() => void> = [];
+
   private readonly _gestureSteps: TutorialStep[] = [
     {
       title: "Swipe Left / Right",
@@ -101,28 +107,6 @@ export class GestureOverlay extends BaseElement {
     isPractice: true,
   };
 
-  private readonly _gestureHandler = (_event: Event): void => {
-    if (!(this._isVisible.value && this._isPracticing.value)) {
-      return;
-    }
-    this._practiceCompleted.value = true;
-    setTimeout(() => this._completePractice(), 500);
-  };
-
-  private readonly _keyboardHandler = (_event: KeyboardEvent): void => {
-    if (_event.key === "Enter" || _event.key === " ") {
-      const nextBtn = this.querySelector(
-        "#next-btn"
-      ) as HTMLButtonElement | null;
-      if (nextBtn && !nextBtn.hasAttribute("disabled")) {
-        nextBtn.click();
-      }
-    }
-    if (_event.key === "Escape") {
-      this._skipTutorial();
-    }
-  };
-
   /** @inheritdoc */
   protected _setupProperties(): void {
     this._isVisible = new Signal<boolean>(false);
@@ -141,6 +125,10 @@ export class GestureOverlay extends BaseElement {
     this._initialized = true;
   }
 
+  protected _createRenderRoot(): Element {
+    return this;
+  }
+
   /** @inheritdoc */
   connectedCallback(): void {
     super.connectedCallback();
@@ -152,17 +140,53 @@ export class GestureOverlay extends BaseElement {
   disconnectedCallback(): void {
     super.disconnectedCallback();
     this._removeGestureListeners();
-    document.removeEventListener("keydown", this._keyboardHandler);
+    if (this._boundKeyboardHandler) {
+      document.removeEventListener("keydown", this._boundKeyboardHandler);
+      this._boundKeyboardHandler = null;
+    }
+    this._cleanupClickHandlers();
   }
 
   private _setupGestureListeners(): void {
-    document.addEventListener("gesture-detected", this._gestureHandler);
-    document.addEventListener("gesture-triggered", this._gestureHandler);
+    this._boundGestureHandler = this._handleGesture.bind(this);
+    document.addEventListener("gesture-detected", this._boundGestureHandler);
+    document.addEventListener("gesture-triggered", this._boundGestureHandler);
   }
 
   private _removeGestureListeners(): void {
-    document.removeEventListener("gesture-detected", this._gestureHandler);
-    document.removeEventListener("gesture-triggered", this._gestureHandler);
+    if (this._boundGestureHandler) {
+      document.removeEventListener(
+        "gesture-detected",
+        this._boundGestureHandler
+      );
+      document.removeEventListener(
+        "gesture-triggered",
+        this._boundGestureHandler
+      );
+      this._boundGestureHandler = null;
+    }
+  }
+
+  private _handleGesture(_event: Event): void {
+    if (!(this._isVisible.value && this._isPracticing.value)) {
+      return;
+    }
+    this._practiceCompleted.value = true;
+    setTimeout(() => this._completePractice(), 500);
+  }
+
+  private _handleKeyboard(_event: KeyboardEvent): void {
+    if (_event.key === "Enter" || _event.key === " ") {
+      const nextBtn = this._renderRoot.querySelector(
+        "#next-btn"
+      ) as HTMLButtonElement | null;
+      if (nextBtn && !nextBtn.hasAttribute("disabled")) {
+        nextBtn.click();
+      }
+    }
+    if (_event.key === "Escape") {
+      this._skipTutorial();
+    }
   }
 
   private _checkFirstVisit(): void {
@@ -312,8 +336,17 @@ export class GestureOverlay extends BaseElement {
     `;
   }
 
+  private _cleanupClickHandlers(): void {
+    for (const cleanup of this._boundClickHandlers) {
+      cleanup();
+    }
+    this._boundClickHandlers = [];
+  }
+
   /** @inheritdoc */
   protected _render(): void {
+    this._cleanupClickHandlers();
+
     const isVisible = this._isVisible.value;
 
     if (!isVisible) {
@@ -346,7 +379,7 @@ export class GestureOverlay extends BaseElement {
       isPractice && !practiceCompleted ? "disabled" : "";
 
     this.innerHTML = `
-      <div class="gesture-overlay">
+      <div class="gesture-overlay" role="dialog" aria-modal="true" aria-labelledby="tutorial-title">
         <div class="gesture-card ${isPractice ? "practice" : ""}">
           ${isPractice ? this._renderPracticeArea(practiceCompleted) : ""}
           
@@ -356,12 +389,12 @@ export class GestureOverlay extends BaseElement {
           </div>
           
           <mad-badge pill variant="brand">${this._renderSectionLabel()}</mad-badge>
-          <h3>${step.title}</h3>
+          <h3 id="tutorial-title">${step.title}</h3>
           <p>${step.description}</p>
           
           ${step.desktopHint ? `<p class="desktop-hint">${step.desktopHint}</p>` : ""}
           
-          <div class="step-indicator">
+          <div class="step-indicator" role="progressbar" aria-valuenow="${globalStepIndex + 1}" aria-valuemin="1" aria-valuemax="${totalSteps}">
             ${this._renderStepIndicators()}
           </div>
           
@@ -387,19 +420,29 @@ export class GestureOverlay extends BaseElement {
     isPractice: boolean,
     isLastStep: boolean
   ): void {
-    const skipBtn = this.querySelector("#skip-btn");
-    const replayBtn = this.querySelector("#replay-btn");
-    const nextBtn = this.querySelector("#next-btn") as HTMLButtonElement | null;
+    const skipBtn = this._renderRoot.querySelector("#skip-btn");
+    const replayBtn = this._renderRoot.querySelector("#replay-btn");
+    const nextBtn = this._renderRoot.querySelector(
+      "#next-btn"
+    ) as HTMLButtonElement | null;
 
-    skipBtn?.addEventListener("click", () => {
+    const skipHandler = (): void => {
       this._skipTutorial();
-    });
+    };
+    skipBtn?.addEventListener("click", skipHandler);
+    this._boundClickHandlers.push(() =>
+      skipBtn?.removeEventListener("click", skipHandler)
+    );
 
-    replayBtn?.addEventListener("click", () => {
+    const replayHandler = (): void => {
       this.replay();
-    });
+    };
+    replayBtn?.addEventListener("click", replayHandler);
+    this._boundClickHandlers.push(() =>
+      replayBtn?.removeEventListener("click", replayHandler)
+    );
 
-    nextBtn?.addEventListener("click", () => {
+    const nextHandler = (): void => {
       if (isLastStep) {
         this.hide();
         return;
@@ -408,9 +451,14 @@ export class GestureOverlay extends BaseElement {
         return;
       }
       this._nextStep();
-    });
+    };
+    nextBtn?.addEventListener("click", nextHandler);
+    this._boundClickHandlers.push(() =>
+      nextBtn?.removeEventListener("click", nextHandler)
+    );
 
-    document.addEventListener("keydown", this._keyboardHandler);
+    this._boundKeyboardHandler = this._handleKeyboard.bind(this);
+    document.addEventListener("keydown", this._boundKeyboardHandler);
   }
 
   /** @inheritdoc */
@@ -523,6 +571,11 @@ export class GestureOverlay extends BaseElement {
           display: flex;
           gap: 12px;
           justify-content: center;
+        }
+
+        .actions mad-button:focus-visible {
+          outline: 2px solid #6366f1;
+          outline-offset: 2px;
         }
 
         .practice-area {

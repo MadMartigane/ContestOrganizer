@@ -97,7 +97,7 @@ export class ErrorMessage extends BaseElement {
         </div>`
       : "";
 
-    this.innerHTML = `<mad-callout class="my-8" open variant="danger">
+    this.innerHTML = `<mad-callout class="my-8" open variant="danger" role="alert">
       <mad-icon class="text-5xl" name="triangle-exclamation" slot="start"></mad-icon>
       <h1 class="text-red-600">Erreur</h1>
       <strong class="container">${this._message}</strong>

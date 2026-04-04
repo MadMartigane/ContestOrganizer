@@ -27,6 +27,78 @@ interface Config {
   minGoal: number;
 }
 
+const template = document.createElement("template");
+template.innerHTML = `
+  <style>
+    :host { display: block; }
+    .scroll-nav {
+      position: fixed;
+      bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+      right: 1rem;
+      z-index: 50;
+      opacity: 0;
+      transform: translateY(100%);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      pointer-events: none;
+    }
+
+    .scroll-nav.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .scroll-nav-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-height: 600px) {
+      .scroll-nav {
+        bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+      }
+    }
+
+    .host-scorer, .visitor-scorer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      justify-self: center;
+    }
+
+    .host-scorer mad-scorer-common,
+    .visitor-scorer mad-scorer-common {
+      width: 100%;
+    }
+  </style>
+  <div part="base">
+    <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 dark:bg-neutral-800 rounded-lg shadow-md">
+      <slot name="content"></slot>
+    </div>
+    <div class="scroll-nav" role="navigation" aria-label="Raccourcis de navigation">
+      <div class="scroll-nav-buttons">
+        <slot name="nav-top"></slot>
+        <slot name="nav-current"></slot>
+        <slot name="nav-bottom"></slot>
+      </div>
+    </div>
+    <div class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+  </div>
+`;
+
 /**
  * PageMatch - Tournament match management page component
  * @element page-match
@@ -1137,56 +1209,6 @@ export class PageMatch extends BaseElement {
   }
 
   /**
-   * Render scroll navigation dock
-   */
-  private _renderScrollNavigation(): string {
-    const hasTargetMatch =
-      calculateTargetMatchIndex(this._tournament.value) !== null;
-    // Visibility is controlled by scroll handler via direct DOM manipulation
-    // Initial state is hidden (no 'visible' class)
-
-    return `
-    <div class="scroll-nav"
-         role="navigation"
-         aria-label="Raccourcis de navigation">
-      <div class="scroll-nav-buttons">
-        <div class="relative group">
-          <mad-button size="medium"
-                     variant="default"
-                     class="w-full nav-btn-top"
-                     aria-label="Aller en haut de la page">
-            <mad-icon name="chevron-up" aria-hidden="true"></mad-icon>
-          </mad-button>
-          <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-neutral-700 text-white dark:bg-neutral-600 text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap">Aller en haut (Alt+T)</div>
-        </div>
-
-        <div class="relative group">
-          <mad-button size="medium"
-                     variant="brand"
-                     class="w-full nav-btn-current"
-                     ${hasTargetMatch ? "" : "disabled"}
-                     aria-label="Aller au match en cours ou dernier match joué">
-            <mad-icon name="crosshair" aria-hidden="true"></mad-icon>
-          </mad-button>
-          <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-neutral-700 text-white dark:bg-neutral-600 text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap">Aller au match actuel (Alt+M)</div>
-        </div>
-
-        <div class="relative group">
-          <mad-button size="medium"
-                     variant="default"
-                     class="w-full nav-btn-bottom"
-                     aria-label="Aller en bas de la page">
-            <mad-icon name="chevron-down" aria-hidden="true"></mad-icon>
-          </mad-button>
-          <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-neutral-700 text-white dark:bg-neutral-600 text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap">Aller en bas (Alt+B)</div>
-        </div>
-      </div>
-    </div>
-    <div class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
-  `;
-  }
-
-  /**
    * Main render method
    */
   protected _render(): void {
@@ -1205,61 +1227,6 @@ export class PageMatch extends BaseElement {
     this.matchRefs.clear();
 
     this.innerHTML = `
-      <style>
-        .scroll-nav {
-          position: fixed;
-          bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
-          right: 1rem;
-          z-index: 50;
-          opacity: 0;
-          transform: translateY(100%);
-          transition: opacity 0.3s ease, transform 0.3s ease;
-          pointer-events: none;
-        }
-
-        .scroll-nav.visible {
-          opacity: 1;
-          transform: translateY(0);
-          pointer-events: auto;
-        }
-
-        .scroll-nav-buttons {
-          display: flex;
-          flex-direction: column;
-          gap: 0.25rem;
-        }
-
-        .sr-only {
-          position: absolute;
-          width: 1px;
-          height: 1px;
-          padding: 0;
-          margin: -1px;
-          overflow: hidden;
-          clip: rect(0, 0, 0, 0);
-          white-space: nowrap;
-          border: 0;
-        }
-
-        @media (max-height: 600px) {
-          .scroll-nav {
-            bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
-          }
-        }
-
-        .host-scorer, .visitor-scorer {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          justify-self: center;
-        }
-
-        .host-scorer mad-scorer-common,
-        .visitor-scorer mad-scorer-common {
-          width: 100%;
-        }
-      </style>
-
       <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 dark:bg-neutral-800 rounded-lg shadow-md">
         ${
           uiError
@@ -1311,7 +1278,42 @@ export class PageMatch extends BaseElement {
         }
       </div>
 
-      ${this._renderScrollNavigation()}
+      <div class="scroll-nav"
+           role="navigation"
+           aria-label="Raccourcis de navigation">
+        <div class="scroll-nav-buttons">
+          <div class="relative group">
+            <mad-button size="medium"
+                       variant="default"
+                       class="w-full nav-btn-top"
+                       aria-label="Aller en haut de la page">
+              <mad-icon name="chevron-up" aria-hidden="true"></mad-icon>
+            </mad-button>
+            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-neutral-700 text-white dark:bg-neutral-600 text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap">Aller en haut (Alt+T)</div>
+          </div>
+
+          <div class="relative group">
+            <mad-button size="medium"
+                       variant="brand"
+                       class="w-full nav-btn-current"
+                       aria-label="Aller au match en cours ou dernier match joué">
+              <mad-icon name="crosshair" aria-hidden="true"></mad-icon>
+            </mad-button>
+            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-neutral-700 text-white dark:bg-neutral-600 text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap">Aller au match actuel (Alt+M)</div>
+          </div>
+
+          <div class="relative group">
+            <mad-button size="medium"
+                       variant="default"
+                       class="w-full nav-btn-bottom"
+                       aria-label="Aller en bas de la page">
+              <mad-icon name="chevron-down" aria-hidden="true"></mad-icon>
+            </mad-button>
+            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-neutral-700 text-white dark:bg-neutral-600 text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap">Aller en bas (Alt+B)</div>
+          </div>
+        </div>
+      </div>
+      <div class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
     `;
 
     // Setup event handlers after render

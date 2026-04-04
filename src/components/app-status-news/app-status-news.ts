@@ -306,8 +306,10 @@ export class AppStatusNews extends BaseElement {
    * @returns {void}
    */
   private _setupEvents(): void {
+    this._boundHandlers = [];
+
     const cardHeaders = Array.from(
-      this.querySelectorAll(".status-card-header")
+      this._renderRoot.querySelectorAll(".status-card-header")
     );
 
     for (const header of cardHeaders) {
@@ -342,14 +344,14 @@ export class AppStatusNews extends BaseElement {
           this._toggleSection(sectionId);
         }
       };
-      header.addEventListener("keydown", keydownHandler);
+      header.addEventListener("keydown", keydownHandler as EventListener);
       this._boundHandlers.push(() =>
-        header.removeEventListener("keydown", keydownHandler)
+        header.removeEventListener("keydown", keydownHandler as EventListener)
       );
     }
 
     // Retry button handler for error state
-    const retryButton = this.querySelector(".status-retry");
+    const retryButton = this._renderRoot.querySelector(".status-retry");
     if (retryButton) {
       const retryHandler = (): void => {
         this._retryLoad();
@@ -385,7 +387,9 @@ export class AppStatusNews extends BaseElement {
    * @returns {void}
    */
   private _updateAriaStates(sectionId: string): void {
-    const card = this.querySelector(`[data-section-id="${sectionId}"]`);
+    const card = this._renderRoot.querySelector(
+      `[data-section-id="${sectionId}"]`
+    );
     if (!card) {
       return;
     }

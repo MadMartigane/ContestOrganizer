@@ -1,6 +1,9 @@
 import { ZoneContainer } from "../zone-container/zone-container.js";
 import "../page-config/page-config.js";
 
+/**
+ * ConfigZone - Configuration zone component with Shadow DOM support.
+ */
 export class ConfigZone extends ZoneContainer {
   constructor() {
     super();
@@ -11,8 +14,9 @@ export class ConfigZone extends ZoneContainer {
 
   protected _render(): void {
     super._render();
-    const zoneContent = this.querySelector(".zone-content");
-    if (zoneContent) {
+    const root = this._renderRoot;
+    const zoneContent = root.querySelector(".zone-content");
+    if (zoneContent && !zoneContent.querySelector("page-config")) {
       const pageConfig = document.createElement("page-config");
       zoneContent.appendChild(pageConfig);
     }

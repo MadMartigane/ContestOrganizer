@@ -1,6 +1,10 @@
 import { ZoneContainer } from "../zone-container/zone-container.js";
 import "../page-tournament/page-tournament.js";
 
+/**
+ * TournamentZone - Tournament detail zone component with Shadow DOM support.
+ * Handles route changes and displays tournament information.
+ */
 export class TournamentZone extends ZoneContainer {
   private currentTournamentId: string | null = null;
   private static readonly TOURNAMENT_PATH_REGEX = /^\/(\d+)$/;
@@ -53,7 +57,8 @@ export class TournamentZone extends ZoneContainer {
   }
 
   private updateTournamentId(tournamentId: string): void {
-    const pageTournament = this.querySelector("page-tournament");
+    const root = this._renderRoot;
+    const pageTournament = root.querySelector("page-tournament");
     if (pageTournament) {
       pageTournament.setAttribute("tournament-id", tournamentId);
     }
@@ -61,16 +66,21 @@ export class TournamentZone extends ZoneContainer {
 
   protected _render(): void {
     super._render();
-    const zoneContent = this.querySelector(".zone-content");
+    const root = this._renderRoot;
+    const zoneContent = root.querySelector(".zone-content");
     if (zoneContent) {
-      zoneContent.innerHTML = "";
-      const pageTournament = document.createElement("page-tournament");
-
-      if (this.currentTournamentId) {
-        pageTournament.setAttribute("tournament-id", this.currentTournamentId);
+      // Check if page-tournament already exists to avoid duplication
+      let pageTournament = zoneContent.querySelector("page-tournament");
+      if (!pageTournament) {
+        pageTournament = document.createElement("page-tournament");
+        if (this.currentTournamentId) {
+          pageTournament.setAttribute(
+            "tournament-id",
+            this.currentTournamentId
+          );
+        }
+        zoneContent.appendChild(pageTournament);
       }
-
-      zoneContent.appendChild(pageTournament);
     }
   }
 }

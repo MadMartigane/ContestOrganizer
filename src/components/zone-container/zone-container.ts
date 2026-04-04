@@ -17,153 +17,12 @@ export interface ZoneContainerProps {
 }
 
 /**
- * ZoneContainer - Container component for spatial zones with gesture and keyboard navigation.
- * Provides zone-specific container with header controls and content slot.
+ * Template for zone container
  */
-export class ZoneContainer extends BaseElement {
-  private gestureEngine: GestureEngine | undefined;
-  private layout: SpatialLayout | undefined;
-
-  private _zoneType: ZoneType = "home";
-  private _title = "";
-  private _icon = "";
-
-  /**
-   * Sets up property getters and setters.
-   * Called by BaseElement constructor.
-   */
-  protected _setupProperties(): void {
-    // Properties are initialized, signals not needed for simple props
-    this._initialized = true;
-  }
-
-  /**
-   * Creates a light DOM render root (no shadow root).
-   */
-  protected _createRenderRoot(): Element {
-    return this;
-  }
-
-  /**
-   * Zone type property getter.
-   */
-  get zoneType(): ZoneType {
-    return this._zoneType;
-  }
-
-  /**
-   * Zone type property setter.
-   */
-  set zoneType(value: ZoneType) {
-    this._zoneType = value;
-    this._requestRender();
-  }
-
-  /**
-   * Title property getter.
-   */
-  get title(): string {
-    return this._title;
-  }
-
-  /**
-   * Title property setter.
-   */
-  set title(value: string) {
-    this._title = value;
-    this._requestRender();
-  }
-
-  /**
-   * Icon property getter.
-   */
-  get icon(): string {
-    return this._icon;
-  }
-
-  /**
-   * Icon property setter.
-   */
-  set icon(value: string) {
-    this._icon = value;
-    this._requestRender();
-  }
-
-  /**
-   * Initializes the gesture engine for the zone content area.
-   */
-  private _initGestureEngine(): void {
-    const content = this.querySelector(".zone-content");
-    if (content instanceof HTMLElement) {
-      this.gestureEngine = new GestureEngine(content);
-      this.gestureEngine.enable();
-    }
-  }
-
-  /**
-   * Called when the element is added to the DOM.
-   * Sets up gesture engine after render.
-   */
-  connectedCallback(): void {
-    super.connectedCallback();
-    queueMicrotask(() => this._initGestureEngine());
-  }
-
-  /**
-   * Called when the element is removed from the DOM.
-   * Cleans up gesture engine.
-   */
-  disconnectedCallback(): void {
-    if (this.gestureEngine) {
-      this.gestureEngine.disable();
-      this.gestureEngine.destroy();
-    }
-    super.disconnectedCallback();
-  }
-
-  /**
-   * Handles focus button click - focuses the zone in layout.
-   */
-  private _handleFocus(): void {
-    if (this.layout) {
-      this.layout.focusZone(this.zoneType);
-    }
-  }
-
-  /**
-   * Checks if the zone is currently focused.
-   */
-  private _isFocused(): boolean {
-    if (!this.layout) {
-      return false;
-    }
-    return this.layout.getZoneConfig(this.zoneType).isFocused;
-  }
-
-  /**
-   * Checks if the zone is currently collapsed.
-   */
-  private _isCollapsed(): boolean {
-    if (!this.layout) {
-      return false;
-    }
-    return this.layout.getZoneConfig(this.zoneType).isCollapsed;
-  }
-
-  /**
-   * Sets the layout manager for this zone container.
-   * @param layout - The spatial layout instance
-   */
-  setLayout(layout: SpatialLayout): void {
-    this.layout = layout;
-    this._requestRender();
-  }
-
-  /**
-   * Returns the CSS for the component.
-   */
-  private _getCss(): string {
-    return `
+const ZONE_CONTAINER_TEMPLATE = document.createElement("template");
+ZONE_CONTAINER_TEMPLATE.innerHTML = `
+  <style>
+    :host { display: block; height: 100%; }
     .zone-container {
       display: flex;
       flex-direction: column;
@@ -196,6 +55,10 @@ export class ZoneContainer extends BaseElement {
     .zone-container.zone-matchs {
       --zone-accent: #16a34a;
       --zone-accent-focused: #16a34a;
+    }
+    .zone-container.zone-tournament {
+      --zone-accent: #ea580c;
+      --zone-accent-focused: #ea580c;
     }
     .zone-header {
       display: flex;
@@ -272,43 +135,203 @@ export class ZoneContainer extends BaseElement {
       --zone-content-bg: #171717;
       --zone-focused-text: #f5f5f5;
     }
-  `;
+  </style>
+  <div part="base" class="zone-container">
+    <header part="header" class="zone-header">
+      <slot name="icon"></slot>
+      <h2 part="title"></h2>
+      <button
+        part="focus-btn"
+        class="focus-btn"
+        aria-label="Focus zone"
+      >
+        <mad-icon name="expand"></mad-icon>
+      </button>
+    </header>
+    <div part="content" class="zone-content">
+      <slot></slot>
+    </div>
+  </div>
+`;
+
+/**
+ * ZoneContainer - Container component for spatial zones with gesture and keyboard navigation.
+ * Provides zone-specific container with header controls and content slot.
+ * Uses Shadow DOM with template pattern.
+ */
+export class ZoneContainer extends BaseElement {
+  private gestureEngine: GestureEngine | undefined;
+  private layout: SpatialLayout | undefined;
+
+  private _zoneType: ZoneType = "home";
+  private _title = "";
+  private _icon = "";
+
+  /**
+   * Sets up property getters and setters.
+   * Called by BaseElement constructor.
+   */
+  protected _setupProperties(): void {
+    // Properties are initialized, signals not needed for simple props
+    this._initialized = true;
+  }
+
+  /**
+   * Zone type property getter.
+   */
+  get zoneType(): ZoneType {
+    return this._zoneType;
+  }
+
+  /**
+   * Zone type property setter.
+   */
+  set zoneType(value: ZoneType) {
+    this._zoneType = value;
+    this._requestRender();
+  }
+
+  /**
+   * Title property getter.
+   */
+  get title(): string {
+    return this._title;
+  }
+
+  /**
+   * Title property setter.
+   */
+  set title(value: string) {
+    this._title = value;
+    this._requestRender();
+  }
+
+  /**
+   * Icon property getter.
+   */
+  get icon(): string {
+    return this._icon;
+  }
+
+  /**
+   * Icon property setter.
+   */
+  set icon(value: string) {
+    this._icon = value;
+    this._requestRender();
+  }
+
+  /**
+   * Initializes the gesture engine for the zone content area.
+   */
+  private _initGestureEngine(): void {
+    const root = this._renderRoot;
+    const content = root.querySelector(".zone-content");
+    if (content instanceof HTMLElement) {
+      this.gestureEngine = new GestureEngine(content);
+      this.gestureEngine.enable();
+    }
+  }
+
+  /**
+   * Called when the element is added to the DOM.
+   * Sets up gesture engine after render.
+   */
+  connectedCallback(): void {
+    super.connectedCallback();
+    queueMicrotask(() => this._initGestureEngine());
+  }
+
+  /**
+   * Called when the element is removed from the DOM.
+   * Cleans up gesture engine.
+   */
+  disconnectedCallback(): void {
+    if (this.gestureEngine) {
+      this.gestureEngine.disable();
+      this.gestureEngine.destroy();
+    }
+    super.disconnectedCallback();
+  }
+
+  /**
+   * Handles focus button click - focuses the zone in layout.
+   */
+  private _handleFocus(): void {
+    if (this.layout) {
+      this.layout.focusZone(this.zoneType);
+    }
+  }
+
+  /**
+   * Checks if the zone is currently focused.
+   */
+  private _isFocused(): boolean {
+    if (!this.layout) {
+      return false;
+    }
+    return this.layout.getZoneConfig(this.zoneType).isFocused;
+  }
+
+  /**
+   * Checks if the zone is currently collapsed.
+   */
+  private _isCollapsed(): boolean {
+    if (!this.layout) {
+      return false;
+    }
+    return this.layout.getZoneConfig(this.zoneType).isCollapsed;
+  }
+
+  /**
+   * Sets the layout manager for this zone container.
+   * @param layout - The spatial layout instance
+   */
+  setLayout(layout: SpatialLayout): void {
+    this.layout = layout;
+    this._requestRender();
   }
 
   /**
    * Main render method.
-   * Called by BaseElement when reactive state changes.
+   * Uses template + cloneNode pattern for Shadow DOM.
    */
   protected _render(): void {
+    const root = this._renderRoot;
+
+    // Initialize template on first render
+    if (!root.firstChild) {
+      root.appendChild(ZONE_CONTAINER_TEMPLATE.content.cloneNode(true));
+    }
+
     const zoneType = this._zoneType;
     const title = this._title;
-    const icon = this._icon;
     const isFocused = this._isFocused();
     const isCollapsed = this._isCollapsed();
     const showFocusButton = !(isFocused || isCollapsed);
 
-    this.innerHTML = `
-			<style>
-				${this._getCss()}
-			</style>
-			<div class="zone-container zone-${zoneType}">
-				<header class="zone-header">
-					${icon ? `<mad-icon name="${icon}"></mad-icon>` : ""}
-					<h2>${title}</h2>
-					<button
-						class="focus-btn"
-						@click="${this._handleFocus}"
-						?hidden="${!showFocusButton}"
-						aria-label="Focus ${title} zone"
-					>
-						<mad-icon name="expand"></mad-icon>
-					</button>
-				</header>
-				<div class="zone-content">
-					<slot></slot>
-				</div>
-			</div>
-		`;
+    // Update DOM attributes instead of replacing HTML
+    const container = root.querySelector('[part="base"]');
+    const titleEl = root.querySelector('[part="title"]');
+    const focusBtn =
+      root.querySelector<HTMLButtonElement>('[part="focus-btn"]');
+
+    if (container) {
+      container.className = `zone-container zone-${zoneType}`;
+      container.setAttribute("data-focused", String(isFocused));
+    }
+
+    if (titleEl) {
+      titleEl.textContent = title;
+    }
+
+    if (focusBtn) {
+      focusBtn.hidden = !showFocusButton;
+      focusBtn.setAttribute("aria-label", `Focus ${title} zone`);
+      focusBtn.onclick = () => this._handleFocus();
+    }
+
+    // Icon is passed via slot="icon" from parent, handled by BaseElement
   }
 }
 

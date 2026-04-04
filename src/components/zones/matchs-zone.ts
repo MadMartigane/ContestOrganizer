@@ -1,11 +1,14 @@
 import { ZoneContainer } from "../zone-container/zone-container.js";
 import "../page-match/page-match.js";
 
-const NUMERIC_ID_REGEX = /^\d+$/;
-
+/**
+ * MatchsZone - Matchs zone component with Shadow DOM support.
+ * Handles route changes and displays match information.
+ */
 export class MatchsZone extends ZoneContainer {
   private currentTournamentId: string | null = null;
   private static readonly MATCHS_PATH_REGEX = /^\/(\d+)$/;
+  private static readonly NUMERIC_ID_REGEX = /^\d+$/;
   private readonly handleRouteChangedBound: (event: Event) => void;
 
   constructor() {
@@ -21,7 +24,7 @@ export class MatchsZone extends ZoneContainer {
     const hash = window.location.hash;
     if (hash.startsWith("#/matchs/")) {
       const id = hash.split("/")[2];
-      if (id && NUMERIC_ID_REGEX.test(id)) {
+      if (id && MatchsZone.NUMERIC_ID_REGEX.test(id)) {
         this.currentTournamentId = id;
       }
     }
@@ -54,7 +57,8 @@ export class MatchsZone extends ZoneContainer {
   }
 
   private updateTournamentId(tournamentId: string): void {
-    const pageMatch = this.querySelector("page-match");
+    const root = this._renderRoot;
+    const pageMatch = root.querySelector("page-match");
     if (pageMatch) {
       pageMatch.setAttribute("tournament-id", tournamentId);
     }
@@ -62,16 +66,18 @@ export class MatchsZone extends ZoneContainer {
 
   protected _render(): void {
     super._render();
-    const zoneContent = this.querySelector(".zone-content");
+    const root = this._renderRoot;
+    const zoneContent = root.querySelector(".zone-content");
     if (zoneContent) {
-      zoneContent.innerHTML = "";
-      const pageMatch = document.createElement("page-match");
-
-      if (this.currentTournamentId) {
-        pageMatch.setAttribute("tournament-id", this.currentTournamentId);
+      // Check if page-match already exists to avoid duplication
+      let pageMatch = zoneContent.querySelector("page-match");
+      if (!pageMatch) {
+        pageMatch = document.createElement("page-match");
+        if (this.currentTournamentId) {
+          pageMatch.setAttribute("tournament-id", this.currentTournamentId);
+        }
+        zoneContent.appendChild(pageMatch);
       }
-
-      zoneContent.appendChild(pageMatch);
     }
   }
 }

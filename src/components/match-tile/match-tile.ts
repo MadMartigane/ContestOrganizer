@@ -20,6 +20,7 @@ export class MatchTile extends BaseElement {
   private declare _visitorSignal: Signal<TeamRow | null>;
   private _fetchPending = false;
   private _tournamentUpdateHandler: (() => void) | null = null;
+  private _tournamentUnsubscribe: (() => void) | null = null;
 
   static get observedAttributes(): string[] {
     return [
@@ -101,10 +102,16 @@ export class MatchTile extends BaseElement {
       this._fetchTeamsFromAttributes();
     };
     // Migration: Using getTournaments() to get singleton instance shared between Stencil and Vanilla bundles
-    getTournaments().onUpdate(this._tournamentUpdateHandler);
+    this._tournamentUnsubscribe = getTournaments().onUpdate(
+      this._tournamentUpdateHandler
+    );
   }
 
   disconnectedCallback(): void {
+    if (this._tournamentUnsubscribe) {
+      this._tournamentUnsubscribe();
+      this._tournamentUnsubscribe = null;
+    }
     this._tournamentUpdateHandler = null;
     super.disconnectedCallback();
   }
@@ -176,10 +183,10 @@ export class MatchTile extends BaseElement {
     hasScore: boolean
   ): boolean {
     // Get existing team tiles
-    const hostTile = this.querySelector(
+    const hostTile = this._renderRoot.querySelector(
       ".host-team-tile"
     ) as MadTeamTileElement | null;
-    const visitorTile = this.querySelector(
+    const visitorTile = this._renderRoot.querySelector(
       ".visitor-team-tile"
     ) as MadTeamTileElement | null;
 
@@ -213,7 +220,7 @@ export class MatchTile extends BaseElement {
     }
 
     // Check layout state (score existence)
-    const existingScores = this.querySelectorAll(".score");
+    const existingScores = this._renderRoot.querySelectorAll(".score");
     if (hasScore !== (existingScores.length === 2)) {
       return false;
     }
@@ -333,13 +340,13 @@ export class MatchTile extends BaseElement {
           font-size: 0.75rem;
         }
       </style>
-      <div class="match-grid">
+      <div class="match-grid" role="article" aria-label="Match between ${host?.team?.name ?? "TBD"} and ${visitor?.team?.name ?? "TBD"}">
         <div class="host-section ${hostColClass}">
           ${host?.team ? `<mad-team-tile class="host-team-tile" rank="${hostRank ?? ""}"></mad-team-tile>` : "<span>Sélection…</span>"}
         </div>
-        ${hasScore ? `<div class="col-span-2 score">${hostScore}</div>` : ""}
-        <div class="vs">VS</div>
-        ${hasScore ? `<div class="col-span-2 score">${visitorScore}</div>` : ""}
+        ${hasScore ? `<div class="col-span-2 score" aria-label="Home score">${hostScore}</div>` : ""}
+        <div class="vs" aria-hidden="true">VS</div>
+        ${hasScore ? `<div class="col-span-2 score" aria-label="Visitor score">${visitorScore}</div>` : ""}
         <div class="visitor-section ${visitorColClass}">
           ${visitor?.team ? `<mad-team-tile class="visitor-team-tile" rank="${visitorRank ?? ""}"></mad-team-tile>` : "<span>Sélection…</span>"}
         </div>
@@ -347,10 +354,10 @@ export class MatchTile extends BaseElement {
     `;
 
     // Second pass: set properties on newly created team-tiles
-    const hostTile = this.querySelector(
+    const hostTile = this._renderRoot.querySelector(
       ".host-team-tile"
     ) as MadTeamTileElement | null;
-    const visitorTile = this.querySelector(
+    const visitorTile = this._renderRoot.querySelector(
       ".visitor-team-tile"
     ) as MadTeamTileElement | null;
 

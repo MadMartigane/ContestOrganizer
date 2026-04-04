@@ -3,6 +3,18 @@ import { Signal } from "@core/signal.js";
 
 const POINTS = [1, 2, 3] as const;
 
+const template = document.createElement("template");
+template.innerHTML = `
+  <style>
+    :host {
+      display: block;
+    }
+  </style>
+  <div part="base" class="scorer-grid">
+    <slot></slot>
+  </div>
+`;
+
 export class MadScorerBasket extends BaseElement {
   // Signals for reactive state
   private declare _number: Signal<number>;
@@ -13,6 +25,9 @@ export class MadScorerBasket extends BaseElement {
   private _max?: number;
   private _value?: number;
   private _readonly = false;
+
+  // Cached elements
+  private _buttonsContainer?: HTMLElement;
 
   static get observedAttributes(): string[] {
     return ["min", "max", "value", "readonly"];
@@ -28,8 +43,8 @@ export class MadScorerBasket extends BaseElement {
     this._initialized = true;
   }
 
-  protected _createRenderRoot(): Element {
-    return this;
+  protected _createRenderRoot(): ShadowRoot {
+    return this.attachShadow({ mode: "open" });
   }
 
   attributeChangedCallback(
@@ -67,7 +82,38 @@ export class MadScorerBasket extends BaseElement {
     super.connectedCallback();
     const initialValue = this._value ?? this._min ?? 0;
     this._number.value = initialValue;
+
+    // Event delegation - single listener on host
+    this._renderRoot.addEventListener("click", this._handleClick);
+    this._renderRoot.addEventListener("mad-change", this._handleSwitchChange);
   }
+
+  disconnectedCallback(): void {
+    // Clean up event listeners
+    this._renderRoot.removeEventListener("click", this._handleClick);
+    this._renderRoot.removeEventListener(
+      "mad-change",
+      this._handleSwitchChange
+    );
+    super.disconnectedCallback();
+  }
+
+  private readonly _handleClick = (e: Event): void => {
+    const target = e.target as HTMLElement;
+    const button = target.closest(
+      "mad-button[data-points]"
+    ) as HTMLElement | null;
+    if (!button) {
+      return;
+    }
+
+    const points = Number(button.getAttribute("data-points"));
+    this._onIncrement(points);
+  };
+
+  private readonly _handleSwitchChange = (): void => {
+    this._onSwitchToggle();
+  };
 
   private _onIncrement(points: number): void {
     if (this._readonly) {
@@ -96,8 +142,18 @@ export class MadScorerBasket extends BaseElement {
   }
 
   protected _render(): void {
+    const root = this._renderRoot;
+
+    // Initialize template on first render
+    if (!root.firstChild) {
+      root.appendChild(template.content.cloneNode(true));
+    }
+
+    // Get container reference
+    this._buttonsContainer = root.querySelector('[part="base"]') as HTMLElement;
+
     if (this._readonly) {
-      this.innerHTML = "";
+      this._buttonsContainer.innerHTML = "";
       return;
     }
 
@@ -105,7 +161,7 @@ export class MadScorerBasket extends BaseElement {
     const iconName = minusMode ? "minus" : "plus";
     const variant = minusMode ? "warning" : "brand";
 
-    this.innerHTML = `
+    this._buttonsContainer.innerHTML = `
       <div class="my-4 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
         ${POINTS.map(
           (points) => `
@@ -113,11 +169,13 @@ export class MadScorerBasket extends BaseElement {
             data-points="${points}"
             size="large"
             variant="${variant}"
+            part="button"
           >
             <mad-icon
               class="xl"
               name="${iconName}"
               slot="start"
+              part="icon"
             ></mad-icon>
             <span slot="end">${points}</span>
           </mad-button>
@@ -128,23 +186,12 @@ export class MadScorerBasket extends BaseElement {
           ${minusMode ? "" : "checked"}
           help-text="Ajouter/Supprimer des points"
           size="large"
+          part="switch"
         >
           <mad-icon class="xl" name="plus-slash-minus"></mad-icon>
         </mad-switch>
       </div>
     `;
-
-    // Attach event listeners after render
-    const buttons = Array.from(
-      this.querySelectorAll("mad-button[data-points]")
-    );
-    for (const btn of buttons) {
-      const points = Number(btn.getAttribute("data-points"));
-      btn.addEventListener("click", () => this._onIncrement(points));
-    }
-
-    const switchEl = this.querySelector("#plus-minus-switch");
-    switchEl?.addEventListener("mad-change", () => this._onSwitchToggle());
   }
 }
 

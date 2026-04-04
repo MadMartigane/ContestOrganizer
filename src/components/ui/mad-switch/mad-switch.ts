@@ -178,9 +178,21 @@ export class MadSwitch extends BaseElement {
   private _trackElement: HTMLElement | null = null;
   private _thumbElement: HTMLElement | null = null;
   private _helpTextElement: HTMLElement | null = null;
+  private readonly _internals: ElementInternals | null = null;
 
   static get observedAttributes(): string[] {
     return ["checked", "disabled", "size", "help-text"];
+  }
+
+  constructor() {
+    super();
+    // Set up ElementInternals for ARIA
+    try {
+      this._internals = this.attachInternals();
+    } catch {
+      // attachInternals not supported (e.g., in older browsers)
+      this._internals = null;
+    }
   }
 
   protected _setupProperties(): void {
@@ -188,30 +200,48 @@ export class MadSwitch extends BaseElement {
   }
 
   connectedCallback(): void {
+    // Use BaseElement's render root (created in super.connectedCallback)
     super.connectedCallback();
 
-    // Attach shadow DOM if not already done
-    if (!this.shadowRoot) {
-      const shadow = this.attachShadow({ mode: "open" });
-      shadow.appendChild(template.content.cloneNode(true));
+    // Append template content to render root
+    const root = this._renderRoot;
+    if (root instanceof ShadowRoot) {
+      root.appendChild(template.content.cloneNode(true));
+    } else {
+      // Fallback for light DOM
+      this.appendChild(template.content.cloneNode(true));
     }
 
     this._cacheElements();
     this._setupEventListeners();
     this._updateVisualState();
+
+    // Set ARIA role via ElementInternals
+    if (this._internals) {
+      this._internals.role = "switch";
+    }
   }
 
   private _cacheElements(): void {
-    const root = this.shadowRoot;
+    const root = this._renderRoot;
     if (!root) {
       return;
     }
 
-    this._switchElement = root.querySelector(".switch");
-    this._inputElement = root.querySelector("input");
-    this._trackElement = root.querySelector(".track");
-    this._thumbElement = root.querySelector(".thumb");
-    this._helpTextElement = root.querySelector(".help-text");
+    if (root instanceof ShadowRoot) {
+      this._switchElement = root.querySelector(".switch");
+      this._inputElement = root.querySelector("input");
+      this._trackElement = root.querySelector(".track");
+      this._thumbElement = root.querySelector(".thumb");
+      this._helpTextElement = root.querySelector(".help-text");
+    } else {
+      // Fallback for light DOM
+      this._switchElement = this.querySelector(".switch");
+      this._inputElement = this.querySelector("input");
+      this._trackElement = this.querySelector(".track");
+      this._thumbElement = this.querySelector(".thumb");
+      this._helpTextElement = this.querySelector(".help-text");
+    }
   }
 
   private _setupEventListeners(): void {

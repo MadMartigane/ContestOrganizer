@@ -9,6 +9,22 @@ import {
 import Utils from "../../modules/utils/utils.js";
 import "./page-tournament-select.css";
 
+const template = document.createElement("template");
+template.innerHTML = `
+  <style>
+    :host { display: block; }
+  </style>
+  <div part="base">
+    <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 dark:bg-neutral-800 rounded-lg shadow-md">
+      <slot name="tournament-list"></slot>
+
+      <hr class="my-4 border-neutral-200 dark:border-neutral-700">
+
+      <slot name="add-form"></slot>
+    </div>
+  </div>
+`;
+
 /**
  * PageTournamentSelect - Tournament selection page component
  * @element page-tournament-select
@@ -42,7 +58,7 @@ export class PageTournamentSelect extends BaseElement {
     // Track signals for reactivity
     this._trackSignal(this._uiAddingTournament);
     this._trackSignal(this._numberOfTournaments);
-    this._trackSignal(this._isNewTournamentNameReady);
+    // Note: _isNewTournamentNameReady is NOT tracked - button state is updated directly via DOM
 
     // Initialize from tournaments module
     if (this.tournaments.isBusy) {
@@ -279,22 +295,29 @@ export class PageTournamentSelect extends BaseElement {
    * Renders the component's DOM
    */
   protected _render(): void {
+    const root = this._renderRoot;
+    if (!root.firstChild) {
+      root.appendChild(template.content.cloneNode(true));
+    }
+
     const uiAddingTournament = this._uiAddingTournament.value;
     const numberOfTournaments = this._numberOfTournaments.value;
 
-    this.innerHTML = `
-      <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 dark:bg-neutral-800 rounded-lg shadow-md">
-        ${numberOfTournaments > 0 ? this.renderTournamentList() : this.renderNoTournamentInfo()}
+    const content = root.querySelector('[part="base"]');
+    if (content) {
+      content.innerHTML = `
+        <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 dark:bg-neutral-800 rounded-lg shadow-md">
+          ${numberOfTournaments > 0 ? this.renderTournamentList() : this.renderNoTournamentInfo()}
 
-        <hr class="my-4 border-neutral-200 dark:border-neutral-700">
+          <hr class="my-4 border-neutral-200 dark:border-neutral-700">
 
-        ${uiAddingTournament ? this.renderAddTournament() : this.renderNewTournamentButton()}
-      </div>
-    `;
+          ${uiAddingTournament ? this.renderAddTournament() : this.renderNewTournamentButton()}
+        </div>
+      `;
+    }
 
     // Query DOM elements after render
-    // (no longer need domTournamentList since we removed wa-menu)
-    const addForm = this.querySelector(".add-tournament-form");
+    const addForm = root.querySelector(".add-tournament-form");
     if (addForm) {
       this.domTournamentName = addForm.querySelector(
         "mad-input"

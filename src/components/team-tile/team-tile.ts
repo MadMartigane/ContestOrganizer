@@ -40,6 +40,9 @@ export class MadTeamTile extends BaseElement {
   /** IntersectionObserver for lazy loading */
   private _intersectionObserver: IntersectionObserver | null = null;
 
+  /** Bound error handler for cleanup */
+  private _boundImageErrorHandler: (() => void) | null = null;
+
   /** Track if image has been loaded */
   private _imageLoaded = false;
 
@@ -141,7 +144,13 @@ export class MadTeamTile extends BaseElement {
    * Cleans up IntersectionObserver.
    */
   disconnectedCallback(): void {
-    this._intersectionObserver?.disconnect();
+    if (this._intersectionObserver) {
+      this._intersectionObserver.disconnect();
+      this._intersectionObserver = null;
+    }
+    if (this._boundImageErrorHandler) {
+      this._boundImageErrorHandler = null;
+    }
     super.disconnectedCallback();
   }
 
@@ -261,7 +270,7 @@ export class MadTeamTile extends BaseElement {
       ? "rank-badge-left"
       : "rank-badge-right";
 
-    return `<div class="rank-badge rank-${rankClass} ${positionClass}">${rank}</div>`;
+    return `<div class="rank-badge rank-${rankClass} ${positionClass}" aria-label="Rank ${rank}">${rank}</div>`;
   }
 
   /**
@@ -355,9 +364,10 @@ export class MadTeamTile extends BaseElement {
 
     // Attach error handler after render for img element
     if (imgSrc && !imageError) {
-      const img = this.querySelector("img");
+      const img = this._renderRoot.querySelector("img");
       if (img) {
-        img.addEventListener("error", () => this._onImageError());
+        this._boundImageErrorHandler = this._onImageError.bind(this);
+        img.addEventListener("error", this._boundImageErrorHandler);
       }
     }
   }

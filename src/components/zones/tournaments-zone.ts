@@ -1,6 +1,9 @@
 import { ZoneContainer } from "../zone-container/zone-container.js";
 import "../page-tournament-select/page-tournament-select.js";
 
+/**
+ * TournamentsZone - Tournaments selection zone component with Shadow DOM support.
+ */
 export class TournamentsZone extends ZoneContainer {
   constructor() {
     super();
@@ -11,10 +14,9 @@ export class TournamentsZone extends ZoneContainer {
 
   protected _render(): void {
     super._render();
-    const zoneContent = this.querySelector(".zone-content");
-    if (zoneContent) {
-      // Clear previous content to prevent duplication on re-render
-      zoneContent.innerHTML = "";
+    const root = this._renderRoot;
+    const zoneContent = root.querySelector(".zone-content");
+    if (zoneContent && !zoneContent.querySelector("page-tournament-select")) {
       const pageTournamentSelect = document.createElement(
         "page-tournament-select"
       );

@@ -8,6 +8,24 @@ import "../zones/tournaments-zone.js";
 import "../zones/matchs-zone.js";
 import "../zones/tournament-zone.js";
 
+const template = document.createElement("template");
+template.innerHTML = `
+  <style>
+    :host { display: block; }
+    .app-container { display: contents; }
+  </style>
+  <div part="base" class="app-container layout-mobile">
+    <slot name="config"></slot>
+    <slot name="home"></slot>
+    <slot name="tournaments"></slot>
+    <slot name="tournament"></slot>
+    <slot name="matchs"></slot>
+  </div>
+
+  <slot name="command-palette"></slot>
+  <slot name="gesture-overlay"></slot>
+`;
+
 export class AppRoot extends BaseElement {
   private _layoutClass = "layout-mobile";
   private orchestrator: NavigationOrchestrator | null = null;
@@ -32,7 +50,7 @@ export class AppRoot extends BaseElement {
 
     // Initialize orchestrator after DOM is rendered
     queueMicrotask(() => {
-      const container = this.querySelector(".app-container");
+      const container = this._renderRoot.querySelector(".app-container");
       if (container instanceof HTMLElement) {
         this.orchestrator = new NavigationOrchestrator(container);
         this.orchestrator.enable();
@@ -58,18 +76,16 @@ export class AppRoot extends BaseElement {
   }
 
   protected _render(): void {
-    this.innerHTML = `
-      <div class="app-container ${this._layoutClass}">
-        <config-zone class="zone config"></config-zone>
-        <home-zone class="zone home"></home-zone>
-        <tournaments-zone class="zone tournaments"></tournaments-zone>
-        <tournament-zone class="zone tournament"></tournament-zone>
-        <matchs-zone class="zone matchs"></matchs-zone>
-      </div>
+    const root = this._renderRoot;
+    if (!root.firstChild) {
+      root.appendChild(template.content.cloneNode(true));
+    }
 
-      <command-palette></command-palette>
-      <gesture-overlay></gesture-overlay>
-    `;
+    // Update container class
+    const container = root.querySelector(".app-container");
+    if (container instanceof HTMLElement) {
+      container.className = `app-container ${this._layoutClass}`;
+    }
   }
 
   private _handleResize(): void {
@@ -77,15 +93,12 @@ export class AppRoot extends BaseElement {
     if (newClass !== this._layoutClass) {
       this._layoutClass = newClass;
 
-      // Instead of full re-render, update the container class in-place
-      // to avoid destroying SpatialLayout's zone element references
-      const container = this.querySelector(".app-container");
+      const container = this._renderRoot.querySelector(".app-container");
       if (container instanceof HTMLElement) {
         container.className = `app-container ${this._layoutClass}`;
       }
     }
 
-    // Always notify orchestrator of current viewport state
     this.orchestrator?.getLayout().handleResize();
   }
 

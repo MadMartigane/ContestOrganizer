@@ -21,6 +21,34 @@ interface PageConfConstants {
   teamNumberStep: number;
 }
 
+const template = document.createElement("template");
+template.innerHTML = `
+  <style>
+    :host { display: block; }
+  </style>
+  <div part="base">
+    <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-[var(--wa-color-neutral-100)] dark:bg-neutral-800 rounded-lg shadow-md">
+      <div>
+        <slot name="tournament-name"></slot>
+
+        <div class="my-4 grid grid-cols-1 items-center text-center">
+          <mad-input-number
+            id="teamNumberInput"
+            label="Nombre d'équipes (min:2, max:32)"
+            max="32"
+            min="2"
+            placeholder="4"
+            step="2"
+            value="4"
+          ></mad-input-number>
+        </div>
+
+        <slot name="grid-content"></slot>
+      </div>
+    </div>
+  </div>
+`;
+
 /**
  * PageTournament - Tournament page component for viewing and editing tournament details
  * @element page-tournament
@@ -407,9 +435,11 @@ export class PageTournament extends BaseElement {
       "#teamNumberInput"
     ) as HTMLElement;
     if (teamNumberInput) {
-      teamNumberInput.addEventListener("madNumberChange", (ev: CustomEvent) => {
+      teamNumberInput.addEventListener("madNumberChange", ((
+        ev: CustomEvent
+      ) => {
         this.onTeamNumberChange(ev.detail);
-      });
+      }) as EventListener);
     }
 
     // Setup grid child events
@@ -417,25 +447,23 @@ export class PageTournament extends BaseElement {
     const gridDefault = this.querySelector("grid-default");
 
     if (gridBasket) {
-      gridBasket.addEventListener(
-        "gridTournamentChange",
-        (ev: CustomEvent<{ tournamentId?: number }>) => {
-          if (ev.detail?.tournamentId) {
-            this.refreshTournament(ev.detail.tournamentId);
-          }
+      gridBasket.addEventListener("gridTournamentChange", ((
+        ev: CustomEvent<{ tournamentId?: number }>
+      ) => {
+        if (ev.detail?.tournamentId) {
+          this.refreshTournament(ev.detail.tournamentId);
         }
-      );
+      }) as EventListener);
     }
 
     if (gridDefault) {
-      gridDefault.addEventListener(
-        "gridTournamentChange",
-        (ev: CustomEvent<{ tournamentId?: number }>) => {
-          if (ev.detail?.tournamentId) {
-            this.refreshTournament(ev.detail.tournamentId);
-          }
+      gridDefault.addEventListener("gridTournamentChange", ((
+        ev: CustomEvent<{ tournamentId?: number }>
+      ) => {
+        if (ev.detail?.tournamentId) {
+          this.refreshTournament(ev.detail.tournamentId);
         }
-      );
+      }) as EventListener);
     }
 
     // Setup footer action buttons

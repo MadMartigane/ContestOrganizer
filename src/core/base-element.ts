@@ -5,6 +5,7 @@
  */
 
 import type { Signal } from "./signal.js";
+import { baseSheet } from "./styles.js";
 
 /**
  * Abstract base class for all Vanilla Web Components.
@@ -43,6 +44,16 @@ export abstract class BaseElement extends HTMLElement {
   private _initialContent: Node[] | null = null;
 
   /**
+   * Shadow root reference for Shadow DOM support.
+   */
+  private _shadow: ShadowRoot | null = null;
+
+  /**
+   * Template registry for caching compiled templates.
+   */
+  private static _templates: Map<string, HTMLTemplateElement> = new Map();
+
+  /**
    * Array of attribute names to observe for changes.
    * Override in subclasses to observe specific attributes.
    */
@@ -61,17 +72,76 @@ export abstract class BaseElement extends HTMLElement {
   }
 
   /**
+   * Creates and returns the render root for the component.
+   * By default, creates an open Shadow DOM root.
+   * Override in subclasses to return `this` for Light DOM (backward compatibility).
+   * @returns The Element or ShadowRoot to render into
+   */
+  protected _createRenderRoot(): Element | ShadowRoot {
+    if (!this._shadow) {
+      this._shadow = this.attachShadow({ mode: "open" });
+      this._shadow.adoptedStyleSheets = [BaseElement._getBaseStyleSheet()];
+    }
+    return this._shadow;
+  }
+
+  /**
+   * Returns the render root for the component.
+   * Defaults to the shadow root, falls back to the element itself for light DOM.
+   */
+  protected get _renderRoot(): Element | ShadowRoot {
+    return this._shadow ?? this;
+  }
+
+  /**
+   * Gets the base stylesheet for shadow roots.
+   * @returns The shared CSSStyleSheet with base styles
+   */
+  private static _getBaseStyleSheet(): CSSStyleSheet {
+    return baseSheet;
+  }
+
+  /**
+   * Registers a template for the component.
+   * Templates are cached and reused for performance.
+   * @param templateId - Unique identifier for the template
+   * @param template - The HTMLTemplateElement to register
+   */
+  protected static _registerTemplate(
+    templateId: string,
+    template: HTMLTemplateElement
+  ): void {
+    BaseElement._templates.set(templateId, template);
+  }
+
+  /**
+   * Retrieves a registered template by ID.
+   * @param templateId - The template identifier
+   * @returns The template element or undefined if not found
+   */
+  protected static _getTemplate(
+    templateId: string
+  ): HTMLTemplateElement | undefined {
+    return BaseElement._templates.get(templateId);
+  }
+
+  /**
    * Called when the element is added to the DOM.
    * Captures light DOM children, triggers render, then distributes slots.
    */
   connectedCallback(): void {
     this._isConnected = true;
-    // Capture light DOM children before _render() overwrites them
+    // Initialize render root (creates shadow DOM if not already created)
+    this._createRenderRoot();
+    // Capture light DOM children for slot projection
     if (!this._initialContent && this.childNodes.length > 0) {
       this._initialContent = Array.from(this.childNodes);
     }
     this._render();
-    this._distributeSlots();
+    // Only distribute slots if using light DOM
+    if (!this._shadow) {
+      this._distributeSlots();
+    }
   }
 
   /**
