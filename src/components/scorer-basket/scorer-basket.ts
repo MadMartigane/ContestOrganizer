@@ -125,7 +125,7 @@ export class MadScorerBasket extends BaseElement {
         ).join("")}
         <mad-switch
           id="plus-minus-switch"
-          checked="${!minusMode}"
+          ${minusMode ? "" : "checked"}
           help-text="Ajouter/Supprimer des points"
           size="large"
         >

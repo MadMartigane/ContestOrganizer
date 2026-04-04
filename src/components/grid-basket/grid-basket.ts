@@ -19,7 +19,6 @@ export class GridBasket extends BaseElement {
   private readonly _tournaments = getTournaments();
   private declare _tournament: Signal<Tournament | null>;
   private declare _isLoadingNbaTeams: Signal<boolean>;
-  private declare _magicFillError: Signal<string | null>;
   private _tournamentUpdateHandler: (() => void) | null = null;
 
   static get observedAttributes(): string[] {
@@ -29,10 +28,8 @@ export class GridBasket extends BaseElement {
   protected _setupProperties(): void {
     this._tournament = new Signal<Tournament | null>(null);
     this._isLoadingNbaTeams = new Signal<boolean>(false);
-    this._magicFillError = new Signal<string | null>(null);
     this._trackSignal(this._tournament);
     this._trackSignal(this._isLoadingNbaTeams);
-    this._trackSignal(this._magicFillError);
 
     this._initialized = true;
   }
@@ -116,14 +113,13 @@ export class GridBasket extends BaseElement {
     return array;
   }
 
-  private async magicFillUpNbaTeams(): Promise<void> {
+  async magicFillUpNbaTeams(): Promise<void> {
     const tournament = this._tournament.value;
     if (!tournament || tournament.type !== "NBA") {
       return;
     }
 
     this._isLoadingNbaTeams.value = true;
-    this._magicFillError.value = null;
 
     try {
       // Fetch all 30 NBA teams
@@ -176,7 +172,6 @@ export class GridBasket extends BaseElement {
       await this._tournaments.update(tournament);
       this.updateTournament();
     } catch (error) {
-      this._magicFillError.value = "Failed to load NBA teams";
       console.error(error);
     } finally {
       this._isLoadingNbaTeams.value = false;
@@ -185,7 +180,7 @@ export class GridBasket extends BaseElement {
 
   private _renderGridHeader(): string {
     return `
-      <thead class="bg-orange-600 text-neutral-100 align-middle">
+      <thead class="bg-orange-600 text-neutral-100 dark:bg-orange-700 dark:text-neutral-50 align-middle">
         <th>
           <mad-icon class="text-2xl" name="sort-numeric-down"></mad-icon>
         </th>
@@ -282,8 +277,6 @@ export class GridBasket extends BaseElement {
 
   protected _render(): void {
     const tournament = this._tournament.value;
-    const isLoadingNbaTeams = this._isLoadingNbaTeams.value;
-    const magicFillError = this._magicFillError.value;
 
     this.innerHTML = `
       <table class="my-6">
@@ -311,34 +304,10 @@ export class GridBasket extends BaseElement {
           ${tournament ? this._renderGridBody() : ""}
         </tbody>
       </table>
-      ${
-        tournament?.type === "NBA"
-          ? `
-          <mad-button
-            class="magic-fill-btn"
-            size="medium"
-            variant="brand"
-          >
-            <mad-icon name="magic" slot="start"></mad-icon>
-            Magic fill-up
-          </mad-button>
-          ${
-            magicFillError
-              ? `
-            <span class="text-red-600 text-sm">${magicFillError}</span>
-          `
-              : ""
-          }
-      `
-          : ""
-      }
     `;
 
     // Two-pass rendering: setup mad-select-team elements
     this._setupTeamSelectors();
-
-    // Setup magic fill button event listener
-    this._setupMagicFillButton(isLoadingNbaTeams);
   }
 
   private _setupTeamSelectors(): void {
@@ -374,33 +343,6 @@ export class GridBasket extends BaseElement {
         );
       }
     }
-  }
-
-  private _setupMagicFillButton(isLoading: boolean): void {
-    const button = this.querySelector(".magic-fill-btn");
-    if (!button) {
-      return;
-    }
-
-    // Set loading state via property if supported
-    if ("loading" in button) {
-      (button as unknown as { loading: boolean }).loading = isLoading;
-    }
-
-    // Remove existing listener to avoid duplicates
-    const newButton = button.cloneNode(true) as HTMLElement;
-    button.parentNode?.replaceChild(newButton, button);
-
-    newButton.addEventListener("click", () => {
-      this.magicFillUpNbaTeams();
-    });
-
-    newButton.addEventListener("keydown", (e: KeyboardEvent) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        this.magicFillUpNbaTeams();
-      }
-    });
   }
 }
 

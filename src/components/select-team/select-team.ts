@@ -413,7 +413,7 @@ export class SelectTeam extends BaseElement {
         (team) => `<mad-menu-item data-team-id="${team.id}">
           <mad-team-tile></mad-team-tile>
           <span slot="end">
-            <mad-icon class="text-4xl text-neutral-400" name="arrow-right-circle"></mad-icon>
+            <mad-icon class="text-4xl text-neutral-400 dark:text-neutral-500" name="arrow-right-circle"></mad-icon>
           </span>
         </mad-menu-item>`
       )
@@ -431,7 +431,7 @@ export class SelectTeam extends BaseElement {
         <div class="mb-3">
           <mad-spinner class="text-4xl"></mad-spinner>
         </div>
-        <span class="text-neutral-400">Chargement des équipes…</span>
+        <span class="text-neutral-400 dark:text-neutral-500">Chargement des équipes…</span>
       </div>`;
     }
 
@@ -528,7 +528,7 @@ export class SelectTeam extends BaseElement {
         ${
           team?.id
             ? "<mad-team-tile></mad-team-tile>"
-            : `<span class="text-neutral-400 text-sm">${placeholder}</span>`
+            : `<span class="text-neutral-400 dark:text-neutral-500 text-sm">${placeholder}</span>`
         }
       `;
 
@@ -578,13 +578,16 @@ export class SelectTeam extends BaseElement {
 
   /**
    * Setup button event handlers after DOM is ready
+   * Uses event delegation on the drawer element to handle clicks
+   * even on cloned/re-rendered buttons
    */
   private setupButtonEvents(): void {
-    // Cancel button
-    const cancelBtn = this.querySelector("#cancel-btn");
-    if (cancelBtn) {
-      cancelBtn.addEventListener("click", () => {
-        this.closeDrawer();
+    if (this.domDrawer) {
+      this.domDrawer.addEventListener("click", (ev: Event) => {
+        const target = ev.target as HTMLElement;
+        if (target.closest("#cancel-btn")) {
+          this.closeDrawer();
+        }
       });
     }
   }

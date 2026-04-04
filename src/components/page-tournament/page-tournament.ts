@@ -46,6 +46,8 @@ export class PageTournament extends BaseElement {
   private declare _uiError: Signal<string | null>;
   private declare _isEditTournamentName: Signal<boolean>;
   private declare _teamNumber: Signal<number>;
+  private declare _magicFillLoading: Signal<boolean>;
+  private declare _magicFillError: Signal<string | null>;
 
   /**
    * Tournament ID property
@@ -81,12 +83,16 @@ export class PageTournament extends BaseElement {
     this._uiError = new Signal<string | null>(null);
     this._isEditTournamentName = new Signal<boolean>(false);
     this._teamNumber = new Signal<number>(this.conf.teamNumberDefault);
+    this._magicFillLoading = new Signal<boolean>(false);
+    this._magicFillError = new Signal<string | null>(null);
 
     // Track signals for reactivity
     this._trackSignal(this._tournament);
     this._trackSignal(this._uiError);
     this._trackSignal(this._isEditTournamentName);
     this._trackSignal(this._teamNumber);
+    this._trackSignal(this._magicFillLoading);
+    this._trackSignal(this._magicFillError);
 
     // Initialize from attributes
     const tournamentIdAttr = this.getAttribute("tournament-id");
@@ -282,7 +288,7 @@ export class PageTournament extends BaseElement {
 
     if (uiError) {
       this.innerHTML = `
-        <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 rounded-lg shadow-md">
+        <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 dark:bg-neutral-800 rounded-lg shadow-md">
           <error-message message="${uiError}"></error-message>
         </div>
       `;
@@ -332,7 +338,7 @@ export class PageTournament extends BaseElement {
         `;
 
     this.innerHTML = `
-      <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-[var(--wa-color-neutral-100)] rounded-lg shadow-md">
+      <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-[var(--wa-color-neutral-100)] dark:bg-neutral-800 rounded-lg shadow-md">
         <div>
           ${tournamentNameHtml}
 
@@ -453,6 +459,17 @@ export class PageTournament extends BaseElement {
         this.goMatch(this._tournament.value?.id);
       });
     }
+
+    // Setup magic fill button click handler
+    const magicFillBtn = this.querySelector("#magicFillBtn");
+    if (magicFillBtn) {
+      magicFillBtn.addEventListener("click", () => {
+        const gridBasket = this.querySelector("grid-basket") as {
+          magicFillUpNbaTeams?: () => Promise<void>;
+        } | null;
+        gridBasket?.magicFillUpNbaTeams?.();
+      });
+    }
   }
 
   private renderGrid(): string {
@@ -489,6 +506,11 @@ export class PageTournament extends BaseElement {
   }
 
   private renderFooterActions(): string {
+    const tournament = this._tournament.value;
+    const isNbaType = tournament?.type === "NBA";
+    const magicFillError = this._magicFillError.value;
+    const magicFillLoading = this._magicFillLoading.value;
+
     return `
       <div class="grid-300 my-4">
         <mad-button
@@ -502,16 +524,33 @@ export class PageTournament extends BaseElement {
 
         ${this.renderSortingButton()}
 
+        ${
+          isNbaType
+            ? `
+          <mad-button
+            id="magicFillBtn"
+            size="large"
+            variant="brand"
+            ${magicFillLoading ? "disabled" : ""}
+          >
+            <mad-icon name="magic" slot="start"></mad-icon>
+            ${magicFillLoading ? "Chargement..." : "Magic fill-up"}
+          </mad-button>
+        `
+            : ""
+        }
+
         <mad-button
           id="matchBtn"
           size="large"
           variant="brand"
         >
           <mad-icon name="trophy" slot="start"></mad-icon>
-          <span>Go Match</span>
+          <span slot="end">Go Match</span>
           <mad-icon name="forward" slot="end"></mad-icon>
         </mad-button>
       </div>
+      ${magicFillError ? `<p class="text-red-600 text-sm my-2">${magicFillError}</p>` : ""}
     `;
   }
 }

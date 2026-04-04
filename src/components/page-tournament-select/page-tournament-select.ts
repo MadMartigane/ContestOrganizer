@@ -42,6 +42,7 @@ export class PageTournamentSelect extends BaseElement {
     // Track signals for reactivity
     this._trackSignal(this._uiAddingTournament);
     this._trackSignal(this._numberOfTournaments);
+    this._trackSignal(this._isNewTournamentNameReady);
 
     // Initialize from tournaments module
     if (this.tournaments.isBusy) {
@@ -282,7 +283,7 @@ export class PageTournamentSelect extends BaseElement {
     const numberOfTournaments = this._numberOfTournaments.value;
 
     this.innerHTML = `
-      <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 rounded-lg shadow-md">
+      <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 dark:bg-neutral-800 rounded-lg shadow-md">
         ${numberOfTournaments > 0 ? this.renderTournamentList() : this.renderNoTournamentInfo()}
 
         <hr class="my-4 border-neutral-200 dark:border-neutral-700">
@@ -419,7 +420,7 @@ export class PageTournamentSelect extends BaseElement {
                 label="Supprimer"
               ></mad-icon>
               <mad-icon
-                class="text-xl text-neutral-400"
+                class="text-xl text-neutral-400 dark:text-neutral-500"
                 name="arrow-right-circle"
               ></mad-icon>
             </div>

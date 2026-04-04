@@ -959,7 +959,7 @@ export class PageMatch extends BaseElement {
    */
   private renderMatchListHeader(): string {
     return `
-      <div class="bg-orange-600 text-neutral-100 grid grid-cols-11 items-center py-2">
+      <div class="bg-orange-600 text-neutral-100 dark:bg-orange-700 dark:text-neutral-50 grid grid-cols-11 items-center py-2">
         <div class="col-span-3">Locaux</div>
         <div class="col-span-5 text-2xl text-center">${this.renderTournamentTypeLabel()}</div>
         <div class="col-span-3">Visiteurs</div>
@@ -1011,7 +1011,7 @@ export class PageMatch extends BaseElement {
 
         <div class="w-fill overflow-x-auto">
           <table class="table-auto">
-            <thead class="bg-orange-600 text-neutral-100">
+            <thead class="bg-orange-600 text-neutral-100 dark:bg-orange-700 dark:text-neutral-50">
               <tr>
                 <th>
                   <mad-icon class="text-2xl" name="list-check"></mad-icon>
@@ -1157,7 +1157,7 @@ export class PageMatch extends BaseElement {
                      aria-label="Aller en haut de la page">
             <mad-icon name="chevron-up" aria-hidden="true"></mad-icon>
           </mad-button>
-          <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap">Aller en haut (Alt+T)</div>
+          <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-neutral-700 text-white dark:bg-neutral-600 text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap">Aller en haut (Alt+T)</div>
         </div>
 
         <div class="relative group">
@@ -1168,7 +1168,7 @@ export class PageMatch extends BaseElement {
                      aria-label="Aller au match en cours ou dernier match joué">
             <mad-icon name="crosshair" aria-hidden="true"></mad-icon>
           </mad-button>
-          <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap">Aller au match actuel (Alt+M)</div>
+          <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-neutral-700 text-white dark:bg-neutral-600 text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap">Aller au match actuel (Alt+M)</div>
         </div>
 
         <div class="relative group">
@@ -1178,7 +1178,7 @@ export class PageMatch extends BaseElement {
                      aria-label="Aller en bas de la page">
             <mad-icon name="chevron-down" aria-hidden="true"></mad-icon>
           </mad-button>
-          <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap">Aller en bas (Alt+B)</div>
+          <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-neutral-700 text-white dark:bg-neutral-600 text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap">Aller en bas (Alt+B)</div>
         </div>
       </div>
     </div>
@@ -1260,7 +1260,7 @@ export class PageMatch extends BaseElement {
         }
       </style>
 
-      <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 rounded-lg shadow-md">
+      <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 dark:bg-neutral-800 rounded-lg shadow-md">
         ${
           uiError
             ? `<error-message message="${uiError}"></error-message>`

@@ -28,13 +28,10 @@ export class PageConfig extends BaseElement {
     this._trackSignal(this._cacheCleared);
   }
 
-  private _onDarkModeChange(): void {
-    if (this.darkModeSwitch) {
-      const input = this.darkModeSwitch.querySelector("input");
-      const isDark = input?.checked ?? false;
-      this.globalSetting.setDarkTheme(isDark);
-      this._isDarkModeActive.value = isDark;
-    }
+  private _onDarkModeChange(event: CustomEvent<{ checked: boolean }>): void {
+    const isDark = event.detail.checked;
+    this.globalSetting.setDarkTheme(isDark);
+    this._isDarkModeActive.value = isDark;
   }
 
   private _clearCache(): void {
@@ -58,8 +55,8 @@ export class PageConfig extends BaseElement {
     const cacheCleared = this._cacheCleared.value;
 
     this.innerHTML = `
-      <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 rounded-lg shadow-md">
-        <h1>Configuration</h1>
+      <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 dark:bg-neutral-800 rounded-lg shadow-md">
+        <h1 class="dark:text-neutral-100">Configuration</h1>
 
         <mad-switch
           id="dark-mode-switch"
@@ -73,8 +70,8 @@ export class PageConfig extends BaseElement {
         <hr class="my-4 border-neutral-200 dark:border-neutral-700">
 
         <div class="my-4">
-          <h3>Cache des équipes</h3>
-          <p class="text-neutral-400 text-sm">
+          <h3 class="dark:text-neutral-100">Cache des équipes</h3>
+          <p class="text-neutral-400 dark:text-neutral-500 text-sm">
             Vide le cache des équipes si vous rencontrez des problèmes de
             recherche.
           </p>
@@ -121,8 +118,8 @@ export class PageConfig extends BaseElement {
 
     // Setup event listeners
     if (this.darkModeSwitch) {
-      this.darkModeSwitch.addEventListener("mad-change", () => {
-        this._onDarkModeChange();
+      this.darkModeSwitch.addEventListener("mad-change", (e: Event) => {
+        this._onDarkModeChange(e as CustomEvent<{ checked: boolean }>);
       });
     }
 

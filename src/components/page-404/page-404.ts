@@ -18,7 +18,7 @@ export class Page404 extends BaseElement {
    */
   protected _render(): void {
     this.innerHTML = `
-      <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 rounded-lg shadow-md">
+      <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 dark:bg-neutral-800 rounded-lg shadow-md">
         <h1>404 - La page demandée n'existe pas.</h1>
 
         <div class="flex justify-center items-center py-8">

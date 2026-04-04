@@ -85,3 +85,27 @@
 :host {
   display: block;
 }
+
+/* Dark mode overrides */
+html.dark .rank-badge {
+  color: #f5f5f5;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+}
+
+html.dark .rank-badge.rank-2 {
+  background: linear-gradient(to bottom, #525252, #262626);
+  border-color: #404040;
+}
+
+html.dark .rank-badge.rank-other {
+  background: linear-gradient(to bottom, #0c4a6e, #075985);
+  border-color: #0369a1;
+}
+
+html.dark .team-image-fallback {
+  background-color: #404040;
+}
+
+html.dark .team-image-fallback svg {
+  color: #737373;
+}
