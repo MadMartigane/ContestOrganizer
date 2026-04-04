@@ -164,96 +164,115 @@ export class ZoneContainer extends BaseElement {
    */
   private _getCss(): string {
     return `
-		.zone-container {
-			display: flex;
-			flex-direction: column;
-			height: 100%;
-		}
-			.zone-container.zone-planning {
-				--zone-accent: #ea580c;
-			}
-			.zone-container.zone-live {
-				--zone-accent: #16a34a;
-			}
-			.zone-container.zone-archive {
-				--zone-accent: #ca8a04;
-			}
-			.zone-container.zone-home {
-				--zone-accent: #ea580c;
-			}
-			.zone-container.zone-config {
-				--zone-accent: #8b5cf6;
-			}
-			.zone-container.zone-tournaments {
-				--zone-accent: #ea580c;
-			}
-			.zone-container.zone-matchs {
-				--zone-accent: #16a34a;
-			}
-			.zone-header {
-				display: flex;
-				align-items: center;
-				gap: 0.5rem;
-				padding: 0.75rem 1rem;
-				background-color: var(--zone-accent, #e5e5e5);
-				border-bottom: 2px solid #d4d4d4;
-				min-height: 3rem;
-			}
-			.zone-header mad-icon {
-				flex-shrink: 0;
-			}
-			.zone-header h2 {
-				flex: 1;
-				margin: 0;
-				font-size: 1rem;
-				font-weight: 600;
-				color: #171717;
-				overflow: hidden;
-				text-overflow: ellipsis;
-				white-space: nowrap;
-			}
-			.focus-btn {
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				width: 2rem;
-				height: 2rem;
-				padding: 0;
-				background-color: transparent;
-				border: 1px solid #a3a3a3;
-				border-radius: 0.5rem;
-				cursor: pointer;
-				opacity: 0.7;
-				transition: opacity 150ms ease, background-color 150ms ease;
-			}
-			.focus-btn:hover {
-				opacity: 1;
-				background-color: #f5f5f5;
-			}
-			.focus-btn:focus-visible {
-				outline: 2px solid var(--zone-accent, #ea580c);
-				outline-offset: 2px;
-			}
-			.focus-btn[hidden] {
-				display: none;
-			}
-			.zone-content {
-				flex: 1;
-				overflow-y: auto;
-				overflow-x: hidden;
-				background-color: #fafafa;
-			}
-			.zone-container[data-focused="true"] .zone-header {
-				background-color: var(--zone-accent, #ea580c);
-			}
-			.zone-container[data-focused="true"] .zone-header h2 {
-				color: #fafafa;
-			}
-			.zone-container[data-focused="true"] .focus-btn {
-				border-color: #fafafa;
-				color: #fafafa;
-			}
-		`;
+    .zone-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    .zone-container.zone-planning {
+      --zone-accent: #ea580c;
+      --zone-accent-focused: #ea580c;
+    }
+    .zone-container.zone-live {
+      --zone-accent: #16a34a;
+      --zone-accent-focused: #16a34a;
+    }
+    .zone-container.zone-archive {
+      --zone-accent: #ca8a04;
+      --zone-accent-focused: #ca8a04;
+    }
+    .zone-container.zone-home {
+      --zone-accent: #ea580c;
+      --zone-accent-focused: #ea580c;
+    }
+    .zone-container.zone-config {
+      --zone-accent: #8b5cf6;
+      --zone-accent-focused: #8b5cf6;
+    }
+    .zone-container.zone-tournaments {
+      --zone-accent: #ea580c;
+      --zone-accent-focused: #ea580c;
+    }
+    .zone-container.zone-matchs {
+      --zone-accent: #16a34a;
+      --zone-accent-focused: #16a34a;
+    }
+    .zone-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      background-color: var(--zone-accent, #e5e5e5);
+      border-bottom: 2px solid var(--zone-border, #d4d4d4);
+      min-height: 3rem;
+    }
+    .zone-header mad-icon {
+      flex-shrink: 0;
+    }
+    .zone-header h2 {
+      flex: 1;
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--zone-text, #171717);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .focus-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2rem;
+      height: 2rem;
+      padding: 0;
+      background-color: transparent;
+      border: 1px solid var(--zone-btn-border, #a3a3a3);
+      border-radius: 0.5rem;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 150ms ease, background-color 150ms ease;
+      color: var(--zone-btn-text, #171717);
+    }
+    .focus-btn:hover {
+      opacity: 1;
+      background-color: var(--zone-btn-hover, #f5f5f5);
+    }
+    .focus-btn:focus-visible {
+      outline: 2px solid var(--zone-accent, #ea580c);
+      outline-offset: 2px;
+    }
+    .focus-btn[hidden] {
+      display: none;
+    }
+    .zone-content {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      background-color: var(--zone-content-bg, #fafafa);
+    }
+    .zone-container[data-focused="true"] .zone-header {
+      background-color: var(--zone-accent-focused, var(--zone-accent, #ea580c));
+    }
+    .zone-container[data-focused="true"] .zone-header h2 {
+      color: var(--zone-focused-text, #fafafa);
+    }
+    .zone-container[data-focused="true"] .focus-btn {
+      border-color: var(--zone-focused-text, #fafafa);
+      color: var(--zone-focused-text, #fafafa);
+    }
+
+    /* Dark mode overrides via CSS custom properties */
+    html.dark .zone-container {
+      --zone-border: #404040;
+      --zone-text: #e5e5e5;
+      --zone-btn-border: #525252;
+      --zone-btn-text: #e5e5e5;
+      --zone-btn-hover: #262626;
+      --zone-content-bg: #171717;
+      --zone-focused-text: #f5f5f5;
+    }
+  `;
   }
 
   /**

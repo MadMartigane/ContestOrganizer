@@ -112,10 +112,10 @@ export class AppStatusNews extends BaseElement {
   private _renderSkeleton(): string {
     return `
       <div class="flex flex-col gap-4" aria-busy="true" aria-label="Loading status data">
-        <div class="h-16 animate-pulse bg-neutral-100 rounded-lg"></div>
-        <div class="h-20 animate-pulse bg-neutral-100 rounded-lg"></div>
-        <div class="h-20 animate-pulse bg-neutral-100 rounded-lg"></div>
-        <div class="h-20 animate-pulse bg-neutral-100 rounded-lg"></div>
+        <div class="h-16 animate-pulse bg-neutral-100 dark:bg-neutral-700 rounded-lg"></div>
+        <div class="h-20 animate-pulse bg-neutral-100 dark:bg-neutral-700 rounded-lg"></div>
+        <div class="h-20 animate-pulse bg-neutral-100 dark:bg-neutral-700 rounded-lg"></div>
+        <div class="h-20 animate-pulse bg-neutral-100 dark:bg-neutral-700 rounded-lg"></div>
       </div>
     `;
   }

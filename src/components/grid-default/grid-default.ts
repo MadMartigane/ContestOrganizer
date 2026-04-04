@@ -132,7 +132,7 @@ export class GridDefault extends BaseElement {
 
     this.innerHTML = `
       <table class="table-auto">
-        <thead class="bg-orange-600 text-neutral-100 align-middle">
+        <thead class="bg-orange-600 text-neutral-100 dark:bg-orange-700 dark:text-neutral-50 align-middle">
           <th>
             <mad-icon class="text-2xl" name="sort-numeric-down"></mad-icon>
           </th>

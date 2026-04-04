@@ -131,3 +131,36 @@
   justify-content: flex-end;
   padding: 0.75rem 1rem;
 }
+
+/* Dark mode overrides */
+html.dark .tournament-card {
+  --card-border-color: #404040;
+}
+
+html.dark .tournament-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+html.dark .tournament-name {
+  color: #e5e5e5;
+}
+
+html.dark .tournament-card-meta {
+  color: #a3a3a3;
+}
+
+html.dark .meta-icon {
+  color: #737373;
+}
+
+html.dark .tournament-card-footer {
+  border-top-color: #262626;
+}
+
+html.dark .delete-tournament-icon:hover {
+  background-color: #450a0a;
+}
+
+html.dark .page-content .text-center h1 {
+  color: #a3a3a3;
+}
