@@ -1,0 +1,18 @@
+@theme {
+  /* Animation tokens (renamed from --wa-* to --anim-*) */
+  --anim-duration-fast: 150ms;
+  --anim-duration-normal: 300ms;
+  --anim-duration-slow: 500ms;
+  --anim-easing-default: ease-out;
+  --anim-easing-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --anim-easing-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark mode: .dark class on <html> */
+html.dark {
+  color-scheme: dark;
+}
+
+html:not(.dark) {
+  color-scheme: light;
+}

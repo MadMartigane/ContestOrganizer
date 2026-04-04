@@ -518,7 +518,7 @@ export function getAllTournaments(): Tournament[] {
 export function createTournament(): void {
   document.dispatchEvent(
     new CustomEvent("navigate", {
-      detail: { hash: "#/zone/planning/tournaments" },
+      detail: { hash: "#/tournaments" },
       bubbles: true,
       composed: true,
     })

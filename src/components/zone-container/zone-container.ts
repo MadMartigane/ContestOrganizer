@@ -164,41 +164,42 @@ export class ZoneContainer extends BaseElement {
    */
   private _getCss(): string {
     return `
-			.zone-container {
-				display: block;
-				height: 100%;
-			}
+		.zone-container {
+			display: flex;
+			flex-direction: column;
+			height: 100%;
+		}
 			.zone-container.zone-planning {
-				--zone-accent: var(--wa-color-primary);
+				--zone-accent: #ea580c;
 			}
 			.zone-container.zone-live {
-				--zone-accent: var(--wa-color-success);
+				--zone-accent: #16a34a;
 			}
 			.zone-container.zone-archive {
-				--zone-accent: var(--wa-color-warning);
+				--zone-accent: #ca8a04;
 			}
 			.zone-container.zone-home {
-				--zone-accent: var(--wa-color-primary);
+				--zone-accent: #ea580c;
 			}
 			.zone-container.zone-config {
-				--zone-accent: var(--wa-color-secondary);
+				--zone-accent: #8b5cf6;
 			}
 			.zone-container.zone-tournaments {
-				--zone-accent: var(--wa-color-brand);
+				--zone-accent: #ea580c;
 			}
 			.zone-container.zone-matchs {
-				--zone-accent: var(--wa-color-success);
+				--zone-accent: #16a34a;
 			}
 			.zone-header {
 				display: flex;
 				align-items: center;
 				gap: 0.5rem;
 				padding: 0.75rem 1rem;
-				background-color: var(--zone-accent, var(--wa-color-neutral-200));
-				border-bottom: 2px solid var(--wa-color-neutral-300);
+				background-color: var(--zone-accent, #e5e5e5);
+				border-bottom: 2px solid #d4d4d4;
 				min-height: 3rem;
 			}
-			.zone-header wa-icon {
+			.zone-header mad-icon {
 				flex-shrink: 0;
 			}
 			.zone-header h2 {
@@ -206,7 +207,7 @@ export class ZoneContainer extends BaseElement {
 				margin: 0;
 				font-size: 1rem;
 				font-weight: 600;
-				color: var(--wa-color-neutral-900);
+				color: #171717;
 				overflow: hidden;
 				text-overflow: ellipsis;
 				white-space: nowrap;
@@ -219,18 +220,18 @@ export class ZoneContainer extends BaseElement {
 				height: 2rem;
 				padding: 0;
 				background-color: transparent;
-				border: 1px solid var(--wa-color-neutral-400);
-				border-radius: var(--wa-border-radius-medium);
+				border: 1px solid #a3a3a3;
+				border-radius: 0.5rem;
 				cursor: pointer;
 				opacity: 0.7;
 				transition: opacity 150ms ease, background-color 150ms ease;
 			}
 			.focus-btn:hover {
 				opacity: 1;
-				background-color: var(--wa-color-neutral-100);
+				background-color: #f5f5f5;
 			}
 			.focus-btn:focus-visible {
-				outline: 2px solid var(--zone-accent, var(--wa-color-primary));
+				outline: 2px solid var(--zone-accent, #ea580c);
 				outline-offset: 2px;
 			}
 			.focus-btn[hidden] {
@@ -240,17 +241,17 @@ export class ZoneContainer extends BaseElement {
 				flex: 1;
 				overflow-y: auto;
 				overflow-x: hidden;
-				background-color: var(--wa-color-neutral-50);
+				background-color: #fafafa;
 			}
 			.zone-container[data-focused="true"] .zone-header {
-				background-color: var(--zone-accent, var(--wa-color-primary));
+				background-color: var(--zone-accent, #ea580c);
 			}
 			.zone-container[data-focused="true"] .zone-header h2 {
-				color: var(--wa-color-neutral-0);
+				color: #fafafa;
 			}
 			.zone-container[data-focused="true"] .focus-btn {
-				border-color: var(--wa-color-neutral-0);
-				color: var(--wa-color-neutral-0);
+				border-color: #fafafa;
+				color: #fafafa;
 			}
 		`;
   }
@@ -273,7 +274,7 @@ export class ZoneContainer extends BaseElement {
 			</style>
 			<div class="zone-container zone-${zoneType}">
 				<header class="zone-header">
-					${icon ? `<wa-icon name="${icon}"></wa-icon>` : ""}
+					${icon ? `<mad-icon name="${icon}"></mad-icon>` : ""}
 					<h2>${title}</h2>
 					<button
 						class="focus-btn"
@@ -281,7 +282,7 @@ export class ZoneContainer extends BaseElement {
 						?hidden="${!showFocusButton}"
 						aria-label="Focus ${title} zone"
 					>
-						<wa-icon name="expand"></wa-icon>
+						<mad-icon name="expand"></mad-icon>
 					</button>
 				</header>
 				<div class="zone-content">

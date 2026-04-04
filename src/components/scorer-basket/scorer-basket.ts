@@ -109,40 +109,42 @@ export class MadScorerBasket extends BaseElement {
       <div class="my-4 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
         ${POINTS.map(
           (points) => `
-          <wa-button
+          <mad-button
             data-points="${points}"
             size="large"
             variant="${variant}"
           >
-            <wa-icon
+            <mad-icon
               class="xl"
               name="${iconName}"
               slot="start"
-            ></wa-icon>
+            ></mad-icon>
             <span slot="end">${points}</span>
-          </wa-button>
+          </mad-button>
         `
         ).join("")}
-        <wa-switch
+        <mad-switch
           id="plus-minus-switch"
           checked="${!minusMode}"
           help-text="Ajouter/Supprimer des points"
           size="large"
         >
-          <wa-icon class="xl" name="plus-slash-minus"></wa-icon>
-        </wa-switch>
+          <mad-icon class="xl" name="plus-slash-minus"></mad-icon>
+        </mad-switch>
       </div>
     `;
 
     // Attach event listeners after render
-    const buttons = Array.from(this.querySelectorAll("wa-button[data-points]"));
+    const buttons = Array.from(
+      this.querySelectorAll("mad-button[data-points]")
+    );
     for (const btn of buttons) {
       const points = Number(btn.getAttribute("data-points"));
       btn.addEventListener("click", () => this._onIncrement(points));
     }
 
     const switchEl = this.querySelector("#plus-minus-switch");
-    switchEl?.addEventListener("wa-change", () => this._onSwitchToggle());
+    switchEl?.addEventListener("mad-change", () => this._onSwitchToggle());
   }
 }
 

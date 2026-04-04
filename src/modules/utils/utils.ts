@@ -1,6 +1,3 @@
-import type WaButton from "@awesome.me/webawesome/dist/components/button/button.js";
-import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
-
 const debounceCollector: { [index: string]: number } = {};
 
 function unmount(child: HTMLElement, parent?: HTMLElement) {
@@ -34,68 +31,14 @@ function setFocus(selector: string | HTMLElement): void {
 
 function confirmChoice(
   message = "Es-tu sûre ?",
-  cancel = "Non",
-  confirm = "Oui"
+  _cancel = "Non",
+  _confirm = "Oui"
 ): Promise<boolean> {
-  let resolve: (value: boolean | PromiseLike<boolean>) => void;
-  const promise: Promise<boolean> = new Promise((res) => {
-    resolve = res;
+  return new Promise((resolve) => {
+    // biome-ignore lint/suspicious/noAlert: using native confirm for UX simplification
+    const result = window.confirm(message);
+    resolve(result);
   });
-
-  const dialog = document.createElement("wa-dialog") as unknown as WaDialog;
-  const paramElement: HTMLParagraphElement = document.createElement("p");
-  paramElement.innerText = message;
-  dialog.append(paramElement);
-
-  const titleElement: HTMLSpanElement = document.createElement("span");
-  titleElement.innerText = "🚨";
-  titleElement.classList.add("3xl");
-  titleElement.slot = "label";
-  dialog.append(titleElement);
-
-  const cancelButton = document.createElement(
-    "wa-button"
-  ) as unknown as WaButton;
-  const confirmButton = document.createElement(
-    "wa-button"
-  ) as unknown as WaButton;
-
-  cancelButton.innerText = cancel;
-  cancelButton.variant = "warning";
-  cancelButton.slot = "footer";
-  cancelButton.size = "large";
-
-  confirmButton.innerText = confirm;
-  confirmButton.variant = "brand";
-  confirmButton.slot = "footer";
-  confirmButton.size = "large";
-
-  dialog.append(cancelButton);
-  dialog.append(confirmButton);
-
-  document.body.appendChild(dialog as unknown as HTMLElement);
-  dialog.setAttribute("open", "");
-
-  cancelButton.addEventListener("click", () => {
-    dialog.removeAttribute("open");
-    unmount(dialog as unknown as HTMLElement);
-    resolve(false);
-  });
-
-  confirmButton.addEventListener("click", () => {
-    dialog.removeAttribute("open");
-    unmount(dialog as unknown as HTMLElement);
-    resolve(true);
-  });
-
-  // Prevent the dialog from closing when the user clicks on the overlay
-  dialog.addEventListener("wa-request-close", (event: CustomEvent) => {
-    if (event.detail.source === "overlay") {
-      event.preventDefault();
-    }
-  });
-
-  return promise;
 }
 
 function scrollIntoView(selector: string | HTMLElement): void {
@@ -137,50 +80,12 @@ function debounce(name: string, callback: () => void): void {
   }, 300);
 }
 
-function alertChoice(message = "Attention", close = "Fermer"): Promise<void> {
-  let resolve: (value: void | PromiseLike<void>) => void;
-  const promise: Promise<void> = new Promise((res) => {
-    resolve = res;
-  });
-
-  const dialog = document.createElement("wa-dialog") as unknown as WaDialog;
-  const paramElement: HTMLParagraphElement = document.createElement("p");
-  paramElement.innerText = message;
-  dialog.append(paramElement);
-
-  const titleElement: HTMLSpanElement = document.createElement("span");
-  titleElement.innerText = "⚠️";
-  titleElement.classList.add("3xl");
-  titleElement.slot = "label";
-  dialog.append(titleElement);
-
-  const closeButton = document.createElement(
-    "wa-button"
-  ) as unknown as WaButton;
-  closeButton.innerText = close;
-  closeButton.variant = "brand";
-  closeButton.slot = "footer";
-  closeButton.size = "large";
-
-  dialog.append(closeButton);
-
-  document.body.appendChild(dialog as unknown as HTMLElement);
-  dialog.setAttribute("open", "");
-
-  closeButton.addEventListener("click", () => {
-    dialog.removeAttribute("open");
-    unmount(dialog as unknown as HTMLElement);
+function alertChoice(message = "Attention", _close = "Fermer"): Promise<void> {
+  return new Promise((resolve) => {
+    // biome-ignore lint/suspicious/noAlert: using native alert for UX simplification
+    window.alert(message);
     resolve();
   });
-
-  // Prevent the dialog from closing when the user clicks on the overlay
-  dialog.addEventListener("wa-request-close", (event: CustomEvent) => {
-    if (event.detail.source === "overlay") {
-      event.preventDefault();
-    }
-  });
-
-  return promise;
 }
 
 function installEventHandler(

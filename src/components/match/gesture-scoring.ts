@@ -239,8 +239,8 @@ export class GestureScoring extends BaseElement {
           left: 50%;
           transform: translateX(-50%);
           padding: 1rem 2rem;
-          background: rgba(255, 255, 255, 0.9);
-          color: black;
+          background: var(--wa-color-neutral-100);
+          color: var(--wa-color-neutral-900);
           border-radius: 0.5rem;
           font-size: 1.25rem;
           animation: toast-in 0.3s ease-out;

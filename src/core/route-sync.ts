@@ -1,27 +1,27 @@
 /**
  * RouteSync - Bidirectional URL ↔ NavigationOrchestrator sync.
  *
- * URL format: #/zone/<active-zone>[/<view-path>]
- * Examples: #/zone/planning, #/zone/live/tournament/123, #/zone/archive
+ * URL format: #/<active-zone>[/<view-path>]
+ * Examples: #/home, #/tournament/123, #/matchs
  *
- * Legacy URL migration: URLs without #/zone/ prefix are migrated:
- *   #/tournament/123 → #/zone/planning/tournament/123
- *   #/tournaments    → #/zone/planning/tournaments
- *   #/home           → #/zone/planning/home
- *   #/config         → #/zone/planning/config
- *   #/match/123      → #/zone/live/match/123
+ * Legacy URL migration: URLs with #/zone/ prefix are migrated:
+ *   #/zone/conf       → #/conf
+ *   #/zone/home       → #/home
+ *   #/zone/tournaments → #/tournaments
+ *   #/zone/tournament/123 → #/tournament/123
+ *   #/zone/matchs     → #/matchs
  */
 
 import type { ZoneType } from "./spatial-layout.js";
 
-const ZONE_PREFIX = "#/zone/";
+const ZONE_PREFIX = "#/";
 const LEGACY_ROUTE_MAP: Record<string, ZoneType> = {
-  "/tournaments": "tournaments",
-  "/home": "home",
-  "/config": "config",
-  "/match": "matchs",
-  "/matchs": "matchs",
-  "/tournament": "tournaments",
+  "/zone/conf": "config",
+  "/zone/home": "home",
+  "/zone/tournaments": "tournaments",
+  "/zone/tournament": "tournament",
+  "/zone/matchs": "matchs",
+  "/zone/match": "matchs",
 };
 
 export class RouteSync extends EventTarget {
@@ -90,7 +90,7 @@ export class RouteSync extends EventTarget {
         this.orchestrator.setActiveZone(zone);
       }
       // Dispatch a "route-changed" event for view components to consume
-      this.dispatchEvent(
+      document.dispatchEvent(
         new CustomEvent("route-changed", {
           detail: { zone, path },
           bubbles: true,
@@ -124,8 +124,9 @@ export class RouteSync extends EventTarget {
    * Handles both new format (#/zone/live/tournament/123) and legacy format (#/tournament/123).
    */
   private parseHash(hash: string): { zone: ZoneType; path: string } | null {
-    if (!hash) {
-      return null;
+    // Empty hash or just "#" → default to home
+    if (!hash || hash === "#") {
+      return { zone: "home", path: "" };
     }
 
     // New format: #/zone/<zone>[/<path>]
@@ -137,12 +138,14 @@ export class RouteSync extends EventTarget {
       ) as ZoneType;
       const path = slashIdx === -1 ? "" : rest.slice(slashIdx);
 
-      if (["home", "config", "tournaments", "matchs"].includes(zone)) {
+      if (
+        ["home", "config", "tournaments", "tournament", "matchs"].includes(zone)
+      ) {
         return { zone: zone as ZoneType, path };
       }
     }
 
-    // Legacy format migration: #/tournament/123 → zone: planning, path: /tournament/123
+    // Legacy format migration: #/zone/tournament/123 → zone: tournament, path: /tournament/123
     for (const [prefix, zone] of Object.entries(LEGACY_ROUTE_MAP)) {
       if (hash === prefix || hash.startsWith(`${prefix}/`)) {
         return { zone, path: hash.slice(1) }; // keep leading slash: /tournament/123

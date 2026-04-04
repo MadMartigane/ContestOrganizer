@@ -4,7 +4,12 @@
  * @module core/spatial-layout
  */
 
-export type ZoneType = "home" | "config" | "tournaments" | "matchs";
+export type ZoneType =
+  | "home"
+  | "config"
+  | "tournaments"
+  | "tournament"
+  | "matchs";
 
 export interface ZoneConfig {
   isCollapsed: boolean;
@@ -22,7 +27,13 @@ export interface LayoutConfig {
   zones: ZoneConfig[];
 }
 
-const ZoneOrder: ZoneType[] = ["home", "config", "tournaments", "matchs"];
+const ZoneOrder: ZoneType[] = [
+  "config",
+  "home",
+  "tournaments",
+  "tournament",
+  "matchs",
+];
 
 const Breakpoints = {
   mobile: 768,
@@ -30,23 +41,26 @@ const Breakpoints = {
 } as const;
 
 const DefaultZoneWidths: Record<ZoneType, number> = {
-  home: 100,
   config: 100,
+  home: 100,
   tournaments: 100,
+  tournament: 100,
   matchs: 100,
 };
 
 const DefaultMinWidths: Record<ZoneType, number> = {
-  home: 100,
   config: 100,
+  home: 100,
   tournaments: 100,
+  tournament: 100,
   matchs: 100,
 };
 
 const DefaultMaxWidths: Record<ZoneType, number> = {
-  home: 100,
   config: 100,
+  home: 100,
   tournaments: 100,
+  tournament: 100,
   matchs: 100,
 };
 
@@ -321,7 +335,7 @@ export class SpatialLayout extends EventTarget {
    */
   private applyLayout(): void {
     const zoneElements = this.container.querySelectorAll<HTMLElement>(
-      "home-zone, config-zone, tournaments-zone, matchs-zone"
+      "config-zone, home-zone, tournaments-zone, tournament-zone, matchs-zone"
     );
 
     for (const element of Array.from(zoneElements)) {

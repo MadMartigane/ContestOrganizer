@@ -6,6 +6,7 @@ import "../zones/home-zone.js";
 import "../zones/config-zone.js";
 import "../zones/tournaments-zone.js";
 import "../zones/matchs-zone.js";
+import "../zones/tournament-zone.js";
 
 export class AppRoot extends BaseElement {
   private _layoutClass = "layout-mobile";
@@ -59,9 +60,10 @@ export class AppRoot extends BaseElement {
   protected _render(): void {
     this.innerHTML = `
       <div class="app-container ${this._layoutClass}">
-        <home-zone class="zone home"></home-zone>
         <config-zone class="zone config"></config-zone>
+        <home-zone class="zone home"></home-zone>
         <tournaments-zone class="zone tournaments"></tournaments-zone>
+        <tournament-zone class="zone tournament"></tournament-zone>
         <matchs-zone class="zone matchs"></matchs-zone>
       </div>
 

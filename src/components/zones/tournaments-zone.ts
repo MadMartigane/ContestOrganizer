@@ -1,5 +1,5 @@
 import { ZoneContainer } from "../zone-container/zone-container.js";
-import "../page-tournament/page-tournament.js";
+import "../page-tournament-select/page-tournament-select.js";
 
 export class TournamentsZone extends ZoneContainer {
   constructor() {
@@ -13,8 +13,12 @@ export class TournamentsZone extends ZoneContainer {
     super._render();
     const zoneContent = this.querySelector(".zone-content");
     if (zoneContent) {
-      const pageTournament = document.createElement("page-tournament");
-      zoneContent.appendChild(pageTournament);
+      // Clear previous content to prevent duplication on re-render
+      zoneContent.innerHTML = "";
+      const pageTournamentSelect = document.createElement(
+        "page-tournament-select"
+      );
+      zoneContent.appendChild(pageTournamentSelect);
     }
   }
 }

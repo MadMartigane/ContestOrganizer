@@ -1,4 +1,5 @@
 import { BaseElement } from "@core/base-element.js";
+import "./page-home.css";
 
 /**
  * PageHome - Home page component with rotating image carousel
@@ -56,7 +57,7 @@ export class PageHome extends BaseElement {
     const img = this.imgList[idx];
     if (this.domImg && img) {
       this.domImg.src = img.src;
-      this.domImg.width = img.width;
+      // Do NOT change width - let CSS handle sizing
     }
   }
 
@@ -65,16 +66,14 @@ export class PageHome extends BaseElement {
    */
   protected _render(): void {
     this.innerHTML = `
-      <div class="page-content">
+      <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 rounded-lg shadow-md">
         <h1>Contest Tournament</h1>
 
-        <div class="flex-center">
+        <div class="carousel-container">
           <img
             alt="Greek freak basketball"
-            class="h-64"
-            height="300"
+            class="carousel-image"
             src="assets/img/undraw_greek_freak.svg"
-            width="300"
           />
         </div>
 
@@ -82,15 +81,15 @@ export class PageHome extends BaseElement {
 
         <div class="footer">
           <div class="grid-300">
-            <wa-button href="#/config" size="large" variant="brand">
-              <wa-icon name="gear" slot="start"></wa-icon>
+            <mad-button href="#/config" size="large" variant="brand">
+              <mad-icon name="gear" slot="start"></mad-icon>
               <span slot="end">Configuration</span>
-            </wa-button>
+            </mad-button>
 
-            <wa-button href="#/tournaments" size="large" variant="brand">
-              <wa-icon name="trophy" slot="start"></wa-icon>
+            <mad-button href="#/tournaments" size="large" variant="brand">
+              <mad-icon name="trophy" slot="start"></mad-icon>
               <span slot="end">Tournois</span>
-            </wa-button>
+            </mad-button>
           </div>
         </div>
       </div>

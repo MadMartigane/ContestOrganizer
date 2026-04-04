@@ -1,4 +1,3 @@
-import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
 import { BaseElement } from "@core/base-element.js";
 import { Signal } from "@core/signal.js";
 import setting, {
@@ -13,7 +12,7 @@ const API_SPORTS_CACHE_KEY = "API_SPORTS_CACHE_TEAMS";
  */
 export class PageConfig extends BaseElement {
   private declare globalSetting: GlobalSetting;
-  private darkModeSwitch: WaSwitch | null = null;
+  private darkModeSwitch: HTMLElement | null = null;
 
   private declare _isDarkModeActive: Signal<boolean>;
   private declare _cacheCleared: Signal<boolean>;
@@ -31,7 +30,8 @@ export class PageConfig extends BaseElement {
 
   private _onDarkModeChange(): void {
     if (this.darkModeSwitch) {
-      const isDark = this.darkModeSwitch.checked;
+      const input = this.darkModeSwitch.querySelector("input");
+      const isDark = input?.checked ?? false;
       this.globalSetting.setDarkTheme(isDark);
       this._isDarkModeActive.value = isDark;
     }
@@ -58,42 +58,42 @@ export class PageConfig extends BaseElement {
     const cacheCleared = this._cacheCleared.value;
 
     this.innerHTML = `
-      <div class="page-content">
+      <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 rounded-lg shadow-md">
         <h1>Configuration</h1>
 
-        <wa-switch
+        <mad-switch
           id="dark-mode-switch"
           ${isDarkModeActive ? "checked" : ""}
           size="large"
         >
           <span class="container">Mode sombre</span>
-          <wa-icon name="highlights"></wa-icon>
-        </wa-switch>
+          <mad-icon name="highlights"></mad-icon>
+        </mad-switch>
 
-        <wa-divider></wa-divider>
+        <hr class="my-4 border-neutral-200 dark:border-neutral-700">
 
         <div class="my-4">
           <h3>Cache des équipes</h3>
-          <p class="text-neutral text-sm">
+          <p class="text-neutral-400 text-sm">
             Vide le cache des équipes si vous rencontrez des problèmes de
             recherche.
           </p>
-          <wa-button
+          <mad-button
             id="clear-cache-btn"
             class="mt-2"
             size="medium"
             variant="warning"
           >
-            <wa-icon name="trash" slot="start"></wa-icon>
+            <mad-icon name="trash" slot="start"></mad-icon>
             Vider le cache
-          </wa-button>
+          </mad-button>
           ${
             cacheCleared
               ? `
-            <wa-callout class="mt-2" open variant="success">
-              <wa-icon name="check2-circle" slot="start"></wa-icon>
+            <mad-callout class="mt-2" open variant="success">
+              <mad-icon name="check2-circle" slot="start"></mad-icon>
               Le cache des équipes a été vidé.
-            </wa-callout>
+            </mad-callout>
           `
               : ""
           }
@@ -101,15 +101,15 @@ export class PageConfig extends BaseElement {
 
         <div class="footer">
           <div class="grid-300">
-            <wa-button href="#/home" size="large" variant="brand">
-              <wa-icon name="house" slot="start"></wa-icon>
+            <mad-button href="#/home" size="large" variant="brand">
+              <mad-icon name="house" slot="start"></mad-icon>
               <span slot="end">Acceuil</span>
-            </wa-button>
+            </mad-button>
 
-            <wa-button href="#/tournaments" size="large" variant="brand">
-              <wa-icon name="trophy" slot="start"></wa-icon>
+            <mad-button href="#/tournaments" size="large" variant="brand">
+              <mad-icon name="trophy" slot="start"></mad-icon>
               <span slot="end">Tournois</span>
-            </wa-button>
+            </mad-button>
           </div>
         </div>
       </div>
@@ -121,7 +121,7 @@ export class PageConfig extends BaseElement {
 
     // Setup event listeners
     if (this.darkModeSwitch) {
-      this.darkModeSwitch.addEventListener("wa-change", () => {
+      this.darkModeSwitch.addEventListener("mad-change", () => {
         this._onDarkModeChange();
       });
     }

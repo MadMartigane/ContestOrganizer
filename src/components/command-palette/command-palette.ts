@@ -213,7 +213,7 @@ export class CommandPalette extends BaseElement {
         execute: () => {
           this.dispatchEvent(
             new CustomEvent("navigate", {
-              detail: { hash: "#/zone/planning/tournaments" },
+              detail: { hash: "#/tournaments" },
               bubbles: true,
               composed: true,
             })
@@ -239,7 +239,7 @@ export class CommandPalette extends BaseElement {
         execute: () => {
           this.dispatchEvent(
             new CustomEvent("navigate", {
-              detail: { hash: "#/zone/planning/home" },
+              detail: { hash: "#/home" },
               bubbles: true,
               composed: true,
             })
@@ -255,7 +255,7 @@ export class CommandPalette extends BaseElement {
         execute: () => {
           this.dispatchEvent(
             new CustomEvent("navigate", {
-              detail: { hash: "#/zone/planning/config" },
+              detail: { hash: "#/config" },
               bubbles: true,
               composed: true,
             })
@@ -311,7 +311,7 @@ export class CommandPalette extends BaseElement {
       .map(
         (cmd, index) => `
       <li class="${index === selectedIndex ? "selected" : ""}" data-index="${index}">
-        <wa-icon name="${cmd.icon ?? "command"}"></wa-icon>
+        <mad-icon name="${cmd.icon ?? "command"}"></mad-icon>
         <span class="label">${cmd.label}</span>
         <span class="shortcut">${cmd.shortcut ?? ""}</span>
       </li>
@@ -323,7 +323,7 @@ export class CommandPalette extends BaseElement {
       <div class="palette-overlay">
         <div class="palette">
           <div class="search-container">
-            <wa-icon name="magnifying-glass"></wa-icon>
+            <mad-icon name="magnifying-glass"></mad-icon>
             <input
               type="text"
               class="search-input"

@@ -129,6 +129,9 @@ export class PageTournament extends BaseElement {
       return 0;
     }
 
+    // CLEAR ERROR ON SUCCESS - defense against stale error state
+    this._uiError.value = null;
+
     this._teamNumber.value =
       this._tournament.value.grid.length || this.conf.teamNumberDefault;
     return this.resizeGrid();
@@ -260,7 +263,7 @@ export class PageTournament extends BaseElement {
     if (tournamentId) {
       this.dispatchEvent(
         new CustomEvent("navigate", {
-          detail: { hash: `#/zone/live/match/${tournamentId}` },
+          detail: { hash: `#/matchs/${tournamentId}` },
           bubbles: true,
           composed: true,
         })
@@ -279,7 +282,7 @@ export class PageTournament extends BaseElement {
 
     if (uiError) {
       this.innerHTML = `
-        <div class="page-content">
+        <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 rounded-lg shadow-md">
           <error-message message="${uiError}"></error-message>
         </div>
       `;
@@ -289,14 +292,14 @@ export class PageTournament extends BaseElement {
     const tournamentNameHtml = isEditTournamentName
       ? `
         <div class="my-4 grid grid-cols-1 items-center text-center">
-          <wa-input
+          <mad-input
             autocomplete="off"
             autofocus
             id="tournamentName"
             name="tournamentName"
             type="text"
             value="${tournament?.name ?? ""}"
-          ></wa-input>
+          ></mad-input>
         </div>
       `
       : `
@@ -329,7 +332,7 @@ export class PageTournament extends BaseElement {
         `;
 
     this.innerHTML = `
-      <div class="page-content">
+      <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-[var(--wa-color-neutral-100)] rounded-lg shadow-md">
         <div>
           ${tournamentNameHtml}
 
@@ -364,7 +367,7 @@ export class PageTournament extends BaseElement {
         // Focus the input after render
         setTimeout(() => {
           const input = this.querySelector(
-            'wa-input[name="tournamentName"]'
+            'mad-input[name="tournamentName"]'
           )?.querySelector("input");
           if (input) {
             (input as HTMLInputElement).focus();
@@ -375,7 +378,7 @@ export class PageTournament extends BaseElement {
 
     // Setup tournament name input
     const tournamentNameInput = this.querySelector(
-      'wa-input[name="tournamentName"]'
+      'mad-input[name="tournamentName"]'
     ) as HTMLElement & { focus: () => void };
     if (tournamentNameInput) {
       this.domInputTournamentName = tournamentNameInput.querySelector(
@@ -474,40 +477,40 @@ export class PageTournament extends BaseElement {
     }
 
     return `
-      <wa-button
+      <mad-button
         id="rankingBtn"
         size="large"
         variant="secondary"
       >
-        <wa-icon name="sort-numeric-down" slot="start"></wa-icon>
+        <mad-icon name="sort-numeric-down" slot="start"></mad-icon>
         <span slot="end">Classement !</span>
-      </wa-button>
+      </mad-button>
     `;
   }
 
   private renderFooterActions(): string {
     return `
       <div class="grid-300 my-4">
-        <wa-button
+        <mad-button
           id="resetBtn"
           size="large"
           variant="warning"
         >
-          <wa-icon name="trash" slot="start"></wa-icon>
+          <mad-icon name="trash" slot="start"></mad-icon>
           <span slot="end">Effacer</span>
-        </wa-button>
+        </mad-button>
 
         ${this.renderSortingButton()}
 
-        <wa-button
+        <mad-button
           id="matchBtn"
           size="large"
           variant="brand"
         >
-          <wa-icon name="trophy" slot="start"></wa-icon>
+          <mad-icon name="trophy" slot="start"></mad-icon>
           <span>Go Match</span>
-          <wa-icon name="forward" slot="end"></wa-icon>
-        </wa-button>
+          <mad-icon name="forward" slot="end"></mad-icon>
+        </mad-button>
       </div>
     `;
   }

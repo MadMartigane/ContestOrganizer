@@ -45,9 +45,11 @@ export class GlobalSetting {
 
   // Add or remove the "dark" class on the document body
   private toggleDarkTheme(shouldBeDark: boolean, fromDevice = false) {
-    // Web Awesome theme
-    document.documentElement.classList.toggle("wa-dark", shouldBeDark);
-    document.documentElement.classList.toggle("wa-light", !shouldBeDark);
+    // Standard dark mode
+    document.documentElement.classList.toggle("dark", shouldBeDark);
+    document.documentElement.style.colorScheme = shouldBeDark
+      ? "dark"
+      : "light";
 
     if (fromDevice) {
       this.devicePrefersDark = shouldBeDark;

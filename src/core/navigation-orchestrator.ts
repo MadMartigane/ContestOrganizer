@@ -5,7 +5,13 @@ import {
 } from "./keyboard-manager.js";
 import { SpatialLayout, type ZoneType } from "./spatial-layout.js";
 
-const ZoneOrder: ZoneType[] = ["home", "config", "tournaments", "matchs"];
+const ZoneOrder: ZoneType[] = [
+  "config",
+  "home",
+  "tournaments",
+  "tournament",
+  "matchs",
+];
 
 export class NavigationOrchestrator extends EventTarget {
   private readonly container: HTMLElement;
@@ -50,7 +56,7 @@ export class NavigationOrchestrator extends EventTarget {
 
     // Connect zones to layout
     const zoneElements = this.container.querySelectorAll<HTMLElement>(
-      "home-zone, config-zone, tournaments-zone, matchs-zone"
+      "config-zone, home-zone, tournaments-zone, tournament-zone, matchs-zone"
     );
     for (const el of Array.from(zoneElements)) {
       if ("setLayout" in el) {

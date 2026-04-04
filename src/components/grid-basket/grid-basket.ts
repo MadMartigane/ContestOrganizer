@@ -185,16 +185,16 @@ export class GridBasket extends BaseElement {
 
   private _renderGridHeader(): string {
     return `
-      <thead class="block-primary align-middle">
+      <thead class="bg-orange-600 text-neutral-100 align-middle">
         <th>
-          <wa-icon class="text-2xl" name="sort-numeric-down"></wa-icon>
+          <mad-icon class="text-2xl" name="sort-numeric-down"></mad-icon>
         </th>
         <th>
           <span>Équipes</span>
         </th>
         <th>
           <span class="block text-xl">
-            <wa-icon name="percent"></wa-icon>
+            <mad-icon name="percent"></mad-icon>
           </span>
         </th>
         <th>
@@ -202,27 +202,27 @@ export class GridBasket extends BaseElement {
           <span class="hidden md:block">Joués</span>
         </th>
         <th>
-          <span class="block text-success md:hidden">G</span>
-          <span class="hidden text-success md:block">Gagnés</span>
+          <span class="block text-green-600 md:hidden">G</span>
+          <span class="hidden text-green-600 md:block">Gagnés</span>
         </th>
         <th>
-          <span class="block text-warning md:hidden">P</span>
-          <span class="hidden text-warning md:block">Perdus</span>
+          <span class="block text-yellow-600 md:hidden">P</span>
+          <span class="hidden text-yellow-600 md:block">Perdus</span>
         </th>
         <th>
-          <span class="block text-success text-xl md:hidden">
-            <wa-icon name="plus"></wa-icon>
+          <span class="block text-green-600 text-xl md:hidden">
+            <mad-icon name="plus"></mad-icon>
           </span>
-          <span class="hidden text-success md:block">Marqués</span>
+          <span class="hidden text-green-600 md:block">Marqués</span>
         </th>
         <th>
-          <span class="block text-warning text-xl md:hidden">
-            <wa-icon name="minus"></wa-icon>
+          <span class="block text-yellow-600 text-xl md:hidden">
+            <mad-icon name="minus"></mad-icon>
           </span>
-          <span class="hidden text-warning md:block">Encaissés</span>
+          <span class="hidden text-yellow-600 md:block">Encaissés</span>
         </th>
         <th class="text-center">
-          <wa-icon class="inline-block text-2xl" name="calendar-event"></wa-icon>
+          <mad-icon class="inline-block text-2xl" name="calendar-event"></mad-icon>
         </th>
       </thead>
     `;
@@ -252,25 +252,25 @@ export class GridBasket extends BaseElement {
               ></mad-select-team>
             </td>
             <td>
-              <span class="text-primary">${gridData?.winGamesPercent}</span>
+              <span class="text-orange-600">${gridData?.winGamesPercent}</span>
             </td>
             <td>
               <span>${(gridData?.winGames || 0) + (gridData?.looseGames || 0)}</span>
             </td>
             <td>
-              <span class="text-success">${gridData?.winGames}</span>
+              <span class="text-green-600">${gridData?.winGames}</span>
             </td>
             <td>
-              <span class="text-warning">${gridData?.looseGames}</span>
+              <span class="text-yellow-600">${gridData?.looseGames}</span>
             </td>
             <td>
-              <span class="text-success">${gridData?.scoredPoints}</span>
+              <span class="text-green-600">${gridData?.scoredPoints}</span>
             </td>
             <td>
-              <span class="text-warning">${gridData?.concededPoints}</span>
+              <span class="text-yellow-600">${gridData?.concededPoints}</span>
             </td>
             <td class="text-center">
-              <span class="text-primary">${gridData?.scheduledMatchs}</span>
+              <span class="text-orange-600">${gridData?.scheduledMatchs}</span>
             </td>
           </tr>
         `;
@@ -288,21 +288,21 @@ export class GridBasket extends BaseElement {
     this.innerHTML = `
       <table class="my-6">
         <caption class="caption-bottom md:hidden">
-          <div class="text-wrap text-left text-neutral text-xs">
-            <span class="mx-1 text-primary">
-              <wa-icon name="percent"></wa-icon>: pourcentage de match gagnés.
+          <div class="text-wrap text-left text-neutral-400 text-xs">
+            <span class="mx-1 text-orange-600">
+              <mad-icon name="percent"></mad-icon>: pourcentage de match gagnés.
             </span>
             <span class="mx-1">J: total de match joués</span>
-            <span class="mx-1 text-success">G: match gagnés</span>
-            <span class="mx-1 text-warning">P: match perdus</span>
-            <span class="mx-1 text-success">
-              <wa-icon name="plus"></wa-icon>: points marqués
+            <span class="mx-1 text-green-600">G: match gagnés</span>
+            <span class="mx-1 text-yellow-600">P: match perdus</span>
+            <span class="mx-1 text-green-600">
+              <mad-icon name="plus"></mad-icon>: points marqués
             </span>
-            <span class="mx-1 text-warning">
-              <wa-icon name="minus"></wa-icon>: points encaissés
+            <span class="mx-1 text-yellow-600">
+              <mad-icon name="minus"></mad-icon>: points encaissés
             </span>
             <span class="mx-1">
-              <wa-icon name="calendar-event"></wa-icon>: match programmés
+              <mad-icon name="calendar-event"></mad-icon>: match programmés
             </span>
           </div>
         </caption>
@@ -314,18 +314,18 @@ export class GridBasket extends BaseElement {
       ${
         tournament?.type === "NBA"
           ? `
-          <wa-button
+          <mad-button
             class="magic-fill-btn"
             size="medium"
             variant="brand"
           >
-            <wa-icon name="magic" slot="start"></wa-icon>
+            <mad-icon name="magic" slot="start"></mad-icon>
             Magic fill-up
-          </wa-button>
+          </mad-button>
           ${
             magicFillError
               ? `
-            <span class="text-danger text-sm">${magicFillError}</span>
+            <span class="text-red-600 text-sm">${magicFillError}</span>
           `
               : ""
           }

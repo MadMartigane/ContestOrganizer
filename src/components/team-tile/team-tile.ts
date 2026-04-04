@@ -226,6 +226,7 @@ export class MadTeamTile extends BaseElement {
         animation: basketball-pulse 1.5s ease-in-out infinite;
         will-change: transform, opacity;
       }
+
       @keyframes basketball-pulse {
         0%, 100% {
           transform: scale(0.95);
@@ -236,58 +237,12 @@ export class MadTeamTile extends BaseElement {
           opacity: 1;
         }
       }
+
       @media (prefers-reduced-motion: reduce) {
         .team-image-fallback svg {
           opacity: 0.8;
           animation: none;
         }
-      }
-      :host {
-        display: block;
-      }
-      .relative {
-        position: relative;
-      }
-      .float-right {
-        float: right;
-      }
-      .float-left {
-        float: left;
-      }
-      .text-6xl {
-        font-size: 3.75rem;
-        line-height: 1;
-      }
-      .text-neutral {
-        color: var(--wa-color-neutral);
-      }
-      .w-16 {
-        width: 4rem;
-      }
-      .w-full {
-        width: 100%;
-      }
-      .min-h-8 {
-        min-height: 2rem;
-      }
-      .md\\:w-1/2 {
-        width: 50%;
-      }
-      .md\\:float-none {
-        float: none;
-      }
-      .my-1 {
-        margin-top: 0.25rem;
-        margin-bottom: 0.25rem;
-      }
-      .text-right {
-        text-align: right;
-      }
-      .text-left {
-        text-align: left;
-      }
-      .text-balance {
-        text-wrap: balance;
       }
     `;
   }
@@ -331,11 +286,11 @@ export class MadTeamTile extends BaseElement {
     let imageHtml: string;
     if (imageError) {
       imageHtml = `
-        <wa-icon
-          class="${reverse ? "float-right text-6xl text-neutral" : "float-left text-6xl text-neutral"}"
+        <mad-icon
+          class="${reverse ? "float-right text-6xl text-neutral-400" : "float-left text-6xl text-neutral-400"}"
           name="shield-x"
           style="width: 64px; height: 64px;"
-        ></wa-icon>
+        ></mad-icon>
       `;
     } else if (imgSrc) {
       imageHtml = `

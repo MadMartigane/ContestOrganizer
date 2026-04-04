@@ -1,8 +1,8 @@
 /**
  * AppStatusNews Component
  *
- * Displays project status information from TODO.md in a beautiful
- * glassmorphism card layout with collapsible sections.
+ * Displays project status information from TODO.md using Web Awesome
+ * components with collapsible sections.
  *
  * @example
  * <app-status-news></app-status-news>
@@ -13,7 +13,6 @@ import { BaseElement } from "@core/base-element.js";
 import { Signal } from "@core/signal.js";
 import type { StatusSection } from "@core/types/status.js";
 import statusData from "@generated/status-data.json";
-import styles from "./app-status-news.css?inline";
 import { renderMarkdown as MarkdownRenderer } from "./markdown-renderer.js";
 
 const VERSION_LABEL = "Version de l'application : ";
@@ -60,11 +59,10 @@ export class AppStatusNews extends BaseElement {
 
     this.innerHTML = `
       <div 
-        class="status-news"
+        class="flex flex-col gap-4 p-4"
         role="region"
         aria-label="Project Status"
       >
-        <style>${styles}</style>
         ${this._renderContent()}
       </div>
     `;
@@ -113,11 +111,11 @@ export class AppStatusNews extends BaseElement {
    */
   private _renderSkeleton(): string {
     return `
-      <div class="status-skeleton" aria-busy="true" aria-label="Loading status data">
-        <div class="skeleton-header"></div>
-        <div class="skeleton-card"></div>
-        <div class="skeleton-card"></div>
-        <div class="skeleton-card"></div>
+      <div class="flex flex-col gap-4" aria-busy="true" aria-label="Loading status data">
+        <div class="h-16 animate-pulse bg-neutral-100 rounded-lg"></div>
+        <div class="h-20 animate-pulse bg-neutral-100 rounded-lg"></div>
+        <div class="h-20 animate-pulse bg-neutral-100 rounded-lg"></div>
+        <div class="h-20 animate-pulse bg-neutral-100 rounded-lg"></div>
       </div>
     `;
   }
@@ -128,8 +126,8 @@ export class AppStatusNews extends BaseElement {
    */
   private _renderEmptyState(): string {
     return `
-      <div class="status-empty" role="status">
-        <span class="status-empty-icon" aria-hidden="true">📭</span>
+      <div class="flex flex-col gap-4 items-center justify-center p-8 text-center text-neutral-500" role="status">
+        <span aria-hidden="true">📭</span>
         <p>No status updates available</p>
       </div>
     `;
@@ -141,16 +139,12 @@ export class AppStatusNews extends BaseElement {
    */
   private _renderErrorState(): string {
     return `
-      <div class="status-error" role="alert">
-        <span class="status-error-icon" aria-hidden="true">⚠️</span>
+      <div class="flex flex-col gap-4 items-center justify-center p-8 text-center bg-red-50 border border-red-200 rounded-lg" role="alert">
+        <span aria-hidden="true">⚠️</span>
         <p>Unable to load status data</p>
-        <button 
-          class="status-retry" 
-          type="button"
-          aria-label="Retry loading status data"
-        >
+        <mad-button variant="danger" size="medium" class="status-retry">
           Retry
-        </button>
+        </mad-button>
       </div>
     `;
   }
@@ -165,11 +159,11 @@ export class AppStatusNews extends BaseElement {
       ${this._renderVersionBadge()}
       
       <!-- Header -->
-      <header class="status-header">
+      <header class="flex flex-col gap-2">
         <h2>📋 ${statusData.projectName}</h2>
-        <div class="status-meta">
-          <span class="status-tech">${statusData.technology}</span>
-          <time class="status-date" datetime="${statusData.lastUpdated}">
+        <div class="flex gap-3 items-center text-sm text-neutral-600">
+          <mad-badge variant="brand" pill>${statusData.technology}</mad-badge>
+          <time class="flex gap-1 items-center text-sm text-neutral-500" datetime="${statusData.lastUpdated}">
             ${this._formatDate(statusData.lastUpdated)}
           </time>
         </div>
@@ -177,7 +171,7 @@ export class AppStatusNews extends BaseElement {
       
       <!-- Sections -->
       <div 
-        class="status-sections" 
+        class="flex flex-col gap-3" 
         role="list"
         aria-live="polite"
         aria-atomic="false"
@@ -197,9 +191,7 @@ export class AppStatusNews extends BaseElement {
     }
 
     return statusData.sections
-      .map((section: StatusSection, index: number) =>
-        this._renderSection(section, index)
-      )
+      .map((section: StatusSection) => this._renderSection(section))
       .join("");
   }
 
@@ -209,20 +201,16 @@ export class AppStatusNews extends BaseElement {
    * @param index - Index for stagger animation delay
    * @returns HTML string of the section
    */
-  private _renderSection(section: StatusSection, index: number): string {
+  private _renderSection(section: StatusSection): string {
     const isExpanded = this._expandedSections.value.has(section.id);
     const contentId = `content-${section.id}`;
     const headerId = `header-${section.id}`;
 
     return `
-      <div 
-        class="status-card ${isExpanded ? "expanded" : ""}"
-        style="--index: ${index}"
-        data-section-id="${section.id}"
-        role="listitem"
-      >
+      <mad-card appearance="outlined" data-section-id="${section.id}" role="listitem">
         <div 
-          class="status-card-header" 
+          slot="header"
+          class="status-card-header flex items-center justify-between gap-4 cursor-pointer" 
           id="${headerId}"
           role="button" 
           tabindex="0"
@@ -231,7 +219,7 @@ export class AppStatusNews extends BaseElement {
         >
           ${this._renderIndicator(section.type)}
           <h3 class="status-title">${section.title}</h3>
-          <span class="status-toggle-icon" aria-hidden="true">${isExpanded ? "▼" : "▶"}</span>
+          <span aria-hidden="true">${isExpanded ? "▼" : "▶"}</span>
         </div>
         <div 
           class="status-card-content" 
@@ -241,12 +229,12 @@ export class AppStatusNews extends BaseElement {
           style="display: ${isExpanded ? "block" : "none"}"
           ${isExpanded ? 'aria-hidden="false"' : 'aria-hidden="true"'}
         >
-          <div class="status-content">
+          <div class="p-4 leading-relaxed text-neutral-600">
             ${MarkdownRenderer(section.content)}
           </div>
           ${section.tables ? this._renderTables(section.tables) : ""}
         </div>
-      </div>
+      </mad-card>
     `;
   }
 
@@ -257,11 +245,19 @@ export class AppStatusNews extends BaseElement {
    */
   private _renderIndicator(type: StatusSection["type"]): string {
     const icon = AppStatusNews.ICONS[type] ?? AppStatusNews.ICONS.info;
+    const variantMap: Record<string, string> = {
+      info: "brand",
+      bug: "danger",
+      task: "neutral",
+      note: "success",
+      warning: "warning",
+    };
+    const variant = variantMap[type] ?? "brand";
     return `
-      <span class="status-indicator" data-type="${type}">
+      <mad-badge variant="${variant}" pill>
         ${icon}
-        <span class="status-indicator-text">${type}</span>
-      </span>
+        <span>${type}</span>
+      </mad-badge>
     `;
   }
 
@@ -276,11 +272,11 @@ export class AppStatusNews extends BaseElement {
     }
 
     return `
-      <div class="status-table-container">
+      <div class="overflow-x-auto mt-4">
         ${tables
           .map(
             (table) => `
-          <table class="status-table">
+          <table class="w-full text-sm border-collapse">
             <thead>
               <tr>
                 ${table.headers.map((h) => `<th scope="col">${h}</th>`).join("")}
@@ -315,7 +311,7 @@ export class AppStatusNews extends BaseElement {
     );
 
     for (const header of cardHeaders) {
-      const card = header.closest(".status-card");
+      const card = header.closest("mad-card");
       if (!card) {
         continue;
       }
@@ -327,7 +323,7 @@ export class AppStatusNews extends BaseElement {
 
       // Set initial state from signal
       if (this._expandedSections.value.has(sectionId)) {
-        card.classList.add("expanded");
+        card.setAttribute("expanded", "");
       }
 
       // Click handler
@@ -439,16 +435,16 @@ export class AppStatusNews extends BaseElement {
   }
 
   /**
-   * Renders the version badge with glassmorphism styling
+   * Renders the version badge
    * @returns HTML string of the version badge
    */
   private _renderVersionBadge(): string {
     return `
-      <div class="status-version" role="status" aria-label="Application version">
-        <span class="status-version-badge">
-          <span class="status-version-label">${VERSION_LABEL}</span>
-          <span class="status-version-number">${statusData.version}</span>
-        </span>
+      <div class="flex justify-center mb-4" role="status" aria-label="Application version">
+        <mad-badge variant="success" pill>
+          <span>${VERSION_LABEL}</span>
+          <span>${statusData.version}</span>
+        </mad-badge>
       </div>
     `;
   }

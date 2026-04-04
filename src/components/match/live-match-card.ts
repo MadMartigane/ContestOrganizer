@@ -198,9 +198,9 @@ export class LiveMatchCard extends BaseElement {
           justify-content: center;
           gap: 1rem;
           padding: 1.5rem;
-          background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+          background: #171717;
           border-radius: 1rem;
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 0 25px -5px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.1);
           user-select: none;
           touch-action: none;
           position: relative;
@@ -212,7 +212,7 @@ export class LiveMatchCard extends BaseElement {
           align-items: center;
           gap: 0.5rem;
           padding: 1.5rem 2rem;
-          background: rgba(255, 255, 255, 0.05);
+          background: #262626;
           border-radius: 0.75rem;
           min-width: 140px;
           cursor: pointer;
@@ -220,12 +220,12 @@ export class LiveMatchCard extends BaseElement {
         }
         .team:active {
           transform: scale(0.98);
-          background: rgba(255, 255, 255, 0.1);
+          background: #404040;
         }
         .team .name {
           font-size: 1.125rem;
           font-weight: 600;
-          color: #e0e0e0;
+          color: #e5e5e5;
           text-align: center;
           max-width: 120px;
           overflow: hidden;
@@ -235,7 +235,7 @@ export class LiveMatchCard extends BaseElement {
         .team .score {
           font-size: 3rem;
           font-weight: 700;
-          color: #ffffff;
+          color: #fafafa;
           line-height: 1;
           transition: transform 0.1s ease;
         }
@@ -251,18 +251,18 @@ export class LiveMatchCard extends BaseElement {
           display: flex;
           gap: 0.75rem;
           font-size: 0.75rem;
-          color: #888;
+          color: #737373;
           margin-top: 0.25rem;
         }
         .gesture-hints span {
           padding: 0.125rem 0.375rem;
-          background: rgba(255, 255, 255, 0.1);
+          background: #404040;
           border-radius: 0.25rem;
         }
         .vs {
           font-size: 1rem;
           font-weight: 700;
-          color: #666;
+          color: #737373;
           text-transform: uppercase;
           letter-spacing: 0.1em;
         }
@@ -271,19 +271,6 @@ export class LiveMatchCard extends BaseElement {
           bottom: -3rem;
           left: 50%;
           transform: translateX(-50%);
-          padding: 0.5rem 1.5rem;
-          font-size: 0.875rem;
-          font-weight: 600;
-          color: #ff6b6b;
-          background: rgba(255, 107, 107, 0.1);
-          border: 1px solid rgba(255, 107, 107, 0.3);
-          border-radius: 2rem;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-        .end-btn:hover {
-          background: rgba(255, 107, 107, 0.2);
-          border-color: rgba(255, 107, 107, 0.5);
         }
       </style>
       <div class="live-match-card">
@@ -305,7 +292,7 @@ export class LiveMatchCard extends BaseElement {
               <span>2× +3</span>
             </div>
           </div>
-          <button class="end-btn" data-action="end-match">End Match</button>
+          <mad-button variant="danger" size="small" pill class="end-btn" data-action="end-match">End Match</mad-button>
         </div>
       </div>
     `;

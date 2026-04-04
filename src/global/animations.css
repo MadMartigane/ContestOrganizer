@@ -1,11 +1,11 @@
 /* Animation Tokens */
 :root {
-  --wa-duration-fast: 150ms;
-  --wa-duration-normal: 300ms;
-  --wa-duration-slow: 500ms;
-  --wa-easing-default: ease-out;
-  --wa-easing-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --wa-easing-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --anim-duration-fast: 150ms;
+  --anim-duration-normal: 300ms;
+  --anim-duration-slow: 500ms;
+  --anim-easing-default: ease-out;
+  --anim-easing-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --anim-easing-smooth: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Reduced Motion Support */
@@ -22,9 +22,9 @@
 /* Zone Transitions */
 .zone-container {
   transition:
-    width var(--wa-duration-normal) var(--wa-easing-default),
-    transform var(--wa-duration-normal) var(--wa-easing-default),
-    opacity var(--wa-duration-fast) var(--wa-easing-default);
+    width var(--anim-duration-normal) var(--anim-easing-default),
+    transform var(--anim-duration-normal) var(--anim-easing-default),
+    opacity var(--anim-duration-fast) var(--anim-easing-default);
 }
 
 .zone-container.focused {
@@ -45,7 +45,7 @@
 }
 
 .gesture-trail {
-  animation: gesture-trail var(--wa-duration-fast) var(--wa-easing-default);
+  animation: gesture-trail var(--anim-duration-fast) var(--anim-easing-default);
 }
 
 /* Score Update Animation */
@@ -62,7 +62,7 @@
 }
 
 .score.updated {
-  animation: score-pop var(--wa-duration-fast) var(--wa-easing-spring);
+  animation: score-pop var(--anim-duration-fast) var(--anim-easing-spring);
 }
 
 /* Zone Swipe Animation */
@@ -89,11 +89,12 @@
 }
 
 .zone-entering-left {
-  animation: slide-in-left var(--wa-duration-normal) var(--wa-easing-smooth);
+  animation: slide-in-left var(--anim-duration-normal) var(--anim-easing-smooth);
 }
 
 .zone-entering-right {
-  animation: slide-in-right var(--wa-duration-normal) var(--wa-easing-smooth);
+  animation: slide-in-right var(--anim-duration-normal)
+    var(--anim-easing-smooth);
 }
 
 /* Shake Animation for Undo */
@@ -118,7 +119,7 @@
 }
 
 .shake-undo {
-  animation: shake var(--wa-duration-normal) var(--wa-easing-default);
+  animation: shake var(--anim-duration-normal) var(--anim-easing-default);
 }
 
 /* Toast Notification */
@@ -134,16 +135,16 @@
 }
 
 .toast {
-  animation: toast-in var(--wa-duration-fast) var(--wa-easing-smooth);
+  animation: toast-in var(--anim-duration-fast) var(--anim-easing-smooth);
 }
 
 /* Command Palette */
 .command-palette-overlay {
-  transition: opacity var(--wa-duration-fast) var(--wa-easing-default);
+  transition: opacity var(--anim-duration-fast) var(--anim-easing-default);
 }
 
 .command-palette {
-  transition: transform var(--wa-duration-fast) var(--wa-easing-spring);
+  transition: transform var(--anim-duration-fast) var(--anim-easing-spring);
 }
 
 /* Loading States */
@@ -158,5 +159,5 @@
 }
 
 .loading {
-  animation: pulse var(--wa-duration-slow) infinite;
+  animation: pulse var(--anim-duration-slow) infinite;
 }

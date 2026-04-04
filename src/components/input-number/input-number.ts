@@ -103,9 +103,9 @@ export class MadInputNumber extends BaseElement {
           gap: 0.5rem;
         }
       </style>
-      <span class="container-xl">
-        <span class="container-xl">
-          <wa-input
+      <span class="m-6">
+        <span class="m-6">
+          <mad-input
             autocomplete="off"
             autofocus
             id="${inputId}"
@@ -119,28 +119,28 @@ export class MadInputNumber extends BaseElement {
             step="${this._step === undefined ? "" : this._step}"
             type="number"
             value="${numberValue}"
-          ></wa-input>
+          ></mad-input>
         </span>
-        <span class="container-xl">
+        <span class="m-6">
           <div class="button-group">
-            <wa-button
+            <mad-button
               class="decrement-btn"
               variant="default"
               ${this._readonly ? "disabled" : ""}
               pill
               size="large"
             >
-              <wa-icon class="text-warning" name="minus"></wa-icon>
-            </wa-button>
-            <wa-button
+              <mad-icon class="text-yellow-600" name="minus"></mad-icon>
+            </mad-button>
+            <mad-button
               class="increment-btn"
               variant="default"
               ${this._readonly ? "disabled" : ""}
               pill
               size="large"
             >
-              <wa-icon class="text-primary" name="plus"></wa-icon>
-            </wa-button>
+              <mad-icon class="text-orange-600" name="plus"></mad-icon>
+            </mad-button>
           </div>
         </span>
       </span>

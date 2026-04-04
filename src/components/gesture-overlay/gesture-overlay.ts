@@ -111,8 +111,10 @@ export class GestureOverlay extends BaseElement {
 
   private readonly _keyboardHandler = (_event: KeyboardEvent): void => {
     if (_event.key === "Enter" || _event.key === " ") {
-      const nextBtn = this.querySelector("#next-btn") as HTMLButtonElement;
-      if (nextBtn && !nextBtn.disabled) {
+      const nextBtn = this.querySelector(
+        "#next-btn"
+      ) as HTMLButtonElement | null;
+      if (nextBtn && !nextBtn.hasAttribute("disabled")) {
         nextBtn.click();
       }
     }
@@ -295,7 +297,7 @@ export class GestureOverlay extends BaseElement {
     return `
       <div class="practice-area ${completed ? "completed" : ""}">
         <div class="practice-zone">
-          <wa-icon name="${iconName}" size="large"></wa-icon>
+          <mad-icon name="${iconName}" size="large"></mad-icon>
           <p>${message}</p>
         </div>
       </div>
@@ -330,14 +332,14 @@ export class GestureOverlay extends BaseElement {
       this._section.value === TUTORIAL_SECTIONS.PRACTICE &&
       currentStep === steps.length - 1;
 
+    let buttonVariant: string;
     let buttonText: string;
-    let buttonClass: string;
     if (isLastStep) {
       buttonText = "Finish!";
-      buttonClass = "primary finish";
+      buttonVariant = "success";
     } else {
       buttonText = "Next";
-      buttonClass = "primary";
+      buttonVariant = "brand";
     }
 
     const nextButtonDisabled =
@@ -349,11 +351,11 @@ export class GestureOverlay extends BaseElement {
           ${isPractice ? this._renderPracticeArea(practiceCompleted) : ""}
           
           <div class="gesture-animation">
-            <wa-icon name="${step.icon}" size="large"></wa-icon>
+            <mad-icon name="${step.icon}" size="large"></mad-icon>
             ${isPractice ? this._renderGesturePrompt() : ""}
           </div>
           
-          <span class="section-label">${this._renderSectionLabel()}</span>
+          <mad-badge pill variant="brand">${this._renderSectionLabel()}</mad-badge>
           <h3>${step.title}</h3>
           <p>${step.description}</p>
           
@@ -366,13 +368,13 @@ export class GestureOverlay extends BaseElement {
           <span class="step-counter">Step ${globalStepIndex + 1} of ${totalSteps}</span>
           
           <div class="actions">
-            <button id="skip-btn" class="secondary">Skip Tutorial</button>
-            <button id="replay-btn" class="secondary" title="Replay Tutorial">
-              <wa-icon name="arrow-counterclockwise" size="small"></wa-icon>
-            </button>
-            <button id="next-btn" class="${buttonClass}" ${nextButtonDisabled}>
+            <mad-button id="skip-btn" variant="default">Skip Tutorial</mad-button>
+            <mad-button id="replay-btn" variant="default" title="Replay Tutorial">
+              <mad-icon name="arrow-counterclockwise" size="small"></mad-icon>
+            </mad-button>
+            <mad-button id="next-btn" variant="${buttonVariant}" ${nextButtonDisabled}>
               ${buttonText}
-            </button>
+            </mad-button>
           </div>
         </div>
       </div>
@@ -387,7 +389,7 @@ export class GestureOverlay extends BaseElement {
   ): void {
     const skipBtn = this.querySelector("#skip-btn");
     const replayBtn = this.querySelector("#replay-btn");
-    const nextBtn = this.querySelector("#next-btn");
+    const nextBtn = this.querySelector("#next-btn") as HTMLButtonElement | null;
 
     skipBtn?.addEventListener("click", () => {
       this._skipTutorial();
@@ -424,7 +426,6 @@ export class GestureOverlay extends BaseElement {
           position: fixed;
           inset: 0;
           background: rgba(0, 0, 0, 0.6);
-          backdrop-filter: blur(4px);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -433,32 +434,19 @@ export class GestureOverlay extends BaseElement {
         }
 
         .gesture-card {
-          background: var(--surface-1, #1a1a2e);
+          background: var(--wa-color-neutral-900);
           border-radius: 16px;
           padding: 32px;
           max-width: 400px;
           width: 90%;
           text-align: center;
-          box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+          box-shadow: var(--wa-shadow-x-large);
           animation: slideUp 400ms cubic-bezier(0.16, 1, 0.3, 1);
           position: relative;
         }
 
         .gesture-card.practice {
           padding-bottom: 200px;
-        }
-
-        .section-label {
-          display: inline-block;
-          background: var(--accent-primary, #6366f1);
-          color: white;
-          padding: 4px 12px;
-          border-radius: 12px;
-          font-size: 12px;
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-          margin-bottom: 16px;
         }
 
         .gesture-animation {
@@ -473,7 +461,7 @@ export class GestureOverlay extends BaseElement {
           position: relative;
         }
 
-        .gesture-animation wa-icon {
+        .gesture-animation mad-icon {
           color: var(--accent-primary, #6366f1);
         }
 
@@ -537,49 +525,6 @@ export class GestureOverlay extends BaseElement {
           justify-content: center;
         }
 
-        button {
-          padding: 12px 24px;
-          border-radius: 8px;
-          font-size: 14px;
-          font-weight: 600;
-          cursor: pointer;
-          border: none;
-          transition: all 150ms ease;
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-        }
-
-        button.primary {
-          background: var(--accent-primary, #6366f1);
-          color: white;
-        }
-
-        button.primary:hover:not(:disabled) {
-          background: var(--accent-primary-hover, #4f46e5);
-          transform: translateY(-1px);
-        }
-
-        button.primary:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-
-        button.primary.finish {
-          background: var(--success, #22c55e);
-        }
-
-        button.secondary {
-          background: transparent;
-          color: var(--text-secondary, #a1a1aa);
-          border: 1px solid var(--surface-3, #3a3a5c);
-        }
-
-        button.secondary:hover {
-          background: var(--surface-2, #252542);
-          color: var(--text-primary, #f1f1f1);
-        }
-
         .practice-area {
           position: absolute;
           bottom: 0;
@@ -599,12 +544,12 @@ export class GestureOverlay extends BaseElement {
           padding: 20px;
         }
 
-        .practice-zone wa-icon {
+        .practice-zone mad-icon {
           color: var(--text-tertiary, #71717a);
           margin-bottom: 8px;
         }
 
-        .practice-area.completed .practice-zone wa-icon {
+        .practice-area.completed .practice-zone mad-icon {
           color: var(--success, #22c55e);
         }
 

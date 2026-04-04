@@ -251,7 +251,7 @@ export class SelectTeam extends BaseElement {
 
     // Handle search input with debounce
     if (this.domInputSearch) {
-      this.domInputSearch.addEventListener("wa-input", (ev: Event) => {
+      this.domInputSearch.addEventListener("input", (ev: Event) => {
         const target = ev.target as HTMLInputElement;
         Utils.debounce("select-team-input-search", () => {
           this.onSearchChange(target.value);
@@ -385,18 +385,18 @@ export class SelectTeam extends BaseElement {
     }
 
     const retryButton = error.retryable
-      ? `<wa-button id="retry-btn" size="small" variant="brand">
-           <wa-icon name="arrow-clockwise" slot="start"></wa-icon>
+      ? `<mad-button id="retry-btn" size="small" variant="brand">
+           <mad-icon name="arrow-clockwise" slot="start"></mad-icon>
            Réessayer
-         </wa-button>`
+         </mad-button>`
       : "";
 
-    return `<wa-callout class="my-2" open variant="danger">
-      <wa-icon name="exclamation-triangle" slot="start"></wa-icon>
+    return `<mad-callout class="my-2" open variant="danger">
+      <mad-icon name="exclamation-triangle" slot="start"></mad-icon>
       <strong>${error.title}</strong>
       <p class="text-sm">${error.message}</p>
       ${retryButton}
-    </wa-callout>`;
+    </mad-callout>`;
   }
 
   /**
@@ -410,16 +410,16 @@ export class SelectTeam extends BaseElement {
 
     const items = teams
       .map(
-        (team) => `<wa-menu-item data-team-id="${team.id}">
+        (team) => `<mad-menu-item data-team-id="${team.id}">
           <mad-team-tile></mad-team-tile>
           <span slot="end">
-            <wa-icon class="text-4xl text-neutral" name="arrow-right-circle"></wa-icon>
+            <mad-icon class="text-4xl text-neutral-400" name="arrow-right-circle"></mad-icon>
           </span>
-        </wa-menu-item>`
+        </mad-menu-item>`
       )
       .join("");
 
-    return `<wa-menu>${items}</wa-menu>`;
+    return `<mad-menu>${items}</mad-menu>`;
   }
 
   /**
@@ -429,9 +429,9 @@ export class SelectTeam extends BaseElement {
     if (this._isLoading.value) {
       return `<div class="flex flex-col items-center justify-center py-8">
         <div class="mb-3">
-          <wa-spinner class="text-4xl"></wa-spinner>
+          <mad-spinner class="text-4xl"></mad-spinner>
         </div>
-        <span class="text-neutral">Chargement des équipes…</span>
+        <span class="text-neutral-400">Chargement des équipes…</span>
       </div>`;
     }
 
@@ -440,10 +440,10 @@ export class SelectTeam extends BaseElement {
     }
 
     if (this.searchValue?.length > 2) {
-      return `<wa-callout open variant="warning">
-        <wa-icon class="text-6xl text-warning" name="emoji-frown" slot="start"></wa-icon>
+      return `<mad-callout open variant="warning">
+        <mad-icon class="text-6xl text-yellow-600" name="emoji-frown" slot="start"></mad-icon>
         <span class="mx-2 text-2xl">Aucun résultat</span>
-      </wa-callout>`;
+      </mad-callout>`;
     }
 
     return "";
@@ -454,28 +454,28 @@ export class SelectTeam extends BaseElement {
    */
   private renderTeamSelection(): string {
     return `<div class="footer">
-      <wa-card>
+      <mad-card>
         <div slot="header">
           <h3>Recherche ton équipe. (${this.minNumberSearchLetter} lettres min)</h3>
         </div>
         <div>
           <div class="my-4">
-            <wa-input
+            <mad-input
               autocomplete="off"
               autofocus
               placeholder="nom d'équipe"
               size="medium"
               type="text"
             >
-              <wa-icon name="magnifying-glass" slot="start"></wa-icon>
-            </wa-input>
+              <mad-icon name="magnifying-glass" slot="start"></mad-icon>
+            </mad-input>
           </div>
           <div id="results-container">
             ${this.renderErrorAlert()}
             ${this.renderResultsContent()}
           </div>
         </div>
-      </wa-card>
+      </mad-card>
     </div>`;
   }
 
@@ -489,24 +489,24 @@ export class SelectTeam extends BaseElement {
 
     // 1. Initialize basic structure if it doesn't exist
     if (!this.domDrawer) {
-      this.innerHTML = `<wa-drawer no-header placement="start">
+      this.innerHTML = `<mad-drawer no-header placement="start">
         ${this.renderTeamSelection()}
         <div class="grid-300" slot="footer">
-          <wa-button id="cancel-btn" variant="brand">
+          <mad-button id="cancel-btn" variant="brand">
             Annuler
-          </wa-button>
+          </mad-button>
         </div>
-      </wa-drawer>
+      </mad-drawer>
       <div class="cursor-pointer">
         <div id="selected-team-container"></div>
       </div>`;
 
       this.domDrawer = this.querySelector(
-        "wa-drawer"
+        "mad-drawer"
       ) as unknown as HTMLElement;
       this.domDivBody = this.querySelector(".cursor-pointer");
       this.domInputSearch = this.querySelector(
-        "wa-input"
+        "mad-input"
       ) as unknown as HTMLElement & {
         value: string;
         disabled: boolean;
@@ -528,7 +528,7 @@ export class SelectTeam extends BaseElement {
         ${
           team?.id
             ? "<mad-team-tile></mad-team-tile>"
-            : `<span class="text-neutral text-sm">${placeholder}</span>`
+            : `<span class="text-neutral-400 text-sm">${placeholder}</span>`
         }
       `;
 
@@ -558,9 +558,9 @@ export class SelectTeam extends BaseElement {
       });
 
       // Re-attach menu events if menu exists
-      const menu = this.domResultsContainer.querySelector("wa-menu");
+      const menu = this.domResultsContainer.querySelector("mad-menu");
       if (menu) {
-        menu.addEventListener("wa-select", (ev: Event) => {
+        menu.addEventListener("mad-select", (ev: Event) => {
           ev.stopPropagation();
           this.onTeamRadioChange(ev as CustomEvent);
         });

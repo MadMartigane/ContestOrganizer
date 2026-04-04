@@ -111,19 +111,19 @@ export class GridDefault extends BaseElement {
               ></mad-select-team>
             </td>
             <td>
-              <span class="text-primary">${gridRow.points}</span>
+              <span class="text-orange-600">${gridRow.points}</span>
             </td>
             <td>
-              <span class="text-success">${gridRow.scoredGoals}</span>
+              <span class="text-green-600">${gridRow.scoredGoals}</span>
             </td>
             <td>
-              <span class="text-warning">${gridRow.concededGoals}</span>
+              <span class="text-yellow-600">${gridRow.concededGoals}</span>
             </td>
             <td>
-              <span class="text-primary">${gridRow.goalAverage}</span>
+              <span class="text-orange-600">${gridRow.goalAverage}</span>
             </td>
             <td class="text-center">
-              <span class="text-primary">${gridRow.scheduledMatchs}</span>
+              <span class="text-orange-600">${gridRow.scheduledMatchs}</span>
             </td>
           </tr>
         `;
@@ -132,9 +132,9 @@ export class GridDefault extends BaseElement {
 
     this.innerHTML = `
       <table class="table-auto">
-        <thead class="block-primary align-middle">
+        <thead class="bg-orange-600 text-neutral-100 align-middle">
           <th>
-            <wa-icon class="text-2xl" name="sort-numeric-down"></wa-icon>
+            <mad-icon class="text-2xl" name="sort-numeric-down"></mad-icon>
           </th>
           <th>
             <span>Équipes</span>
@@ -143,18 +143,18 @@ export class GridDefault extends BaseElement {
             <span>Points</span>
           </th>
           <th>
-            <span class="text-success">Buts</span>
-            <wa-icon class="text-2xl text-success" name="plus"></wa-icon>
+            <span class="text-green-600">Buts</span>
+            <mad-icon class="text-2xl text-green-600" name="plus"></mad-icon>
           </th>
           <th>
-            <span class="text-warning">Buts</span>
-            <wa-icon class="text-2xl text-warning" name="minus"></wa-icon>
+            <span class="text-yellow-600">Buts</span>
+            <mad-icon class="text-2xl text-yellow-600" name="minus"></mad-icon>
           </th>
           <th>
             <span>Goal average</span>
           </th>
           <th class="text-center">
-            <wa-icon class="inline-block text-2xl" name="calendar-event"></wa-icon>
+            <mad-icon class="inline-block text-2xl" name="calendar-event"></mad-icon>
           </th>
         </thead>
         <tbody>

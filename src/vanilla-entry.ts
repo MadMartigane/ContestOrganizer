@@ -6,39 +6,31 @@
  * side effects into a single file for the application.
  */
 
-// Import Tailwind CSS first - must be before component imports
+// Import Tailwind CSS
 import "./global/tailwind.css";
 
-// Import Web Awesome styles
-import "@awesome.me/webawesome/dist/styles/webawesome.css";
+// Register Phosphor Icons (side-effect imports)
+import "./core/icons.js";
+
+// Import UI components
+import "./components/ui/mad-button/mad-button.js";
+import "./components/ui/mad-icon/mad-icon.js";
+import "./components/ui/mad-input/mad-input.js";
+import "./components/ui/mad-card/mad-card.js";
+import "./components/ui/mad-badge/mad-badge.js";
+import "./components/ui/mad-spinner/mad-spinner.js";
+import "./components/ui/mad-callout/mad-callout.js";
+import "./components/ui/mad-switch/mad-switch.js";
+import "./components/ui/mad-select/mad-select.js";
+import "./components/ui/mad-drawer/mad-drawer.js";
+import "./components/ui/mad-breadcrumb/mad-breadcrumb.js";
+import "./components/ui/mad-tooltip/mad-tooltip.js";
+import "./components/ui/mad-menu/mad-menu.js";
 
 // Initialize global state
 import { getTournaments } from "./modules/init";
 
 getTournaments();
-
-// Import all Web Awesome components
-import "@awesome.me/webawesome/dist/components/callout/callout.js";
-import "@awesome.me/webawesome/dist/components/badge/badge.js";
-import "@awesome.me/webawesome/dist/components/breadcrumb/breadcrumb.js";
-import "@awesome.me/webawesome/dist/components/breadcrumb-item/breadcrumb-item.js";
-import "@awesome.me/webawesome/dist/components/button/button.js";
-import "@awesome.me/webawesome/dist/components/button-group/button-group.js";
-import "@awesome.me/webawesome/dist/components/card/card.js";
-import "@awesome.me/webawesome/dist/components/carousel/carousel.js";
-import "@awesome.me/webawesome/dist/components/carousel-item/carousel-item.js";
-import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
-import "@awesome.me/webawesome/dist/components/divider/divider.js";
-import "@awesome.me/webawesome/dist/components/drawer/drawer.js";
-import "@awesome.me/webawesome/dist/components/icon/icon.js";
-import "@awesome.me/webawesome/dist/components/input/input.js";
-import "@awesome.me/webawesome/dist/components/option/option.js";
-import "@awesome.me/webawesome/dist/components/radio/radio.js";
-import "@awesome.me/webawesome/dist/components/radio-group/radio-group.js";
-import "@awesome.me/webawesome/dist/components/select/select.js";
-import "@awesome.me/webawesome/dist/components/spinner/spinner.js";
-import "@awesome.me/webawesome/dist/components/switch/switch.js";
-import "@awesome.me/webawesome/dist/components/tag/tag.js";
 
 import setting from "./modules/global-setting/global-setting";
 

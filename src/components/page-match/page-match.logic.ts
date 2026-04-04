@@ -1,5 +1,5 @@
-import { type Match, MatchStatus } from "../../modules/matchs/matchs";
-import type { Tournament } from "../../modules/tournaments/tournaments.types";
+import { type Match, MatchStatus } from "../../modules/matchs/matchs.js";
+import type { Tournament } from "../../modules/tournaments/tournaments.types.js";
 
 /**
  * Pure function to calculate the target match index for auto-scrolling.

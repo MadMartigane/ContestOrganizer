@@ -18,29 +18,24 @@ export class Page404 extends BaseElement {
    */
   protected _render(): void {
     this.innerHTML = `
-      <div class="page-content">
+      <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 rounded-lg shadow-md">
         <h1>404 - La page demandée n'existe pas.</h1>
 
-        <wa-carousel autoplay loop pagination>
-          <wa-carousel-item>
-            <img alt="404 - Not found" height="300" src="/assets/img/undraw_page_not_found.svg" width="400" />
-          </wa-carousel-item>
-          <wa-carousel-item>
-            <img alt="404 - Page abducted" height="300" src="/assets/img/undraw_taken.svg" width="400" />
-          </wa-carousel-item>
-        </wa-carousel>
+        <div class="flex justify-center items-center py-8">
+          <img alt="404 - Not found" height="300" src="/assets/img/undraw_page_not_found.svg" width="400" />
+        </div>
 
         <div class="footer">
           <div class="grid-300">
-            <wa-button href="#/home" size="large" variant="brand">
-              <wa-icon name="house" slot="start"></wa-icon>
+            <mad-button href="#/home" size="large" variant="brand">
+              <mad-icon name="house" slot="start"></mad-icon>
               <span slot="suffix">Accueil</span>
-            </wa-button>
+            </mad-button>
 
-            <wa-button href="#/tournaments" size="large" variant="brand">
-              <wa-icon name="trophy" slot="start"></wa-icon>
+            <mad-button href="#/tournaments" size="large" variant="brand">
+              <mad-icon name="trophy" slot="start"></mad-icon>
               <span slot="suffix">Tournois</span>
-            </wa-button>
+            </mad-button>
           </div>
         </div>
       </div>

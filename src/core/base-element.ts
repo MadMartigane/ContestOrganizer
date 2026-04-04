@@ -37,6 +37,12 @@ export abstract class BaseElement extends HTMLElement {
   protected _initialized = false;
 
   /**
+   * Captured light DOM children for slot distribution.
+   * Stored before _render() overwrites innerHTML.
+   */
+  private _initialContent: Node[] | null = null;
+
+  /**
    * Array of attribute names to observe for changes.
    * Override in subclasses to observe specific attributes.
    */
@@ -56,11 +62,16 @@ export abstract class BaseElement extends HTMLElement {
 
   /**
    * Called when the element is added to the DOM.
-   * Sets connection state and triggers initial render.
+   * Captures light DOM children, triggers render, then distributes slots.
    */
   connectedCallback(): void {
     this._isConnected = true;
+    // Capture light DOM children before _render() overwrites them
+    if (!this._initialContent && this.childNodes.length > 0) {
+      this._initialContent = Array.from(this.childNodes);
+    }
     this._render();
+    this._distributeSlots();
   }
 
   /**
@@ -147,6 +158,7 @@ export abstract class BaseElement extends HTMLElement {
       // Only render if still connected
       if (this._isConnected) {
         this._render();
+        this._distributeSlots();
       }
     });
   }
@@ -165,6 +177,37 @@ export abstract class BaseElement extends HTMLElement {
     });
 
     this.dispatchEvent(event);
+  }
+
+  /**
+   * Replaces <slot> elements in rendered content with captured light DOM children.
+   * Supports both default slots and named slots via the 'slot' attribute.
+   */
+  private _distributeSlots(): void {
+    if (!this._initialContent) {
+      return;
+    }
+
+    const slotElements = Array.from(
+      this.querySelectorAll<HTMLSlotElement>("slot")
+    );
+    for (const slotEl of slotElements) {
+      const slotName = slotEl.getAttribute("name");
+      const matchedNodes = slotName
+        ? this._initialContent.filter(
+            (node) =>
+              node instanceof Element && node.getAttribute("slot") === slotName
+          )
+        : this._initialContent.filter(
+            (node) => !(node instanceof Element && node.hasAttribute("slot"))
+          );
+
+      const fragment = document.createDocumentFragment();
+      for (const node of matchedNodes) {
+        fragment.appendChild(node.cloneNode(true));
+      }
+      slotEl.replaceWith(fragment);
+    }
   }
 
   /**

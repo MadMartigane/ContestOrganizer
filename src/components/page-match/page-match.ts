@@ -1,27 +1,27 @@
 import { BaseElement } from "@core/base-element.js";
 import { Signal } from "@core/signal.js";
-import { getTournaments } from "../../modules/init";
+import { getTournaments } from "../../modules/init.js";
 import Matchs, {
   Match,
   MatchStatus,
   MatchTeamType,
   type Row,
-} from "../../modules/matchs/matchs";
+} from "../../modules/matchs/matchs.js";
 import {
   generateNBAScheduleMinimax,
   getNBAMissingMatchCount,
   validateNBAScheduleGeneration,
-} from "../../modules/nba/nba.scheduler";
-import type { GenericTeam } from "../../modules/team-row/team-row.d";
-import { Tournaments } from "../../modules/tournaments/tournaments";
-import type { Tournament } from "../../modules/tournaments/tournaments.types";
+} from "../../modules/nba/nba.scheduler.js";
+import type { GenericTeam } from "../../modules/team-row/team-row.d.js";
+import { Tournaments } from "../../modules/tournaments/tournaments.js";
+import type { Tournament } from "../../modules/tournaments/tournaments.types.js";
 import {
   TournamentType,
   TournamentTypeLabel,
-} from "../../modules/tournaments/tournaments.types";
-import Utils from "../../modules/utils/utils";
+} from "../../modules/tournaments/tournaments.types.js";
+import Utils from "../../modules/utils/utils.js";
 
-import { calculateTargetMatchIndex } from "./page-match.logic";
+import { calculateTargetMatchIndex } from "./page-match.logic.js";
 
 interface Config {
   minGoal: number;
@@ -138,9 +138,6 @@ export class PageMatch extends BaseElement {
     this._trackSignal(this._currentMatch);
     this._trackSignal(this._matchRefs);
 
-    // Initialize tournaments
-    this.initTournaments();
-
     // Mark initialization as complete to enable rendering
     this._initialized = true;
 
@@ -153,7 +150,7 @@ export class PageMatch extends BaseElement {
    */
   connectedCallback(): void {
     super.connectedCallback();
-
+    this.initTournaments();
     this._setupScrollNavigation();
   }
 
@@ -194,6 +191,9 @@ export class PageMatch extends BaseElement {
       this._uiError.value = `Tournois #${this._tournamentId} non trouvé.`;
       return 0;
     }
+
+    // CLEAR ERROR ON SUCCESS - defense against stale error state
+    this._uiError.value = null;
 
     this._tournament.value = tournament;
     this._matchNumber.value = tournament.matchs.length;
@@ -339,7 +339,7 @@ export class PageMatch extends BaseElement {
    * Update status badge content and variant for a match item
    */
   private updateMatchStatusBadge(matchItem: Element, match: Match): void {
-    const statusBadge = matchItem.querySelector("wa-tag");
+    const statusBadge = matchItem.querySelector("mad-badge");
     if (!statusBadge) {
       return;
     }
@@ -371,14 +371,14 @@ export class PageMatch extends BaseElement {
     statusBadge: Element,
     iconName: string
   ): void {
-    const existingSpinner = statusBadge.querySelector("wa-spinner");
+    const existingSpinner = statusBadge.querySelector("mad-spinner");
     if (existingSpinner) {
-      const icon = document.createElement("wa-icon");
-      icon.classList.add("text-3xl", "text-warning");
+      const icon = document.createElement("mad-icon");
+      icon.classList.add("text-3xl", "text-yellow-600");
       icon.setAttribute("name", iconName);
       existingSpinner.replaceWith(icon);
     } else {
-      const existingIcon = statusBadge.querySelector("wa-icon");
+      const existingIcon = statusBadge.querySelector("mad-icon");
       if (existingIcon) {
         existingIcon.setAttribute("name", iconName);
       }
@@ -389,9 +389,9 @@ export class PageMatch extends BaseElement {
    * Replace status icon with spinner for active match
    */
   private replaceStatusIconWithSpinner(statusBadge: Element): void {
-    const icon = statusBadge.querySelector("wa-icon");
+    const icon = statusBadge.querySelector("mad-icon");
     if (icon) {
-      const spinner = document.createElement("wa-spinner");
+      const spinner = document.createElement("mad-spinner");
       spinner.classList.add("text-2xl");
       icon.replaceWith(spinner);
     }
@@ -401,10 +401,10 @@ export class PageMatch extends BaseElement {
    * Replace status spinner with icon for completed match
    */
   private replaceStatusSpinnerWithIcon(statusBadge: Element): void {
-    const spinner = statusBadge.querySelector("wa-spinner");
+    const spinner = statusBadge.querySelector("mad-spinner");
     if (spinner) {
-      const icon = document.createElement("wa-icon");
-      icon.classList.add("text-3xl", "text-warning");
+      const icon = document.createElement("mad-icon");
+      icon.classList.add("text-3xl", "text-yellow-600");
       icon.setAttribute("name", "check2-square");
       spinner.replaceWith(icon);
     }
@@ -715,28 +715,28 @@ export class PageMatch extends BaseElement {
   private renderActionButtonsContent(match: Match): string {
     const isDoing = match.status === MatchStatus.DOING;
     return `
-      <wa-button
+      <mad-button
         class="delete-btn w-full"
         data-match-id="${match.id || ""}"
         role="button"
         size="large"
         variant="warning"
       >
-        <wa-icon name="trash"></wa-icon>
-      </wa-button>
+        <mad-icon name="trash"></mad-icon>
+      </mad-button>
 
       ${
         isDoing
-          ? `<wa-button class="stop-btn w-full" data-match-id="${
+          ? `<mad-button class="stop-btn w-full" data-match-id="${
               match.id || ""
             }" role="button" size="large" variant="brand">
-          <wa-icon name="stop-circle"></wa-icon>
-        </wa-button>`
-          : `<wa-button class="play-btn w-full" data-match-id="${
+          <mad-icon name="stop-circle"></mad-icon>
+        </mad-button>`
+          : `<mad-button class="play-btn w-full" data-match-id="${
               match.id || ""
             }" role="button" size="large" variant="brand">
-          <wa-icon name="play-circle"></wa-icon>
-        </wa-button>`
+          <mad-icon name="play-circle"></mad-icon>
+        </mad-button>`
       }
     `;
   }
@@ -758,28 +758,28 @@ export class PageMatch extends BaseElement {
   private renderMatchStatus(match: Match): string {
     if (match.status === MatchStatus.PENDING) {
       return `
-        <wa-tag variant="brand">
+        <mad-badge variant="brand">
           <span class="container">Match programmé</span>
-          <wa-icon class="text-3xl text-primary" name="calendar-check"></wa-icon>
-        </wa-tag>
+          <mad-icon class="text-3xl text-orange-600" name="calendar-check"></mad-icon>
+        </mad-badge>
       `;
     }
 
     if (match.status === MatchStatus.DOING) {
       return `
-        <wa-tag variant="success">
+        <mad-badge variant="success">
           <span class="container">Match en cours</span>
-          <wa-spinner class="text-2xl"></wa-spinner>
-        </wa-tag>
+          <mad-spinner class="text-2xl"></mad-spinner>
+        </mad-badge>
       `;
     }
 
     if (match.status === MatchStatus.DONE) {
       return `
-        <wa-tag variant="warning">
+        <mad-badge variant="warning">
           <span class="container">Match terminé</span>
-          <wa-icon class="text-3xl text-warning" name="check2-square"></wa-icon>
-        </wa-tag>
+          <mad-icon class="text-3xl text-yellow-600" name="check2-square"></mad-icon>
+        </mad-badge>
       `;
     }
 
@@ -907,7 +907,7 @@ export class PageMatch extends BaseElement {
       : undefined;
 
     return `
-      <div id="match-${index}" class="match-item rounded border border-sky border-solid px-1 py-4" data-match-index="${index}">
+      <div id="match-${index}" class="match-item rounded border border-sky-300 border-solid px-1 py-4" data-match-index="${index}">
         <div>${this.renderMatchStatus(match)}</div>
 
         <mad-match-tile
@@ -959,7 +959,7 @@ export class PageMatch extends BaseElement {
    */
   private renderMatchListHeader(): string {
     return `
-      <div class="block-primary grid grid-cols-11 items-center py-2">
+      <div class="bg-orange-600 text-neutral-100 grid grid-cols-11 items-center py-2">
         <div class="col-span-3">Locaux</div>
         <div class="col-span-5 text-2xl text-center">${this.renderTournamentTypeLabel()}</div>
         <div class="col-span-3">Visiteurs</div>
@@ -979,8 +979,8 @@ export class PageMatch extends BaseElement {
         <td>
           ${
             row.selected
-              ? `<wa-icon class="text-2xl text-success" name="check-square"></wa-icon>`
-              : `<wa-icon class="text-2xl text-success" name="square"></wa-icon>`
+              ? `<mad-icon class="text-2xl text-green-600" name="check-square"></mad-icon>`
+              : `<mad-icon class="text-2xl text-green-600" name="square"></mad-icon>`
           }
         </td>
         <td>
@@ -1011,10 +1011,10 @@ export class PageMatch extends BaseElement {
 
         <div class="w-fill overflow-x-auto">
           <table class="table-auto">
-            <thead class="block-primary">
+            <thead class="bg-orange-600 text-neutral-100">
               <tr>
                 <th>
-                  <wa-icon class="text-2xl" name="list-check"></wa-icon>
+                  <mad-icon class="text-2xl" name="list-check"></mad-icon>
                 </th>
                 <th>
                   <span>Équipes</span>
@@ -1040,16 +1040,16 @@ export class PageMatch extends BaseElement {
 
         <div class="footer">
           <div class="grid-300">
-            <wa-button
+            <mad-button
               class="cancel-btn"
               role="button"
               size="large"
               variant="warning"
             >
-              <wa-icon name="ban" slot="start"></wa-icon>
+              <mad-icon name="ban" slot="start"></mad-icon>
               <span slot="end">Annuler</span>
-            </wa-button>
-            <wa-button
+            </mad-button>
+            <mad-button
               class="validate-btn"
               ${
                 currentMatch && !(currentMatch.visitorId && currentMatch.hostId)
@@ -1061,8 +1061,8 @@ export class PageMatch extends BaseElement {
               variant="brand"
             >
               <span slot="start">Valider</span>
-              <wa-icon name="arrow-right" slot="end"></wa-icon>
-            </wa-button>
+              <mad-icon name="arrow-right" slot="end"></mad-icon>
+            </mad-button>
           </div>
         </div>
       </div>
@@ -1081,23 +1081,23 @@ export class PageMatch extends BaseElement {
     const missingCount = getNBAMissingMatchCount(tournament);
     if (missingCount === 0) {
       return `
-        <wa-button disabled size="large" variant="success">
-          <wa-icon name="check-circle" slot="start"></wa-icon>
+        <mad-button disabled size="large" variant="success">
+          <mad-icon name="check-circle" slot="start"></mad-icon>
           <span slot="end">Season Complete (82 games)</span>
-        </wa-button>
+        </mad-button>
       `;
     }
 
     return `
-      <wa-button
+      <mad-button
         class="generate-nba-btn"
         role="button"
         size="large"
         variant="success"
       >
-        <wa-icon name="calendar-plus" slot="start"></wa-icon>
+        <mad-icon name="calendar-plus" slot="start"></mad-icon>
         <span slot="end">Generate All Missing (${missingCount})</span>
-      </wa-button>
+      </mad-button>
     `;
   }
 
@@ -1110,26 +1110,26 @@ export class PageMatch extends BaseElement {
     return `
       <div class="footer">
         <div class="grid-300 gap-4">
-          <wa-button
+          <mad-button
             class="new-match-btn"
             ${isNBAComplete ? "disabled" : ""}
             role="button"
             size="large"
             variant="brand"
           >
-            <wa-icon name="plus" slot="start"></wa-icon>
+            <mad-icon name="plus" slot="start"></mad-icon>
             <span slot="end">Nouveau match</span>
-          </wa-button>
-          <wa-button
+          </mad-button>
+          <mad-button
             class="auto-match-btn"
             ${isNBAComplete ? "disabled" : ""}
             role="button"
             size="large"
             variant="success"
           >
-            <wa-icon name="robot" slot="start"></wa-icon>
+            <mad-icon name="robot" slot="start"></mad-icon>
             <span slot="end">Auto-Match</span>
-          </wa-button>
+          </mad-button>
           ${this.renderNBAGenerateButton()}
         </div>
       </div>
@@ -1150,33 +1150,36 @@ export class PageMatch extends BaseElement {
          role="navigation"
          aria-label="Raccourcis de navigation">
       <div class="scroll-nav-buttons">
-        <wa-tooltip content="Aller en haut (Alt+T)" placement="left">
-          <wa-button size="medium"
+        <div class="relative group">
+          <mad-button size="medium"
                      variant="default"
-                     class="nav-btn-top"
+                     class="w-full nav-btn-top"
                      aria-label="Aller en haut de la page">
-            <wa-icon name="chevron-up" aria-hidden="true"></wa-icon>
-          </wa-button>
-        </wa-tooltip>
+            <mad-icon name="chevron-up" aria-hidden="true"></mad-icon>
+          </mad-button>
+          <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap">Aller en haut (Alt+T)</div>
+        </div>
 
-        <wa-tooltip content="Aller au match actuel (Alt+M)" placement="left">
-          <wa-button size="medium"
+        <div class="relative group">
+          <mad-button size="medium"
                      variant="brand"
-                     class="nav-btn-current"
+                     class="w-full nav-btn-current"
                      ${hasTargetMatch ? "" : "disabled"}
                      aria-label="Aller au match en cours ou dernier match joué">
-            <wa-icon name="crosshair" aria-hidden="true"></wa-icon>
-          </wa-button>
-        </wa-tooltip>
+            <mad-icon name="crosshair" aria-hidden="true"></mad-icon>
+          </mad-button>
+          <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap">Aller au match actuel (Alt+M)</div>
+        </div>
 
-        <wa-tooltip content="Aller en bas (Alt+B)" placement="left">
-          <wa-button size="medium"
+        <div class="relative group">
+          <mad-button size="medium"
                      variant="default"
-                     class="nav-btn-bottom"
+                     class="w-full nav-btn-bottom"
                      aria-label="Aller en bas de la page">
-            <wa-icon name="chevron-down" aria-hidden="true"></wa-icon>
-          </wa-button>
-        </wa-tooltip>
+            <mad-icon name="chevron-down" aria-hidden="true"></mad-icon>
+          </mad-button>
+          <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap">Aller en bas (Alt+B)</div>
+        </div>
       </div>
     </div>
     <div class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
@@ -1205,9 +1208,9 @@ export class PageMatch extends BaseElement {
       <style>
         .scroll-nav {
           position: fixed;
-          bottom: calc(var(--wa-spacing-medium) + env(safe-area-inset-bottom, 0px));
-          right: var(--wa-spacing-medium);
-          z-index: var(--wa-z-index-drawer);
+          bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+          right: 1rem;
+          z-index: 50;
           opacity: 0;
           transform: translateY(100%);
           transition: opacity 0.3s ease, transform 0.3s ease;
@@ -1220,19 +1223,10 @@ export class PageMatch extends BaseElement {
           pointer-events: auto;
         }
 
-        .scroll-nav wa-button:focus-visible {
-          outline: 2px solid var(--wa-color-brand-600);
-          outline-offset: 2px;
-        }
-
         .scroll-nav-buttons {
           display: flex;
           flex-direction: column;
-          gap: var(--wa-spacing-2x-small);
-        }
-
-        .scroll-nav-buttons wa-button {
-          width: 100%;
+          gap: 0.25rem;
         }
 
         .sr-only {
@@ -1249,7 +1243,7 @@ export class PageMatch extends BaseElement {
 
         @media (max-height: 600px) {
           .scroll-nav {
-            bottom: calc(var(--wa-spacing-large) + env(safe-area-inset-bottom, 0px));
+            bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
           }
         }
 
@@ -1266,7 +1260,7 @@ export class PageMatch extends BaseElement {
         }
       </style>
 
-      <div class="page-content">
+      <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 rounded-lg shadow-md">
         ${
           uiError
             ? `<error-message message="${uiError}"></error-message>`
@@ -1299,7 +1293,7 @@ export class PageMatch extends BaseElement {
                       ? ""
                       : `
                     <h2>
-                      <span class="text-warning"> Aucun match en cours </span>
+                      <span class="text-yellow-600"> Aucun match en cours </span>
                     </h2>
                   `
                   }
