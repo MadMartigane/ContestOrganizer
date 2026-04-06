@@ -1,16 +1,16 @@
-import { BaseElement } from "@core/base-element.js";
-import { Signal } from "@core/signal.js";
+import { BaseElement } from "@core/base-element";
+import { Signal } from "@core/signal";
 import { html, nothing } from "lit-html";
 import { repeat } from "lit-html/directives/repeat.js";
-import Basket from "../../modules/data-basket/data-basket.js";
-import type { GridTeamOnUpdateDetail } from "../../modules/grid-common/grid-common.types.js";
-import { getTournaments } from "../../modules/init.js";
-import TeamRow from "../../modules/team-row/team-row.js";
-import theSportsDbService from "../../modules/thesportsdb/thesportsdb.service.js";
+import Basket from "../../modules/data-basket/data-basket";
+import type { GridTeamOnUpdateDetail } from "../../modules/grid-common/grid-common.types";
+import { getTournaments } from "../../modules/init";
+import TeamRow from "../../modules/team-row/team-row";
+import theSportsDbService from "../../modules/thesportsdb/thesportsdb.service";
 import type {
   Tournament,
   TournamentUpdateEvent,
-} from "../../modules/tournaments/tournaments.types.js";
+} from "../../modules/tournaments/tournaments.types";
 
 /**
  * GridBasket - Displays basketball/NBA tournament grid with team selections

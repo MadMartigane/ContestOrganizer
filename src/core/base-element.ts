@@ -10,8 +10,8 @@ export { html, nothing } from "lit-html";
 
 // Import render and TemplateResult locally for use in _renderTemplate
 import { render, type TemplateResult } from "lit-html";
-import type { Signal } from "./signal.js";
-import { baseSheet, tailwindSheet } from "./styles.js";
+import type { Signal } from "./signal";
+import { baseSheet, tailwindSheet } from "./styles";
 
 /**
  * Abstract base class for all Vanilla Web Components.
@@ -52,7 +52,7 @@ export abstract class BaseElement extends HTMLElement {
    * Array of attribute names to observe for changes.
    * Override in subclasses to observe specific attributes.
    */
-  static get observedAttributes(): string[] {
+  static get observedAttributes(): readonly string[] {
     return [];
   }
 

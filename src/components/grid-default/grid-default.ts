@@ -1,13 +1,13 @@
-import { BaseElement } from "@core/base-element.js";
-import { Signal } from "@core/signal.js";
+import { BaseElement } from "@core/base-element";
+import { Signal } from "@core/signal";
 import { html } from "lit-html";
 import { repeat } from "lit-html/directives/repeat.js";
-import type { GridTeamOnUpdateDetail } from "../../modules/grid-common/grid-common.types.js";
-import { getTournaments } from "../../modules/init.js";
+import type { GridTeamOnUpdateDetail } from "../../modules/grid-common/grid-common.types";
+import { getTournaments } from "../../modules/init";
 import type {
   Tournament,
   TournamentUpdateEvent,
-} from "../../modules/tournaments/tournaments.types.js";
+} from "../../modules/tournaments/tournaments.types";
 
 /**
  * GridDefault - Displays tournament grid with team selections

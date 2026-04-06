@@ -1,6 +1,6 @@
 import { html, nothing, type TemplateResult } from "lit-html";
-import { BaseElement } from "../../core/base-element.js";
-import { Signal } from "../../core/signal.js";
+import { BaseElement } from "../../core/base-element";
+import { Signal } from "../../core/signal";
 
 /**
  * Command palette component for desktop (⌘K) inspired by VS Code/Linear.

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { Computed, Signal } from "./signal.js";
+import { Computed, Signal } from "./signal";
 
 describe("Signal", () => {
   describe("initialization", () => {

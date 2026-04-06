@@ -38,7 +38,7 @@ vi.mock("../../modules/utils/utils", () => ({
   },
 }));
 
-import "./select-team.js";
+import "./select-team";
 
 describe("SelectTeam", () => {
   it("should be registered as custom element", () => {

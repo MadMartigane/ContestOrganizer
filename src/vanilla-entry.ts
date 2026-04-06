@@ -10,22 +10,22 @@
 import "./global/tailwind.css";
 
 // Register Phosphor Icons (side-effect imports)
-import "./core/icons.js";
+import "./core/icons";
 
 // Import UI components
-import "./components/ui/mad-button/mad-button.js";
-import "./components/ui/mad-icon/mad-icon.js";
-import "./components/ui/mad-input/mad-input.js";
-import "./components/ui/mad-card/mad-card.js";
-import "./components/ui/mad-badge/mad-badge.js";
-import "./components/ui/mad-spinner/mad-spinner.js";
-import "./components/ui/mad-callout/mad-callout.js";
-import "./components/ui/mad-switch/mad-switch.js";
-import "./components/ui/mad-select/mad-select.js";
-import "./components/ui/mad-drawer/mad-drawer.js";
-import "./components/ui/mad-breadcrumb/mad-breadcrumb.js";
-import "./components/ui/mad-tooltip/mad-tooltip.js";
-import "./components/ui/mad-menu/mad-menu.js";
+import "./components/ui/mad-button/mad-button";
+import "./components/ui/mad-icon/mad-icon";
+import "./components/ui/mad-input/mad-input";
+import "./components/ui/mad-card/mad-card";
+import "./components/ui/mad-badge/mad-badge";
+import "./components/ui/mad-spinner/mad-spinner";
+import "./components/ui/mad-callout/mad-callout";
+import "./components/ui/mad-switch/mad-switch";
+import "./components/ui/mad-select/mad-select";
+import "./components/ui/mad-drawer/mad-drawer";
+import "./components/ui/mad-breadcrumb/mad-breadcrumb";
+import "./components/ui/mad-tooltip/mad-tooltip";
+import "./components/ui/mad-menu/mad-menu";
 
 // Initialize global state
 import { getTournaments } from "./modules/init";
@@ -54,12 +54,12 @@ import "./components/grid-default/grid-default";
 import "./components/grid-basket/grid-basket";
 import "./components/page-tournament/page-tournament";
 import "./components/app-root/app-root";
-import "./components/zone-container/zone-container.js";
-import "./components/command-palette/command-palette.js";
-import "./components/gesture-overlay/gesture-overlay.js";
-import "./components/zones/home-zone.js";
-import "./components/zones/config-zone.js";
-import "./components/zones/tournaments-zone.js";
-import "./components/zones/matchs-zone.js";
-import "./components/match/live-match-card.js";
-import "./components/match/gesture-scoring.js";
+import "./components/zone-container/zone-container";
+import "./components/command-palette/command-palette";
+import "./components/gesture-overlay/gesture-overlay";
+import "./components/zones/home-zone";
+import "./components/zones/config-zone";
+import "./components/zones/tournaments-zone";
+import "./components/zones/matchs-zone";
+import "./components/match/live-match-card";
+import "./components/match/gesture-scoring";

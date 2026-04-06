@@ -1,4 +1,4 @@
-import { BaseElement } from "@core/base-element.js";
+import { BaseElement } from "@core/base-element";
 import { html, nothing, type TemplateResult } from "lit-html";
 import errorMessageStyles from "./error-message.css?raw";
 

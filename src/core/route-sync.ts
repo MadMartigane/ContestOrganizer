@@ -12,7 +12,7 @@
  *   #/zone/matchs     → #/matchs
  */
 
-import type { ZoneType } from "./spatial-layout.js";
+import type { ZoneType } from "./spatial-layout";
 
 const ZONE_PREFIX = "#/";
 const LEGACY_ROUTE_MAP: Record<string, ZoneType> = {

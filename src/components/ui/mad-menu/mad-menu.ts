@@ -1,13 +1,37 @@
-import { BaseElement } from "@core/base-element.js";
+import { BaseElement } from "@core/base-element";
+import { createComponentSheet } from "@core/styles";
 import { html } from "lit-html";
 
+const menuSheet = createComponentSheet(`
+  .menu-container {
+    outline: none;
+    &:focus-visible {
+      outline: 2px solid #f97316;
+      outline-offset: 2px;
+    }
+  }
+`);
+
+/**
+ * MadMenu - Keyboard-navigable menu container with ARIA menu pattern
+ *
+ * Observed attributes: none
+ *
+ * Keyboard: ArrowUp/ArrowDown to navigate, Home/End to jump
+ *
+ * @element mad-menu
+ */
 export class MadMenu extends BaseElement {
-  static get observedAttributes(): string[] {
-    return [];
+  static get observedAttributes() {
+    return [] as const;
   }
 
   protected _setupProperties(): void {
-    this._initialized = true;
+    // No signals needed — properties handled via attributes/getters
+  }
+
+  protected _injectStyles(): void {
+    super._injectStyles(menuSheet);
   }
 
   /**
@@ -68,22 +92,7 @@ export class MadMenu extends BaseElement {
 
   protected _render(): void {
     this._renderTemplate(
-      html` <style>
-        :host {
-          display: block;
-        }
-        :host([hidden]) {
-          display: none;
-        }
-        .menu-container {
-          outline: none;
-        }
-        .menu-container:focus-visible {
-          outline: 2px solid #f97316;
-          outline-offset: 2px;
-        }
-      </style>
-      <div
+      html` <div
         part="base"
         class="divide-y divide-neutral-200 dark:divide-neutral-700 menu-container"
         role="menu"
@@ -98,13 +107,23 @@ export class MadMenu extends BaseElement {
 
 customElements.define("mad-menu", MadMenu);
 
+/**
+ * MadMenuItem - Individual selectable item within a menu
+ *
+ * Observed attributes: none
+ *
+ * Custom events:
+ * - `mad-select`: Fired when item is clicked, detail: { item: MadMenuItem }
+ *
+ * @element mad-menu-item
+ */
 export class MadMenuItem extends BaseElement {
-  static get observedAttributes(): string[] {
-    return [];
+  static get observedAttributes() {
+    return [] as const;
   }
 
   protected _setupProperties(): void {
-    this._initialized = true;
+    // No signals needed — properties handled via attributes/getters
   }
 
   /**
@@ -116,12 +135,7 @@ export class MadMenuItem extends BaseElement {
 
   protected _render(): void {
     this._renderTemplate(
-      html` <style>
-        :host {
-          display: block;
-        }
-      </style>
-      <div
+      html` <div
         part="base"
         class="flex items-center justify-between gap-3 p-3 hover:bg-neutral-50 dark:hover:bg-neutral-800 cursor-pointer transition-colors"
         role="menuitem"

@@ -1,8 +1,8 @@
 import { html, nothing, render } from "lit-html";
-import { BaseElement } from "../../core/base-element.js";
-import { GestureEngine } from "../../core/gesture-engine.js";
-import { Signal } from "../../core/signal.js";
-import type { Match } from "../../modules/matchs/matchs.js";
+import { BaseElement } from "../../core/base-element";
+import { GestureEngine } from "../../core/gesture-engine";
+import { Signal } from "../../core/signal";
+import type { Match } from "../../modules/matchs/matchs";
 
 interface LastAction {
   points: number;

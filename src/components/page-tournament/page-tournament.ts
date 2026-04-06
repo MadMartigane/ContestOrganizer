@@ -1,15 +1,22 @@
-import { BaseElement } from "@core/base-element.js";
-import { Signal } from "@core/signal.js";
+import { BaseElement } from "@core/base-element";
+import { Signal } from "@core/signal";
+import { createComponentSheet } from "@core/styles";
 import { html, nothing, type TemplateResult } from "lit-html";
-import { getTournaments } from "../../modules/init.js";
-import type { GenericTeam } from "../../modules/team-row/team-row.d.js";
-import { TeamRow } from "../../modules/team-row/team-row.js";
-import { Tournaments } from "../../modules/tournaments/tournaments.js";
+import { getTournaments } from "../../modules/init";
+import { TeamRow } from "../../modules/team-row/team-row";
+import type { GenericTeam } from "../../modules/team-row/team-row.d";
+import { Tournaments } from "../../modules/tournaments/tournaments";
 import {
   type Tournament,
   TournamentType,
-} from "../../modules/tournaments/tournaments.types.js";
-import Utils from "../../modules/utils/utils.js";
+} from "../../modules/tournaments/tournaments.types";
+import Utils from "../../modules/utils/utils";
+
+const pageTournamentSheet = createComponentSheet(`
+  .page-tournament {
+    display: block;
+  }
+`);
 
 interface PageConfConstants {
   concededGoalsMin: number;
@@ -24,8 +31,14 @@ interface PageConfConstants {
 
 /**
  * PageTournament - Tournament page component for viewing and editing tournament details
+ *
+ * Observed attributes:
+ * - `tournament-id`: ID of the tournament to display (numeric string)
+ *
+ * Custom events:
+ * - `navigate`: Fired when navigating to matchs page, detail: { hash: string }
+ *
  * @element page-tournament
- * @fires navigate
  */
 export class PageTournament extends BaseElement {
   private readonly tournaments = getTournaments();
@@ -62,8 +75,8 @@ export class PageTournament extends BaseElement {
   /**
    * Observed attributes for reactive updates
    */
-  static get observedAttributes(): string[] {
-    return ["tournament-id"];
+  static get observedAttributes() {
+    return ["tournament-id"] as const;
   }
 
   protected _setupProperties(): void {
@@ -97,8 +110,11 @@ export class PageTournament extends BaseElement {
     const tournamentIdAttr = this.getAttribute("tournament-id");
     this._tournamentId = tournamentIdAttr ? Number(tournamentIdAttr) : 0;
 
-    // Mark initialization as complete to enable rendering
-    this._initialized = true;
+    // _initialized is set automatically by BaseElement after this method returns
+  }
+
+  protected _injectStyles(): void {
+    super._injectStyles(pageTournamentSheet);
   }
 
   /**
@@ -114,8 +130,16 @@ export class PageTournament extends BaseElement {
    */
   protected _onAttributeChange(name: string, value: string | null): void {
     if (name === "tournament-id") {
-      this._tournamentId = value ? Number(value) : 0;
-      this.initTournaments();
+      const update = (): void => {
+        this._tournamentId = value ? Number(value) : 0;
+        this.initTournaments();
+      };
+
+      if (document.startViewTransition) {
+        document.startViewTransition(() => update());
+      } else {
+        update();
+      }
     }
   }
 
@@ -356,14 +380,9 @@ export class PageTournament extends BaseElement {
             </div>`;
 
     this._renderTemplate(
-      html`<style>
-          .page-tournament {
-            display: block;
-          }
-        </style>
-        <div class="page-tournament">
-          <div part="base">
-            <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-[var(--wa-color-neutral-100)] dark:bg-neutral-800 rounded-lg shadow-md">
+      html`<div class="page-tournament">
+        <div part="base">
+          <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-[var(--wa-color-neutral-100)] dark:bg-neutral-800 rounded-lg shadow-md">
             <div>
               <slot name="tournament-name"></slot>
 

@@ -1,8 +1,8 @@
 // /src/components/scorer-common/scorer-common.ts
 
 import { html } from "lit-html";
-import { BaseElement } from "../../core/base-element.js";
-import { Signal } from "../../core/signal.js";
+import { BaseElement } from "../../core/base-element";
+import { Signal } from "../../core/signal";
 import scorerCommonStyles from "./scorer-common.css?raw";
 
 export class MadScorerCommon extends BaseElement {

@@ -1,13 +1,15 @@
 import { html } from "lit-html";
-import { ZoneContainer } from "../zone-container/zone-container.js";
-import "../page-config/page-config.js";
+import { ZoneContainer } from "../zone-container/zone-container";
+import "../page-config/page-config";
 
 /**
  * ConfigZone - Configuration zone component that renders page-config inside the zone container.
- * Uses Shadow DOM with lit-html rendering.
+ *
+ * Observed attributes: none
+ *
+ * Custom events: none
+ *
  * @element config-zone
- * @observedAttributes None - uses JavaScript properties (zoneType, title, icon)
- * @fires None
  */
 export class ConfigZone extends ZoneContainer {
   constructor() {
@@ -26,7 +28,6 @@ export class ConfigZone extends ZoneContainer {
     const showFocusButton = !(isFocused || isCollapsed);
 
     this._renderTemplate(html`
-      ${this._getStyles()}
       <div part="base" class="zone-container zone-${zoneType}" data-focused="${isFocused}">
         <header part="header" class="zone-header">
           <mad-icon name="${icon}"></mad-icon>

@@ -3,10 +3,10 @@
  * @module components/team-tile
  */
 
-import { BaseElement } from "@core/base-element.js";
-import { Signal } from "@core/signal.js";
+import { BaseElement } from "@core/base-element";
+import { Signal } from "@core/signal";
 import { html } from "lit-html";
-import type { GenericTeam } from "../../modules/team-row/team-row.d.js";
+import type { GenericTeam } from "../../modules/team-row/team-row.d";
 
 /**
  * Type-safe interface for mad-team-tile element properties.

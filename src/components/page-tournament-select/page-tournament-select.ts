@@ -1,18 +1,29 @@
-import { BaseElement } from "@core/base-element.js";
-import { Signal } from "@core/signal.js";
+import { BaseElement } from "@core/base-element";
+import { Signal } from "@core/signal";
+import { createComponentSheet } from "@core/styles";
 import { html, type TemplateResult } from "lit-html";
 import { repeat } from "lit-html/directives/repeat.js";
-import { getTournaments } from "../../modules/init.js";
+import { getTournaments } from "../../modules/init";
 import {
   type Tournament,
   TournamentType,
   TournamentTypeLabel,
-} from "../../modules/tournaments/tournaments.types.js";
-import Utils from "../../modules/utils/utils.js";
+} from "../../modules/tournaments/tournaments.types";
+import Utils from "../../modules/utils/utils";
 import pageTournamentSelectStyles from "./page-tournament-select.css?raw";
 
+const pageTournamentSelectSheet = createComponentSheet(
+  pageTournamentSelectStyles
+);
+
 /**
- * PageTournamentSelect - Tournament selection page component
+ * PageTournamentSelect - Tournament selection and creation page
+ *
+ * Observed attributes: none
+ *
+ * Custom events:
+ * - `navigate`: Fired when navigating to a tournament, detail: { hash: string }
+ *
  * @element page-tournament-select
  */
 export class PageTournamentSelect extends BaseElement {
@@ -61,8 +72,7 @@ export class PageTournamentSelect extends BaseElement {
       });
     });
 
-    // Mark initialization as complete to enable rendering
-    this._initialized = true;
+    // _initialized is set automatically by BaseElement after this method returns
   }
 
   /**
@@ -70,9 +80,6 @@ export class PageTournamentSelect extends BaseElement {
    */
   connectedCallback(): void {
     super.connectedCallback();
-    const sheet = new CSSStyleSheet();
-    sheet.replaceSync(pageTournamentSelectStyles);
-    this._injectStyles(sheet);
   }
 
   /**
@@ -80,6 +87,10 @@ export class PageTournamentSelect extends BaseElement {
    */
   disconnectedCallback(): void {
     super.disconnectedCallback();
+  }
+
+  protected _injectStyles(): void {
+    super._injectStyles(pageTournamentSelectSheet);
   }
 
   /**
@@ -234,14 +245,6 @@ export class PageTournamentSelect extends BaseElement {
   private displayUiAddingTournament(): void {
     this._uiAddingTournament.value = true;
     this._isNewTournamentNameReady.value = false;
-  }
-
-  private _getStyles(): TemplateResult {
-    return html`
-      <style>
-        .page-tournament-select { display: block; }
-      </style>
-    `;
   }
 
   /**
@@ -404,7 +407,6 @@ export class PageTournamentSelect extends BaseElement {
     const numberOfTournaments = this._numberOfTournaments.value;
 
     return html`
-      ${this._getStyles()}
       <div class="page-tournament-select">
         <div part="base">
           <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 dark:bg-neutral-800 rounded-lg shadow-md">

@@ -1,6 +1,6 @@
 import { html, nothing, type TemplateResult } from "lit-html";
-import { BaseElement } from "../../core/base-element.js";
-import { Signal } from "../../core/signal.js";
+import { BaseElement } from "../../core/base-element";
+import { Signal } from "../../core/signal";
 import apiSports from "../../modules/api-sports/api-sports";
 import type { ClassifiedError } from "../../modules/error/error.utils";
 import { classifyError } from "../../modules/error/error.utils";

@@ -1,13 +1,15 @@
 import { html } from "lit-html";
-import { ZoneContainer } from "../zone-container/zone-container.js";
-import "../page-tournament-select/page-tournament-select.js";
+import { ZoneContainer } from "../zone-container/zone-container";
+import "../page-tournament-select/page-tournament-select";
 
 /**
  * TournamentsZone - Tournaments selection zone component that renders page-tournament-select inside the zone container.
- * Uses Shadow DOM with lit-html rendering.
+ *
+ * Observed attributes: none
+ *
+ * Custom events: none
+ *
  * @element tournaments-zone
- * @observedAttributes None - uses JavaScript properties (zoneType, title, icon)
- * @fires None
  */
 export class TournamentsZone extends ZoneContainer {
   constructor() {
@@ -26,7 +28,6 @@ export class TournamentsZone extends ZoneContainer {
     const showFocusButton = !(isFocused || isCollapsed);
 
     this._renderTemplate(html`
-      ${this._getStyles()}
       <div part="base" class="zone-container zone-${zoneType}" data-focused="${isFocused}">
         <header part="header" class="zone-header">
           <mad-icon name="${icon}"></mad-icon>

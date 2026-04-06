@@ -1,16 +1,203 @@
-import { BaseElement } from "@core/base-element.js";
+import { BaseElement } from "@core/base-element";
+import { createComponentSheet } from "@core/styles";
 import { html } from "lit-html";
 
+const switchSheet = createComponentSheet(`
+  :host {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  :host([disabled]) {
+    pointer-events: none;
+    opacity: 0.6;
+
+    & .switch {
+      cursor: not-allowed;
+    }
+
+    & .thumb {
+      cursor: not-allowed;
+    }
+
+    & ::slotted(*) {
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+  }
+
+  .switch {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    outline: none;
+
+    &.focus-visible {
+      outline: 2px solid #f97316;
+      outline-offset: 2px;
+    }
+  }
+
+  .track {
+    position: relative;
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: 9999px;
+    transition: background-color 200ms ease;
+
+    &.off {
+      background-color: #d1d5db;
+    }
+
+    &.on {
+      background-color: #f97316;
+    }
+
+    &.disabled {
+      background-color: #9ca3af;
+    }
+  }
+
+  .thumb {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 50%;
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: transform 200ms ease;
+
+    &.off {
+      transform: translateY(-50%) translateX(0);
+    }
+
+    &.on {
+      transform: translateY(-50%) translateX(100%);
+    }
+  }
+
+  :host([size="small"]) {
+    & .track {
+      width: 36px;
+      height: 18px;
+    }
+
+    & .thumb {
+      width: 14px;
+      height: 14px;
+      left: 2px;
+
+      &.on {
+        transform: translateY(-50%) translateX(calc(36px - 14px - 4px));
+      }
+    }
+  }
+
+  :host(:not([size])) {
+    & .track {
+      width: 48px;
+      height: 24px;
+    }
+
+    & .thumb {
+      width: 20px;
+      height: 20px;
+      left: 2px;
+
+      &.on {
+        transform: translateY(-50%) translateX(calc(48px - 20px - 4px));
+      }
+    }
+  }
+
+  :host([size="medium"]) {
+    & .track {
+      width: 48px;
+      height: 24px;
+    }
+
+    & .thumb {
+      width: 20px;
+      height: 20px;
+      left: 2px;
+
+      &.on {
+        transform: translateY(-50%) translateX(calc(48px - 20px - 4px));
+      }
+    }
+  }
+
+  :host([size="large"]) {
+    & .track {
+      width: 60px;
+      height: 30px;
+    }
+
+    & .thumb {
+      width: 26px;
+      height: 26px;
+      left: 2px;
+
+      &.on {
+        transform: translateY(-50%) translateX(calc(60px - 26px - 4px));
+      }
+    }
+  }
+
+  .input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+  }
+
+  ::slotted(*) {
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .help-text {
+    margin: 4px 0 0 0;
+    font-size: 0.75rem;
+    color: #6b7280;
+    display: none;
+
+    &.visible {
+      display: block;
+    }
+  }
+`);
+
 /**
- * MadSwitch - A toggle switch component with animation
+ * MadSwitch - Toggle switch component with ARIA switch role
+ *
+ * Observed attributes:
+ * - `checked`: When present, switch is on
+ * - `disabled`: Disables the switch
+ * - `size`: Size — "small" | "medium" | "large" (default: "medium")
+ * - `name`: Form field name
+ * - `value`: Form field value
+ * - `help-text`: Help text displayed below the switch
+ *
+ * Custom events:
+ * - `mad-change`: Fired when switch toggles, detail: { checked: boolean }
+ *
  * @element mad-switch
- * @fires mad-change - Fired when the switch toggles, detail: {checked: boolean}
  */
 export class MadSwitch extends BaseElement {
   private readonly _internals: ElementInternals | null = null;
 
-  static get observedAttributes(): string[] {
-    return ["checked", "disabled", "size", "name", "value", "help-text"];
+  static get observedAttributes() {
+    return [
+      "checked",
+      "disabled",
+      "size",
+      "name",
+      "value",
+      "help-text",
+    ] as const;
   }
 
   constructor() {
@@ -26,6 +213,10 @@ export class MadSwitch extends BaseElement {
 
   protected _setupProperties(): void {
     // Properties are handled via getters/setters
+  }
+
+  protected _injectStyles(): void {
+    super._injectStyles(switchSheet);
   }
 
   connectedCallback(): void {
@@ -139,158 +330,6 @@ export class MadSwitch extends BaseElement {
     const helpText = this.getAttribute("help-text") ?? "";
 
     this._renderTemplate(html`
-      <style>
-        :host {
-          display: inline-block;
-          vertical-align: middle;
-        }
-
-        :host([disabled]) {
-          pointer-events: none;
-          opacity: 0.6;
-        }
-
-        :host([disabled]) .switch {
-          cursor: not-allowed;
-        }
-
-        :host([disabled]) .thumb {
-          cursor: not-allowed;
-        }
-
-        .switch {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          cursor: pointer;
-          outline: none;
-        }
-
-        .switch.focus-visible {
-          outline: 2px solid #f97316;
-          outline-offset: 2px;
-        }
-
-        .track {
-          position: relative;
-          flex-shrink: 0;
-          overflow: hidden;
-          border-radius: 9999px;
-          transition: background-color 200ms ease;
-        }
-
-        .track.off {
-          background-color: #d1d5db;
-        }
-
-        .track.on {
-          background-color: #f97316;
-        }
-
-        .track.disabled {
-          background-color: #9ca3af;
-        }
-
-        .thumb {
-          position: absolute;
-          top: 50%;
-          transform: translateY(-50%);
-          border-radius: 50%;
-          background-color: white;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-          transition: transform 200ms ease;
-        }
-
-        .thumb.off {
-          transform: translateY(-50%) translateX(0);
-        }
-
-        .thumb.on {
-          transform: translateY(-50%) translateX(100%);
-        }
-
-        /* Size: small */
-        :host([size="small"]) .track {
-          width: 36px;
-          height: 18px;
-        }
-
-        :host([size="small"]) .thumb {
-          width: 14px;
-          height: 14px;
-          left: 2px;
-        }
-
-        :host([size="small"]) .thumb.on {
-          transform: translateY(-50%) translateX(calc(36px - 14px - 4px));
-        }
-
-        /* Size: medium */
-        :host(:not([size])) .track,
-        :host([size="medium"]) .track {
-          width: 48px;
-          height: 24px;
-        }
-
-        :host(:not([size])) .thumb,
-        :host([size="medium"]) .thumb {
-          width: 20px;
-          height: 20px;
-          left: 2px;
-        }
-
-        :host(:not([size])) .thumb.on,
-        :host([size="medium"]) .thumb.on {
-          transform: translateY(-50%) translateX(calc(48px - 20px - 4px));
-        }
-
-        /* Size: large */
-        :host([size="large"]) .track {
-          width: 60px;
-          height: 30px;
-        }
-
-        :host([size="large"]) .thumb {
-          width: 26px;
-          height: 26px;
-          left: 2px;
-        }
-
-        :host([size="large"]) .thumb.on {
-          transform: translateY(-50%) translateX(calc(60px - 26px - 4px));
-        }
-
-        /* Hidden input for accessibility */
-        .input {
-          position: absolute;
-          opacity: 0;
-          width: 0;
-          height: 0;
-          pointer-events: none;
-        }
-
-        ::slotted(*) {
-          cursor: pointer;
-          user-select: none;
-        }
-
-        :host([disabled]) ::slotted(*) {
-          cursor: not-allowed;
-          pointer-events: none;
-        }
-
-        .help-text {
-          margin: 4px 0 0 0;
-          font-size: 0.75rem;
-          color: #6b7280;
-          display: none;
-        }
-
-        .help-text.visible {
-          display: block;
-        }
-      </style>
-
       <div
         class="switch ${disabled ? "" : ""}"
         role="switch"

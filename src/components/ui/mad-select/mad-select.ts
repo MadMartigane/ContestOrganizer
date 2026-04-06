@@ -1,10 +1,91 @@
-import { BaseElement } from "@core/base-element.js";
+import { BaseElement } from "@core/base-element";
+import { createComponentSheet } from "@core/styles";
 import { html, nothing } from "lit-html";
 import { repeat } from "lit-html/directives/repeat.js";
 
+const selectSheet = createComponentSheet(`
+  label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #404040;
+    margin-bottom: 0.25rem;
+
+    @media (prefers-color-scheme: dark) {
+      color: #d4d4d4;
+    }
+  }
+
+  select {
+    width: 100%;
+    border-radius: 0.5rem;
+    border: 1px solid #d4d4d4;
+    background-color: #ffffff;
+    color: #171717;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    transition: border-color 0.2s, box-shadow 0.2s;
+
+    &:focus {
+      outline: none;
+      border-color: #f97316;
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      border-color: #525252;
+      background-color: #262626;
+      color: #fafafa;
+    }
+  }
+
+  .size-small {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .size-medium {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+  }
+
+  .size-large {
+    padding: 0.75rem 1rem;
+    font-size: 1.125rem;
+  }
+
+  .help-text {
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #737373;
+
+    @media (prefers-color-scheme: dark) {
+      color: #a3a3a3;
+    }
+  }
+`);
+
 /**
- * MadSelect - Custom select component with Shadow DOM and Form-Associated Custom Element (FACE) support
- * Projects options from light DOM <mad-option> children into shadow <select>
+ * MadSelect - Form-Associated Custom Element select dropdown
+ *
+ * Observed attributes:
+ * - `label`: Label text
+ * - `placeholder`: Placeholder option text
+ * - `size`: Size — "small" | "medium" | "large" (default: "medium")
+ * - `help-text`: Help text displayed below the select
+ * - `value`: Currently selected value
+ * - `disabled`: Disables the select
+ * - `name`: Form field name
+ *
+ * Custom events:
+ * - `mad-change`: Fired on selection change, detail: { value: string }
+ *
  * @element mad-select
  */
 export class MadSelect extends BaseElement {
@@ -16,7 +97,7 @@ export class MadSelect extends BaseElement {
   /**
    * Attributes to observe for changes
    */
-  static get observedAttributes(): string[] {
+  static get observedAttributes() {
     return [
       "label",
       "placeholder",
@@ -25,7 +106,7 @@ export class MadSelect extends BaseElement {
       "value",
       "disabled",
       "name",
-    ];
+    ] as const;
   }
 
   /**
@@ -139,6 +220,10 @@ export class MadSelect extends BaseElement {
     this.#internals.setValidity({ customError: !!message }, message);
   }
 
+  protected _injectStyles(): void {
+    super._injectStyles(selectSheet);
+  }
+
   protected _setupProperties(): void {
     // Properties are handled via attributes
   }
@@ -167,75 +252,6 @@ export class MadSelect extends BaseElement {
     const options = Array.from(this.querySelectorAll("mad-option"));
 
     this._renderTemplate(html`
-      <style>
-        :host {
-          display: block;
-        }
-        :host([hidden]) {
-          display: none;
-        }
-        label {
-          display: block;
-          font-size: 0.875rem;
-          font-weight: 500;
-          color: #404040;
-          margin-bottom: 0.25rem;
-        }
-        @media (prefers-color-scheme: dark) {
-          label {
-            color: #d4d4d4;
-          }
-        }
-        select {
-          width: 100%;
-          border-radius: 0.5rem;
-          border: 1px solid #d4d4d4;
-          background-color: #ffffff;
-          color: #171717;
-          padding: 0.5rem 1rem;
-          font-size: 1rem;
-          line-height: 1.5;
-          transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        select:focus {
-          outline: none;
-          border-color: #f97316;
-          box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
-        }
-        select:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-        @media (prefers-color-scheme: dark) {
-          select {
-            border-color: #525252;
-            background-color: #262626;
-            color: #fafafa;
-          }
-        }
-        .size-small {
-          padding: 0.375rem 0.75rem;
-          font-size: 0.875rem;
-        }
-        .size-medium {
-          padding: 0.5rem 1rem;
-          font-size: 1rem;
-        }
-        .size-large {
-          padding: 0.75rem 1rem;
-          font-size: 1.125rem;
-        }
-        .help-text {
-          margin-top: 0.25rem;
-          font-size: 0.875rem;
-          color: #737373;
-        }
-        @media (prefers-color-scheme: dark) {
-          .help-text {
-            color: #a3a3a3;
-          }
-        }
-      </style>
       <label part="label" style="display: ${label ? "block" : "none"}">${label}</label>
       <select
         part="select"
@@ -274,13 +290,17 @@ export class MadSelect extends BaseElement {
 customElements.define("mad-select", MadSelect);
 
 /**
- * MadOption - Option element for use within MadSelect
- * Light DOM element that gets projected into the select
+ * MadOption - Option data holder for use within MadSelect
+ *
+ * Observed attributes:
+ * - `value`: Option value
+ * - `disabled`: Disables the option
+ *
  * @element mad-option
  */
 export class MadOption extends BaseElement {
-  static get observedAttributes(): string[] {
-    return ["value", "disabled"];
+  static get observedAttributes() {
+    return ["value", "disabled"] as const;
   }
 
   protected _setupProperties(): void {

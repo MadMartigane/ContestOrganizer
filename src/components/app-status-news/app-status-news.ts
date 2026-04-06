@@ -1,9 +1,9 @@
-import { BaseElement } from "@core/base-element.js";
-import { Signal } from "@core/signal.js";
-import type { StatusSection } from "@core/types/status.js";
+import { BaseElement } from "@core/base-element";
+import { Signal } from "@core/signal";
+import type { StatusSection } from "@core/types/status";
 import statusData from "@generated/status-data.json";
 import { html, nothing, type TemplateResult } from "lit-html";
-import { renderMarkdown as MarkdownRenderer } from "./markdown-renderer.js";
+import { renderMarkdown as MarkdownRenderer } from "./markdown-renderer";
 
 const VERSION_LABEL = "Version de l'application : ";
 

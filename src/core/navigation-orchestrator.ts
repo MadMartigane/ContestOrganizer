@@ -1,9 +1,6 @@
-import type { GestureRecognizedEvent } from "./gesture-engine.js";
-import {
-  type GestureEventDetail,
-  KeyboardManager,
-} from "./keyboard-manager.js";
-import { SpatialLayout, type ZoneType } from "./spatial-layout.js";
+import type { GestureRecognizedEvent } from "./gesture-engine";
+import { type GestureEventDetail, KeyboardManager } from "./keyboard-manager";
+import { SpatialLayout, type ZoneType } from "./spatial-layout";
 
 const ZoneOrder: ZoneType[] = [
   "config",

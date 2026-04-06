@@ -1,17 +1,129 @@
-import { BaseElement } from "@core/base-element.js";
+import { BaseElement } from "@core/base-element";
+import { createComponentSheet } from "@core/styles";
 import { html, nothing } from "lit-html";
 
+const inputSheet = createComponentSheet(`
+  .mad-input-root {
+    display: block;
+
+    &[hidden] {
+      display: none;
+    }
+
+    &[data-size="small"] input {
+      padding: 0.375rem 0.75rem;
+      font-size: 0.875rem;
+    }
+
+    &[data-size="large"] input {
+      padding: 0.75rem 1rem;
+      font-size: 1.125rem;
+    }
+
+    &[data-theme="dark"] {
+      --mad-input-label-color: #d6d3d1;
+      --mad-input-border-color: #525252;
+      --mad-input-bg-color: #262626;
+      --mad-input-text-color: #fafafa;
+      --mad-input-placeholder-color: #737373;
+      --mad-input-focus-color: #fb923c;
+      --mad-input-focus-ring-color: rgba(251, 146, 60, 0.2);
+    }
+
+    &[no-spin-buttons] input[type="number"]::-webkit-inner-spin-button,
+    &[no-spin-buttons] input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    &[no-spin-buttons] input[type="number"] {
+      -moz-appearance: textfield;
+    }
+  }
+
+  .input-wrapper {
+    display: block;
+  }
+
+  .label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--mad-input-label-color, #44403c);
+    margin-bottom: 0.25rem;
+  }
+
+  input {
+    width: 100%;
+    border-radius: 0.5rem;
+    border: 1px solid var(--mad-input-border-color, #d6d3d1);
+    background-color: var(--mad-input-bg-color, #fff);
+    color: var(--mad-input-text-color, #1c1917);
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    transition: border-color 0.15s, box-shadow 0.15s;
+
+    &::placeholder {
+      color: var(--mad-input-placeholder-color, #a8a29e);
+    }
+
+    &:focus {
+      outline: none;
+      border-color: var(--mad-input-focus-color, #f97316);
+      box-shadow: 0 0 0 3px var(--mad-input-focus-ring-color, rgba(249, 115, 22, 0.2));
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    &:read-only {
+      cursor: default;
+    }
+
+    &:invalid {
+      border-color: var(--mad-input-error-color, #ef4444);
+
+      &:focus {
+        box-shadow: 0 0 0 3px var(--mad-input-error-ring-color, rgba(239, 68, 68, 0.2));
+      }
+    }
+  }
+`);
+
 /**
- * MadInput - Form-Associated Custom Element (FACE) input component
+ * MadInput - Form-Associated Custom Element (FACE) text input
+ *
+ * Observed attributes:
+ * - `type`: Input type (default: "text")
+ * - `value`: Current input value
+ * - `placeholder`: Placeholder text
+ * - `label`: Label text displayed above the input
+ * - `size`: Size — "small" | "medium" | "large" (default: "medium")
+ * - `disabled`: Disables the input
+ * - `readonly`: Makes the input read-only
+ * - `autofocus`: Auto-focuses the input on connect
+ * - `autocomplete`: Autocomplete hint (default: "off")
+ * - `min` / `max` / `step`: Numeric constraints
+ * - `minlength` / `maxlength`: Length constraints
+ * - `name`: Form field name
+ * - `required`: Marks as required for validation
+ * - `pattern`: Regex pattern for validation
+ * - `no-spin-buttons`: Hides number input spin buttons
+ *
+ * Custom events:
+ * - `change`: Fired on input change, detail: { value: string }
+ *
  * @element mad-input
- * @extends BaseElement
  */
 export class MadInput extends BaseElement {
   /** Enable form association */
   static formAssociated = true;
 
   /** Observed attributes for reactivity */
-  static get observedAttributes(): string[] {
+  static get observedAttributes() {
     return [
       "type",
       "value",
@@ -31,7 +143,7 @@ export class MadInput extends BaseElement {
       "required",
       "pattern",
       "no-spin-buttons",
-    ];
+    ] as const;
   }
 
   /** ElementInternals for form integration */
@@ -237,8 +349,12 @@ export class MadInput extends BaseElement {
     this.#internals.setValidity({ valueMissing: false }, "");
   }
 
+  protected _injectStyles(): void {
+    super._injectStyles(inputSheet);
+  }
+
   protected _setupProperties(): void {
-    this._initialized = true;
+    // No signals needed — properties handled via attributes/getters
   }
 
   protected _render(): void {
@@ -265,85 +381,6 @@ export class MadInput extends BaseElement {
         window.matchMedia("(prefers-color-scheme: dark)").matches);
 
     this._renderTemplate(html`
-      <style>
-        .mad-input-root {
-          display: block;
-        }
-        .mad-input-root[hidden] {
-          display: none;
-        }
-        .input-wrapper {
-          display: block;
-        }
-        .label {
-          display: block;
-          font-size: 0.875rem;
-          font-weight: 500;
-          color: var(--mad-input-label-color, #44403c);
-          margin-bottom: 0.25rem;
-        }
-        input {
-          width: 100%;
-          border-radius: 0.5rem;
-          border: 1px solid var(--mad-input-border-color, #d6d3d1);
-          background-color: var(--mad-input-bg-color, #fff);
-          color: var(--mad-input-text-color, #1c1917);
-          padding: 0.5rem 1rem;
-          font-size: 1rem;
-          line-height: 1.5;
-          transition: border-color 0.15s, box-shadow 0.15s;
-        }
-        input::placeholder {
-          color: var(--mad-input-placeholder-color, #a8a29e);
-        }
-        input:focus {
-          outline: none;
-          border-color: var(--mad-input-focus-color, #f97316);
-          box-shadow: 0 0 0 3px var(--mad-input-focus-ring-color, rgba(249, 115, 22, 0.2));
-        }
-        input:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-        input:read-only {
-          cursor: default;
-        }
-        /* Size variants */
-        .mad-input-root[data-size="small"] input {
-          padding: 0.375rem 0.75rem;
-          font-size: 0.875rem;
-        }
-        .mad-input-root[data-size="large"] input {
-          padding: 0.75rem 1rem;
-          font-size: 1.125rem;
-        }
-        /* Dark theme via attribute */
-        .mad-input-root[data-theme="dark"] {
-          --mad-input-label-color: #d6d3d1;
-          --mad-input-border-color: #525252;
-          --mad-input-bg-color: #262626;
-          --mad-input-text-color: #fafafa;
-          --mad-input-placeholder-color: #737373;
-          --mad-input-focus-color: #fb923c;
-          --mad-input-focus-ring-color: rgba(251, 146, 60, 0.2);
-        }
-        /* No spin buttons for number input */
-        .mad-input-root[no-spin-buttons] input[type="number"]::-webkit-inner-spin-button,
-        .mad-input-root[no-spin-buttons] input[type="number"]::-webkit-outer-spin-button {
-          -webkit-appearance: none;
-          margin: 0;
-        }
-        .mad-input-root[no-spin-buttons] input[type="number"] {
-          -moz-appearance: textfield;
-        }
-        /* Validation styles */
-        input:invalid {
-          border-color: var(--mad-input-error-color, #ef4444);
-        }
-        input:invalid:focus {
-          box-shadow: 0 0 0 3px var(--mad-input-error-ring-color, rgba(239, 68, 68, 0.2));
-        }
-      </style>
       <div class="mad-input-root">
         <div class="input-wrapper">
           <label class="label">${label}</label>

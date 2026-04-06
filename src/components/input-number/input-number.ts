@@ -1,7 +1,7 @@
-import { BaseElement } from "@core/base-element.js";
-import { Signal } from "@core/signal.js";
+import { BaseElement } from "@core/base-element";
+import { Signal } from "@core/signal";
 import { html, nothing } from "lit-html";
-import uuid from "../../modules/uuid/uuid.js";
+import uuid from "../../modules/uuid/uuid";
 
 /**
  * MadInputNumber - Number input component with increment/decrement buttons

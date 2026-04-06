@@ -1,14 +1,16 @@
 import { html } from "lit-html";
-import { ZoneContainer } from "../zone-container/zone-container.js";
-import "../page-match/page-match.js";
+import { ZoneContainer } from "../zone-container/zone-container";
+import "../page-match/page-match";
 
 /**
  * MatchsZone - Matchs zone component that renders page-match inside the zone container.
  * Handles route changes and displays match information.
- * Uses Shadow DOM with lit-html rendering.
+ *
+ * Observed attributes: none
+ *
+ * Custom events: none
+ *
  * @element matchs-zone
- * @observedAttributes None - uses JavaScript properties (zoneType, title, icon)
- * @fires None
  */
 export class MatchsZone extends ZoneContainer {
   private currentTournamentId: string | null = null;
@@ -79,7 +81,6 @@ export class MatchsZone extends ZoneContainer {
     const tournamentId = this.currentTournamentId ?? "";
 
     this._renderTemplate(html`
-      ${this._getStyles()}
       <div part="base" class="zone-container zone-${zoneType}" data-focused="${isFocused}">
         <header part="header" class="zone-header">
           <mad-icon name="${icon}"></mad-icon>

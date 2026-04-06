@@ -1,22 +1,25 @@
-import { BaseElement } from "@core/base-element.js";
-import { spinnerSheet } from "@core/styles.js";
+import { BaseElement } from "@core/base-element";
+import { spinnerSheet } from "@core/styles";
 import { html } from "lit-html";
 
+/**
+ * MadSpinner - Animated loading spinner indicator
+ *
+ * Observed attributes: none
+ *
+ * @element mad-spinner
+ */
 export class MadSpinner extends BaseElement {
-  static get observedAttributes(): string[] {
-    return [];
+  static get observedAttributes() {
+    return [] as const;
   }
 
   protected _setupProperties(): void {
-    this._initialized = true;
+    // No signals needed — properties handled via attributes/getters
   }
 
-  protected _createRenderRoot(): ShadowRoot {
-    const root = super._createRenderRoot();
-    if (root instanceof ShadowRoot) {
-      root.adoptedStyleSheets = [...root.adoptedStyleSheets, spinnerSheet];
-    }
-    return root;
+  protected _injectStyles(): void {
+    super._injectStyles(spinnerSheet);
   }
 
   protected _render(): void {

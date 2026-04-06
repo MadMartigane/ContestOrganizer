@@ -1,7 +1,7 @@
 import { html } from "lit-html";
-import { BaseElement } from "../../core/base-element.js";
-import type { GestureRecognizedEvent } from "../../core/gesture-engine.js";
-import { GestureEngine } from "../../core/gesture-engine.js";
+import { BaseElement } from "../../core/base-element";
+import type { GestureRecognizedEvent } from "../../core/gesture-engine";
+import { GestureEngine } from "../../core/gesture-engine";
 
 interface Match {
   host: { name: string };

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { BaseElement } from "./base-element.js";
-import { Signal } from "./signal.js";
+import { BaseElement } from "./base-element";
+import { Signal } from "./signal";
 
 class TestElement extends BaseElement {
   renderCount = 0;

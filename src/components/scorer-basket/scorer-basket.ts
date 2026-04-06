@@ -1,5 +1,5 @@
-import { BaseElement } from "@core/base-element.js";
-import { Signal } from "@core/signal.js";
+import { BaseElement } from "@core/base-element";
+import { Signal } from "@core/signal";
 import { html, nothing } from "lit-html";
 import scorerBasketStyles from "./scorer-basket.css?raw";
 

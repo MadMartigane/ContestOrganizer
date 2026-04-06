@@ -1,16 +1,181 @@
-import { BaseElement } from "@core/base-element.js";
+import { BaseElement } from "@core/base-element";
+import { createComponentSheet } from "@core/styles";
 import { html } from "lit-html";
 
+const buttonSheet = createComponentSheet(`
+  :host([disabled]) {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-family: inherit;
+    font-weight: 500;
+    transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    text-decoration: none;
+
+    &:focus-visible {
+      outline: 2px solid #f97316;
+      outline-offset: 2px;
+    }
+  }
+
+  :host([variant="default"]),
+  :host(:not([variant])) {
+    & .button {
+      background-color: #f3f4f6;
+      color: #111827;
+
+      &:hover {
+        background-color: #e5e7eb;
+      }
+
+      &:focus-visible {
+        outline-color: #f97316;
+      }
+    }
+  }
+
+  :host([variant="brand"]) {
+    & .button {
+      background-color: #ea580c;
+      color: #ffffff;
+
+      &:hover {
+        background-color: #c2410c;
+      }
+    }
+  }
+
+  :host([variant="success"]) {
+    & .button {
+      background-color: #16a34a;
+      color: #ffffff;
+
+      &:hover {
+        background-color: #15803d;
+      }
+
+      &:focus-visible {
+        outline-color: #16a34a;
+      }
+    }
+  }
+
+  :host([variant="warning"]) {
+    & .button {
+      background-color: #eab308;
+      color: #111827;
+
+      &:hover {
+        background-color: #ca8a04;
+      }
+
+      &:focus-visible {
+        outline-color: #eab308;
+      }
+    }
+  }
+
+  :host([variant="danger"]) {
+    & .button {
+      background-color: #dc2626;
+      color: #ffffff;
+
+      &:hover {
+        background-color: #b91c1c;
+      }
+
+      &:focus-visible {
+        outline-color: #dc2626;
+      }
+    }
+  }
+
+  :host([variant="secondary"]) {
+    & .button {
+      background-color: #e5e7eb;
+      color: #111827;
+
+      &:hover {
+        background-color: #d1d5db;
+      }
+    }
+  }
+
+  :host([size="small"]) {
+    & .button {
+      padding: 0.375rem 0.75rem;
+      font-size: 0.875rem;
+    }
+  }
+
+  :host([size="medium"]),
+  :host(:not([size])) {
+    & .button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+    }
+  }
+
+  :host([size="large"]) {
+    & .button {
+      padding: 0.75rem 1.5rem;
+      font-size: 1.125rem;
+    }
+  }
+
+  :host([pill]) {
+    & .button {
+      border-radius: 9999px;
+    }
+  }
+
+  :host(:not([pill])) {
+    & .button {
+      border-radius: 0.5rem;
+    }
+  }
+
+  :host([disabled]) {
+    & .button {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
+
+  ::slotted(*) {
+    pointer-events: none;
+  }
+`);
+
 /**
- * MadButton - A button component with variants, sizes, and accessibility
+ * MadButton - Button component with variants, sizes, and link support
+ *
+ * Observed attributes:
+ * - `variant`: Color variant — "default" | "brand" | "success" | "warning" | "danger" | "secondary" (default: "default")
+ * - `size`: Size — "small" | "medium" | "large" (default: "medium")
+ * - `disabled`: When present, disables the button
+ * - `pill`: When present, renders with fully rounded corners
+ * - `href`: When set, renders as an anchor link instead of a button
+ *
+ * Custom events:
+ * - `mad-click`: Fired when button is activated (not fired for href mode)
+ *
  * @element mad-button
- * @fires mad-click - Fired when button is activated
  */
 export class MadButton extends BaseElement {
   static formAssociated = false;
 
-  static get observedAttributes(): string[] {
-    return ["variant", "size", "disabled", "pill", "href"];
+  static get observedAttributes() {
+    return ["variant", "size", "disabled", "pill", "href"] as const;
   }
 
   private readonly _internals: ElementInternals | null;
@@ -104,161 +269,12 @@ export class MadButton extends BaseElement {
     value ? this.setAttribute("href", value) : this.removeAttribute("href");
   }
 
+  protected _injectStyles(): void {
+    super._injectStyles(buttonSheet);
+  }
+
   protected _render(): void {
     this._renderTemplate(html`
-      <style>
-        :host {
-          display: inline-block;
-        }
-
-        :host([hidden]) {
-          display: none !important;
-        }
-
-        :host([disabled]) {
-          pointer-events: none;
-          opacity: 0.5;
-        }
-
-        .button {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.5rem;
-          font-family: inherit;
-          font-weight: 500;
-          transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
-          cursor: pointer;
-          border: none;
-          outline: none;
-          text-decoration: none;
-        }
-
-        /* Focus visible styles */
-        .button:focus-visible {
-          outline: 2px solid #f97316;
-          outline-offset: 2px;
-        }
-
-        /* Variant: default */
-        :host([variant="default"]) .button,
-        :host(:not([variant])) .button {
-          background-color: #f3f4f6;
-          color: #111827;
-        }
-
-        :host([variant="default"]) .button:hover,
-        :host(:not([variant])) .button:hover {
-          background-color: #e5e7eb;
-        }
-
-        :host([variant="default"]) .button:focus-visible,
-        :host(:not([variant])) .button:focus-visible {
-          outline-color: #f97316;
-        }
-
-        /* Variant: brand */
-        :host([variant="brand"]) .button {
-          background-color: #ea580c;
-          color: #ffffff;
-        }
-
-        :host([variant="brand"]) .button:hover {
-          background-color: #c2410c;
-        }
-
-        /* Variant: success */
-        :host([variant="success"]) .button {
-          background-color: #16a34a;
-          color: #ffffff;
-        }
-
-        :host([variant="success"]) .button:hover {
-          background-color: #15803d;
-        }
-
-        :host([variant="success"]) .button:focus-visible {
-          outline-color: #16a34a;
-        }
-
-        /* Variant: warning */
-        :host([variant="warning"]) .button {
-          background-color: #eab308;
-          color: #111827;
-        }
-
-        :host([variant="warning"]) .button:hover {
-          background-color: #ca8a04;
-        }
-
-        :host([variant="warning"]) .button:focus-visible {
-          outline-color: #eab308;
-        }
-
-        /* Variant: danger */
-        :host([variant="danger"]) .button {
-          background-color: #dc2626;
-          color: #ffffff;
-        }
-
-        :host([variant="danger"]) .button:hover {
-          background-color: #b91c1c;
-        }
-
-        :host([variant="danger"]) .button:focus-visible {
-          outline-color: #dc2626;
-        }
-
-        /* Variant: secondary */
-        :host([variant="secondary"]) .button {
-          background-color: #e5e7eb;
-          color: #111827;
-        }
-
-        :host([variant="secondary"]) .button:hover {
-          background-color: #d1d5db;
-        }
-
-        /* Size: small */
-        :host([size="small"]) .button {
-          padding: 0.375rem 0.75rem;
-          font-size: 0.875rem;
-        }
-
-        /* Size: medium (default) */
-        :host([size="medium"]) .button,
-        :host(:not([size])) .button {
-          padding: 0.5rem 1rem;
-          font-size: 1rem;
-        }
-
-        /* Size: large */
-        :host([size="large"]) .button {
-          padding: 0.75rem 1.5rem;
-          font-size: 1.125rem;
-        }
-
-        /* Border radius */
-        :host([pill]) .button {
-          border-radius: 9999px;
-        }
-
-        :host(:not([pill])) .button {
-          border-radius: 0.5rem;
-        }
-
-        /* Disabled styles */
-        :host([disabled]) .button {
-          cursor: not-allowed;
-          opacity: 0.5;
-        }
-
-        /* Slot styles */
-        ::slotted(*) {
-          pointer-events: none;
-        }
-      </style>
-
       ${
         this.href
           ? html`<a class="button" href=${this.href} @click=${this._activate}><slot name="start"></slot><slot></slot><slot name="end"></slot></a>`

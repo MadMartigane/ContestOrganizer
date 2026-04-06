@@ -1,10 +1,10 @@
 import { html, nothing } from "lit-html";
-import { BaseElement } from "../../core/base-element.js";
-import { Signal } from "../../core/signal.js";
-import { getTournaments } from "../../modules/init.js";
-import type { GenericTeam } from "../../modules/team-row/team-row.d.js";
-import type TeamRow from "../../modules/team-row/team-row.js";
-import type { Tournament } from "../../modules/tournaments/tournaments.types.js";
+import { BaseElement } from "../../core/base-element";
+import { Signal } from "../../core/signal";
+import { getTournaments } from "../../modules/init";
+import type TeamRow from "../../modules/team-row/team-row";
+import type { GenericTeam } from "../../modules/team-row/team-row.d";
+import type { Tournament } from "../../modules/tournaments/tournaments.types";
 
 interface MadTeamTileElement extends HTMLElement {
   rank?: number;

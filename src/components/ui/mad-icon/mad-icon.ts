@@ -1,5 +1,5 @@
-import { BaseElement } from "@core/base-element.js";
-import { createComponentSheet } from "@core/styles.js";
+import { BaseElement } from "@core/base-element";
+import { createComponentSheet } from "@core/styles";
 import { html, nothing } from "lit-html";
 
 const iconSheet = createComponentSheet(":host { display: inline-block; }");
@@ -154,21 +154,26 @@ const ICON_MAP: Record<string, string> = {
   "floppy-disk": "floppy-disk",
 };
 
+/**
+ * MadIcon - Icon component wrapping Phosphor icons
+ *
+ * Observed attributes:
+ * - `name`: Icon name mapping to Phosphor icon set (e.g., "house", "gear", "trash")
+ * - `label`: Accessible label; when absent, icon is aria-hidden
+ *
+ * @element mad-icon
+ */
 export class MadIcon extends BaseElement {
-  static get observedAttributes(): string[] {
-    return ["name", "label"];
+  static get observedAttributes() {
+    return ["name", "label"] as const;
   }
 
   protected _setupProperties(): void {
-    this._initialized = true;
+    // No signals needed — properties handled via attributes/getters
   }
 
-  protected _createRenderRoot(): ShadowRoot {
-    const root = super._createRenderRoot();
-    if (root instanceof ShadowRoot) {
-      root.adoptedStyleSheets = [...root.adoptedStyleSheets, iconSheet];
-    }
-    return root;
+  protected _injectStyles(): void {
+    super._injectStyles(iconSheet);
   }
 
   protected _render(): void {

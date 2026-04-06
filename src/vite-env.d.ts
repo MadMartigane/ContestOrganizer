@@ -4,7 +4,7 @@
  * JSON modules generated at build time
  */
 declare module "@generated/status-data.json" {
-  import type { StatusData } from "@core/types/status.js";
+  import type { StatusData } from "@core/types/status";
   const statusData: StatusData;
   export default statusData;
 }

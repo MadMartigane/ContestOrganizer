@@ -1,24 +1,29 @@
-import { BaseElement } from "@core/base-element.js";
-import { createComponentSheet } from "@core/styles.js";
+import { BaseElement } from "@core/base-element";
+import { createComponentSheet } from "@core/styles";
 import { html } from "lit-html";
 
 const badgeSheet = createComponentSheet(":host { display: inline-block; }");
 
+/**
+ * MadBadge - Inline badge/pill indicator for labels and status
+ *
+ * Observed attributes:
+ * - `variant`: Color variant — "default" | "brand" | "success" | "warning" | "danger" | "neutral" (default: "default")
+ * - `pill`: When present, renders with fully rounded corners
+ *
+ * @element mad-badge
+ */
 export class MadBadge extends BaseElement {
-  static get observedAttributes(): string[] {
-    return ["variant", "pill"];
+  static get observedAttributes() {
+    return ["variant", "pill"] as const;
   }
 
   protected _setupProperties(): void {
-    this._initialized = true;
+    // No signals needed — properties handled via attributes/getters
   }
 
-  protected _createRenderRoot(): ShadowRoot {
-    const root = super._createRenderRoot();
-    if (root instanceof ShadowRoot) {
-      root.adoptedStyleSheets = [...root.adoptedStyleSheets, badgeSheet];
-    }
-    return root;
+  protected _injectStyles(): void {
+    super._injectStyles(badgeSheet);
   }
 
   get variant(): string {

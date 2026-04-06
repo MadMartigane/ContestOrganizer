@@ -1,13 +1,15 @@
 import { html } from "lit-html";
-import { ZoneContainer } from "../zone-container/zone-container.js";
-import "../page-home/page-home.js";
+import { ZoneContainer } from "../zone-container/zone-container";
+import "../page-home/page-home";
 
 /**
  * HomeZone - Home zone component that renders page-home inside the zone container.
- * Uses Shadow DOM with lit-html rendering.
+ *
+ * Observed attributes: none
+ *
+ * Custom events: none
+ *
  * @element home-zone
- * @observedAttributes None - uses JavaScript properties (zoneType, title, icon)
- * @fires None
  */
 export class HomeZone extends ZoneContainer {
   constructor() {
@@ -26,7 +28,6 @@ export class HomeZone extends ZoneContainer {
     const showFocusButton = !(isFocused || isCollapsed);
 
     this._renderTemplate(html`
-      ${this._getStyles()}
       <div part="base" class="zone-container zone-${zoneType}" data-focused="${isFocused}">
         <header part="header" class="zone-header">
           <mad-icon name="${icon}"></mad-icon>

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import "./page-404.js"; // Import to register the component
+import "./page-404"; // Import to register the component
 
 describe("Page404", () => {
   beforeEach(() => {

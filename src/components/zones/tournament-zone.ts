@@ -1,14 +1,16 @@
 import { html } from "lit-html";
-import { ZoneContainer } from "../zone-container/zone-container.js";
-import "../page-tournament/page-tournament.js";
+import { ZoneContainer } from "../zone-container/zone-container";
+import "../page-tournament/page-tournament";
 
 /**
  * TournamentZone - Tournament detail zone component that renders page-tournament inside the zone container.
  * Handles route changes and displays tournament information.
- * Uses Shadow DOM with lit-html rendering.
+ *
+ * Observed attributes: none
+ *
+ * Custom events: none
+ *
  * @element tournament-zone
- * @observedAttributes None - uses JavaScript properties (zoneType, title, icon)
- * @fires None
  */
 export class TournamentZone extends ZoneContainer {
   private currentTournamentId: string | null = null;
@@ -79,7 +81,6 @@ export class TournamentZone extends ZoneContainer {
     const tournamentId = this.currentTournamentId ?? "";
 
     this._renderTemplate(html`
-      ${this._getStyles()}
       <div part="base" class="zone-container zone-${zoneType}" data-focused="${isFocused}">
         <header part="header" class="zone-header">
           <mad-icon name="${icon}"></mad-icon>

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import "./error-message.js";
+import "./error-message";
 
 describe("ErrorMessage", () => {
   beforeEach(() => {

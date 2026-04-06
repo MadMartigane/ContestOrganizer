@@ -1,1 +1,0 @@
-export const CACHE_KEY = "CONTEST_TOURNAMENTS";

@@ -1,15 +1,24 @@
-import { BaseElement } from "@core/base-element.js";
-import { Signal } from "@core/signal.js";
+import { BaseElement } from "@core/base-element";
+import { Signal } from "@core/signal";
+import { createComponentSheet } from "@core/styles";
 import { html } from "lit-html";
 import setting, {
   type GlobalSetting,
-} from "../../modules/global-setting/global-setting.js";
+} from "../../modules/global-setting/global-setting";
 import pageConfigStyles from "./page-config.css?raw";
+
+const pageConfigSheet = createComponentSheet(pageConfigStyles);
 
 const API_SPORTS_CACHE_KEY = "API_SPORTS_CACHE_TEAMS";
 
 /**
  * PageConfig - Configuration page with dark mode toggle and cache management
+ *
+ * Observed attributes: none
+ *
+ * Custom events:
+ * - `mad-change`: Fired when dark mode toggle changes, detail: { checked: boolean }
+ *
  * @element page-config
  */
 export class PageConfig extends BaseElement {
@@ -30,6 +39,10 @@ export class PageConfig extends BaseElement {
     this._initialized = true;
   }
 
+  protected _injectStyles(): void {
+    super._injectStyles(pageConfigSheet);
+  }
+
   private _onDarkModeChange(event: CustomEvent<{ checked: boolean }>): void {
     const isDark = event.detail.checked;
     this.globalSetting.setDarkTheme(isDark);
@@ -46,9 +59,6 @@ export class PageConfig extends BaseElement {
 
   connectedCallback(): void {
     super.connectedCallback();
-    const sheet = new CSSStyleSheet();
-    sheet.replaceSync(pageConfigStyles);
-    this._injectStyles(sheet);
   }
 
   disconnectedCallback(): void {
@@ -59,9 +69,6 @@ export class PageConfig extends BaseElement {
     const isDarkModeActive = this.globalSetting.isDarkThemeActive();
 
     this._renderTemplate(html`
-      <style>
-        .page-config { display: block; }
-      </style>
       <div class="page-config">
         <div part="base">
           <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 dark:bg-neutral-800 rounded-lg shadow-md">

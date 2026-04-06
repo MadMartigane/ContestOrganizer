@@ -1,4 +1,4 @@
-import { BaseElement } from "@core/base-element.js";
+import { BaseElement } from "@core/base-element";
 import { html } from "lit-html";
 
 const separatorSvg = html`<svg class="w-4 h-4 text-neutral-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>`;
@@ -9,15 +9,22 @@ interface BreadcrumbItemData {
   text: string;
 }
 
+/**
+ * MadBreadcrumb - Navigation breadcrumb trail with automatic separator rendering
+ *
+ * Observed attributes: none
+ *
+ * @element mad-breadcrumb
+ */
 export class MadBreadcrumb extends BaseElement {
   private _itemMutationObserver: MutationObserver | null = null;
 
-  static get observedAttributes(): string[] {
-    return [];
+  static get observedAttributes() {
+    return [] as const;
   }
 
   protected _setupProperties(): void {
-    this._initialized = true;
+    // No signals needed — properties handled via attributes/getters
   }
 
   connectedCallback(): void {
@@ -62,9 +69,6 @@ export class MadBreadcrumb extends BaseElement {
     const items = this._getBreadcrumbItems();
 
     this._renderTemplate(html`
-      <style>
-        :host { display: block; }
-      </style>
       <nav part="base" class="flex items-center gap-2 text-sm" aria-label="Breadcrumb">
         ${items.map((item) => {
           if (item.href && !item.isLast) {
@@ -84,13 +88,21 @@ export class MadBreadcrumb extends BaseElement {
 
 customElements.define("mad-breadcrumb", MadBreadcrumb);
 
+/**
+ * MadBreadcrumbItem - Individual item within a breadcrumb trail
+ *
+ * Observed attributes:
+ * - `href`: Optional link URL; last item renders as text without link
+ *
+ * @element mad-breadcrumb-item
+ */
 export class MadBreadcrumbItem extends BaseElement {
-  static get observedAttributes(): string[] {
-    return ["href"];
+  static get observedAttributes() {
+    return ["href"] as const;
   }
 
   protected _setupProperties(): void {
-    this._initialized = true;
+    // No signals needed — properties handled via attributes/getters
   }
 
   protected _render(): void {

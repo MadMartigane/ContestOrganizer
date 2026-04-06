@@ -1,20 +1,29 @@
-import { BaseElement } from "@core/base-element.js";
+import { BaseElement } from "@core/base-element";
 import { html } from "lit-html";
 
+/**
+ * MadCard - Container card with header, body, and footer slots
+ *
+ * Observed attributes: none
+ *
+ * Slots:
+ * - `header`: Card header content
+ * - default: Card body content
+ * - `footer`: Card footer content
+ *
+ * @element mad-card
+ */
 export class MadCard extends BaseElement {
-  static get observedAttributes(): string[] {
-    return [];
+  static get observedAttributes() {
+    return [] as const;
   }
 
   protected _setupProperties(): void {
-    this._initialized = true;
+    // No signals needed — properties handled via attributes/getters
   }
 
   protected _render(): void {
     this._renderTemplate(html`
-      <style>
-        :host { display: block; }
-      </style>
       <div part="base" class="rounded-lg border border-neutral-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
         <div part="header" class="px-4 py-3">
           <slot name="header"></slot>

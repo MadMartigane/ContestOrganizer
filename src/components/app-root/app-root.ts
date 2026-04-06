@@ -1,12 +1,12 @@
-import { BaseElement } from "@core/base-element.js";
-import { NavigationOrchestrator } from "@core/navigation-orchestrator.js";
-import { RouteSync } from "@core/route-sync.js";
+import { BaseElement } from "@core/base-element";
+import { NavigationOrchestrator } from "@core/navigation-orchestrator";
+import { RouteSync } from "@core/route-sync";
 import { html, type TemplateResult } from "lit-html";
-import "../zones/home-zone.js";
-import "../zones/config-zone.js";
-import "../zones/tournaments-zone.js";
-import "../zones/matchs-zone.js";
-import "../zones/tournament-zone.js";
+import "../zones/home-zone";
+import "../zones/config-zone";
+import "../zones/tournaments-zone";
+import "../zones/matchs-zone";
+import "../zones/tournament-zone";
 
 export class AppRoot extends BaseElement {
   private _layoutClass = "layout-mobile";

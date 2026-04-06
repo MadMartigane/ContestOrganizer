@@ -1,10 +1,18 @@
-import { BaseElement } from "@core/base-element.js";
+import { BaseElement } from "@core/base-element";
+import { createComponentSheet } from "@core/styles";
 import { html, type TemplateResult } from "lit-html";
 import page404Styles from "./page-404.css?raw";
 
+const page404Sheet = createComponentSheet(page404Styles);
+
 /**
- * Page404 component - Displays a 404 error page with navigation options
- * @module components/page-404
+ * Page404 - 404 error page component with navigation options
+ *
+ * Observed attributes: none
+ *
+ * Custom events: none
+ *
+ * @element page-404
  */
 export class Page404 extends BaseElement {
   /**
@@ -12,29 +20,18 @@ export class Page404 extends BaseElement {
    */
   connectedCallback(): void {
     super.connectedCallback();
-    const sheet = new CSSStyleSheet();
-    sheet.replaceSync(page404Styles);
-    this._injectStyles(sheet);
   }
 
-  /**
-   * Sets up component properties (none needed for this component)
-   */
+  protected _injectStyles(): void {
+    super._injectStyles(page404Sheet);
+  }
+
   protected _setupProperties(): void {
     // No properties to set up
   }
 
-  private _getStyles(): TemplateResult {
-    return html`
-      <style>
-        :host { display: block; }
-      </style>
-    `;
-  }
-
   private _renderContent(): TemplateResult {
     return html`
-      ${this._getStyles()}
       <div part="base">
         <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 dark:bg-neutral-800 rounded-lg shadow-md">
           <h1>404 - La page demandée n'existe pas.</h1>
