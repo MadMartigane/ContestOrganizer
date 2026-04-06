@@ -69,7 +69,7 @@ protected _render(): void {
 - **Component-Specific Styles (preferred):** Use constructable stylesheets with `_injectStyles()`:
 
 ```typescript
-import { createComponentSheet } from '../../core/styles.js';
+import { createComponentSheet } from '@core/styles.js';
 
 const mySheet = createComponentSheet(`
   :host { padding: 1rem; }
@@ -270,13 +270,14 @@ The `_trackSignal()` method subscribes to a signal, which immediately triggers a
 
 `BaseElement` provides an `_initialized` flag that prevents rendering until initialization completes:
 
-1. **In BaseElement constructor**: `_requestRender()` checks `this._initialized` and returns early if `false`. The constructor sets `this._initialized = true` **after** `_setupProperties()` returns, ensuring no premature renders.
+1. **In BaseElement constructor**: `_requestRender()` checks `this._initialized` and returns early if `false`. The constructor sets the `_initialized` flag to `true` **after** `_setupProperties()` returns, ensuring no premature renders.
 2. **In Component**: Simply initialize and track your signals in `_setupProperties()`. The `_initialized` flag is managed by `BaseElement` automatically — you do NOT need to set it explicitly in most cases.
 
 ### Example
 
 ```typescript
 import { html } from 'lit-html';
+import { Signal } from '@core/signal.js';
 
 export class MyComponent extends BaseElement {
   declare private _count: Signal<number>;
@@ -340,6 +341,7 @@ this._mySignal.set(newValue); // Error!
 
 ```typescript
 import { html } from 'lit-html';
+import { Signal } from '@core/signal.js';
 
 export class MyComponent extends BaseElement {
   declare private _count: Signal<number>;
@@ -347,7 +349,6 @@ export class MyComponent extends BaseElement {
   protected _setupProperties(): void {
     this._count = new Signal(0);
     this._trackSignal(this._count);
-    this._initialized = true;
   }
 
   private _increment(): void {
