@@ -337,3 +337,242 @@ For deeper dives, read these as needed:
 | `references/css-architecture.md` | `@scope`, `@layer`, part/token design system patterns |
 | `references/ssr-hydration.md` | DSD, `customElements.upgrade()`, streaming HTML |
 | `references/testing.md` | Unit testing with Web Test Runner, JSDOM limitations |
+| `references/project-patterns.md` | lit-html, BaseElement, Signals, Tailwind in Shadow DOM |
+
+---
+
+## 11. Project Integration: lit-html, BaseElement & Signals
+
+> This section covers project-specific patterns that build on the generic Web Component
+> standards in §1–§10. These patterns apply when the project uses `BaseElement`, `lit-html`,
+> and a custom `Signal` implementation.
+
+### 11.1 lit-html as Rendering Engine
+
+Instead of raw `<template>` + `cloneNode` (§3), this project uses **lit-html** for
+declarative templating with efficient DOM diffing.
+
+```ts
+import { html, nothing } from 'lit-html';
+import { repeat } from 'lit-html/directives/repeat.js';
+
+// Inside _render():
+this._renderTemplate(html`
+  <div class="card">
+    <h2>${this._title.value}</h2>
+    ${this._items.value.length
+      ? repeat(
+          this._items.value,
+          (item) => item.id,
+          (item) => html`<div class="item">${item.name}</div>`
+        )
+      : nothing}
+  </div>
+`);
+```
+
+**Binding syntax:**
+
+| Prefix | Purpose | Example |
+|--------|---------|---------|
+| `@` | Event listener | `@click=${this._handleClick}` |
+| `.` | Property binding | `.value=${this._inputVal}` |
+| `?` | Boolean attribute | `?disabled=${this._isDisabled}` |
+| `${}` | Text interpolation / child | `${this._label.value}` |
+
+**Conditionals:** Use `${condition ? html\`...\` : nothing}`. Import `nothing` from `lit-html`.
+
+**Lists:** Use `repeat(items, keyFn, templateFn)` for keyed list rendering. Falls back to
+array `.map()` for simple static lists.
+
+**Slots:** Use native `<slot>` and `<slot name="...">`. Slot distribution is handled by the browser.
+
+---
+
+### 11.2 BaseElement Abstract Class
+
+All components extend `BaseElement` (from `src/core/base-element.ts`) instead of raw
+`HTMLElement`. It provides:
+
+- Shadow DOM creation via `_createRenderRoot()`
+- lit-html rendering via `_renderTemplate(template)`
+- Signal reactivity via `_trackSignal(signal)`
+- Custom event dispatch via `_emit(name, detail)`
+- Render batching via `_requestRender()`
+
+**Lifecycle:**
+
+```
+constructor() → _setupProperties() [abstract] → _initialized = true
+connectedCallback() → _createRenderRoot() → _injectStyles() → _render()
+attributeChangedCallback() → _onAttributeChange() → _requestRender()
+disconnectedCallback() → _cleanupSignals()
+```
+
+**Minimal component:**
+
+```ts
+import { BaseElement, html } from '../../core/base-element.js';
+
+export class MyCard extends BaseElement {
+  static observedAttributes = ['title'] as const;
+
+  protected _setupProperties(): void {
+    // Initialize signals, properties, etc.
+  }
+
+  protected _render(): void {
+    this._renderTemplate(html`
+      <div class="card">
+        <slot></slot>
+      </div>
+    `);
+  }
+}
+```
+
+**Rules:**
+
+- **DO NOT** override `_createRenderRoot()`. Use `_injectStyles(...sheets)` to add
+  component-specific constructable stylesheets.
+- **DO NOT** override `connectedCallback()` without calling `super.connectedCallback()`.
+- `_setupProperties()` is called in the constructor — do NOT access DOM or attributes there.
+- `_render()` is called in `connectedCallback()` — safe to access attributes and DOM.
+
+---
+
+### 11.3 Signal-Based Reactivity
+
+The project uses a custom `Signal<T>` class (from `src/core/signal.ts`) for fine-grained
+reactive state.
+
+```ts
+import { Signal } from '../../core/signal.js';
+
+declare private _count: Signal<number>; // 'declare' prevents useDefineForClassFields overwrite (§4.1)
+
+protected _setupProperties(): void {
+  this._count = new Signal(0);
+  this._trackSignal(this._count); // Auto re-renders on change
+}
+```
+
+**API:**
+
+- Read: `signal.value` (getter)
+- Write: `signal.value = newValue` (setter, uses `Object.is` comparison)
+- Track: `this._trackSignal(signal)` — subscribes and triggers `_requestRender()` on change
+
+**`_trackSignal()` details:**
+
+- Calls `signal.subscribe()`, which fires the callback **immediately** with current value.
+- The callback calls `_requestRender()`, which is gated by `this._initialized`.
+- `BaseElement` sets `_initialized = true` **after** `_setupProperties()` returns, so premature
+  renders during initialization are prevented automatically.
+
+**Pattern — components WITHOUT signals:**
+
+```ts
+protected _setupProperties(): void {
+  // No signals to track — nothing needed here
+  // _initialized is set by BaseElement constructor automatically
+}
+```
+
+**Pattern — components WITH signals:**
+
+```ts
+declare private _name: Signal<string>;
+declare private _items: Signal<Item[]>;
+
+protected _setupProperties(): void {
+  this._name = new Signal('');
+  this._items = new Signal([]);
+  this._trackSignal(this._name);
+  this._trackSignal(this._items);
+  // _initialized is set by BaseElement constructor automatically after this returns
+}
+```
+
+---
+
+### 11.4 Tailwind CSS v4 in Shadow DOM
+
+Global Tailwind styles do not penetrate Shadow DOM. `BaseElement` solves this by:
+
+1. **`tailwindSheet`** — A constructable stylesheet containing ~190 Tailwind utility classes
+   (layout, spacing, typography, colors, effects). Auto-injected into every Shadow Root via
+   `adoptedStyleSheets`.
+
+2. **`baseSheet`** — Provides CSS reset, `:host { display: block }`, `:host([hidden])`,
+   and dark mode CSS variables.
+
+3. **`createComponentSheet(css)`** — Utility to create component-specific constructable
+   stylesheets (from `src/core/styles.ts`).
+
+**Adding component-specific styles:**
+
+```ts
+import { createComponentSheet } from '../../core/styles.js';
+
+const mySheet = createComponentSheet(`
+  :host { padding: 1rem; }
+  .title { font-weight: bold; }
+`);
+
+export class MyComponent extends BaseElement {
+  protected _injectStyles(): void {
+    super._injectStyles(mySheet);
+  }
+}
+```
+
+Prefer constructable stylesheets (`_injectStyles`) over `<style>` tags in lit-html templates
+for any styles used across instances. Use `<style>` in templates only for truly
+instance-specific dynamic styles.
+
+---
+
+### 11.5 CSS in Shadow DOM — Project Conventions
+
+**:host selector** — Recommended and canonical (per §3, §4.5, §5). Use it to set `display`,
+padding, and other host-level styles. `baseSheet` already provides `:host { display: block }`
+and `:host([hidden]) { display: none !important; }`.
+
+**CSS Nesting** — Fully supported in Shadow DOM. Use native CSS nesting for component styles:
+
+```css
+.card {
+  padding: 1rem;
+  & .title {
+    font-weight: bold;
+  }
+  &:hover {
+    background: var(--color-surface-hover);
+  }
+}
+```
+
+**Pre-built sheets** (from `src/core/styles.ts`):
+
+- `baseSheet` — Reset, `:host` defaults, dark mode variables
+- `inlineBlockSheet` — `:host { display: inline-block }` for icon/badge/spinner/tooltip
+- `spinnerSheet` — Inline-block + spin animation
+- `tailwindSheet` — ~190 Tailwind utility classes
+
+**addEventListener exception:** For elements outside the lit-html template (e.g., `document`,
+`window`, `renderRoot` for `slotchange`), manual `addEventListener` is acceptable with proper
+cleanup per §4.3:
+
+```ts
+#handleKeyDown = (e: KeyboardEvent) => { /* ... */ };
+
+connectedCallback() {
+  super.connectedCallback();
+  document.addEventListener('keydown', this.#handleKeyDown);
+}
+disconnectedCallback() {
+  document.removeEventListener('keydown', this.#handleKeyDown);
+  super.disconnectedCallback();
+}
+```

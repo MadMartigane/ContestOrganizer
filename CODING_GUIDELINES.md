@@ -25,8 +25,8 @@ This project uses **Shadow DOM exclusively**:
 
 - `BaseElement` automatically creates a Shadow Root in `_createRenderRoot()`.
 - **DO NOT** override `_createRenderRoot()` to return `this` (which would disable Shadow DOM).
-- **DO NOT** use `:host` selector in component styles — it only works with Shadow DOM.
-- Use standard CSS selectors targeting elements within your template instead.
+- The `:host` selector is the **canonical** way to style the host element in Shadow DOM. Use it for `display`, padding, and host-level styles.
+- `baseSheet` (injected by BaseElement) already provides `:host { display: block }` and `:host([hidden]) { display: none !important; }`. Override display as needed for inline-block components.
 
 > **LLM WARNING - COMMON MISTAKE**
 >
@@ -66,21 +66,42 @@ protected _render(): void {
 
 - **Tailwind CSS v4:** This project uses Tailwind CSS v4 for utility classes.
 - **Shadow DOM Compatibility:** Global Tailwind classes do not penetrate Shadow DOM. `BaseElement` automatically injects a pre-configured `tailwindSheet` into every Shadow Root, providing access to common utility classes (flex, grid, spacing, typography, colors).
-- **Component-Specific Styles:** For component-specific styles, use a `<style>` block inside the lit-html template:
+- **Component-Specific Styles (preferred):** Use constructable stylesheets with `_injectStyles()`:
+
+```typescript
+import { createComponentSheet } from '../../core/styles.js';
+
+const mySheet = createComponentSheet(`
+  :host { padding: 1rem; }
+  .title { font-weight: bold; }
+`);
+
+export class MyComponent extends BaseElement {
+  protected _injectStyles(): void {
+    super._injectStyles(mySheet);
+  }
+}
+```
+
+- **Instance-Specific Styles (secondary):** For dynamic or instance-specific styles, a `<style>` block inside the lit-html template is acceptable:
 
 ```typescript
 protected _render(): void {
   this._renderTemplate(html`
     <style>
-      .my-component {
-        display: block;
-        background: var(--color-surface);
-      }
+      .dynamic-class { color: ${this._color.value}; }
     </style>
-    <div class="my-component">
-      Content here
-    </div>
+    <div class="dynamic-class">Content</div>
   `);
+}
+```
+
+- **CSS Nesting:** Native CSS nesting is supported in Shadow DOM. Use it for cleaner component styles:
+```css
+.card {
+  padding: 1rem;
+  & .title { font-weight: bold; }
+  &:hover { background: var(--color-surface-hover); }
 }
 ```
 
@@ -104,7 +125,7 @@ protected _render(): void {
 }
 ```
 
-- **DO NOT** use manual `addEventListener` for elements inside the template.
+- **Prefer** lit-html declarative binding (`@`) for elements inside the template. Manual `addEventListener` is acceptable for non-template targets (e.g., `document`, `window`, `renderRoot` for `slotchange`) with proper cleanup in `disconnectedCallback()` (see web-components-vanilla-ts skill §4.3).
 - The event handler is automatically removed when the template re-renders.
 
 ### Boolean Attributes
@@ -172,8 +193,8 @@ this._renderTemplate(html`
 `);
 ```
 
-- **DO NOT** use manual slot distribution (e.g., `slot.assignedNodes()`).
-- Let the browser handle slot distribution natively.
+- Let the browser handle slot distribution natively by default.
+- `slotchange` events and `slot.assignedNodes()` are acceptable when you need to react to slotted content changes (e.g., detecting which elements are slotted for layout logic).
 
 ---
 
@@ -247,10 +268,10 @@ The `_trackSignal()` method subscribes to a signal, which immediately triggers a
 
 ### The Solution
 
-`BaseElement` provides an `_initialized` flag that prevents rendering until explicitly set:
+`BaseElement` provides an `_initialized` flag that prevents rendering until initialization completes:
 
-1. **In BaseElement**: The `_requestRender()` method checks `this._initialized` and returns early if false.
-2. **In Component**: Set `this._initialized = true` at the end of `_setupProperties()` after all signals are initialized and tracked.
+1. **In BaseElement constructor**: `_requestRender()` checks `this._initialized` and returns early if `false`. The constructor sets `this._initialized = true` **after** `_setupProperties()` returns, ensuring no premature renders.
+2. **In Component**: Simply initialize and track your signals in `_setupProperties()`. The `_initialized` flag is managed by `BaseElement` automatically — you do NOT need to set it explicitly in most cases.
 
 ### Example
 
@@ -262,20 +283,19 @@ export class MyComponent extends BaseElement {
   declare private _name: Signal<string>;
 
   protected _setupProperties(): void {
-    // 1. Initialize all signals first
+    // Initialize all signals first
     this._count = new Signal(0);
     this._name = new Signal('');
 
-    // 2. Track all signals
+    // Track all signals — re-renders are deferred until _initialized = true
+    // (set automatically by BaseElement constructor after this method returns)
     this._trackSignal(this._count);
     this._trackSignal(this._name);
-
-    // 3. Mark initialization as complete (REQUIRED)
-    this._initialized = true;
   }
 
   protected _render(): void {
-    // Safe to access signals here - _render() won't be called until _initialized is true
+    // Safe to access signals — _render() won't be called until connectedCallback()
+    // which runs after the constructor has set _initialized = true
     this._renderTemplate(html`
       <div class="count">${this._name.value}: ${this._count.value}</div>
     `);
@@ -285,10 +305,10 @@ export class MyComponent extends BaseElement {
 
 ### Key Points
 
-- Use `declare` for signal properties (e.g., `declare private _count: Signal<number>;`). This is required to prevent TypeScript from emitting initialization code that overwrites the signal instance created in `_setupProperties()` when `useDefineForClassFields: true` is enabled (default in modern Vite/esbuild).
-- Always set `this._initialized = true` at the end of `_setupProperties()`.
-- This ensures `_render()` is only called after all signals are ready.
-- The flag is checked in `_requestRender()` before scheduling any render.
+- Use `declare` for signal properties (e.g., `declare private _count: Signal<number>;`). This prevents TypeScript's `useDefineForClassFields` from emitting initialization code that would overwrite the signal instance created in `_setupProperties()` (see web-components-vanilla-ts skill §4.1).
+- `BaseElement` sets `_initialized = true` automatically after `_setupProperties()` returns. Do NOT set it explicitly in your component.
+- `_requestRender()` checks `_initialized` and defers all renders until it is `true`.
+- `_render()` is called in `connectedCallback()` which runs after the constructor — signals are always ready.
 
 ---
 
