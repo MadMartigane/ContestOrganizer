@@ -29,17 +29,20 @@ theme.extend.fontFamily   →  --font-sans: "Inter", sans-serif
 ## Structure du fichier CSS principal
 
 ```css
-/* app.css — point d'entrée CSS */
-@import "tailwindcss";
-@import "./theme.css";          /* design tokens */
-@import "./components.css";     /* composants custom (optionnel) */
+/* tailwind.css — point d'entrée CSS (ordre IMPORTANT) */
+@import "tailwindcss";          /* TOUJOURS en premier — établit la base layer */
+@import "./theme.css";          /* design tokens (@theme) */
+@import "./app.css";            /* CSS custom (.grid-300, .border-sky, etc.) */
 ```
+
+> **⚠️ L'ordre des imports est crucial.** `@import "tailwindcss"` doit TOUJOURS être le premier import. Il initialise les couches CSS de base (base, components, utilities). Les imports suivants (thème, styles custom) viennent se greffer sur cette base.
 
 ```css
 /* theme.css — tous les design tokens */
 @theme {
   /* couleurs, polices, radius, ombres, animations... */
 }
+```
 ```
 
 > **⚠️ `@theme` doit toujours être top-level.** Jamais imbriqué sous `:root`, `@media`, ou tout autre sélecteur.
@@ -297,6 +300,121 @@ Définir les keyframes et l'animation dans `@theme` :
 
 ---
 
+## Détection automatique du contenu (Content Detection)
+
+### Comment ça fonctionne
+
+Tailwind v4 scanne **automatiquement tous les fichiers** du projet (sauf `.gitignore`, `node_modules`, fichiers binaires, fichiers CSS, lock files). Il traite chaque fichier comme du **texte brut** et recherche des tokens qui pourraient être des noms de classes.
+
+**Conséquence** : les classes dans les template literals TypeScript, `classList.add()`, et les objets statiques sont toutes détectées automatiquement.
+
+```typescript
+// ✅ Auto-détecté — les strings sont lues comme du texte brut
+const variantClasses: Record<string, string> = {
+  default: "bg-neutral-100 text-neutral-700 dark:bg-neutral-600 dark:text-neutral-50",
+  brand: "bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-200",
+};
+
+// ✅ Auto-détecté — "text-3xl" et "text-yellow-600" sont trouvés dans le texte
+icon.classList.add("text-3xl", "text-yellow-600");
+
+// ✅ Auto-détecté — "grid grid-cols-11 gap-4" est trouvé comme texte
+html`<div class="grid grid-cols-11 gap-4">...</div>`;
+```
+
+### Quand utiliser `@source`
+
+Utiliser `@source` **uniquement** pour scanner des chemins ignorés par défaut (ex: `node_modules`) :
+
+```css
+/* ⚠️ Rarement nécessaire — uniquement pour des packages externes */
+@source "../node_modules/mon-paquet/**/*.js";
+```
+
+### Quand utiliser `@source inline()`
+
+Utiliser `@source inline()` **uniquement** pour les classes construites dynamiquement au runtime qui n'apparaissent PAS dans le code source :
+
+```css
+/* ✅ Classe construite dynamiquement — le nom complet n'est pas dans le source */
+@source inline("bg-red-{50,{100..900..100},950}");
+
+/* ❌ NE PAS utiliser pour des classes statiques — auto-détectées */
+/* ❌ NE PAS utiliser comme "safelist global" — c'est un anti-pattern en v4 */
+```
+
+> **Règle d'or** : Si la classe apparaît en toutes lettres dans un fichier du projet, elle est auto-détectée. Pas besoin de `@source inline()`.
+
+### Support brace expansion
+
+`@source inline()` supporte la syntaxe brace expansion pour générer plusieurs classes :
+
+```css
+/* Génère : bg-red-50, bg-red-100, bg-red-200, ..., bg-red-900, bg-red-950 */
+@source inline("bg-red-{50,{100..900..100},950}");
+
+/* Génère : hover:bg-red-500, focus:bg-red-500, bg-red-500 */
+@source inline("{hover:,focus:,}bg-red-500");
+```
+
+---
+
+## Shadow DOM et Tailwind CSS
+
+### Le problème
+
+Les Web Components utilisent le Shadow DOM pour encapsuler les styles. **Le CSS global (y compris les utilitaires Tailwind) ne pénètre PAS dans les shadow roots.**
+
+```typescript
+// ❌ Les classes Tailwind dans le shadow root ne fonctionnent PAS avec le CSS global
+class MyComponent extends BaseElement {
+  protected _render(): void {
+    this._renderTemplate(html`
+      <div class="bg-red-500 text-white p-4">  <!-- ❌ Ces classes n'ont aucun effet -->
+        <slot></slot>
+      </div>
+    `);
+  }
+}
+```
+
+### La solution du projet : `tailwindSheet`
+
+Ce projet utilise une feuille de style constructable (`tailwindSheet` dans `src/core/styles.ts`) injectée dans chaque shadow root via `adoptedStyleSheets`. Elle contient les utilitaires Tailwind codés en dur.
+
+```typescript
+// src/core/base-element.ts — Injection automatique dans chaque composant
+protected _createRenderRoot(): ShadowRoot {
+  this._shadow = this.attachShadow({ mode: "open" });
+  this._shadow.adoptedStyleSheets = [baseSheet, tailwindSheet]; // ← Ici
+  return this._shadow;
+}
+```
+
+### Règles pour les composants Shadow DOM
+
+1. **Les utilitaires Tailwind dans le shadow root doivent exister dans `tailwindSheet`** — vérifier `src/core/styles.ts` avant d'utiliser une classe.
+2. **Si un utilitaire manque**, l'ajouter dans `tailwindSheet` (section correspondante).
+3. **Les CSS custom properties (`--color-*` de `@theme`) traversent les frontières du shadow DOM** — elles sont accessibles via `var(--color-primary)` dans les styles inline du composant.
+4. **Le dark mode dans le shadow root** utilise `@media (prefers-color-scheme: dark)`, pas la classe `.dark` (qui est sur `<html>` et invisible depuis le shadow root).
+5. **Pour des styles spécifiques au composant**, utiliser `createComponentSheet()` plutôt que des classes Tailwind.
+
+### Les CSS custom properties traversent le Shadow DOM
+
+```css
+/* ✅ Dans theme.css — disponible partout, y compris shadow roots */
+@theme {
+  --color-primary: oklch(0.65 0.22 50);
+}
+
+/* ✅ Dans un composant shadow DOM — la variable est accessible */
+:host {
+  background-color: var(--color-primary);
+}
+```
+
+---
+
 ## Trois modes de @theme
 
 | Mode | Syntaxe | Usage |
@@ -328,6 +446,9 @@ Définir les keyframes et l'animation dans `@theme` :
 8. **Séparer le thème du reste** : `theme.css` pour les tokens, pas de logique CSS mélangée
 9. **Utiliser les utilitaires Tailwind** en priorité, `@layer components` uniquement pour des patterns répétitifs
 10. **Tester dans Tailwind Playground** : [play.tailwindcss.com](https://play.tailwindcss.com/)
+11. **Mettre `@import "tailwindcss"` en premier** dans le fichier CSS principal — jamais après d'autres imports
+12. **Vérifier `tailwindSheet`** (src/core/styles.ts) pour les classes Tailwind utilisées dans le Shadow DOM
+13. **Faire confiance à l'auto-détection** — ne pas utiliser `@source inline()` comme safelist global
 
 ### ❌ NE PAS FAIRE
 
@@ -341,6 +462,10 @@ Définir les keyframes et l'animation dans `@theme` :
 8. **Ne pas utiliser `@apply`** sauf dans `@layer components` pour des patterns répétitifs
 9. **Ne pas réécrire des utilitaires Tailwind existants** en custom CSS
 10. **Ne pas hardcoder des couleurs en inline** : toujours passer par les variables du thème
+11. **Ne pas utiliser `@source inline()` comme safelist global** — c'est un anti-pattern en v4, l'auto-détection fonctionne
+12. **Ne pas ajouter `@source "../**/*.ts"`** — Tailwind scanne déjà tous les fichiers par défaut
+13. **Ne pas supposer que le CSS global pénètre le Shadow DOM** — utiliser `tailwindSheet` ou `createComponentSheet()`
+14. **Ne pas importer `variables.css` en double** — vérifier la chaîne d'imports pour éviter les doublons
 
 ---
 
@@ -419,20 +544,20 @@ element.style.backgroundColor = 'var(--color-primary)';
 
 ```
 src/
-├── css/
-│   ├── app.css          ← @import "tailwindcss" + imports
-│   ├── theme.css        ← @theme { ... } (design tokens purs)
-│   └── components.css   ← @layer components (patterns répétitifs)
-├── js/
-│   └── main.ts          ← Point d'entrée JS
+├── global/
+│   ├── tailwind.css       ← @import "tailwindcss" + imports (point d'entrée)
+│   ├── theme.css          ← @theme { ... } (design tokens purs)
+│   ├── app.css            ← @import "./variables.css" (CSS custom)
+│   └── variables.css      ← Classes custom (.grid-300, .border-sky, .can-be-clicked)
+├── vanilla-entry.ts       ← import "./global/tailwind.css" + tous les composants
 └── ...
 ```
 
 ```css
-/* app.css */
-@import "tailwindcss";
-@import "./theme.css";
-@import "./components.css";
+/* tailwind.css */
+@import "tailwindcss";       /* 1️⃣ Premier — base Tailwind */
+@import "./theme.css";       /* 2️⃣ Design tokens */
+@import "./app.css";         /* 3️⃣ CSS custom */
 ```
 
 ```css

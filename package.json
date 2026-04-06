@@ -34,7 +34,6 @@
   "devDependencies": {
     "@biomejs/biome": "^2.4.9",
     "@rollup/plugin-replace": "^6.0.3",
-    "@tailwindcss/postcss": "^4",
     "@tailwindcss/vite": "^4",
     "@types/jest": "^29.5.14",
     "@types/node": "^25.0.0",
