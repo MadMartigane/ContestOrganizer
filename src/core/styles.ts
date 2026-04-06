@@ -205,6 +205,22 @@ tailwindSheet.replaceSync(`
   /* Dividers */
   .divide-y > :not([hidden]) ~ :not([hidden]) { border-top-width: 1px; }
   .divide-neutral-200 > :not([hidden]) ~ :not([hidden]) { border-color: #e5e5e5; }
+
+  /* Element resets (from global tailwind.css) */
+  h1 { font-size: 1.5rem; line-height: 2rem; margin-top: 0.5rem; margin-bottom: 0.5rem; }
+  h2 { font-size: 1.25rem; line-height: 1.75rem; margin-top: 0.5rem; margin-bottom: 0.5rem; }
+  table { margin-right: auto; margin-left: auto; width: 100%; border-collapse: collapse; text-align: center; vertical-align: middle; align-items: center; }
+  th { border: 1px solid; min-width: 2.5rem; border-color: #d4d4d4; }
+  td { border: 1px solid; min-width: 2.5rem; border-color: #e5e5e5; }
+  @media (prefers-color-scheme: dark) {
+    th { border-color: #525252; }
+    td { border-color: #404040; }
+  }
+
+  /* Global utility classes (from global variables.css) */
+  .grid-300 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; max-width: 1280px; margin-left: auto; margin-right: auto; }
+  .grid-300 > * { display: block; }
+  .footer { margin: 3rem 0; }
 `);
 
 /**

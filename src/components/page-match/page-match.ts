@@ -1,29 +1,83 @@
-import { BaseElement } from "@core/base-element.js";
-import { Signal } from "@core/signal.js";
+import { BaseElement } from "@core/base-element";
+import { Signal } from "@core/signal";
+import { createComponentSheet } from "@core/styles";
 import { html, nothing, render, type TemplateResult } from "lit-html";
 import { repeat } from "lit-html/directives/repeat.js";
-import { getTournaments } from "../../modules/init.js";
+import { getTournaments } from "../../modules/init";
 import Matchs, {
   Match,
   MatchStatus,
   MatchTeamType,
   type Row,
-} from "../../modules/matchs/matchs.js";
+} from "../../modules/matchs/matchs";
 import {
   generateNBAScheduleMinimax,
   getNBAMissingMatchCount,
   validateNBAScheduleGeneration,
-} from "../../modules/nba/nba.scheduler.js";
-import type { GenericTeam } from "../../modules/team-row/team-row.d.js";
-import { Tournaments } from "../../modules/tournaments/tournaments.js";
-import type { Tournament } from "../../modules/tournaments/tournaments.types.js";
+} from "../../modules/nba/nba.scheduler";
+import type { GenericTeam } from "../../modules/team-row/team-row.d";
+import { Tournaments } from "../../modules/tournaments/tournaments";
+import type { Tournament } from "../../modules/tournaments/tournaments.types";
 import {
   TournamentType,
   TournamentTypeLabel,
-} from "../../modules/tournaments/tournaments.types.js";
-import Utils from "../../modules/utils/utils.js";
+} from "../../modules/tournaments/tournaments.types";
+import Utils from "../../modules/utils/utils";
 
-import { calculateTargetMatchIndex } from "./page-match.logic.js";
+import { calculateTargetMatchIndex } from "./page-match.logic";
+
+const pageMatchSheet = createComponentSheet(`
+  .scroll-nav {
+    position: fixed;
+    bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+    right: 1rem;
+    z-index: 50;
+    opacity: 0;
+    transform: translateY(100%);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+
+    &.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    @media (max-height: 600px) {
+      bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+    }
+  }
+
+  .scroll-nav-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .host-scorer,
+  .visitor-scorer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    justify-self: center;
+
+    mad-scorer-common {
+      width: 100%;
+    }
+  }
+`);
 
 interface Config {
   minGoal: number;
@@ -31,8 +85,14 @@ interface Config {
 
 /**
  * PageMatch - Tournament match management page component
+ *
+ * Observed attributes:
+ * - `tournament-id`: ID of the tournament to display (numeric string)
+ *
+ * Custom events:
+ * - `navigate`: Fired when navigating, detail: { hash: string }
+ *
  * @element page-match
- * @fires navigate
  */
 export class PageMatch extends BaseElement {
   private readonly config: Config = {
@@ -81,8 +141,8 @@ export class PageMatch extends BaseElement {
   /**
    * Observed attributes for reactive updates
    */
-  static get observedAttributes(): string[] {
-    return ["tournament-id"];
+  static get observedAttributes() {
+    return ["tournament-id"] as const;
   }
 
   /**
@@ -140,8 +200,7 @@ export class PageMatch extends BaseElement {
     this._trackSignal(this._currentMatch);
     this._trackSignal(this._matchRefs);
 
-    // Mark initialization as complete to enable rendering
-    this._initialized = true;
+    // _initialized is set automatically by BaseElement after this method returns
 
     // Setup keyboard shortcuts
     this._setupKeyboardShortcuts();
@@ -152,7 +211,6 @@ export class PageMatch extends BaseElement {
    */
   connectedCallback(): void {
     super.connectedCallback();
-    this.initTournaments();
     this._setupScrollNavigation();
   }
 
@@ -163,6 +221,13 @@ export class PageMatch extends BaseElement {
     document.removeEventListener("keydown", this._handleKeydown);
     window.removeEventListener("scroll", this._handleScroll);
     super.disconnectedCallback();
+  }
+
+  /**
+   * Inject component-specific styles
+   */
+  protected _injectStyles(): void {
+    super._injectStyles(pageMatchSheet);
   }
 
   /**
@@ -1223,61 +1288,6 @@ export class PageMatch extends BaseElement {
     this.matchRefs.clear();
 
     this._renderTemplate(html`
-      <style>
-        :host { display: block; }
-        .scroll-nav {
-          position: fixed;
-          bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
-          right: 1rem;
-          z-index: 50;
-          opacity: 0;
-          transform: translateY(100%);
-          transition: opacity 0.3s ease, transform 0.3s ease;
-          pointer-events: none;
-        }
-
-        .scroll-nav.visible {
-          opacity: 1;
-          transform: translateY(0);
-          pointer-events: auto;
-        }
-
-        .scroll-nav-buttons {
-          display: flex;
-          flex-direction: column;
-          gap: 0.25rem;
-        }
-
-        .sr-only {
-          position: absolute;
-          width: 1px;
-          height: 1px;
-          padding: 0;
-          margin: -1px;
-          overflow: hidden;
-          clip: rect(0, 0, 0, 0);
-          white-space: nowrap;
-          border: 0;
-        }
-
-        @media (max-height: 600px) {
-          .scroll-nav {
-            bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
-          }
-        }
-
-        .host-scorer, .visitor-scorer {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          justify-self: center;
-        }
-
-        .host-scorer mad-scorer-common,
-        .visitor-scorer mad-scorer-common {
-          width: 100%;
-        }
-      </style>
       <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 dark:bg-neutral-800 rounded-lg shadow-md">
         <slot name="content"></slot>
       </div>

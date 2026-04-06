@@ -1,4 +1,4 @@
-import { BaseElement } from "@core/base-element.js";
+import { BaseElement } from "@core/base-element";
 import { html, nothing } from "lit-html";
 
 const variantClasses: Record<string, string> = {
@@ -13,13 +13,22 @@ const variantClasses: Record<string, string> = {
   info: "bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-200",
 };
 
+/**
+ * MadCallout - Dismissible callout/alert box for notifications
+ *
+ * Observed attributes:
+ * - `variant`: Color variant — "default" | "danger" | "warning" | "success" | "info" (default: "default")
+ * - `open`: When present, the callout is visible; when absent, hidden
+ *
+ * @element mad-callout
+ */
 export class MadCallout extends BaseElement {
-  static get observedAttributes(): string[] {
-    return ["variant", "open"];
+  static get observedAttributes() {
+    return ["variant", "open"] as const;
   }
 
   protected _setupProperties(): void {
-    this._initialized = true;
+    // No signals needed — properties handled via attributes/getters
   }
 
   get variant(): string {
@@ -53,9 +62,6 @@ export class MadCallout extends BaseElement {
     const baseClasses = "rounded-lg border p-4";
 
     this._renderTemplate(html`
-      <style>
-        :host { display: block; }
-      </style>
       <div part="base" class="${baseClasses} ${classes}">
         <slot name="start"></slot>
         <slot></slot>

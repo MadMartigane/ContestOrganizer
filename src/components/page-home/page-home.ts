@@ -1,10 +1,18 @@
-import { BaseElement } from "@core/base-element.js";
+import { BaseElement } from "@core/base-element";
+import { createComponentSheet } from "@core/styles";
 import { html, type TemplateResult } from "lit-html";
 import pageHomeStyles from "./page-home.css?raw";
 
+const pageHomeSheet = createComponentSheet(pageHomeStyles);
+
 /**
  * PageHome - Home page component with rotating image carousel
- * @extends BaseElement
+ *
+ * Observed attributes: none
+ *
+ * Custom events: none
+ *
+ * @element page-home
  */
 export class PageHome extends BaseElement {
   private readonly imgList: Array<{ src: string; width: number }> = [
@@ -25,14 +33,15 @@ export class PageHome extends BaseElement {
     // No additional properties to set up
   }
 
+  protected _injectStyles(): void {
+    super._injectStyles(pageHomeSheet);
+  }
+
   /**
    * Called when the element is added to the DOM
    */
   connectedCallback(): void {
     super.connectedCallback();
-    const sheet = new CSSStyleSheet();
-    sheet.replaceSync(pageHomeStyles);
-    this._injectStyles(sheet);
     this.intervalId = setInterval(() => {
       this.displayNextImg();
     }, 5000);
@@ -65,20 +74,11 @@ export class PageHome extends BaseElement {
     }
   }
 
-  private _getStyles(): TemplateResult {
-    return html`
-      <style>
-        :host { display: block; }
-      </style>
-    `;
-  }
-
   private _renderContent(): TemplateResult {
     return html`
-      ${this._getStyles()}
       <div part="base">
         <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 dark:bg-neutral-800 rounded-lg shadow-md">
-          <h1>Contest Tournament</h1>
+          <h1 class="text-2xl my-2">Contest Tournament</h1>
 
           <div class="carousel-container">
             <img
