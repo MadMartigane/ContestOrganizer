@@ -1,18 +1,9 @@
 // /src/components/scorer-common/scorer-common.ts
+
+import { html } from "lit-html";
 import { BaseElement } from "../../core/base-element.js";
 import { Signal } from "../../core/signal.js";
-
-const template = document.createElement("template");
-template.innerHTML = `
-  <style>
-    :host {
-      display: block;
-    }
-  </style>
-  <div part="base" class="scorer-wrapper">
-    <slot></slot>
-  </div>
-`;
+import scorerCommonStyles from "./scorer-common.css?raw";
 
 export class MadScorerCommon extends BaseElement {
   // Signal for reactive state
@@ -28,9 +19,6 @@ export class MadScorerCommon extends BaseElement {
 
   // Event emitter
   private readonly _emitChange: (value: string) => void;
-
-  // Cached elements
-  private _wrapper?: HTMLElement;
 
   static get observedAttributes(): string[] {
     return ["min", "max", "step", "value", "readonly", "hidden"];
@@ -100,36 +88,17 @@ export class MadScorerCommon extends BaseElement {
 
   connectedCallback(): void {
     super.connectedCallback();
+    const sheet = new CSSStyleSheet();
+    sheet.replaceSync(scorerCommonStyles);
+    this._injectStyles(sheet);
     // Initialize number from value or min
     const initialValue = this._value ?? this._min ?? 0;
     this._number.value = initialValue;
-
-    // Event delegation - single listener on host
-    this._renderRoot.addEventListener("click", this._handleClick);
   }
 
   disconnectedCallback(): void {
-    // Clean up event listeners
-    this._renderRoot.removeEventListener("click", this._handleClick);
     super.disconnectedCallback();
   }
-
-  private readonly _handleClick = (e: Event): void => {
-    const target = e.target as HTMLElement;
-
-    // Handle decrement button
-    const decrementBtn = target.closest(".decrement-btn") as HTMLElement | null;
-    if (decrementBtn) {
-      this._decrement();
-      return;
-    }
-
-    // Handle increment button
-    const incrementBtn = target.closest(".increment-btn") as HTMLElement | null;
-    if (incrementBtn) {
-      this._increment();
-    }
-  };
 
   // Public getter for current value (useful for testing/debugging)
   get value(): number {
@@ -173,53 +142,59 @@ export class MadScorerCommon extends BaseElement {
     this._emitChange(String(newValue));
   }
 
+  private readonly _handleDecrement = (): void => {
+    this._decrement();
+  };
+
+  private readonly _handleIncrement = (): void => {
+    this._increment();
+  };
+
   protected _render(): void {
-    const root = this._renderRoot;
-
-    // Initialize template on first render
-    if (!root.firstChild) {
-      root.appendChild(template.content.cloneNode(true));
-    }
-
-    // Get wrapper reference
-    this._wrapper = root.querySelector('[part="base"]') as HTMLElement;
-
     const isReadonly = this._readonly;
     const value = this._number.value;
 
-    this._wrapper.classList.toggle("hidden", this._hidden);
+    this._renderTemplate(html`
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
+      <div part="base" class="scorer-wrapper ${this._hidden ? "hidden" : ""}">
+        <div class="flex justify-center items-center gap-4 py-4">
+          <mad-button
+            variant="warning"
+            size="large"
+            pill
+            ?disabled=${isReadonly}
+            aria-label="Decrement score"
+            title="Decrease score"
+            class="decrement-btn"
+            part="button decrement"
+            @click=${this._handleDecrement}
+          >
+            <mad-icon name="dash-lg" slot="prefix" part="icon"></mad-icon>
+          </mad-button>
 
-    this._wrapper.innerHTML = `
-      <div class="flex justify-center items-center gap-4 py-4">
-        <mad-button
-          variant="warning"
-          size="large"
-          pill
-          ${isReadonly ? "disabled" : ""}
-          aria-label="Decrement score"
-          title="Decrease score"
-          class="decrement-btn"
-          part="button decrement"
-        >
-          <mad-icon name="dash-lg" slot="prefix" part="icon"></mad-icon>
-        </mad-button>
+          <span class="text-2xl font-mono font-bold min-w-12 text-center tabular-nums">${value}</span>
 
-        <span class="text-2xl font-mono font-bold min-w-12 text-center tabular-nums">${value}</span>
-
-        <mad-button
-          variant="brand"
-          size="large"
-          pill
-          ${isReadonly ? "disabled" : ""}
-          aria-label="Increment score"
-          title="Increase score"
-          class="increment-btn"
-          part="button increment"
-        >
-          <mad-icon name="plus-lg" slot="prefix" part="icon"></mad-icon>
-        </mad-button>
+          <mad-button
+            variant="brand"
+            size="large"
+            pill
+            ?disabled=${isReadonly}
+            aria-label="Increment score"
+            title="Increase score"
+            class="increment-btn"
+            part="button increment"
+            @click=${this._handleIncrement}
+          >
+            <mad-icon name="plus-lg" slot="prefix" part="icon"></mad-icon>
+          </mad-button>
+        </div>
+        <slot></slot>
       </div>
-    `;
+    `);
   }
 }
 

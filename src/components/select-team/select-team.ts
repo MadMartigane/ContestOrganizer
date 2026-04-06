@@ -1,3 +1,4 @@
+import { html, nothing, type TemplateResult } from "lit-html";
 import { BaseElement } from "../../core/base-element.js";
 import { Signal } from "../../core/signal.js";
 import apiSports from "../../modules/api-sports/api-sports";
@@ -18,21 +19,9 @@ export class SelectTeam extends BaseElement {
   private readonly apiSports = apiSports;
 
   private domDrawer!: HTMLElement & { show?: () => void; hide?: () => void };
-  private domDivBody: HTMLDivElement | null = null;
-  private domInputSearch:
-    | (HTMLElement & { value: string; disabled: boolean })
-    | null = null;
-  private domResultsContainer: HTMLElement | null = null;
   private searchValue = "";
   private searchRequestId = 0;
   private readonly minNumberSearchLetter = 3;
-
-  // Bound handlers for cleanup
-  private _boundBodyClickHandler: ((ev: Event) => void) | null = null;
-  private _boundSearchInputHandler: ((ev: Event) => void) | null = null;
-  private _boundCancelClickHandler: ((ev: Event) => void) | null = null;
-  private _boundMenuSelectHandler: ((ev: Event) => void) | null = null;
-  private _boundRetryClickHandler: (() => void) | null = null;
 
   // Props as signals (initialized in _setupProperties to run after parent constructor)
   private declare _color: Signal<string>;
@@ -179,10 +168,6 @@ export class SelectTeam extends BaseElement {
     this._initialized = true;
   }
 
-  protected _createRenderRoot(): Element {
-    return this;
-  }
-
   /**
    * Parse team value from attribute safely
    */
@@ -249,57 +234,6 @@ export class SelectTeam extends BaseElement {
   }
 
   /**
-   * Cleans up event listeners
-   */
-  private _cleanupEventListeners(): void {
-    if (this.domDivBody && this._boundBodyClickHandler) {
-      this.domDivBody.removeEventListener("click", this._boundBodyClickHandler);
-      this._boundBodyClickHandler = null;
-    }
-    if (this.domInputSearch && this._boundSearchInputHandler) {
-      this.domInputSearch.removeEventListener(
-        "input",
-        this._boundSearchInputHandler
-      );
-      this._boundSearchInputHandler = null;
-    }
-    if (this.domDrawer && this._boundCancelClickHandler) {
-      this.domDrawer.removeEventListener(
-        "click",
-        this._boundCancelClickHandler
-      );
-      this._boundCancelClickHandler = null;
-    }
-    if (this.domResultsContainer && this._boundMenuSelectHandler) {
-      this.domResultsContainer.removeEventListener(
-        "mad-select",
-        this._boundMenuSelectHandler
-      );
-      this._boundMenuSelectHandler = null;
-    }
-    if (this.domResultsContainer && this._boundRetryClickHandler) {
-      const retryBtn = this.domResultsContainer.querySelector("#retry-btn");
-      if (retryBtn) {
-        retryBtn.removeEventListener("click", this._boundRetryClickHandler);
-      }
-      this._boundRetryClickHandler = null;
-    }
-  }
-
-  disconnectedCallback(): void {
-    this._cleanupEventListeners();
-    super.disconnectedCallback();
-  }
-
-  /**
-   * Handle body click to open drawer
-   */
-  private _handleBodyClick(ev: Event): void {
-    ev.stopPropagation();
-    this._openDrawer();
-  }
-
-  /**
    * Handle search input with debounce
    */
   private _handleSearchInput(ev: Event): void {
@@ -315,8 +249,9 @@ export class SelectTeam extends BaseElement {
   private _openDrawer(): void {
     if (this.domDrawer) {
       this.domDrawer.setAttribute("open", "");
-      if (this.domInputSearch) {
-        Utils.setFocus(this.domInputSearch);
+      const inputSearch = this._renderRoot.querySelector("mad-input");
+      if (inputSearch) {
+        Utils.setFocus(inputSearch as HTMLElement);
       }
     }
   }
@@ -388,8 +323,10 @@ export class SelectTeam extends BaseElement {
    * Scroll to search results
    */
   private _scrollOnSearchResult(): void {
-    if (this.domResultsContainer) {
-      Utils.scrollIntoView(this.domResultsContainer);
+    const resultsContainer =
+      this._renderRoot.querySelector("#results-container");
+    if (resultsContainer) {
+      Utils.scrollIntoView(resultsContainer as HTMLElement);
     }
   }
 
@@ -406,41 +343,33 @@ export class SelectTeam extends BaseElement {
   }
 
   /**
-   * Handle team radio change event
-   */
-  private _onTeamRadioChange(ev: CustomEvent): void {
-    ev.stopPropagation();
-
-    const detail = ev.detail as { item: HTMLElement };
-    const teamId = detail.item?.dataset?.teamId;
-
-    if (teamId) {
-      const team = this._suggested.value.find(
-        (candidate) => candidate.id === Number(teamId)
-      );
-      if (team) {
-        this._onTeamSelected(team);
-      }
-    }
-  }
-
-  /**
    * Render the error alert
    */
-  private _renderErrorAlert(): string {
+  private _renderErrorAlert(): TemplateResult | typeof nothing {
     const error = this._searchError.value;
     if (!error) {
-      return "";
+      return nothing;
     }
 
     const retryButton = error.retryable
-      ? `<mad-button id="retry-btn" size="small" variant="brand">
-           <mad-icon name="arrow-clockwise" slot="start"></mad-icon>
-           Réessayer
-         </mad-button>`
-      : "";
+      ? html`<mad-button
+          id="retry-btn"
+          size="small"
+          variant="brand"
+          @click=${this._retrySearch}
+        >
+          <mad-icon name="arrow-clockwise" slot="start"></mad-icon>
+          Réessayer
+        </mad-button>`
+      : nothing;
 
-    return `<mad-callout class="my-2" open variant="danger" role="alert" aria-live="polite">
+    return html`<mad-callout
+      class="my-2"
+      open
+      variant="danger"
+      role="alert"
+      aria-live="polite"
+    >
       <mad-icon name="exclamation-triangle" slot="start"></mad-icon>
       <strong>${error.title}</strong>
       <p class="text-sm">${error.message}</p>
@@ -451,36 +380,46 @@ export class SelectTeam extends BaseElement {
   /**
    * Render the team result list
    */
-  private _renderTeamResultList(): string {
+  private _renderTeamResultList(): TemplateResult | typeof nothing {
     const teams = this._suggested.value;
     if (!teams.length) {
-      return "";
+      return nothing;
     }
 
-    const items = teams
-      .map(
-        (team) => `<mad-menu-item data-team-id="${team.id}">
-          <mad-team-tile></mad-team-tile>
-          <span slot="end">
-            <mad-icon class="text-4xl text-neutral-400 dark:text-neutral-500" name="arrow-right-circle"></mad-icon>
-          </span>
-        </mad-menu-item>`
-      )
-      .join("");
+    const items = teams.map(
+      (team) => html`<mad-menu-item
+        data-team-id="${team.id}"
+        @click=${() => this._onTeamSelected(team)}
+      >
+        <mad-team-tile .team=${team}></mad-team-tile>
+        <span slot="end">
+          <mad-icon
+            class="text-4xl text-neutral-400 dark:text-neutral-500"
+            name="arrow-right-circle"
+          ></mad-icon>
+        </span>
+      </mad-menu-item>`
+    );
 
-    return `<mad-menu>${items}</mad-menu>`;
+    return html`<mad-menu>${items}</mad-menu>`;
   }
 
   /**
    * Render the results content
    */
-  private _renderResultsContent(): string {
+  private _renderResultsContent(): TemplateResult | typeof nothing {
     if (this._isLoading.value) {
-      return `<div class="flex flex-col items-center justify-center py-8" role="status" aria-label="Loading teams">
+      return html`<div
+        class="flex flex-col items-center justify-center py-8"
+        role="status"
+        aria-label="Loading teams"
+      >
         <div class="mb-3">
           <mad-spinner class="text-4xl"></mad-spinner>
         </div>
-        <span class="text-neutral-400 dark:text-neutral-500">Chargement des équipes…</span>
+        <span class="text-neutral-400 dark:text-neutral-500"
+          >Chargement des équipes…</span
+        >
       </div>`;
     }
 
@@ -489,20 +428,27 @@ export class SelectTeam extends BaseElement {
     }
 
     if (this.searchValue?.length > 2) {
-      return `<mad-callout open variant="warning" role="status">
-        <mad-icon class="text-6xl text-yellow-600" name="emoji-frown" slot="start"></mad-icon>
+      return html`<mad-callout open variant="warning" role="status">
+        <mad-icon
+          class="text-6xl text-yellow-600"
+          name="emoji-frown"
+          slot="start"
+        ></mad-icon>
         <span class="mx-2 text-2xl">Aucun résultat</span>
       </mad-callout>`;
     }
 
-    return "";
+    return nothing;
   }
 
   /**
    * Render the team selection drawer content
    */
-  private _renderTeamSelection(): string {
-    return `<div class="footer">
+  private _renderTeamSelection(): TemplateResult {
+    const errorAlert = this._renderErrorAlert();
+    const resultsContent = this._renderResultsContent();
+
+    return html`<div class="footer">
       <mad-card>
         <div slot="header">
           <h3>Recherche ton équipe. (${this.minNumberSearchLetter} lettres min)</h3>
@@ -515,13 +461,14 @@ export class SelectTeam extends BaseElement {
               placeholder="nom d'équipe"
               size="medium"
               type="text"
+              @input=${this._handleSearchInput}
             >
               <mad-icon name="magnifying-glass" slot="start"></mad-icon>
             </mad-input>
           </div>
           <div id="results-container">
-            ${this._renderErrorAlert()}
-            ${this._renderResultsContent()}
+            ${errorAlert}
+            ${resultsContent}
           </div>
         </div>
       </mad-card>
@@ -532,148 +479,57 @@ export class SelectTeam extends BaseElement {
    * Main render method
    */
   protected _render(): void {
-    this._cleanupEventListeners();
-
     const team = this._team.value;
     const label = this._label.value;
     const placeholder = this._placeholder.value;
 
-    // 1. Initialize basic structure if it doesn't exist
-    if (!this.domDrawer) {
-      this.innerHTML = `<mad-drawer no-header placement="start">
-        ${this._renderTeamSelection()}
+    const teamSelectionContent = this._renderTeamSelection();
+
+    this._renderTemplate(html`
+      <style>
+        .footer {
+          grid-template-columns: 300px;
+        }
+      </style>
+      <mad-drawer no-header placement="start">
+        ${teamSelectionContent}
         <div class="grid-300" slot="footer">
-          <mad-button id="cancel-btn" variant="brand">
+          <mad-button id="cancel-btn" variant="brand" @click=${this._closeDrawer}>
             Annuler
           </mad-button>
         </div>
       </mad-drawer>
-      <div class="cursor-pointer" role="button" tabindex="0" aria-label="Select team, opens team selection dialog">
-        <div id="selected-team-container"></div>
-      </div>`;
+      <div
+        class="cursor-pointer"
+        role="button"
+        tabindex="0"
+        aria-label="Select team, opens team selection dialog"
+        @click=${this._openDrawer}
+        @keydown=${(ev: KeyboardEvent) => {
+          if (ev.key === "Enter" || ev.key === " ") {
+            ev.preventDefault();
+            this._openDrawer();
+          }
+        }}
+      >
+        <div id="selected-team-container">
+          ${label ? html`<span>${label}</span>` : nothing}
+          ${
+            team?.id
+              ? html`<mad-team-tile .team=${team}></mad-team-tile>`
+              : html`<span
+                  class="text-neutral-400 dark:text-neutral-500 text-sm"
+                  >${placeholder}</span
+                >`
+          }
+        </div>
+      </div>
+    `);
 
-      this.domDrawer = this._renderRoot.querySelector(
-        "mad-drawer"
-      ) as unknown as HTMLElement;
-      this.domDivBody = this._renderRoot.querySelector(".cursor-pointer");
-      this.domInputSearch = this._renderRoot.querySelector(
-        "mad-input"
-      ) as unknown as HTMLElement & {
-        value: string;
-        disabled: boolean;
-      };
-      this.domResultsContainer =
-        this._renderRoot.querySelector("#results-container");
-
-      this._setupButtonEvents();
-      this._setupEvents();
-    }
-
-    // 2. Update dynamic parts
-    // Update selected team display
-    const selectedTeamContainer = this._renderRoot.querySelector(
-      "#selected-team-container"
-    );
-    if (selectedTeamContainer) {
-      selectedTeamContainer.innerHTML = `
-        ${label ? `<span>${label}</span>` : ""}
-        ${
-          team?.id
-            ? "<mad-team-tile></mad-team-tile>"
-            : `<span class="text-neutral-400 dark:text-neutral-500 text-sm">${placeholder}</span>`
-        }
-      `;
-
-      if (team?.id) {
-        const tile = selectedTeamContainer.querySelector("mad-team-tile");
-        if (tile && "team" in tile) {
-          (tile as HTMLElement & { team: GenericTeam }).team = team;
-        }
-      }
-    }
-
-    // Update results container
-    if (this.domResultsContainer) {
-      this.domResultsContainer.innerHTML = `
-        ${this._renderErrorAlert()}
-        ${this._renderResultsContent()}
-      `;
-
-      // Set team property on result tiles
-      const resultTiles =
-        this.domResultsContainer.querySelectorAll("mad-team-tile");
-      const teams = this._suggested.value;
-      resultTiles.forEach((tile, index) => {
-        if (teams[index] && "team" in tile) {
-          (tile as HTMLElement & { team: GenericTeam }).team = teams[index];
-        }
-      });
-
-      // Re-attach menu events if menu exists
-      const menu = this.domResultsContainer.querySelector("mad-menu");
-      if (menu) {
-        this._boundMenuSelectHandler = (ev: Event) => {
-          ev.stopPropagation();
-          this._onTeamRadioChange(ev as CustomEvent);
-        };
-        menu.addEventListener("mad-select", this._boundMenuSelectHandler);
-      }
-
-      // Re-attach retry button event if it exists
-      const retryBtn = this.domResultsContainer.querySelector("#retry-btn");
-      if (retryBtn) {
-        this._boundRetryClickHandler = () => {
-          this._retrySearch();
-        };
-        retryBtn.addEventListener("click", this._boundRetryClickHandler);
-      }
-    }
-  }
-
-  /**
-   * Sets up event handlers
-   */
-  private _setupEvents(): void {
-    // Handle body click to open drawer
-    if (this.domDivBody) {
-      this._boundBodyClickHandler = this._handleBodyClick.bind(this);
-      this.domDivBody.addEventListener("click", this._boundBodyClickHandler);
-
-      // Add keyboard handler for Enter/Space to open drawer
-      this.domDivBody.addEventListener("keydown", (ev: Event) => {
-        const keyboardEvent = ev as KeyboardEvent;
-        if (keyboardEvent.key === "Enter" || keyboardEvent.key === " ") {
-          ev.preventDefault();
-          this._openDrawer();
-        }
-      });
-    }
-
-    // Handle search input with debounce
-    if (this.domInputSearch) {
-      this._boundSearchInputHandler = this._handleSearchInput.bind(this);
-      this.domInputSearch.addEventListener(
-        "input",
-        this._boundSearchInputHandler
-      );
-    }
-  }
-
-  /**
-   * Setup button event handlers after DOM is ready
-   * Uses event delegation on the drawer element to handle clicks
-   * even on cloned/re-rendered buttons
-   */
-  private _setupButtonEvents(): void {
-    if (this.domDrawer) {
-      this._boundCancelClickHandler = (ev: Event) => {
-        const target = ev.target as HTMLElement;
-        if (target.closest("#cancel-btn")) {
-          this._closeDrawer();
-        }
-      };
-      this.domDrawer.addEventListener("click", this._boundCancelClickHandler);
-    }
+    // Store drawer reference for programmatic control
+    this.domDrawer = this._renderRoot.querySelector(
+      "mad-drawer"
+    ) as unknown as HTMLElement & { show?: () => void; hide?: () => void };
   }
 }
 

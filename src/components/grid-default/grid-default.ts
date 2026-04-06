@@ -1,21 +1,13 @@
 import { BaseElement } from "@core/base-element.js";
 import { Signal } from "@core/signal.js";
+import { html } from "lit-html";
+import { repeat } from "lit-html/directives/repeat.js";
 import type { GridTeamOnUpdateDetail } from "../../modules/grid-common/grid-common.types.js";
 import { getTournaments } from "../../modules/init.js";
 import type {
   Tournament,
   TournamentUpdateEvent,
 } from "../../modules/tournaments/tournaments.types.js";
-
-const template = document.createElement("template");
-template.innerHTML = `
-  <style>
-    :host { display: block; }
-  </style>
-  <div part="base">
-    <slot></slot>
-  </div>
-`;
 
 /**
  * GridDefault - Displays tournament grid with team selections
@@ -27,9 +19,6 @@ export class GridDefault extends BaseElement {
   private _tournamentUpdateHandler: (() => void) | null = null;
   private _tournamentUnsubscribe: (() => void) | null = null;
 
-  // Bound handlers for cleanup
-  private _boundSelectChangeHandlers: Array<() => void> = [];
-
   static get observedAttributes(): string[] {
     return ["tournament-id"];
   }
@@ -39,10 +28,6 @@ export class GridDefault extends BaseElement {
     this._trackSignal(this._tournament);
 
     this._initialized = true;
-  }
-
-  protected _createRenderRoot(): Element {
-    return this;
   }
 
   connectedCallback(): void {
@@ -57,20 +42,12 @@ export class GridDefault extends BaseElement {
   }
 
   disconnectedCallback(): void {
-    this._cleanupEventListeners();
     if (this._tournamentUnsubscribe) {
       this._tournamentUnsubscribe();
       this._tournamentUnsubscribe = null;
     }
     this._tournamentUpdateHandler = null;
     super.disconnectedCallback();
-  }
-
-  private _cleanupEventListeners(): void {
-    for (const cleanup of this._boundSelectChangeHandlers) {
-      cleanup();
-    }
-    this._boundSelectChangeHandlers = [];
   }
 
   protected _onAttributeChange(name: string, _value: string | null): void {
@@ -117,32 +94,69 @@ export class GridDefault extends BaseElement {
     this.updateTournament();
   }
 
-  protected _render(): void {
-    this._cleanupEventListeners();
+  private _renderGridHeader(): ReturnType<typeof html> {
+    return html`
+      <thead class="bg-orange-600 text-neutral-100 dark:bg-orange-700 dark:text-neutral-50 align-middle">
+        <th>
+          <mad-icon class="text-2xl" name="sort-numeric-down"></mad-icon>
+        </th>
+        <th>
+          <span>Équipes</span>
+        </th>
+        <th>
+          <span>Points</span>
+        </th>
+        <th>
+          <span class="text-green-600">Buts</span>
+          <mad-icon class="text-2xl text-green-600" name="plus"></mad-icon>
+        </th>
+        <th>
+          <span class="text-yellow-600">Buts</span>
+          <mad-icon class="text-2xl text-yellow-600" name="minus"></mad-icon>
+        </th>
+        <th>
+          <span>Goal average</span>
+        </th>
+        <th class="text-center">
+          <mad-icon class="inline-block text-2xl" name="calendar-event"></mad-icon>
+        </th>
+      </thead>
+    `;
+  }
 
-    const root = this._renderRoot;
-    if (!root.firstChild) {
-      root.appendChild(template.content.cloneNode(true));
-    }
-
+  private _renderGridBody(): ReturnType<typeof html> {
     const tournament = this._tournament.value;
     const rows = tournament?.grid ?? [];
 
+    if (rows.length === 0) {
+      return html``;
+    }
+
     let counter = 0;
-    const tableRows = rows
-      .map((gridRow) => {
+    const tableRows = repeat(
+      rows,
+      (gridRow) => gridRow.id,
+      (gridRow) => {
         const rowNumber = ++counter;
-        return `
+        const rowNumberPrefix = rowNumber > 9 ? "" : "0";
+        return html`
           <tr>
             <td>
-              <span class="counter">
-                ${rowNumber > 9 ? null : "0"}
-                ${rowNumber}
-              </span>
+              <span class="counter">${rowNumberPrefix}${rowNumber}</span>
             </td>
             <td>
               <mad-select-team
                 data-grid-id="${gridRow.id}"
+                tournament-grid-id="${gridRow.id}"
+                color="primary"
+                placeholder="Équipe vide"
+                type="${tournament?.type ?? ""}"
+                value="${gridRow.team ? JSON.stringify(gridRow.team) : ""}"
+                @mad-select-change=${(
+                  ev: CustomEvent<GridTeamOnUpdateDetail>
+                ) => {
+                  this.onTeamTeamChange(ev.detail);
+                }}
               ></mad-select-team>
             </td>
             <td>
@@ -162,82 +176,27 @@ export class GridDefault extends BaseElement {
             </td>
           </tr>
         `;
-      })
-      .join("");
-
-    const table = root.querySelector("table");
-    if (table) {
-      table.innerHTML = `
-        <thead class="bg-orange-600 text-neutral-100 dark:bg-orange-700 dark:text-neutral-50 align-middle">
-          <th>
-            <mad-icon class="text-2xl" name="sort-numeric-down"></mad-icon>
-          </th>
-          <th>
-            <span>Équipes</span>
-          </th>
-          <th>
-            <span>Points</span>
-          </th>
-          <th>
-            <span class="text-green-600">Buts</span>
-            <mad-icon class="text-2xl text-green-600" name="plus"></mad-icon>
-          </th>
-          <th>
-            <span class="text-yellow-600">Buts</span>
-            <mad-icon class="text-2xl text-yellow-600" name="minus"></mad-icon>
-          </th>
-          <th>
-            <span>Goal average</span>
-          </th>
-          <th class="text-center">
-            <mad-icon class="inline-block text-2xl" name="calendar-event"></mad-icon>
-          </th>
-        </thead>
-        <tbody>
-          ${tableRows}
-        </tbody>
-      `;
-    }
-
-    this._setupTeamSelectors();
-  }
-
-  private _setupTeamSelectors(): void {
-    const tournament = this._tournament.value;
-    const selectors = Array.from(
-      this._renderRoot.querySelectorAll("mad-select-team")
+      }
     );
 
-    for (const selector of selectors) {
-      const gridIdStr = selector.getAttribute("data-grid-id");
-      if (!gridIdStr) {
-        continue;
-      }
+    return html`<tbody>${tableRows}</tbody>`;
+  }
 
-      const gridId = Number(gridIdStr);
-      const gridRow = tournament?.grid.find((g) => g.id === gridId);
-
-      if (gridRow && selector) {
-        const element = selector as HTMLElement;
-        element.setAttribute("tournament-grid-id", String(gridId));
-        element.setAttribute("color", "primary");
-        element.setAttribute("placeholder", "Équipe vide");
-        if (tournament?.type) {
-          element.setAttribute("type", tournament.type);
-        }
-        if (gridRow.team) {
-          element.setAttribute("value", JSON.stringify(gridRow.team));
-        }
-
-        const handler = ((ev: CustomEvent<GridTeamOnUpdateDetail>) => {
-          this.onTeamTeamChange(ev.detail);
-        }) as EventListener;
-        selector.addEventListener("madSelectChange", handler);
-        this._boundSelectChangeHandlers.push(() =>
-          selector.removeEventListener("madSelectChange", handler)
-        );
-      }
-    }
+  protected _render(): void {
+    this._renderTemplate(html`
+      <style>
+        .grid-default { display: block; }
+      </style>
+      <div class="grid-default">
+        <div part="base">
+          <slot></slot>
+          <table class="w-full">
+            ${this._renderGridHeader()}
+            ${this._renderGridBody()}
+          </table>
+        </div>
+      </div>
+    `);
   }
 }
 

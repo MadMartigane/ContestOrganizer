@@ -1,4 +1,6 @@
 import { BaseElement } from "@core/base-element.js";
+import { html, nothing, type TemplateResult } from "lit-html";
+import errorMessageStyles from "./error-message.css?raw";
 
 /**
  * ErrorMessage - A vanilla web component that displays an error message with optional home button.
@@ -63,6 +65,14 @@ export class ErrorMessage extends BaseElement {
   }
 
   /** @inheritdoc */
+  connectedCallback(): void {
+    super.connectedCallback();
+    const sheet = new CSSStyleSheet();
+    sheet.replaceSync(errorMessageStyles);
+    this._injectStyles(sheet);
+  }
+
+  /** @inheritdoc */
   protected _setupProperties(): void {
     this._message = this.getAttribute("message") ?? "";
     this._goHomeButton = this._parseBoolean(
@@ -86,23 +96,40 @@ export class ErrorMessage extends BaseElement {
     }
   }
 
+  private _getStyles(): TemplateResult {
+    return html`
+      <style>
+        :host { display: block; }
+      </style>
+    `;
+  }
+
+  private _renderHomeButton(): TemplateResult {
+    return html`
+      <div class="grid-300">
+        <mad-button href="#/home" size="large" variant="brand">
+          <mad-icon name="house" slot="start"></mad-icon>
+          <span>Retour à l'accueil</span>
+        </mad-button>
+      </div>
+    `;
+  }
+
+  private _renderContent(): TemplateResult {
+    return html`
+      ${this._getStyles()}
+      <mad-callout class="my-8" open variant="danger" role="alert">
+        <mad-icon class="text-5xl" name="triangle-exclamation" slot="start"></mad-icon>
+        <h1 class="text-red-600">Erreur</h1>
+        <strong class="container">${this._message}</strong>
+      </mad-callout>
+      ${this._goHomeButton ? this._renderHomeButton() : nothing}
+    `;
+  }
+
   /** @inheritdoc */
   protected _render(): void {
-    const homeButtonHtml = this._goHomeButton
-      ? `<div class="grid-300">
-          <mad-button href="#/home" size="large" variant="brand">
-            <mad-icon name="house" slot="start"></mad-icon>
-            <span>Retour à l'accueil</span>
-          </mad-button>
-        </div>`
-      : "";
-
-    this.innerHTML = `<mad-callout class="my-8" open variant="danger" role="alert">
-      <mad-icon class="text-5xl" name="triangle-exclamation" slot="start"></mad-icon>
-      <h1 class="text-red-600">Erreur</h1>
-      <strong class="container">${this._message}</strong>
-    </mad-callout>
-    ${homeButtonHtml}`;
+    this._renderTemplate(this._renderContent());
   }
 }
 

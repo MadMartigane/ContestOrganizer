@@ -1,257 +1,213 @@
-# TODO - État de la Session de Développement
+# Rapport d'Audit Complet — 42 Composants
 
-## 1. Contexte du Projet
-
-**Projet** : ContestOrganizer - Outil pour organiser et profiter des concours sportifs
-**Technologie** : Migration Stencil → Vanilla Web Components
-**Stack** : TypeScript, Shoelace, BaseElement pattern, Signals
-
-Le projet migre progressivement les composants Stencil vers des Web Components Vanilla utilisant `BaseElement` et le pattern Signal.
+**Date** : 2026-04-05
+**Référentiel** : `CODING_GUIDELINES.md` (15 règles)
+**Périmètre** : 42 composants Web (vanilla TypeScript, lit-html, Shadow DOM)
+**Verdict** : Zéro composant n'est 100% clean. ~80+ anomalies détectées.
 
 ---
 
-## 🐛 Bugs
+## 🔴 CRITIQUES (Bugs fonctionnels)
 
-### BUG-001 : Alignement des scores dans les matchs FOOT
+### 1. `app-status-news.ts` — `_state` déclaré comme Signal mais utilisé comme string
+- **Lignes** : 20, 40
+- **Problème** : `private declare _state: ComponentState;` (typé Signal) mais `this._state = this._determineState();` assigne une string, pas un Signal.
+- **Impact** : Le type ment à l'exécution. Pas de `.value` utilisé, pas de tracking réactif.
 
-**Gravité** : Mineur  
-**Contexte** : Dans les matchs de type FOOT, les scores des deux équipes sont affichés l'un sous l'autre, tous deux alignés à gauche.  
-**Comportement actuel** : Les deux scores apparaissent groupés sur la gauche, non alignés sous leur équipe respective.  
-**Comportement attendu** : Chaque score doit être aligné sous l'équipe dont il est le score (score de l'équipe à domicile aligné à droite sous l'équipe domicile, score visiteur aligné à gauche sous l'équipe visiteur).  
-**Fichiers concernés** : `src/components/match-tile/match-tile.ts`
+### 2. `app-status-news.ts` — `_expandedSections` jamais tracké
+- **Ligne** : 33
+- **Problème** : `new Signal<Set<string>>(new Set())` créé mais **jamais passé à `_trackSignal()`**.
+- **Impact** : Les changements ne déclenchent aucun re-render automatique. Le composant contourne avec de la manipulation DOM manuelle (`_updateAriaStates()`).
 
----
+### 3. `page-match.ts` — `?disabled` avec string interpolation (toujours truthy)
+- **Lignes** : 1116, 1175, 1186
+- **Problème** : `?disabled="${expression}"` au lieu de `?disabled=${expression}`
+- **Impact** : Les guillemets transforment l'expression en string non-vide → **toujours truthy** → les boutons restent toujours disabled.
 
-## ✨ Features
+### 4. `page-tournament.ts` — `?disabled` avec string interpolation
+- **Ligne** : 486
+- **Problème** : `?disabled="${magicFillLoading}"` — même bug, toujours truthy.
 
-### FEAT-001 : Type de tournoi par défaut NBA
+### 5. `gesture-overlay.ts` — Boolean attribute avec string
+- **Lignes** : 356, 405
+- **Problème** : `const nextButtonDisabled = ... ? "disabled" : ""` puis `?disabled=${nextButtonDisabled}`
+- **Impact** : Fonctionne par accident mais sémantiquement faux et fragile.
 
-**Priorité** : Élevée  
-**Contexte** : Lors de la création d'un nouveau tournoi, le type de sport est actuellement FOOT.  
-**Comportement actuel** : Le sélecteur de type de tournoi propose FOOT comme valeur par défaut.  
-**Comportement attendu** : Le type par défaut doit être NBA.  
-**Fichiers concernés** : `src/components/page-tournament-select/page-tournament-select.tsx`
+### 6. `input-number.ts` — `max=""` et `step=""` vides (bug runtime)
+- **Lignes** : 98-99, 124, 130
+- **Problème** : Quand `max`/`step` sont `undefined`, le code rend `max=""` et `step=""`
+- **Impact** : `max=""` sur un `<input type="number">` est interprété comme `max=0` → **toutes les valeurs sont capées à 0**.
 
----
+### 7. `input-number.ts` — `value="${...}"` au lieu de `.value=${...}`
+- **Ligne** : 132
+- **Problème** : `value="${numberValue}"` — binding par attribut, pas par propriété.
+- **Impact** : La valeur de l'input ne se met pas à jour réactivement.
 
-## 🔧 Améliorations
+### 8. `mad-input.ts` — `value="${value}"` au lieu de `.value=${value}`
+- **Ligne** : 351
+- **Problème** : Même violation sur le composant input UI.
+- **Impact** : L'input ne reflète pas les changements de valeur réactivement.
 
-### IMPROV-001 : Équilibrage en temps réel de la génération aléatoire NBA
+### 9. `match-tile.ts` — `rank="${...}"` au lieu de `.rank=${...}`
+- **Lignes** : 346, 364
+- **Problème** : `rank` est une propriété `number` sur `MadTeamTile`, mais passée comme string attribute.
+- **Impact** : Force un workaround de "second pass" DOM manipulation (lignes 372-392) pour corriger le type.
 
-**Priorité** : Moyenne  
-**Contexte** : La génération automatique de matchs pour les tournois NBA crée des combinaisons aléatoires, mais l'algorithme actuel produit souvent des séries déséquilibrées.  
-**Problème identifié** : L'algorithme sélectionne l'équipe avec le plus de matchs restants puis cherche un adversaire, créant parfois des longues séries avec la même équipe pendant que d'autres équipes n'ont aucun match. L'équilibre n'est vérifié qu'après coup, pas à chaque itération.  
-**Amélioration attendue** : À chaque génération de match, l'algorithme doit tendre vers l'équilibre global. Avant de créer un match, vérifier que la sélection ne crée pas de déséquilibre temporaire (ex : même équipe jouée 3 fois de suite alors que d'autres n'ont pas joué). L'équilibre doit être vérifié et appliqué à chaque itération, pas uniquement lors du résultat final.  
-**Fichiers concernés** : `src/modules/nba/nba.scheduler.ts`
+### 10. `page-match.ts` — Property binding manquant sur `mad-match-tile`
+- **Lignes** : 965-971
+- **Problème** : `tournament-id="${...}"`, `host-score="${...}"` etc. au lieu de `.tournamentId=${...}`.
 
----
-
-## 🚀 Migration Stencil → Vanilla
-
-### Documentation du Format TODO.md
-
-Ce fichier est parsé par le script `scripts/generate-status.ts` pour générer les données affichées dans le composant `<app-status-news>`.
-
-**Format attendu :**
-- **Sections** : Définies par `## [emoji] Titre` (🐛 Bugs, ✨ Features, 🔧 Améliorations, 🚀 Migration)
-- **Items** : Définis par `### [ID] : Titre` (ex: `BUG-001`, `MIG-001`)
-- **Métadonnées** : Champs en gras `**Champ** : Valeur`
-- **Fichiers** : Chemins entre backticks `` `path/to/file` ``
-
-**Exécution du script :**
-```bash
-pnpm exec tsx scripts/generate-status.ts [patch|minor|major] [--skip-version]
-```
-
-Le script génère :
-- `src/generated/status-data.json` - Données JSON pour le composant
-- `src/generated/status-data.d.ts` - Types TypeScript
-- Met à jour `package.json` version (sauf avec `--skip-version`)
+### 11. `page-tournament.ts` — `.value="${...}"` avec quotes
+- **Lignes** : 328, 376
+- **Problème** : `.value="${tournament?.name ?? ""}"` — le `.value=` est correct mais les quotes `"${...}"` transforment en string interpolation.
 
 ---
 
-### Statut de la Migration
+## 🟠 HAUTES (Anti-patterns architecturaux)
 
-**Composants Migrés ✅** (9/20) :
-- `action-bar`, `app-status-news`, `error-message`, `mad-match-tile`, `mad-scorer-common`, `mad-select-team`, `page-404`, `page-config`, `page-home`, `page-match`
+### 12. `addEventListener` manuel sur des éléments de template (9 fichiers)
 
-**Composants à Migrer ⏳** (11/20) :
+| Fichier | Lignes | Détail |
+|---------|--------|--------|
+| `app-status-news.ts` | 303, 315, 327 | 3 listeners manuels sur `.status-card-header` et `.status-retry` |
+| `page-config.ts` | 116-125 | `addEventListener` sur `darkModeSwitch` et `clearCacheBtn` |
+| `page-match.ts` | 433-449, 1423-1470 | `_setupEvents()` attache manuellement tous les listeners |
+| `page-tournament.ts` | 408-420 | `addEventListener` sur les grid components |
+| `page-tournament-select.ts` | 94-155 | 6+ listeners manuels (cards, buttons, input) |
+| `live-match-card.ts` | 95-109 | `addEventListener("gesture", ...)` sur `_hostZone` et `_visitorZone` |
+| `grid-default.ts` | 230 | `addEventListener("madSelectChange", ...)` |
+| `grid-basket.ts` | 368 | Même pattern que grid-default |
+| `mad-drawer.ts` | 134 | `overlay.addEventListener("click", ...)` avec guard `dataset.madHook` |
 
-| Priorité | Composant | Tag | Complexité | Dépendances | Status |
-|----------|-----------|-----|------------|-------------|--------|
-| 1 | page-config | `page-config` | Low | Aucune | ✅ |
-| 2 | page-tournament-select | `page-tournament-select` | Low | Aucune | ✅ |
-| 3 | input-number | `mad-input-number` | Low | Aucune | ✅ |
-| 4 | team-tile | `mad-team-tile` | Low | Aucune | ✅ |
-| 5 | scorer-basket | `mad-scorer-basket` | Low | Aucune | ✅ |
-| 6 | scorer-rugby | `mad-scorer-rugby` | Low | Aucune | ✅ |
-| 7 | grid-default | `grid-default` | Medium | mad-select-team ✅ | ✅ |
-| 8 | grid-basket | `grid-basket` | Medium | mad-select-team ✅, action-bar ✅ | ✅ |
-| 9 | page-tournament | `page-tournament` | High | grid-basket ✅, grid-default ✅, input-number ✅, error-message ✅ | ✅ |
-| 10 | mad-route | `mad-route` | Medium | Aucune (router) | ✅ |
-| 11 | app-root | `app-root` | High | mad-route ✅, toutes les pages ✅ | ✅ |
+**Impact** : ~200+ lignes de boilerplate (`_setupEvents`, `_boundHandlers`, cleanup) qui seraient inutiles avec `@event=${handler}` dans les templates lit-html.
 
----
+### 13. 5 zone components ne utilisent JAMAIS `_renderTemplate()`
+- **Fichiers** : `home-zone.ts`, `config-zone.ts`, `matchs-zone.ts`, `tournament-zone.ts`, `tournaments-zone.ts`
+- **Pattern** : `super._render()` puis `document.createElement("page-*")` + `appendChild()`
+- **Impact** : Bypass total du système de rendu lit-html. Les enfants ne sont pas trackés par lit-html.
 
-### MIG-001 : Migration de page-config
-
-**Priorité** : Élevée  
-**Ordre** : 1  
-**Composant** : `page-config`  
-**Tag** : `page-config`  
-**Fichier source** : `src/components/page-config/page-config.tsx`  
-**Fichier cible** : `src/components/page-config/page-config.ts`  
-**Complexité** : Low  
-**Dépendances** : Aucune (composant standalone)  
-**Description** : Page de configuration simple, affiche les paramètres de l'application. Bon candidat pour démarrer la migration.  
-**Status** : ✅ Terminé
+### 14. `page-match.ts` — `render()` impératif de lit-html
+- **Ligne** : 427
+- **Problème** : `render(template, container as unknown as ShadowRoot)`
+- **Impact** : Bypass le pipeline de rendu du composant. Seul fichier qui fait ça.
 
 ---
 
-### MIG-002 : Migration de page-tournament-select
+## 🟡 MOYENNES
 
-**Priorité** : Élevée  
-**Ordre** : 2  
-**Composant** : `page-tournament-select`  
-**Tag** : `page-tournament-select`  
-**Fichier source** : `src/components/page-tournament-select/page-tournament-select.tsx`  
-**Fichier cible** : `src/components/page-tournament-select/page-tournament-select.ts`  
-**Complexité** : Low  
-**Dépendances** : Aucune  
-**Description** : Page de sélection des tournois, affiche la liste des tournois existants.  
-**Status** : ✅ Terminé
+### 15. `.map()` au lieu de `repeat` directive (9 fichiers)
 
----
+| Fichier | Lignes |
+|---------|--------|
+| `page-match.ts` | 1098, 1295-1297 |
+| `page-tournament-select.ts` | 376-411 |
+| `scorer-basket.ts` | 133 |
+| `scorer-rugby.ts` | 133 |
+| `select-team.ts` | 389-402 |
+| `grid-default.ts` | 146-176 |
+| `grid-basket.ts` | 272-310 |
+| `command-palette.ts` | 446 |
+| `mad-breadcrumb.ts` | 69 |
 
-### MIG-003 : Migration de input-number
+**Impact** : Pas de keyed DOM reconciliation. Les éléments sont détruits/recréés à chaque re-render au lieu d'être réutilisés.
 
-**Priorité** : Élevée  
-**Ordre** : 3  
-**Composant** : `input-number`  
-**Tag** : `mad-input-number`  
-**Fichier source** : `src/components/input-number/input-number.tsx`  
-**Fichier cible** : `src/components/input-number/input-number.ts`  
-**Complexité** : Low  
-**Dépendances** : Aucune  
-**Description** : Composant input numérique, utilisé par les grilles et pages de tournoi.  
-**Status** : ✅ Terminé
+### 16. Sélecteur `:host` interdit (15 fichiers)
 
----
+| Fichier | Lignes |
+|---------|--------|
+| `page-404.ts` | 30 |
+| `page-config.ts` | 64 |
+| `page-home.ts` | 71 |
+| `page-match.ts` | 1221 |
+| `page-tournament.ts` | 310, 357 |
+| `page-tournament-select.ts` | 289 |
+| `zone-container.ts` | 156 |
+| `scorer-common.ts` | 159 |
+| `scorer-basket.ts` | 127 |
+| `scorer-rugby.ts` | 127 |
+| `grid-default.ts` | 186 |
+| `grid-basket.ts` | 322 |
+| `input-number.ts` | 109-115 |
+| `command-palette.ts` | 319 |
+| `error-message.ts` | 102 |
 
-### MIG-004 : Migration de team-tile
+**Note** : Techniquement `:host` fonctionne avec Shadow DOM, mais la règle l'interdit explicitement. Remplacer par des sélecteurs de classe.
 
-**Priorité** : Élevée  
-**Ordre** : 4  
-**Composant** : `team-tile`  
-**Tag** : `mad-team-tile`  
-**Fichier source** : `src/components/team-tile/team-tile.tsx`  
-**Fichier cible** : `src/components/team-tile/team-tile.ts`  
-**Complexité** : Low  
-**Dépendances** : Aucune  
-**Description** : Tuile d'affichage d'une équipe avec image.  
-**Status** : ✅ Terminé
+### 17. Scorers bypassent `adoptedStyleSheets` du BaseElement
+- **Fichiers** : `scorer-common.ts`, `scorer-basket.ts`, `scorer-rugby.ts`
+- **Problème** : Override `_createRenderRoot()` pour appeler `this.attachShadow()` directement.
+- **Impact** : Ne reçoivent pas `baseSheet` ni `tailwindSheet` injectés automatiquement par `BaseElement`.
 
----
+### 18. `console` statements en production (3 fichiers)
 
-### MIG-005 : Migration de scorer-basket
-
-**Priorité** : Moyenne  
-**Ordre** : 5  
-**Composant** : `scorer-basket`  
-**Tag** : `mad-scorer-basket`  
-**Fichier source** : `src/components/scorer-basket/scorer-basket.tsx`  
-**Fichier cible** : `src/components/scorer-basket/scorer-basket.ts`  
-**Complexité** : Low  
-**Dépendances** : Aucune  
-**Description** : Composant de score pour matchs de basket.  
-**Status** : ✅ Terminé
+| Fichier | Lignes | Détail |
+|---------|--------|--------|
+| `team-tile.ts` | 163 | `console.warn(...)` |
+| `grid-basket.ts` | 190 | `console.error(error)` |
+| `input-number.ts` | 214-216 | `console.warn(...)` |
 
 ---
 
-### MIG-006 : Migration de scorer-rugby
+## 🟢 BASSES
 
-**Priorité** : Moyenne  
-**Ordre** : 6  
-**Composant** : `scorer-rugby`  
-**Tag** : `mad-scorer-rugby`  
-**Fichier source** : `src/components/scorer-rugby/scorer-rugby.tsx`  
-**Fichier cible** : `src/components/scorer-rugby/scorer-rugby.ts`  
-**Complexité** : Low  
-**Dépendances** : Aucune  
-**Description** : Composant de score pour matchs de rugby.  
-**Status** : ✅ Terminé
+### 19. JSDoc incomplet ou absent (25+ fichiers)
+Tous les composants ont un JSDoc manquant ou incomplet sur au moins un point :
+- Pas de documentation des `observedAttributes`
+- Pas de documentation des custom events (`@fires`)
+- Certains n'ont aucun JSDoc du tout : `scorer-common.ts`, `mad-badge.ts`, `mad-callout.ts`, `mad-card.ts`, `mad-menu.ts`, `mad-spinner.ts`
 
----
+### 20. TypeScript — casts non-safe (6 fichiers)
 
-### MIG-007 : Migration de grid-default
+| Fichier | Détail |
+|---------|--------|
+| `select-team.ts` | `as unknown as HTMLElement & {...}` double cast |
+| `page-tournament-select.ts` | Structural type assertions au lieu d'interfaces |
+| `grid-default.ts` | `as HTMLElement`, `as EventListener` |
+| `grid-basket.ts` | `as HTMLElement`, `as EventListener` |
+| `page-match.ts` | `(ev as CustomEvent).detail` |
+| `command-palette.ts` | `e[key as keyof KeyboardEvent]` |
 
-**Priorité** : Moyenne  
-**Ordre** : 7  
-**Composant** : `grid-default`  
-**Tag** : `grid-default`  
-**Fichier source** : `src/components/grid-default/grid-default.tsx`  
-**Fichier cible** : `src/components/grid-default/grid-default.ts`  
-**Complexité** : Medium  
-**Dépendances** : `mad-select-team` ✅ (déjà migré)  
-**Description** : Grille d'affichage par défaut pour les tournois.  
-**Status** : ✅ Terminé
+### 21. `page-config.ts` — `_initialized = true` manquant dans `_setupProperties()`
+- Le BaseElement le set dans le constructeur, mais la guideline exige qu'il soit set à la fin de `_setupProperties()`.
+
+### 22. `page-tournament.ts` — Code unreachable
+- **Ligne** : 243
+- **Problème** : `if (event.key === "Escape")` est unreachable car le bloc précédent (ligne 238) gère déjà Escape avec un `return`.
 
 ---
 
-### MIG-008 : Migration de grid-basket
+## 📊 Résumé par Règle
 
-**Priorité** : Moyenne  
-**Ordre** : 8  
-**Composant** : `grid-basket`  
-**Tag** : `grid-basket`  
-**Fichier source** : `src/components/grid-basket/grid-basket.tsx`  
-**Fichier cible** : `src/components/grid-basket/grid-basket.ts`  
-**Complexité** : Medium  
-**Dépendances** : `mad-select-team` ✅, `action-bar` ✅ (déjà migrés)  
-**Description** : Grille d'affichage spécifique NBA avec classement.  
-**Status** : ✅ Terminé
-
----
-
-### MIG-009 : Migration de page-tournament
-
-**Priorité** : Moyenne  
-**Ordre** : 9  
-**Composant** : `page-tournament`  
-**Tag** : `page-tournament`  
-**Fichier source** : `src/components/page-tournament/page-tournament.tsx`  
-**Fichier cible** : `src/components/page-tournament/page-tournament.ts`  
-**Complexité** : High  
-**Dépendances** : `grid-basket` ✅, `grid-default` ✅, `input-number` ✅, `error-message` ✅  
-**Description** : Page d'édition d'un tournoi, composant complexe avec génération de matchs.  
-**Status** : ✅ Terminé
+| Règle | Description | Violations | Fichiers touchés |
+|-------|-------------|-----------|-----------------|
+| **R2** | Rendering (`_renderTemplate`) | 6 | 5 zones + `page-match.ts` |
+| **R3** | Signal API (`.value`) | 2 | `app-status-news.ts` |
+| **R4** | Signal Init/Track | 2 | `app-status-news.ts`, `page-config.ts` |
+| **R5/11** | Event Listeners (`@event=`) | 9 | `app-status-news`, `page-config`, `page-match`, `page-tournament`, `page-tournament-select`, `live-match-card`, `grid-default`, `grid-basket`, `mad-drawer` |
+| **R6** | Boolean Attributes (`?disabled=`) | 4 | `page-match.ts`, `page-tournament.ts`, `gesture-overlay.ts`, `mad-input.ts` |
+| **R7** | Property Binding (`.value=`) | 7 | `page-match.ts`, `page-tournament.ts`, `match-tile.ts`, `input-number.ts`, `mad-input.ts`, `mad-select.ts`, `mad-icon.ts` |
+| **R8** | JSDoc complet | 25+ | Quasiment tous les fichiers |
+| **R13** | Pas de `:host` selector | 15 | Voir liste ci-dessus |
+| **R14** | `repeat` directive | 9 | Voir liste ci-dessus |
+| **R15** | Pas de `console` | 3 | `team-tile`, `grid-basket`, `input-number` |
+| **Shadow DOM** | Pas de bypass `adoptedStyleSheets` | 3 | `scorer-common`, `scorer-basket`, `scorer-rugby` |
 
 ---
 
-### MIG-010 : Migration de mad-route
+## 🏆 Top 3 des fichiers les plus problématiques
 
-**Priorité** : Basse  
-**Ordre** : 10  
-**Composant** : `mad-route`  
-**Tag** : `mad-route`  
-**Fichier source** : `src/components/mad-route/mad-route.tsx`  
-**Fichier cible** : `src/components/mad-route/mad-route.ts`  
-**Complexité** : Medium  
-**Dépendances** : Router module  
-**Description** : Composant de routing, essentiel pour app-root.  
-**Status** : ✅ Terminé
+1. **`page-match.ts`** — 1490 lignes, 12+ violations dont des bugs fonctionnels (`?disabled` string, `render()` impératif, `.map()`, property binding manquant)
+2. **`app-status-news.ts`** — Signal API complètement cassée (`_state` non-Signal, `_expandedSections` non-tracké, 3 `addEventListener` manuels)
+3. **`input-number.ts`** — Bug runtime critique (`max=""` cappe les valeurs à 0), property binding manquant, `console.warn`
 
 ---
 
-### MIG-011 : Migration de app-root
+## 🎯 Ordre de correction recommandé
 
-**Priorité** : Basse  
-**Ordre** : 11  
-**Composant** : `app-root`  
-**Tag** : `app-root`  
-**Fichier source** : `src/components/app-root/app-root.tsx`  
-**Fichier cible** : `src/components/app-root/app-root.ts`  
-**Complexité** : High  
-**Dépendances** : `mad-route` ✅, toutes les pages ✅  
-**Description** : Composant racine, routeur principal de l'application. À faire en dernier.  
-**Status** : ✅ Terminé
+1. **Bugs fonctionnels** (R3, R4, R6, R7) — Corriger les signaux cassés et les bindings
+2. **addEventListener → @event** (R5/11) — Éliminer ~200 lignes de boilerplate
+3. **`:host` → sélecteurs de classe** (R13) — 15 fichiers, fix rapide
+4. **`.map()` → `repeat`** (R14) — 9 fichiers, fix rapide
+5. **JSDoc** (R8) — Documentation systématique
+6. **Console cleanup** (R15) — Supprimer les `console.*`
+7. **Shadow DOM scorers** — Restaurer l'injection automatique des styles

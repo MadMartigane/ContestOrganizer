@@ -1,8 +1,13 @@
+import { html } from "lit-html";
 import { ZoneContainer } from "../zone-container/zone-container.js";
 import "../page-config/page-config.js";
 
 /**
- * ConfigZone - Configuration zone component with Shadow DOM support.
+ * ConfigZone - Configuration zone component that renders page-config inside the zone container.
+ * Uses Shadow DOM with lit-html rendering.
+ * @element config-zone
+ * @observedAttributes None - uses JavaScript properties (zoneType, title, icon)
+ * @fires None
  */
 export class ConfigZone extends ZoneContainer {
   constructor() {
@@ -13,13 +18,34 @@ export class ConfigZone extends ZoneContainer {
   }
 
   protected _render(): void {
-    super._render();
-    const root = this._renderRoot;
-    const zoneContent = root.querySelector(".zone-content");
-    if (zoneContent && !zoneContent.querySelector("page-config")) {
-      const pageConfig = document.createElement("page-config");
-      zoneContent.appendChild(pageConfig);
-    }
+    const zoneType = this.zoneType;
+    const title = this.title;
+    const icon = this.icon;
+    const isFocused = this._isFocused();
+    const isCollapsed = this._isCollapsed();
+    const showFocusButton = !(isFocused || isCollapsed);
+
+    this._renderTemplate(html`
+      ${this._getStyles()}
+      <div part="base" class="zone-container zone-${zoneType}" data-focused="${isFocused}">
+        <header part="header" class="zone-header">
+          <mad-icon name="${icon}"></mad-icon>
+          <h2 part="title">${title}</h2>
+          <button
+            part="focus-btn"
+            class="focus-btn"
+            aria-label="Focus ${title} zone"
+            ?hidden=${!showFocusButton}
+            @click=${this._handleFocus}
+          >
+            <mad-icon name="expand"></mad-icon>
+          </button>
+        </header>
+        <div part="content" class="zone-content">
+          <page-config></page-config>
+        </div>
+      </div>
+    `);
   }
 }
 customElements.define("config-zone", ConfigZone);

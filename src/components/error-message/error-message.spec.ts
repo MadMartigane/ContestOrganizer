@@ -19,8 +19,10 @@ describe("ErrorMessage", () => {
     element.setAttribute("message", "Test error message");
     document.body.appendChild(element);
 
-    expect(element.innerHTML).toContain("Test error message");
-    expect(element.innerHTML).toContain("mad-callout");
+    expect((element as any)._renderRoot.innerHTML).toContain(
+      "Test error message"
+    );
+    expect((element as any)._renderRoot.innerHTML).toContain("mad-callout");
   });
 
   it("should show home button by default", () => {
@@ -28,7 +30,9 @@ describe("ErrorMessage", () => {
     element.setAttribute("message", "Error");
     document.body.appendChild(element);
 
-    expect(element.innerHTML).toContain("Retour à l'accueil");
+    expect((element as any)._renderRoot.innerHTML).toContain(
+      "Retour à l'accueil"
+    );
   });
 
   it("should hide home button when go-home-button is false", () => {
@@ -37,7 +41,9 @@ describe("ErrorMessage", () => {
     element.setAttribute("go-home-button", "false");
     document.body.appendChild(element);
 
-    expect(element.innerHTML).not.toContain("Retour à l'accueil");
+    expect((element as any)._renderRoot.innerHTML).not.toContain(
+      "Retour à l'accueil"
+    );
   });
 
   it("should update when message attribute changes", async () => {
@@ -45,11 +51,11 @@ describe("ErrorMessage", () => {
     element.setAttribute("message", "Initial");
     document.body.appendChild(element);
 
-    expect(element.innerHTML).toContain("Initial");
+    expect((element as any)._renderRoot.innerHTML).toContain("Initial");
 
     element.setAttribute("message", "Updated");
     await new Promise((resolve) => setTimeout(resolve, 10));
 
-    expect(element.innerHTML).toContain("Updated");
+    expect((element as any)._renderRoot.innerHTML).toContain("Updated");
   });
 });

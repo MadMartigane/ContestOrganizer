@@ -334,7 +334,10 @@ export class SpatialLayout extends EventTarget {
    * Applies the current layout to the container element.
    */
   private applyLayout(): void {
-    const zoneElements = this.container.querySelectorAll<HTMLElement>(
+    // If this.container is inside a Shadow DOM, get the host element to find light DOM zones
+    const root = this.container.getRootNode();
+    const searchRoot = root instanceof ShadowRoot ? root.host : this.container;
+    const zoneElements = searchRoot.querySelectorAll<HTMLElement>(
       "config-zone, home-zone, tournaments-zone, tournament-zone, matchs-zone"
     );
 
@@ -354,6 +357,10 @@ export class SpatialLayout extends EventTarget {
         continue;
       }
 
+      element.style.position = "absolute";
+      element.style.top = "0";
+      element.style.left = "0";
+      element.style.height = "100%";
       element.style.width = `${config.width}%`;
       element.style.minWidth = `${config.minWidth}%`;
       element.style.maxWidth = `${config.maxWidth}%`;

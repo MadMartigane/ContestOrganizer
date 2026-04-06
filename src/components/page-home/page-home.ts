@@ -1,34 +1,6 @@
 import { BaseElement } from "@core/base-element.js";
-import "./page-home.css";
-
-const template = document.createElement("template");
-template.innerHTML = `
-  <style>
-    :host { display: block; }
-  </style>
-  <div part="base">
-    <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 dark:bg-neutral-800 rounded-lg shadow-md">
-      <h1>Contest Tournament</h1>
-
-      <div class="carousel-container">
-        <img
-          alt="Greek freak basketball"
-          class="carousel-image"
-          src="assets/img/undraw_greek_freak.svg"
-        />
-      </div>
-
-      <slot name="status-news"></slot>
-
-      <div class="footer">
-        <div class="grid-300">
-          <slot name="config-button"></slot>
-          <slot name="tournaments-button"></slot>
-        </div>
-      </div>
-    </div>
-  </div>
-`;
+import { html, type TemplateResult } from "lit-html";
+import pageHomeStyles from "./page-home.css?raw";
 
 /**
  * PageHome - Home page component with rotating image carousel
@@ -58,6 +30,9 @@ export class PageHome extends BaseElement {
    */
   connectedCallback(): void {
     super.connectedCallback();
+    const sheet = new CSSStyleSheet();
+    sheet.replaceSync(pageHomeStyles);
+    this._injectStyles(sheet);
     this.intervalId = setInterval(() => {
       this.displayNextImg();
     }, 5000);
@@ -90,17 +65,50 @@ export class PageHome extends BaseElement {
     }
   }
 
+  private _getStyles(): TemplateResult {
+    return html`
+      <style>
+        :host { display: block; }
+      </style>
+    `;
+  }
+
+  private _renderContent(): TemplateResult {
+    return html`
+      ${this._getStyles()}
+      <div part="base">
+        <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 dark:bg-neutral-800 rounded-lg shadow-md">
+          <h1>Contest Tournament</h1>
+
+          <div class="carousel-container">
+            <img
+              alt="Greek freak basketball"
+              class="carousel-image"
+              src="assets/img/undraw_greek_freak.svg"
+            />
+          </div>
+
+          <slot name="status-news"></slot>
+
+          <div class="footer">
+            <div class="grid-300">
+              <slot name="config-button"></slot>
+              <slot name="tournaments-button"></slot>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   /**
    * Renders the component's DOM
    */
   protected _render(): void {
-    const root = this._renderRoot;
-    if (!root.firstChild) {
-      root.appendChild(template.content.cloneNode(true));
-    }
+    this._renderTemplate(this._renderContent());
 
     // Query DOM for image element after render
-    this.domImg = root.querySelector("img");
+    this.domImg = this._renderRoot.querySelector("img");
   }
 }
 

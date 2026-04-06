@@ -1,12 +1,8 @@
 import { BaseElement } from "@core/base-element.js";
 import { createComponentSheet } from "@core/styles.js";
+import { html } from "lit-html";
 
 const badgeSheet = createComponentSheet(":host { display: inline-block; }");
-
-const template = document.createElement("template");
-template.innerHTML = `
-  <span part="base"><slot></slot></span>
-`;
 
 export class MadBadge extends BaseElement {
   static get observedAttributes(): string[] {
@@ -17,7 +13,7 @@ export class MadBadge extends BaseElement {
     this._initialized = true;
   }
 
-  protected _createRenderRoot(): Element | ShadowRoot {
+  protected _createRenderRoot(): ShadowRoot {
     const root = super._createRenderRoot();
     if (root instanceof ShadowRoot) {
       root.adoptedStyleSheets = [...root.adoptedStyleSheets, badgeSheet];
@@ -40,16 +36,6 @@ export class MadBadge extends BaseElement {
   }
 
   protected _render(): void {
-    const root = this._renderRoot;
-    if (!root.firstChild) {
-      root.appendChild(template.content.cloneNode(true));
-    }
-
-    const span = root.querySelector('[part="base"]');
-    if (!span) {
-      return;
-    }
-
     const variant = this.variant;
     const pill = this.pill;
 
@@ -70,7 +56,9 @@ export class MadBadge extends BaseElement {
     const borderRadius = pill ? "rounded-full" : "rounded-md";
     const classes = `inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium ${variantClasses[variant] ?? variantClasses.default} ${borderRadius}`;
 
-    span.className = classes;
+    this._renderTemplate(html`
+      <span part="base" class="${classes}"><slot></slot></span>
+    `);
   }
 }
 

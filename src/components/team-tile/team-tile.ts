@@ -5,6 +5,7 @@
 
 import { BaseElement } from "@core/base-element.js";
 import { Signal } from "@core/signal.js";
+import { html } from "lit-html";
 import type { GenericTeam } from "../../modules/team-row/team-row.d.js";
 
 /**
@@ -40,9 +41,6 @@ export class MadTeamTile extends BaseElement {
   /** IntersectionObserver for lazy loading */
   private _intersectionObserver: IntersectionObserver | null = null;
 
-  /** Bound error handler for cleanup */
-  private _boundImageErrorHandler: (() => void) | null = null;
-
   /** Track if image has been loaded */
   private _imageLoaded = false;
 
@@ -60,13 +58,6 @@ export class MadTeamTile extends BaseElement {
     this._trackSignal(this._imageError);
 
     this._initialized = true;
-  }
-
-  /**
-   * Creates a light DOM render root (no shadow root).
-   */
-  protected _createRenderRoot(): Element {
-    return this;
   }
 
   /**
@@ -147,9 +138,6 @@ export class MadTeamTile extends BaseElement {
     if (this._intersectionObserver) {
       this._intersectionObserver.disconnect();
       this._intersectionObserver = null;
-    }
-    if (this._boundImageErrorHandler) {
-      this._boundImageErrorHandler = null;
     }
     super.disconnectedCallback();
   }
@@ -259,7 +247,7 @@ export class MadTeamTile extends BaseElement {
   /**
    * Renders the rank badge HTML if rank is set.
    */
-  private _renderRankBadge(): string {
+  private _renderRankBadge(): ReturnType<typeof html> | string {
     const rank = this._rank;
     if (!rank) {
       return "";
@@ -270,17 +258,17 @@ export class MadTeamTile extends BaseElement {
       ? "rank-badge-left"
       : "rank-badge-right";
 
-    return `<div class="rank-badge rank-${rankClass} ${positionClass}" aria-label="Rank ${rank}">${rank}</div>`;
+    return html`<div class="rank-badge rank-${rankClass} ${positionClass}" aria-label="Rank ${rank}">${rank}</div>`;
   }
 
   /**
    * Renders the team name element.
    */
-  private _renderTeamName(): string {
+  private _renderTeamName(): ReturnType<typeof html> {
     const team = this._team;
     return team
-      ? `<span class="text-balance">${team.name}</span>`
-      : "<span>⏳</span>";
+      ? html`<span class="text-balance">${team.name}</span>`
+      : html`<span>⏳</span>`;
   }
 
   /**
@@ -292,47 +280,6 @@ export class MadTeamTile extends BaseElement {
     const imgSrc = this._imgSrc.value;
     const imageError = this._imageError.value;
 
-    let imageHtml: string;
-    if (imageError) {
-      imageHtml = `
-        <mad-icon
-          class="${reverse ? "float-right text-6xl text-neutral-400" : "float-left text-6xl text-neutral-400"}"
-          name="shield-x"
-          style="width: 64px; height: 64px;"
-        ></mad-icon>
-      `;
-    } else if (imgSrc) {
-      imageHtml = `
-        <img
-          alt="${this._team?.name ?? ""} club logo"
-          class="${reverse ? "float-right w-16" : "float-left w-16"}"
-          height="64"
-          src="${imgSrc}"
-          width="64"
-        />
-      `;
-    } else {
-      imageHtml = `
-        <div class="${reverse ? "team-image-fallback float-right" : "team-image-fallback float-left"}">
-          <svg
-            aria-hidden="true"
-            fill="none"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="1.5"
-            viewBox="0 0 24 24"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <line x1="2" x2="22" y1="12" y2="12" />
-            <line x1="12" x2="12" y1="2" y2="22" />
-            <path d="M12 2c-3 3-3 17 0 22" />
-            <path d="M12 2c3 3 3 17 0 22" />
-          </svg>
-        </div>
-      `;
-    }
-
     const imageContainerClass = reverse
       ? "min-h-8 w-full md:w-1/2"
       : "min-h-8 w-full md:w-1/2";
@@ -343,7 +290,51 @@ export class MadTeamTile extends BaseElement {
       ? "float-right my-1 w-full text-right"
       : "float-left my-1 w-full text-left";
 
-    this.innerHTML = `
+    // Compute image content
+    let imageContent: ReturnType<typeof html>;
+    if (imageError) {
+      const iconClass = reverse
+        ? "float-right text-6xl text-neutral-400"
+        : "float-left text-6xl text-neutral-400";
+      imageContent = html`<mad-icon
+        class="${iconClass}"
+        name="shield-x"
+        style="width: 64px; height: 64px;"
+      ></mad-icon>`;
+    } else if (imgSrc) {
+      const imgClass = reverse ? "float-right w-16" : "float-left w-16";
+      imageContent = html`<img
+        alt="${this._team?.name ?? ""} club logo"
+        class="${imgClass}"
+        height="64"
+        src="${imgSrc}"
+        width="64"
+        @error=${this._onImageError.bind(this)}
+      />`;
+    } else {
+      const fallbackClass = reverse
+        ? "team-image-fallback float-right"
+        : "team-image-fallback float-left";
+      imageContent = html`<div class="${fallbackClass}">
+        <svg
+          aria-hidden="true"
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.5"
+          viewBox="0 0 24 24"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <line x1="2" x2="22" y1="12" y2="12" />
+          <line x1="12" x2="12" y1="2" y2="22" />
+          <path d="M12 2c-3 3-3 17 0 22" />
+          <path d="M12 2c3 3 3 17 0 22" />
+        </svg>
+      </div>`;
+    }
+
+    this._renderTemplate(html`
       <style>
         ${this._getCss()}
       </style>
@@ -351,7 +342,7 @@ export class MadTeamTile extends BaseElement {
         ${this._renderRankBadge()}
         <div class="w-full">
           <div class="${imageContainerClass}">
-            ${imageHtml}
+            ${imageContent}
           </div>
           <div class="${nameContainerClass}">
             <div class="${nameTextClass}">
@@ -360,16 +351,7 @@ export class MadTeamTile extends BaseElement {
           </div>
         </div>
       </div>
-    `;
-
-    // Attach error handler after render for img element
-    if (imgSrc && !imageError) {
-      const img = this._renderRoot.querySelector("img");
-      if (img) {
-        this._boundImageErrorHandler = this._onImageError.bind(this);
-        img.addEventListener("error", this._boundImageErrorHandler);
-      }
-    }
+    `);
   }
 }
 

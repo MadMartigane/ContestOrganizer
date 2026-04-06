@@ -1,12 +1,8 @@
 import { BaseElement } from "@core/base-element.js";
 import { createComponentSheet } from "@core/styles.js";
+import { html, nothing } from "lit-html";
 
 const iconSheet = createComponentSheet(":host { display: inline-block; }");
-
-const template = document.createElement("template");
-template.innerHTML = `
-  <ph-icon part="base"></ph-icon>
-`;
 
 const ICON_MAP: Record<string, string> = {
   house: "house",
@@ -167,7 +163,7 @@ export class MadIcon extends BaseElement {
     this._initialized = true;
   }
 
-  protected _createRenderRoot(): Element | ShadowRoot {
+  protected _createRenderRoot(): ShadowRoot {
     const root = super._createRenderRoot();
     if (root instanceof ShadowRoot) {
       root.adoptedStyleSheets = [...root.adoptedStyleSheets, iconSheet];
@@ -176,28 +172,18 @@ export class MadIcon extends BaseElement {
   }
 
   protected _render(): void {
-    const root = this._renderRoot;
-    if (!root.firstChild) {
-      root.appendChild(template.content.cloneNode(true));
-    }
-
     const name = this.getAttribute("name") ?? "";
     const label = this.getAttribute("label");
     const phName = ICON_MAP[name] ?? name;
 
-    const iconEl = root.querySelector('[part="base"]');
-    if (!iconEl) {
-      return;
-    }
-
-    iconEl.setAttribute("name", phName);
-    if (label) {
-      iconEl.setAttribute("aria-label", label);
-      iconEl.removeAttribute("aria-hidden");
-    } else {
-      iconEl.setAttribute("aria-hidden", "true");
-      iconEl.removeAttribute("aria-label");
-    }
+    this._renderTemplate(html`
+      <ph-icon
+        part="base"
+        name="${phName}"
+        aria-label="${label ?? nothing}"
+        aria-hidden="${label ? nothing : "true"}"
+      ></ph-icon>
+    `);
   }
 }
 

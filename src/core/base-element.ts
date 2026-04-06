@@ -1,16 +1,22 @@
 /**
  * BaseElement - Abstract base class for Vanilla Web Components
- * Replaces Stencil's Component decorator and lifecycle hooks
+ * Uses lit-html as the rendering engine
  * @module core/base-element
  */
 
+// Re-export html and nothing for subclass convenience
+// biome-ignore lint/performance/noBarrelFile: Re-exports required for subclasses to create templates
+export { html, nothing } from "lit-html";
+
+// Import render and TemplateResult locally for use in _renderTemplate
+import { render, type TemplateResult } from "lit-html";
 import type { Signal } from "./signal.js";
-import { baseSheet } from "./styles.js";
+import { baseSheet, tailwindSheet } from "./styles.js";
 
 /**
  * Abstract base class for all Vanilla Web Components.
  * Provides lifecycle management, signal integration, and attribute observation.
- * Extend this class to create custom web components.
+ * Uses lit-html for templating.
  * @abstract
  */
 export abstract class BaseElement extends HTMLElement {
@@ -38,20 +44,9 @@ export abstract class BaseElement extends HTMLElement {
   protected _initialized = false;
 
   /**
-   * Captured light DOM children for slot distribution.
-   * Stored before _render() overwrites innerHTML.
-   */
-  private _initialContent: Node[] | null = null;
-
-  /**
    * Shadow root reference for Shadow DOM support.
    */
   private _shadow: ShadowRoot | null = null;
-
-  /**
-   * Template registry for caching compiled templates.
-   */
-  private static _templates: Map<string, HTMLTemplateElement> = new Map();
 
   /**
    * Array of attribute names to observe for changes.
@@ -74,74 +69,57 @@ export abstract class BaseElement extends HTMLElement {
   /**
    * Creates and returns the render root for the component.
    * By default, creates an open Shadow DOM root.
-   * Override in subclasses to return `this` for Light DOM (backward compatibility).
-   * @returns The Element or ShadowRoot to render into
+   * @returns The ShadowRoot to render into
    */
-  protected _createRenderRoot(): Element | ShadowRoot {
+  protected _createRenderRoot(): ShadowRoot {
     if (!this._shadow) {
-      this._shadow = this.attachShadow({ mode: "open" });
-      this._shadow.adoptedStyleSheets = [BaseElement._getBaseStyleSheet()];
+      this._shadow = this.shadowRoot ?? this.attachShadow({ mode: "open" });
+      this._shadow.adoptedStyleSheets = [baseSheet, tailwindSheet];
     }
     return this._shadow;
   }
 
   /**
+   * Injects additional stylesheets into the shadow root.
+   * Override in subclasses to inject component-specific styles.
+   * @param sheets - CSSStyleSheet objects to add to the shadow root
+   */
+  protected _injectStyles(...sheets: CSSStyleSheet[]): void {
+    if (this._shadow) {
+      const existing = this._shadow.adoptedStyleSheets || [];
+      this._shadow.adoptedStyleSheets = [...existing, ...sheets];
+    }
+  }
+
+  /**
+   * Sets up getters and setters for component properties.
+   * Override in subclasses to define reactive properties.
+   * @abstract
+   */
+  protected abstract _setupProperties(): void;
+
+  /**
    * Returns the render root for the component.
-   * Defaults to the shadow root, falls back to the element itself for light DOM.
+   * Defaults to the shadow root.
    */
-  protected get _renderRoot(): Element | ShadowRoot {
-    return this._shadow ?? this;
-  }
-
-  /**
-   * Gets the base stylesheet for shadow roots.
-   * @returns The shared CSSStyleSheet with base styles
-   */
-  private static _getBaseStyleSheet(): CSSStyleSheet {
-    return baseSheet;
-  }
-
-  /**
-   * Registers a template for the component.
-   * Templates are cached and reused for performance.
-   * @param templateId - Unique identifier for the template
-   * @param template - The HTMLTemplateElement to register
-   */
-  protected static _registerTemplate(
-    templateId: string,
-    template: HTMLTemplateElement
-  ): void {
-    BaseElement._templates.set(templateId, template);
-  }
-
-  /**
-   * Retrieves a registered template by ID.
-   * @param templateId - The template identifier
-   * @returns The template element or undefined if not found
-   */
-  protected static _getTemplate(
-    templateId: string
-  ): HTMLTemplateElement | undefined {
-    return BaseElement._templates.get(templateId);
+  protected get _renderRoot(): ShadowRoot {
+    if (!this._shadow) {
+      throw new Error(
+        "Render root not initialized. Call _createRenderRoot() first."
+      );
+    }
+    return this._shadow;
   }
 
   /**
    * Called when the element is added to the DOM.
-   * Captures light DOM children, triggers render, then distributes slots.
+   * Initializes render root, injects styles, and triggers initial render.
    */
   connectedCallback(): void {
     this._isConnected = true;
-    // Initialize render root (creates shadow DOM if not already created)
     this._createRenderRoot();
-    // Capture light DOM children for slot projection
-    if (!this._initialContent && this.childNodes.length > 0) {
-      this._initialContent = Array.from(this.childNodes);
-    }
+    this._injectStyles();
     this._render();
-    // Only distribute slots if using light DOM
-    if (!this._shadow) {
-      this._distributeSlots();
-    }
   }
 
   /**
@@ -181,18 +159,15 @@ export abstract class BaseElement extends HTMLElement {
    * @returns The same signal for convenience
    */
   protected _trackSignal<T>(signal: Signal<T>): Signal<T> {
-    // If already tracking this signal, return early
     const signalsMap = this._signals as unknown as Map<Signal<T>, () => void>;
     if (signalsMap.has(signal)) {
       return signal;
     }
 
-    // Subscribe to signal changes and request render on each change
     const unsubscribe = signal.subscribe(() => {
       this._requestRender();
     });
 
-    // Store signal and unsubscribe function
     signalsMap.set(signal, unsubscribe);
 
     return signal;
@@ -203,8 +178,7 @@ export abstract class BaseElement extends HTMLElement {
    * Called automatically during disconnectedCallback.
    */
   protected _cleanupSignals(): void {
-    for (const entry of Array.from(this._signals.entries())) {
-      const unsubscribe = entry[1];
+    for (const [, unsubscribe] of Array.from(this._signals.entries())) {
       unsubscribe();
     }
     this._signals.clear();
@@ -215,20 +189,16 @@ export abstract class BaseElement extends HTMLElement {
    * Uses queueMicrotask for efficient render coalescing.
    */
   protected _requestRender(): void {
-    // Prevent duplicate render requests or rendering before initialization
     if (this._renderPending || !this._initialized) {
       return;
     }
 
     this._renderPending = true;
 
-    // Batch render requests using microtask
     queueMicrotask(() => {
       this._renderPending = false;
-      // Only render if still connected
       if (this._isConnected) {
         this._render();
-        this._distributeSlots();
       }
     });
   }
@@ -240,56 +210,28 @@ export abstract class BaseElement extends HTMLElement {
    * @param detail - Data to pass with the event
    */
   protected _emit<T>(eventName: string, detail: T): void {
-    const event = new CustomEvent(eventName, {
-      detail,
-      bubbles: true,
-      composed: true,
-    });
-
-    this.dispatchEvent(event);
-  }
-
-  /**
-   * Replaces <slot> elements in rendered content with captured light DOM children.
-   * Supports both default slots and named slots via the 'slot' attribute.
-   */
-  private _distributeSlots(): void {
-    if (!this._initialContent) {
-      return;
-    }
-
-    const slotElements = Array.from(
-      this.querySelectorAll<HTMLSlotElement>("slot")
+    this.dispatchEvent(
+      new CustomEvent(eventName, {
+        detail,
+        bubbles: true,
+        composed: true,
+      })
     );
-    for (const slotEl of slotElements) {
-      const slotName = slotEl.getAttribute("name");
-      const matchedNodes = slotName
-        ? this._initialContent.filter(
-            (node) =>
-              node instanceof Element && node.getAttribute("slot") === slotName
-          )
-        : this._initialContent.filter(
-            (node) => !(node instanceof Element && node.hasAttribute("slot"))
-          );
-
-      const fragment = document.createDocumentFragment();
-      for (const node of matchedNodes) {
-        fragment.appendChild(node.cloneNode(true));
-      }
-      slotEl.replaceWith(fragment);
-    }
   }
 
   /**
-   * Sets up getters and setters for component properties.
-   * Override in subclasses to define reactive properties.
-   * @abstract
+   * Renders a lit-html template result to the component's render root.
+   * Subclasses should call this method from their _render() implementation.
+   * @param template - The TemplateResult to render
    */
-  protected abstract _setupProperties(): void;
+  protected _renderTemplate(template: TemplateResult): void {
+    render(template, this._renderRoot);
+  }
 
   /**
    * Renders the component's DOM and state.
    * Override in subclasses to implement custom rendering logic.
+   * Subclasses should call this._renderTemplate(html`...`) to render.
    * @abstract
    */
   protected abstract _render(): void;

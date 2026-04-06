@@ -1,0 +1,6 @@
+export const PROCEDURE_TYPE_ERROR = [
+  "500",
+  "NOT_FOUND",
+  "NOT_IMPLEMENTED",
+  "NOT_SUPPORTED",
+];

@@ -1,9 +1,14 @@
+import { html } from "lit-html";
 import { ZoneContainer } from "../zone-container/zone-container.js";
 import "../page-match/page-match.js";
 
 /**
- * MatchsZone - Matchs zone component with Shadow DOM support.
+ * MatchsZone - Matchs zone component that renders page-match inside the zone container.
  * Handles route changes and displays match information.
+ * Uses Shadow DOM with lit-html rendering.
+ * @element matchs-zone
+ * @observedAttributes None - uses JavaScript properties (zoneType, title, icon)
+ * @fires None
  */
 export class MatchsZone extends ZoneContainer {
   private currentTournamentId: string | null = null;
@@ -65,20 +70,35 @@ export class MatchsZone extends ZoneContainer {
   }
 
   protected _render(): void {
-    super._render();
-    const root = this._renderRoot;
-    const zoneContent = root.querySelector(".zone-content");
-    if (zoneContent) {
-      // Check if page-match already exists to avoid duplication
-      let pageMatch = zoneContent.querySelector("page-match");
-      if (!pageMatch) {
-        pageMatch = document.createElement("page-match");
-        if (this.currentTournamentId) {
-          pageMatch.setAttribute("tournament-id", this.currentTournamentId);
-        }
-        zoneContent.appendChild(pageMatch);
-      }
-    }
+    const zoneType = this.zoneType;
+    const title = this.title;
+    const icon = this.icon;
+    const isFocused = this._isFocused();
+    const isCollapsed = this._isCollapsed();
+    const showFocusButton = !(isFocused || isCollapsed);
+    const tournamentId = this.currentTournamentId ?? "";
+
+    this._renderTemplate(html`
+      ${this._getStyles()}
+      <div part="base" class="zone-container zone-${zoneType}" data-focused="${isFocused}">
+        <header part="header" class="zone-header">
+          <mad-icon name="${icon}"></mad-icon>
+          <h2 part="title">${title}</h2>
+          <button
+            part="focus-btn"
+            class="focus-btn"
+            aria-label="Focus ${title} zone"
+            ?hidden=${!showFocusButton}
+            @click=${this._handleFocus}
+          >
+            <mad-icon name="expand"></mad-icon>
+          </button>
+        </header>
+        <div part="content" class="zone-content">
+          <page-match tournament-id="${tournamentId}"></page-match>
+        </div>
+      </div>
+    `);
   }
 }
 

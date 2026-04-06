@@ -1,5 +1,7 @@
 import { BaseElement } from "@core/base-element.js";
 import { Signal } from "@core/signal.js";
+import { html, nothing, render, type TemplateResult } from "lit-html";
+import { repeat } from "lit-html/directives/repeat.js";
 import { getTournaments } from "../../modules/init.js";
 import Matchs, {
   Match,
@@ -27,81 +29,10 @@ interface Config {
   minGoal: number;
 }
 
-const template = document.createElement("template");
-template.innerHTML = `
-  <style>
-    :host { display: block; }
-    .scroll-nav {
-      position: fixed;
-      bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
-      right: 1rem;
-      z-index: 50;
-      opacity: 0;
-      transform: translateY(100%);
-      transition: opacity 0.3s ease, transform 0.3s ease;
-      pointer-events: none;
-    }
-
-    .scroll-nav.visible {
-      opacity: 1;
-      transform: translateY(0);
-      pointer-events: auto;
-    }
-
-    .scroll-nav-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-
-    @media (max-height: 600px) {
-      .scroll-nav {
-        bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
-      }
-    }
-
-    .host-scorer, .visitor-scorer {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      justify-self: center;
-    }
-
-    .host-scorer mad-scorer-common,
-    .visitor-scorer mad-scorer-common {
-      width: 100%;
-    }
-  </style>
-  <div part="base">
-    <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 dark:bg-neutral-800 rounded-lg shadow-md">
-      <slot name="content"></slot>
-    </div>
-    <div class="scroll-nav" role="navigation" aria-label="Raccourcis de navigation">
-      <div class="scroll-nav-buttons">
-        <slot name="nav-top"></slot>
-        <slot name="nav-current"></slot>
-        <slot name="nav-bottom"></slot>
-      </div>
-    </div>
-    <div class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
-  </div>
-`;
-
 /**
  * PageMatch - Tournament match management page component
  * @element page-match
+ * @fires navigate
  */
 export class PageMatch extends BaseElement {
   private readonly config: Config = {
@@ -142,8 +73,7 @@ export class PageMatch extends BaseElement {
           this._scrollToCurrentMatch();
           break;
         default:
-          // Ignore other keys
-          break;
+        // Ignore other keys
       }
     }
   };
@@ -233,13 +163,6 @@ export class PageMatch extends BaseElement {
     document.removeEventListener("keydown", this._handleKeydown);
     window.removeEventListener("scroll", this._handleScroll);
     super.disconnectedCallback();
-  }
-
-  /**
-   * Use Light DOM for Shoelace compatibility
-   */
-  protected _createRenderRoot(): Element {
-    return this;
   }
 
   /**
@@ -381,7 +304,7 @@ export class PageMatch extends BaseElement {
    * Update only the score display for a specific match without full re-render
    */
   private updateMatchScore(index: number, match: Match): void {
-    const matchTile = this.querySelector(
+    const matchTile = this._renderRoot.querySelector(
       `mad-match-tile[data-match-index="${index}"]`
     );
     if (matchTile) {
@@ -395,7 +318,7 @@ export class PageMatch extends BaseElement {
    * Follows the same incremental update pattern as updateMatchScore().
    */
   private updateMatchStatus(index: number, match: Match): void {
-    const matchItem = this.querySelector(
+    const matchItem = this._renderRoot.querySelector(
       `.match-item[data-match-index="${index}"]`
     );
     if (!matchItem) {
@@ -493,11 +416,21 @@ export class PageMatch extends BaseElement {
       return;
     }
 
-    actionsContainer.innerHTML = this.renderActionButtonsContent(match);
+    // Clear existing content and re-render with lit-html
+    this._renderActionButtonsInto(actionsContainer, match);
+  }
+
+  /**
+   * Render action buttons content into a container element
+   */
+  private _renderActionButtonsInto(container: Element, match: Match): void {
+    // For incremental updates, render the lit-html template into the container
+    const template = this._getActionButtonsTemplate(match);
+    render(template, container as HTMLElement);
 
     // Re-attach event listeners for new buttons
-    const playBtn = actionsContainer.querySelector(".play-btn");
-    const stopBtn = actionsContainer.querySelector(".stop-btn");
+    const playBtn = container.querySelector(".play-btn");
+    const stopBtn = container.querySelector(".stop-btn");
 
     playBtn?.addEventListener("click", () => {
       const matchId = (playBtn as HTMLElement).dataset.matchId;
@@ -516,6 +449,38 @@ export class PageMatch extends BaseElement {
         this.stopMatch(m);
       }
     });
+  }
+
+  /**
+   * Get action buttons template for incremental updates
+   */
+  private _getActionButtonsTemplate(match: Match): TemplateResult {
+    const isDoing = match.status === MatchStatus.DOING;
+    return html`
+      <mad-button
+        class="delete-btn w-full"
+        data-match-id="${match.id || ""}"
+        role="button"
+        size="large"
+        variant="warning"
+      >
+        <mad-icon name="trash"></mad-icon>
+      </mad-button>
+
+      ${
+        isDoing
+          ? html`<mad-button class="stop-btn w-full" data-match-id="${
+              match.id || ""
+            }" role="button" size="large" variant="brand">
+          <mad-icon name="stop-circle"></mad-icon>
+        </mad-button>`
+          : html`<mad-button class="play-btn w-full" data-match-id="${
+              match.id || ""
+            }" role="button" size="large" variant="brand">
+          <mad-icon name="play-circle"></mad-icon>
+        </mad-button>`
+      }
+    `;
   }
 
   /**
@@ -710,7 +675,9 @@ export class PageMatch extends BaseElement {
       return;
     }
 
-    const matchElement = this.querySelector(`#match-${targetIndex}`);
+    const matchElement = this._renderRoot.querySelector(
+      `#match-${targetIndex}`
+    );
     if (!matchElement) {
       if (retryCount < 10) {
         requestAnimationFrame(() => this._autoScrollToMatch(retryCount + 1));
@@ -743,7 +710,7 @@ export class PageMatch extends BaseElement {
       : scrollY > reducedThreshold;
 
     // Direct DOM manipulation - bypass Signal for performance
-    const scrollNav = this.querySelector(".scroll-nav");
+    const scrollNav = this._renderRoot.querySelector(".scroll-nav");
     if (scrollNav) {
       scrollNav.classList.toggle("visible", shouldShow);
     }
@@ -784,9 +751,9 @@ export class PageMatch extends BaseElement {
   /**
    * Render action buttons content (buttons only, no wrapper div)
    */
-  private renderActionButtonsContent(match: Match): string {
+  private renderActionButtonsContent(match: Match): TemplateResult {
     const isDoing = match.status === MatchStatus.DOING;
-    return `
+    return html`
       <mad-button
         class="delete-btn w-full"
         data-match-id="${match.id || ""}"
@@ -799,16 +766,24 @@ export class PageMatch extends BaseElement {
 
       ${
         isDoing
-          ? `<mad-button class="stop-btn w-full" data-match-id="${
-              match.id || ""
-            }" role="button" size="large" variant="brand">
-          <mad-icon name="stop-circle"></mad-icon>
-        </mad-button>`
-          : `<mad-button class="play-btn w-full" data-match-id="${
-              match.id || ""
-            }" role="button" size="large" variant="brand">
-          <mad-icon name="play-circle"></mad-icon>
-        </mad-button>`
+          ? html`<mad-button
+            class="stop-btn w-full"
+            data-match-id="${match.id || ""}"
+            role="button"
+            size="large"
+            variant="brand"
+          >
+            <mad-icon name="stop-circle"></mad-icon>
+          </mad-button>`
+          : html`<mad-button
+            class="play-btn w-full"
+            data-match-id="${match.id || ""}"
+            role="button"
+            size="large"
+            variant="brand"
+          >
+            <mad-icon name="play-circle"></mad-icon>
+          </mad-button>`
       }
     `;
   }
@@ -816,8 +791,8 @@ export class PageMatch extends BaseElement {
   /**
    * Render action buttons for a match
    */
-  private renderActionButtons(match: Match): string {
-    return `
+  private renderActionButtons(match: Match): TemplateResult {
+    return html`
       <div class="flex justify-center gap-8 py-4">
         ${this.renderActionButtonsContent(match)}
       </div>
@@ -827,9 +802,9 @@ export class PageMatch extends BaseElement {
   /**
    * Render match status badge
    */
-  private renderMatchStatus(match: Match): string {
+  private renderMatchStatus(match: Match): TemplateResult {
     if (match.status === MatchStatus.PENDING) {
-      return `
+      return html`
         <mad-badge variant="brand">
           <span class="container">Match programmé</span>
           <mad-icon class="text-3xl text-orange-600" name="calendar-check"></mad-icon>
@@ -838,7 +813,7 @@ export class PageMatch extends BaseElement {
     }
 
     if (match.status === MatchStatus.DOING) {
-      return `
+      return html`
         <mad-badge variant="success">
           <span class="container">Match en cours</span>
           <mad-spinner class="text-2xl"></mad-spinner>
@@ -847,7 +822,7 @@ export class PageMatch extends BaseElement {
     }
 
     if (match.status === MatchStatus.DONE) {
-      return `
+      return html`
         <mad-badge variant="warning">
           <span class="container">Match terminé</span>
           <mad-icon class="text-3xl text-yellow-600" name="check2-square"></mad-icon>
@@ -855,13 +830,13 @@ export class PageMatch extends BaseElement {
       `;
     }
 
-    return "";
+    return html``;
   }
 
   /**
    * Render scorers based on tournament type
    */
-  private renderScorers(match: Match): string {
+  private renderScorers(match: Match): TemplateResult {
     const tournamentType = this._tournament.value?.type;
     const isBasketType =
       tournamentType === TournamentType.NBA ||
@@ -878,88 +853,88 @@ export class PageMatch extends BaseElement {
     const hostScore = match.goals.host;
     const visitorScore = match.goals.visitor;
 
-    return `
+    return html`
       <div class="grid grid-cols-11 gap-4">
         ${
           isBasketType
-            ? `<mad-scorer-basket
-            min="${minGoal}"
-            class="host-scorer col-span-5"
-            data-match-id="${match.id || ""}"
-            data-team-type="host"
-            ${readonlyAttr}
-            value="${hostScore}"
-          ></mad-scorer-basket>`
-            : ""
+            ? html`<mad-scorer-basket
+              min="${minGoal}"
+              class="host-scorer col-span-5"
+              data-match-id="${match.id || ""}"
+              data-team-type="host"
+              ${readonlyAttr}
+              value="${hostScore}"
+            ></mad-scorer-basket>`
+            : nothing
         }
 
         ${
           isFootType
-            ? `<mad-scorer-common
-            min="${minGoal}"
-            class="host-scorer col-span-5"
-            data-match-id="${match.id || ""}"
-            data-team-type="host"
-            ${readonlyAttr}
-            ${hiddenAttr}
-            value="${hostScore}"
-          ></mad-scorer-common>`
-            : ""
+            ? html`<mad-scorer-common
+              min="${minGoal}"
+              class="host-scorer col-span-5"
+              data-match-id="${match.id || ""}"
+              data-team-type="host"
+              ${readonlyAttr}
+              ${hiddenAttr}
+              value="${hostScore}"
+            ></mad-scorer-common>`
+            : nothing
         }
 
         ${
           isRugbyType
-            ? `<mad-scorer-rugby
-            min="${minGoal}"
-            class="host-scorer col-span-5"
-            data-match-id="${match.id || ""}"
-            data-team-type="host"
-            ${readonlyAttr}
-            value="${hostScore}"
-          ></mad-scorer-rugby>`
-            : ""
+            ? html`<mad-scorer-rugby
+              min="${minGoal}"
+              class="host-scorer col-span-5"
+              data-match-id="${match.id || ""}"
+              data-team-type="host"
+              ${readonlyAttr}
+              value="${hostScore}"
+            ></mad-scorer-rugby>`
+            : nothing
         }
 
         <div class="col-span-1"></div>
 
         ${
           isBasketType
-            ? `<mad-scorer-basket
-            min="${minGoal}"
-            class="visitor-scorer col-span-5"
-            data-match-id="${match.id || ""}"
-            data-team-type="visitor"
-            ${readonlyAttr}
-            value="${visitorScore}"
-          ></mad-scorer-basket>`
-            : ""
+            ? html`<mad-scorer-basket
+              min="${minGoal}"
+              class="visitor-scorer col-span-5"
+              data-match-id="${match.id || ""}"
+              data-team-type="visitor"
+              ${readonlyAttr}
+              value="${visitorScore}"
+            ></mad-scorer-basket>`
+            : nothing
         }
 
         ${
           tournamentType === TournamentType.FOOT
-            ? `<mad-scorer-common
-            min="${minGoal}"
-            class="visitor-scorer col-span-5"
-            data-match-id="${match.id || ""}"
-            data-team-type="visitor"
-            ${readonlyAttr}
-            ${hiddenAttr}
-            value="${visitorScore}"
-          ></mad-scorer-common>`
-            : ""
+            ? html`<mad-scorer-common
+              min="${minGoal}"
+              class="visitor-scorer col-span-5"
+              data-match-id="${match.id || ""}"
+              data-team-type="visitor"
+              ${readonlyAttr}
+              ${hiddenAttr}
+              value="${visitorScore}"
+            ></mad-scorer-common>`
+            : nothing
         }
 
         ${
           isRugbyType
-            ? `<mad-scorer-rugby
-            min="${minGoal}"
-            class="visitor-scorer col-span-5"
-            data-match-id="${match.id || ""}"
-            data-team-type="visitor"
-            ${readonlyAttr}
-            value="${visitorScore}"
-          ></mad-scorer-rugby>`
-            : ""
+            ? html`<mad-scorer-rugby
+              min="${minGoal}"
+              class="visitor-scorer col-span-5"
+              data-match-id="${match.id || ""}"
+              data-team-type="visitor"
+              ${readonlyAttr}
+              value="${visitorScore}"
+            ></mad-scorer-rugby>`
+            : nothing
         }
       </div>
     `;
@@ -972,26 +947,30 @@ export class PageMatch extends BaseElement {
     match: Match,
     index: number,
     rankMap: Map<number, number>
-  ): string {
+  ): TemplateResult {
     const hostRank = match.hostId ? rankMap.get(match.hostId) : undefined;
     const visitorRank = match.visitorId
       ? rankMap.get(match.visitorId)
       : undefined;
 
-    return `
-      <div id="match-${index}" class="match-item rounded border border-sky-300 border-solid px-1 py-4" data-match-index="${index}">
+    return html`
+      <div
+        id="match-${index}"
+        class="match-item rounded border border-sky-300 border-solid px-1 py-4"
+        data-match-index="${index}"
+      >
         <div>${this.renderMatchStatus(match)}</div>
 
         <mad-match-tile
           class="match-tile"
           data-match-index="${index}"
-          tournament-id="${this._tournament.value?.id || ""}"
-          host-id="${match.hostId || ""}"
-          host-rank="${hostRank || ""}"
-          host-score="${match.goals.host}"
-          visitor-id="${match.visitorId || ""}"
-          visitor-rank="${visitorRank || ""}"
-          visitor-score="${match.goals.visitor}"
+          .tournamentId=${this._tournament.value?.id ?? 0}
+          .hostId=${match.hostId ?? 0}
+          .hostRank=${hostRank ?? 0}
+          .hostScore=${match.goals.host}
+          .visitorId=${match.visitorId ?? 0}
+          .visitorRank=${visitorRank ?? 0}
+          .visitorScore=${match.goals.visitor}
         ></mad-match-tile>
 
         ${this.renderScorers(match)}
@@ -1004,33 +983,33 @@ export class PageMatch extends BaseElement {
   /**
    * Render tournament type label
    */
-  private renderTournamentTypeLabel(): string {
+  private renderTournamentTypeLabel(): TemplateResult {
     const type = this._tournament.value?.type;
 
     if (type === TournamentType.NBA) {
-      return TournamentTypeLabel.NBA;
+      return html`${TournamentTypeLabel.NBA}`;
     }
     if (type === TournamentType.NFL) {
-      return TournamentTypeLabel.NFL;
+      return html`${TournamentTypeLabel.NFL}`;
     }
     if (type === TournamentType.FOOT) {
-      return TournamentTypeLabel.FOOT;
+      return html`${TournamentTypeLabel.FOOT}`;
     }
     if (type === TournamentType.RUGBY) {
-      return TournamentTypeLabel.RUGBY;
+      return html`${TournamentTypeLabel.RUGBY}`;
     }
     if (type === TournamentType.BASKET) {
-      return TournamentTypeLabel.BASKET;
+      return html`${TournamentTypeLabel.BASKET}`;
     }
 
-    return "";
+    return html``;
   }
 
   /**
    * Render match list header
    */
-  private renderMatchListHeader(): string {
-    return `
+  private renderMatchListHeader(): TemplateResult {
+    return html`
       <div class="bg-orange-600 text-neutral-100 dark:bg-orange-700 dark:text-neutral-50 grid grid-cols-11 items-center py-2">
         <div class="col-span-3">Locaux</div>
         <div class="col-span-5 text-2xl text-center">${this.renderTournamentTypeLabel()}</div>
@@ -1042,17 +1021,18 @@ export class PageMatch extends BaseElement {
   /**
    * Render team selector row
    */
-  private renderTeamSelectorRow(row: Row): string {
-    return `
+  private renderTeamSelectorRow(row: Row): TemplateResult {
+    return html`
       <tr
         class="team-row cursor-pointer items-center"
         data-team-id="${row.team.id}"
+        @click="${() => this._handleTeamRowClick(row)}"
       >
         <td>
           ${
             row.selected
-              ? `<mad-icon class="text-2xl text-green-600" name="check-square"></mad-icon>`
-              : `<mad-icon class="text-2xl text-green-600" name="square"></mad-icon>`
+              ? html`<mad-icon class="text-2xl text-green-600" name="check-square"></mad-icon>`
+              : html`<mad-icon class="text-2xl text-green-600" name="square"></mad-icon>`
           }
         </td>
         <td>
@@ -1066,19 +1046,30 @@ export class PageMatch extends BaseElement {
   }
 
   /**
+   * Handle team row click
+   */
+  private _handleTeamRowClick(row: Row): void {
+    const teamToSelect = this._teamToSelect.value || [];
+    const selectedRow = teamToSelect.find((r) => r.team.id === row.team.id);
+    if (selectedRow) {
+      this.onTeamSelected(selectedRow);
+    }
+  }
+
+  /**
    * Render team selector
    */
-  private renderTeamSelector(): string {
+  private renderTeamSelector(): TemplateResult {
     const teamToSelect = this._teamToSelect.value || [];
     const currentMatch = this._currentMatch.value;
 
-    return `
+    return html`
       <div>
         <h3>Équipes sélectionnées:</h3>
         <mad-match-tile
-          tournament-id="${this._tournament.value?.id || ""}"
-          host-id="${currentMatch?.hostId || ""}"
-          visitor-id="${currentMatch?.visitorId || ""}"
+          .tournamentId=${this._tournament.value?.id ?? 0}
+          .hostId=${currentMatch?.hostId ?? 0}
+          .visitorId=${currentMatch?.visitorId ?? 0}
         ></mad-match-tile>
 
         <div class="w-fill overflow-x-auto">
@@ -1106,7 +1097,11 @@ export class PageMatch extends BaseElement {
               </tr>
             </thead>
 
-            ${teamToSelect.map((row) => this.renderTeamSelectorRow(row)).join("")}
+            ${repeat(
+              teamToSelect,
+              (row) => row.team.id,
+              (row) => this.renderTeamSelectorRow(row)
+            )}
           </table>
         </div>
 
@@ -1117,20 +1112,18 @@ export class PageMatch extends BaseElement {
               role="button"
               size="large"
               variant="warning"
+              @click="${() => this.cancelSelection()}"
             >
               <mad-icon name="ban" slot="start"></mad-icon>
               <span slot="end">Annuler</span>
             </mad-button>
             <mad-button
               class="validate-btn"
-              ${
-                currentMatch && !(currentMatch.visitorId && currentMatch.hostId)
-                  ? "disabled"
-                  : ""
-              }
+              ?disabled=${currentMatch != null && !(currentMatch.visitorId && currentMatch.hostId)}
               role="button"
               size="large"
               variant="brand"
+              @click="${() => this.goValidateSelection()}"
             >
               <span slot="start">Valider</span>
               <mad-icon name="arrow-right" slot="end"></mad-icon>
@@ -1144,15 +1137,15 @@ export class PageMatch extends BaseElement {
   /**
    * Render NBA generate button
    */
-  private renderNBAGenerateButton(): string {
+  private renderNBAGenerateButton(): TemplateResult | typeof nothing {
     const tournament = this._tournament.value;
     if (tournament?.type !== TournamentType.NBA) {
-      return "";
+      return nothing;
     }
 
     const missingCount = getNBAMissingMatchCount(tournament);
     if (missingCount === 0) {
-      return `
+      return html`
         <mad-button disabled size="large" variant="success">
           <mad-icon name="check-circle" slot="start"></mad-icon>
           <span slot="end">Season Complete (82 games)</span>
@@ -1160,12 +1153,13 @@ export class PageMatch extends BaseElement {
       `;
     }
 
-    return `
+    return html`
       <mad-button
         class="generate-nba-btn"
         role="button"
         size="large"
         variant="success"
+        @click="${() => this.goGenerateAllNBAMatches()}"
       >
         <mad-icon name="calendar-plus" slot="start"></mad-icon>
         <span slot="end">Generate All Missing (${missingCount})</span>
@@ -1176,28 +1170,30 @@ export class PageMatch extends BaseElement {
   /**
    * Render new match button
    */
-  private renderNewMatchButton(): string {
+  private renderNewMatchButton(): TemplateResult {
     const isNBAComplete = this.isNBAScheduleComplete;
 
-    return `
+    return html`
       <div class="footer">
         <div class="grid-300 gap-4">
           <mad-button
             class="new-match-btn"
-            ${isNBAComplete ? "disabled" : ""}
+            ?disabled=${isNBAComplete}
             role="button"
             size="large"
             variant="brand"
+            @click="${() => this.goMatch()}"
           >
             <mad-icon name="plus" slot="start"></mad-icon>
             <span slot="end">Nouveau match</span>
           </mad-button>
           <mad-button
             class="auto-match-btn"
-            ${isNBAComplete ? "disabled" : ""}
+            ?disabled=${isNBAComplete}
             role="button"
             size="large"
             variant="success"
+            @click="${() => this.goAutoMatch()}"
           >
             <mad-icon name="robot" slot="start"></mad-icon>
             <span slot="end">Auto-Match</span>
@@ -1226,46 +1222,105 @@ export class PageMatch extends BaseElement {
     // Store match elements for auto-scroll
     this.matchRefs.clear();
 
-    this.innerHTML = `
+    this._renderTemplate(html`
+      <style>
+        :host { display: block; }
+        .scroll-nav {
+          position: fixed;
+          bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+          right: 1rem;
+          z-index: 50;
+          opacity: 0;
+          transform: translateY(100%);
+          transition: opacity 0.3s ease, transform 0.3s ease;
+          pointer-events: none;
+        }
+
+        .scroll-nav.visible {
+          opacity: 1;
+          transform: translateY(0);
+          pointer-events: auto;
+        }
+
+        .scroll-nav-buttons {
+          display: flex;
+          flex-direction: column;
+          gap: 0.25rem;
+        }
+
+        .sr-only {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: -1px;
+          overflow: hidden;
+          clip: rect(0, 0, 0, 0);
+          white-space: nowrap;
+          border: 0;
+        }
+
+        @media (max-height: 600px) {
+          .scroll-nav {
+            bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+          }
+        }
+
+        .host-scorer, .visitor-scorer {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          justify-self: center;
+        }
+
+        .host-scorer mad-scorer-common,
+        .visitor-scorer mad-scorer-common {
+          width: 100%;
+        }
+      </style>
       <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 dark:bg-neutral-800 rounded-lg shadow-md">
-        ${
-          uiError
-            ? `<error-message message="${uiError}"></error-message>`
-            : `
+        <slot name="content"></slot>
+      </div>
+
+      ${
+        uiError
+          ? html`<error-message message="${uiError}"></error-message>`
+          : html`
           <div>
             <h1>${tournament?.name || ""}</h1>
             <h2>Match(s)</h2>
 
             ${
               matchNumber > 0 && !displayTeamSelector
-                ? `
-                <div class="grid grid-cols-1 gap-4">
-                  ${this.renderMatchListHeader()}
+                ? html`
+                  <div class="grid grid-cols-1 gap-4">
+                    ${this.renderMatchListHeader()}
 
-                  ${
-                    tournament?.matchs
-                      ? tournament.matchs
-                          .map((match, index) =>
-                            this.renderMatchItem(match, index, rankMap)
+                    ${
+                      tournament?.matchs
+                        ? repeat(
+                            tournament.matchs,
+                            (match) => match.id,
+                            (match, index) =>
+                              this.renderMatchItem(match, index, rankMap)
                           )
-                          .join("")
-                      : ""
-                  }
-                </div>
-              `
-                : `
-                <div>
-                  ${
-                    displayTeamSelector
-                      ? ""
-                      : `
-                    <h2>
-                      <span class="text-yellow-600"> Aucun match en cours </span>
-                    </h2>
-                  `
-                  }
-                </div>
-              `
+                        : nothing
+                    }
+                  </div>
+                `
+                : html`
+                  <div>
+                    ${
+                      displayTeamSelector
+                        ? nothing
+                        : html`
+                          <h2>
+                            <span class="text-yellow-600"> Aucun match en cours </span>
+                          </h2>
+                        `
+                    }
+                  </div>
+                `
             }
 
             ${
@@ -1275,38 +1330,44 @@ export class PageMatch extends BaseElement {
             }
           </div>
         `
-        }
-      </div>
+      }
 
-      <div class="scroll-nav"
-           role="navigation"
-           aria-label="Raccourcis de navigation">
+      <div class="scroll-nav" role="navigation" aria-label="Raccourcis de navigation">
         <div class="scroll-nav-buttons">
           <div class="relative group">
-            <mad-button size="medium"
-                       variant="default"
-                       class="w-full nav-btn-top"
-                       aria-label="Aller en haut de la page">
+            <mad-button
+              size="medium"
+              variant="default"
+              class="w-full nav-btn-top"
+              aria-label="Aller en haut de la page"
+              @click="${this._scrollToTop}"
+            >
               <mad-icon name="chevron-up" aria-hidden="true"></mad-icon>
             </mad-button>
             <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-neutral-700 text-white dark:bg-neutral-600 text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap">Aller en haut (Alt+T)</div>
           </div>
 
           <div class="relative group">
-            <mad-button size="medium"
-                       variant="brand"
-                       class="w-full nav-btn-current"
-                       aria-label="Aller au match en cours ou dernier match joué">
+            <mad-button
+              size="medium"
+              variant="brand"
+              class="w-full nav-btn-current"
+              aria-label="Aller au match en cours ou dernier match joué"
+              @click="${this._scrollToCurrentMatch}"
+            >
               <mad-icon name="crosshair" aria-hidden="true"></mad-icon>
             </mad-button>
             <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-neutral-700 text-white dark:bg-neutral-600 text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap">Aller au match actuel (Alt+M)</div>
           </div>
 
           <div class="relative group">
-            <mad-button size="medium"
-                       variant="default"
-                       class="w-full nav-btn-bottom"
-                       aria-label="Aller en bas de la page">
+            <mad-button
+              size="medium"
+              variant="default"
+              class="w-full nav-btn-bottom"
+              aria-label="Aller en bas de la page"
+              @click="${this._scrollToBottom}"
+            >
               <mad-icon name="chevron-down" aria-hidden="true"></mad-icon>
             </mad-button>
             <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-neutral-700 text-white dark:bg-neutral-600 text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap">Aller en bas (Alt+B)</div>
@@ -1314,10 +1375,7 @@ export class PageMatch extends BaseElement {
         </div>
       </div>
       <div class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
-    `;
-
-    // Setup event handlers after render
-    this._setupEvents();
+    `);
 
     // Populate team tiles with team data (cannot be passed as HTML attributes)
     this._populateTeamTiles();
@@ -1330,7 +1388,9 @@ export class PageMatch extends BaseElement {
    * Update match DOM references
    */
   private updateMatchRefs(): void {
-    const matchElements = Array.from(this.querySelectorAll(".match-item"));
+    const matchElements = Array.from(
+      this._renderRoot.querySelectorAll(".match-item")
+    );
     for (const [index, el] of matchElements.entries()) {
       this.matchRefs.set(index, el as HTMLElement);
     }
@@ -1348,7 +1408,7 @@ export class PageMatch extends BaseElement {
     }
 
     const teamTiles = Array.from(
-      this.querySelectorAll("mad-team-tile[data-team-row-id]")
+      this._renderRoot.querySelectorAll("mad-team-tile[data-team-row-id]")
     );
     for (const tile of teamTiles) {
       const teamRowId = Number((tile as HTMLElement).dataset.teamRowId);
@@ -1361,56 +1421,13 @@ export class PageMatch extends BaseElement {
   }
 
   /**
-   * Setup event handlers
+   * Setup event handlers for elements that can't use @click in templates
    */
   protected _setupEvents(): void {
-    // New match button
-    const newMatchBtn = this.querySelector(".new-match-btn");
-    newMatchBtn?.addEventListener("click", () => {
-      this.goMatch();
-    });
-
-    // Auto match button
-    const autoMatchBtn = this.querySelector(".auto-match-btn");
-    autoMatchBtn?.addEventListener("click", () => {
-      this.goAutoMatch();
-    });
-
-    // Generate NBA button
-    const generateNBABtn = this.querySelector(".generate-nba-btn");
-    generateNBABtn?.addEventListener("click", () => {
-      this.goGenerateAllNBAMatches();
-    });
-
-    // Cancel button
-    const cancelBtn = this.querySelector(".cancel-btn");
-    cancelBtn?.addEventListener("click", () => {
-      this.cancelSelection();
-    });
-
-    // Validate button
-    const validateBtn = this.querySelector(".validate-btn");
-    validateBtn?.addEventListener("click", () => {
-      this.goValidateSelection();
-    });
-
-    // Team selector rows
-    const teamRows = Array.from(this.querySelectorAll(".team-row"));
-    for (const row of teamRows) {
-      row.addEventListener("click", () => {
-        const teamId = (row as HTMLElement).dataset.teamId;
-        const teamToSelect = this._teamToSelect.value || [];
-        const selectedRow = teamToSelect.find(
-          (r) => r.team.id === Number(teamId)
-        );
-        if (selectedRow) {
-          this.onTeamSelected(selectedRow);
-        }
-      });
-    }
-
-    // Delete buttons
-    const deleteBtns = Array.from(this.querySelectorAll(".delete-btn"));
+    // Delete buttons - these are rendered dynamically so need event delegation
+    const deleteBtns = Array.from(
+      this._renderRoot.querySelectorAll(".delete-btn")
+    );
     for (const btn of deleteBtns) {
       btn.addEventListener("click", () => {
         const matchId = (btn as HTMLElement).dataset.matchId;
@@ -1425,34 +1442,10 @@ export class PageMatch extends BaseElement {
       });
     }
 
-    // Play buttons
-    const playBtns = Array.from(this.querySelectorAll(".play-btn"));
-    for (const btn of playBtns) {
-      btn.addEventListener("click", () => {
-        const matchId = (btn as HTMLElement).dataset.matchId;
-        const tournament = this._tournament.value;
-        const match = tournament?.matchs?.find((m) => m.id === Number(matchId));
-        if (match) {
-          this.playMatch(match);
-        }
-      });
-    }
-
-    // Stop buttons
-    const stopBtns = Array.from(this.querySelectorAll(".stop-btn"));
-    for (const btn of stopBtns) {
-      btn.addEventListener("click", () => {
-        const matchId = (btn as HTMLElement).dataset.matchId;
-        const tournament = this._tournament.value;
-        const match = tournament?.matchs?.find((m) => m.id === Number(matchId));
-        if (match) {
-          this.stopMatch(match);
-        }
-      });
-    }
-
-    // Scorer change events
-    const hostScorers = Array.from(this.querySelectorAll(".host-scorer"));
+    // Scorer change events - cannot use @madNumberChange in templates
+    const hostScorers = Array.from(
+      this._renderRoot.querySelectorAll(".host-scorer")
+    );
     for (const scorer of hostScorers) {
       scorer.addEventListener("madNumberChange", (ev: Event) => {
         const matchId = (scorer as HTMLElement).dataset.matchId;
@@ -1468,7 +1461,9 @@ export class PageMatch extends BaseElement {
       });
     }
 
-    const visitorScorers = Array.from(this.querySelectorAll(".visitor-scorer"));
+    const visitorScorers = Array.from(
+      this._renderRoot.querySelectorAll(".visitor-scorer")
+    );
     for (const scorer of visitorScorers) {
       scorer.addEventListener("madNumberChange", (ev: Event) => {
         const matchId = (scorer as HTMLElement).dataset.matchId;
@@ -1483,25 +1478,16 @@ export class PageMatch extends BaseElement {
         }
       });
     }
-
-    // Scroll navigation buttons
-    const btnTop = this.querySelector(".nav-btn-top");
-    const btnCurrent = this.querySelector(".nav-btn-current");
-    const btnBottom = this.querySelector(".nav-btn-bottom");
-
-    btnTop?.addEventListener("click", this._scrollToTop);
-    btnCurrent?.addEventListener("click", this._scrollToCurrentMatch);
-    btnBottom?.addEventListener("click", this._scrollToBottom);
   }
 
   /**
    * Teardown event handlers
    */
   protected _teardownEvents(): void {
-    // Scroll navigation buttons
-    const btnTop = this.querySelector(".nav-btn-top");
-    const btnCurrent = this.querySelector(".nav-btn-current");
-    const btnBottom = this.querySelector(".nav-btn-bottom");
+    // Scroll navigation buttons - removed since they use @click in templates
+    const btnTop = this._renderRoot.querySelector(".nav-btn-top");
+    const btnCurrent = this._renderRoot.querySelector(".nav-btn-current");
+    const btnBottom = this._renderRoot.querySelector(".nav-btn-bottom");
 
     btnTop?.removeEventListener("click", this._scrollToTop);
     btnCurrent?.removeEventListener("click", this._scrollToCurrentMatch);

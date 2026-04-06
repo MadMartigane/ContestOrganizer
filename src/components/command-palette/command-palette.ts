@@ -1,4 +1,4 @@
-import "./command-palette.css";
+import { html, nothing, type TemplateResult } from "lit-html";
 import { BaseElement } from "../../core/base-element.js";
 import { Signal } from "../../core/signal.js";
 
@@ -7,103 +7,6 @@ import { Signal } from "../../core/signal.js";
  * Provides quick access to application commands via keyboard shortcut.
  * @element command-palette
  */
-const template = document.createElement("template");
-template.innerHTML = `
-  <style>
-    :host { display: block; }
-    .palette-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.5);
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      padding-top: 15vh;
-      z-index: 9999;
-    }
-    .palette {
-      background: var(--wa-color-neutral-900, #171717);
-      border-radius: 12px;
-      width: 90%;
-      max-width: 600px;
-      box-shadow: var(--wa-shadow-x-large, 0 25px 50px -12px rgba(0, 0, 0, 0.25));
-      overflow: hidden;
-    }
-    .search-container {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 16px;
-      border-bottom: 1px solid var(--wa-color-neutral-700, #404040);
-    }
-    .search-input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      color: var(--wa-color-neutral-100, #f5f5f5);
-      font-size: 18px;
-      outline: none;
-    }
-    .search-input:focus-visible {
-      outline: 2px solid #6366f1;
-      outline-offset: 2px;
-    }
-    .search-input::placeholder {
-      color: var(--wa-color-neutral-500, #737373);
-    }
-    .command-list {
-      list-style: none;
-      margin: 0;
-      padding: 8px 0;
-      max-height: 400px;
-      overflow-y: auto;
-    }
-    .command-list li {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      cursor: pointer;
-      transition: background 150ms ease;
-    }
-    .command-list li:hover,
-    .command-list li.selected {
-      background: var(--wa-color-neutral-800, #262626);
-    }
-    .command-list li:focus-visible {
-      outline: 2px solid #6366f1;
-      outline-offset: -2px;
-    }
-    .command-list li.selected {
-      background: var(--wa-color-brand, #6366f1);
-    }
-    .command-list .label {
-      flex: 1;
-      color: var(--wa-color-neutral-100, #f5f5f5);
-    }
-    .command-list .shortcut {
-      color: var(--wa-color-neutral-400, #a3a3a3);
-      font-size: 12px;
-      font-family: monospace;
-    }
-  </style>
-  <div class="palette-overlay" role="dialog" aria-label="Command Palette" aria-modal="true">
-    <div class="palette" role="document">
-      <div class="search-container">
-        <mad-icon name="magnifying-glass"></mad-icon>
-        <input
-          type="text"
-          class="search-input"
-          placeholder="Type a command or search..."
-          autocomplete="off"
-          aria-label="Search commands"
-        />
-      </div>
-      <ul class="command-list" role="listbox" aria-label="Commands"></ul>
-    </div>
-  </div>
-`;
-
 export class CommandPalette extends BaseElement {
   private static readonly shortcutKey = "k";
   private static readonly modifierKeys = ["metaKey", "ctrlKey"];
@@ -122,9 +25,6 @@ export class CommandPalette extends BaseElement {
 
   // Bound handlers for cleanup
   private _boundGlobalKeydown: ((e: KeyboardEvent) => void) | null = null;
-  private _boundInputHandler: ((e: Event) => void) | null = null;
-  private _boundOverlayClick: (() => void) | null = null;
-  private _boundPaletteClick: ((e: Event) => void) | null = null;
 
   protected _setupProperties(): void {
     this._isOpen = new Signal<boolean>(false);
@@ -136,10 +36,6 @@ export class CommandPalette extends BaseElement {
     this._trackSignal(this._selectedIndex);
 
     this._initialized = true;
-  }
-
-  protected _createRenderRoot(): Element {
-    return this;
   }
 
   connectedCallback(): void {
@@ -155,17 +51,6 @@ export class CommandPalette extends BaseElement {
       document.removeEventListener("keydown", this._boundGlobalKeydown);
       this._boundGlobalKeydown = null;
     }
-    this._cleanupEventListeners();
-  }
-
-  private _cleanupEventListeners(): void {
-    if (this.domInput && this._boundInputHandler) {
-      this.domInput.removeEventListener("input", this._boundInputHandler);
-      this.domInput = null;
-    }
-    this._boundInputHandler = null;
-    this._boundOverlayClick = null;
-    this._boundPaletteClick = null;
   }
 
   /**
@@ -418,87 +303,162 @@ export class CommandPalette extends BaseElement {
   }
 
   /**
-   * Render the command palette
+   * Handle command item click
    */
-  protected _render(): void {
+  private _handleItemClick(index: number): void {
+    const filtered = this._filteredCommands;
+    const command = filtered[index];
+    if (command) {
+      this._execute(command);
+    }
+  }
+
+  private _getStyles(): TemplateResult {
+    return html`
+      <style>
+        :host { display: block; }
+        .palette-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: flex-start;
+          justify-content: center;
+          padding-top: 15vh;
+          z-index: 9999;
+        }
+        .palette {
+          background: var(--wa-color-neutral-900, #171717);
+          border-radius: 12px;
+          width: 90%;
+          max-width: 600px;
+          box-shadow: var(--wa-shadow-x-large, 0 25px 50px -12px rgba(0, 0, 0, 0.25));
+          overflow: hidden;
+        }
+        .search-container {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 16px;
+          border-bottom: 1px solid var(--wa-color-neutral-700, #404040);
+        }
+        .search-input {
+          flex: 1;
+          background: transparent;
+          border: none;
+          color: var(--wa-color-neutral-100, #f5f5f5);
+          font-size: 18px;
+          outline: none;
+        }
+        .search-input:focus-visible {
+          outline: 2px solid #6366f1;
+          outline-offset: 2px;
+        }
+        .search-input::placeholder {
+          color: var(--wa-color-neutral-500, #737373);
+        }
+        .command-list {
+          list-style: none;
+          margin: 0;
+          padding: 8px 0;
+          max-height: 400px;
+          overflow-y: auto;
+        }
+        .command-list li {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 12px 16px;
+          cursor: pointer;
+          transition: background 150ms ease;
+        }
+        .command-list li:hover,
+        .command-list li.selected {
+          background: var(--wa-color-neutral-800, #262626);
+        }
+        .command-list li:focus-visible {
+          outline: 2px solid #6366f1;
+          outline-offset: -2px;
+        }
+        .command-list li.selected {
+          background: var(--wa-color-brand, #6366f1);
+        }
+        .command-list .label {
+          flex: 1;
+          color: var(--wa-color-neutral-100, #f5f5f5);
+        }
+        .command-list .shortcut {
+          color: var(--wa-color-neutral-400, #a3a3a3);
+          font-size: 12px;
+          font-family: monospace;
+        }
+      </style>
+    `;
+  }
+
+  private _renderCommandItem(
+    cmd: Command,
+    index: number,
+    selectedIndex: number
+  ): TemplateResult {
+    const isSelected = index === selectedIndex;
+    return html`
+      <li
+        class="${isSelected ? "selected" : ""}"
+        data-index="${index}"
+        role="option"
+        aria-selected="${isSelected}"
+        @click=${() => this._handleItemClick(index)}
+      >
+        <mad-icon name="${cmd.icon ?? "command"}"></mad-icon>
+        <span class="label">${cmd.label}</span>
+        <span class="shortcut">${cmd.shortcut ?? ""}</span>
+      </li>
+    `;
+  }
+
+  private _renderContent(): TemplateResult {
     if (!this._isOpen.value) {
-      this.innerHTML = "";
-      return;
+      return html`${nothing}`;
     }
 
     const filtered = this._filteredCommands;
     const selectedIndex = this._selectedIndex.value;
 
-    const commandItems = filtered
-      .map(
-        (cmd, index) => `
-      <li class="${index === selectedIndex ? "selected" : ""}" data-index="${index}" role="option" aria-selected="${index === selectedIndex}">
-        <mad-icon name="${cmd.icon ?? "command"}"></mad-icon>
-        <span class="label">${cmd.label}</span>
-        <span class="shortcut">${cmd.shortcut ?? ""}</span>
-      </li>
-    `
-      )
-      .join("");
-
-    this.innerHTML = `
-      <div class="palette-overlay">
-        <div class="palette">
+    return html`
+      ${this._getStyles()}
+      <div class="palette-overlay" role="dialog" aria-label="Command Palette" aria-modal="true" @click=${this._handleOverlayClick}>
+        <div class="palette" role="document" @click=${this._handlePaletteClick}>
           <div class="search-container">
             <mad-icon name="magnifying-glass"></mad-icon>
             <input
               type="text"
               class="search-input"
               placeholder="Type a command or search..."
-              value="${this._query.value}"
+              .value="${this._query.value}"
               autocomplete="off"
               autofocus
               aria-label="Search commands"
+              @input=${this._handleInput}
             />
           </div>
           <ul class="command-list" role="listbox" aria-label="Commands" aria-live="polite">
-            ${commandItems}
+            ${filtered.map((cmd, index) => this._renderCommandItem(cmd, index, selectedIndex))}
           </ul>
         </div>
       </div>
     `;
+  }
 
-    // Cache DOM references
-    this.domInput = this.querySelector(".search-input");
-    this.domCommandList = this.querySelector(".command-list");
+  /**
+   * Render the command palette
+   */
+  protected _render(): void {
+    this._renderTemplate(this._renderContent());
 
-    // Attach event listeners
-    if (this.domInput) {
-      this._boundInputHandler = this._handleInput.bind(this);
-      this.domInput.addEventListener("input", this._boundInputHandler);
-    }
-
-    const overlay = this.querySelector(".palette-overlay");
-    const palette = this.querySelector(".palette");
-
-    if (overlay) {
-      this._boundOverlayClick = this._handleOverlayClick.bind(this);
-      overlay.addEventListener("click", this._boundOverlayClick);
-    }
-
-    if (palette) {
-      this._boundPaletteClick = this._handlePaletteClick.bind(this);
-      palette.addEventListener("click", this._boundPaletteClick);
-    }
-
-    // Attach click handlers to command items
-    if (this.domCommandList) {
-      const items = Array.from(this.domCommandList.querySelectorAll("li"));
-      for (const item of items) {
-        item.addEventListener("click", () => {
-          const index = Number(item.dataset.index);
-          const command = filtered[index];
-          if (command) {
-            this._execute(command);
-          }
-        });
-      }
-    }
+    // Cache DOM references after render
+    this.domInput = this._renderRoot.querySelector(".search-input");
+    this.domCommandList = this._renderRoot.querySelector(".command-list");
   }
 }
 

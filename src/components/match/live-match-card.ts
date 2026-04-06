@@ -1,3 +1,4 @@
+import { html } from "lit-html";
 import { BaseElement } from "../../core/base-element.js";
 import type { GestureRecognizedEvent } from "../../core/gesture-engine.js";
 import { GestureEngine } from "../../core/gesture-engine.js";
@@ -21,20 +22,14 @@ type Team = "host" | "visitor";
 /**
  * LiveMatchCard - Enhanced match card with gesture-based scoring
  * @element mad-live-match-card
+ * @fires score - Dispatched when a score is added via gesture (detail: { team: "host" | "visitor", points: number })
  */
 export class LiveMatchCard extends BaseElement {
   private declare _hostGestureEngine: GestureEngine | null;
   private declare _visitorGestureEngine: GestureEngine | null;
-  private declare _hostZone: HTMLElement | null;
-  private declare _visitorZone: HTMLElement | null;
   private declare _match: Match;
   private declare _onScore: (team: "host" | "visitor", points: number) => void;
   private declare _onEnd: () => void;
-
-  // Bound handlers for cleanup
-  private _boundHostGestureHandler: ((event: Event) => void) | null = null;
-  private _boundVisitorGestureHandler: ((event: Event) => void) | null = null;
-  private _boundEndClickHandler: (() => void) | null = null;
 
   static get observedAttributes(): string[] {
     return [];
@@ -43,8 +38,6 @@ export class LiveMatchCard extends BaseElement {
   protected _setupProperties(): void {
     this._hostGestureEngine = null;
     this._visitorGestureEngine = null;
-    this._hostZone = null;
-    this._visitorZone = null;
     this._match = {
       id: 0,
       host: { name: "" },
@@ -61,17 +54,32 @@ export class LiveMatchCard extends BaseElement {
     this._initialized = true;
   }
 
-  protected _createRenderRoot(): Element {
-    return this;
-  }
-
   connectedCallback(): void {
     super.connectedCallback();
-    this._setupGestures();
+    // Initialize gesture engines after render
+    requestAnimationFrame(() => {
+      const hostZone = this._renderRoot.querySelector(".team.host");
+      const visitorZone = this._renderRoot.querySelector(".team.visitor");
+
+      if (hostZone) {
+        this._hostGestureEngine = new GestureEngine(hostZone as HTMLElement);
+        this._hostGestureEngine.enable();
+      }
+
+      if (visitorZone) {
+        this._visitorGestureEngine = new GestureEngine(
+          visitorZone as HTMLElement
+        );
+        this._visitorGestureEngine.enable();
+      }
+    });
   }
 
   disconnectedCallback(): void {
-    this._cleanupGestures();
+    this._hostGestureEngine?.destroy();
+    this._visitorGestureEngine?.destroy();
+    this._hostGestureEngine = null;
+    this._visitorGestureEngine = null;
     super.disconnectedCallback();
   }
 
@@ -83,58 +91,6 @@ export class LiveMatchCard extends BaseElement {
     this._onScore = props.onScore;
     this._onEnd = props.onEnd;
     this._requestRender();
-  }
-
-  private _setupGestures(): void {
-    // Wait for render then attach gesture handlers
-    requestAnimationFrame(() => {
-      this._hostZone = this._renderRoot.querySelector(".team.host") ?? null;
-      this._visitorZone =
-        this._renderRoot.querySelector(".team.visitor") ?? null;
-
-      if (this._hostZone) {
-        this._hostGestureEngine = new GestureEngine(this._hostZone);
-        this._hostGestureEngine.enable();
-        this._boundHostGestureHandler = this._handleHostGesture.bind(this);
-        this._hostZone.addEventListener(
-          "gesture",
-          this._boundHostGestureHandler
-        );
-      }
-
-      if (this._visitorZone) {
-        this._visitorGestureEngine = new GestureEngine(this._visitorZone);
-        this._visitorGestureEngine.enable();
-        this._boundVisitorGestureHandler =
-          this._handleVisitorGesture.bind(this);
-        this._visitorZone.addEventListener(
-          "gesture",
-          this._boundVisitorGestureHandler
-        );
-      }
-    });
-  }
-
-  private _cleanupGestures(): void {
-    if (this._hostZone && this._boundHostGestureHandler) {
-      this._hostZone.removeEventListener(
-        "gesture",
-        this._boundHostGestureHandler
-      );
-      this._boundHostGestureHandler = null;
-    }
-    if (this._visitorZone && this._boundVisitorGestureHandler) {
-      this._visitorZone.removeEventListener(
-        "gesture",
-        this._boundVisitorGestureHandler
-      );
-      this._boundVisitorGestureHandler = null;
-    }
-
-    this._hostGestureEngine?.destroy();
-    this._visitorGestureEngine?.destroy();
-    this._hostGestureEngine = null;
-    this._visitorGestureEngine = null;
   }
 
   private _handleHostGesture(event: Event): void {
@@ -170,7 +126,8 @@ export class LiveMatchCard extends BaseElement {
   }
 
   private _animateScore(team: Team): void {
-    const zone = team === "host" ? this._hostZone : this._visitorZone;
+    const selector = team === "host" ? ".team.host" : ".team.visitor";
+    const zone = this._renderRoot.querySelector(selector);
     if (!zone) {
       return;
     }
@@ -208,7 +165,12 @@ export class LiveMatchCard extends BaseElement {
   }
 
   protected _render(): void {
-    this.innerHTML = `
+    const hostName = this._match.host.name;
+    const hostScore = this._match.hostScore;
+    const visitorName = this._match.visitor.name;
+    const visitorScore = this._match.visitorScore;
+
+    this._renderTemplate(html`
       <style>
         .live-match-card {
           display: block;
@@ -296,32 +258,47 @@ export class LiveMatchCard extends BaseElement {
       </style>
       <div class="live-match-card">
         <div class="live-match-card-inner">
-          <div class="team host" data-team="host" role="button" aria-label="Host team swipe to score">
-            <span class="name">${this._match.host.name}</span>
-            <span class="score">${this._match.hostScore}</span>
+          <div
+            class="team host"
+            data-team="host"
+            role="button"
+            aria-label="Host team swipe to score"
+            @gesture=${this._handleHostGesture}
+          >
+            <span class="name">${hostName}</span>
+            <span class="score">${hostScore}</span>
             <div class="gesture-hints">
               <span>↑ +1</span>
               <span>2× +3</span>
             </div>
           </div>
           <div class="vs" aria-hidden="true">VS</div>
-          <div class="team visitor" data-team="visitor" role="button" aria-label="Visitor team swipe to score">
-            <span class="name">${this._match.visitor.name}</span>
-            <span class="score">${this._match.visitorScore}</span>
+          <div
+            class="team visitor"
+            data-team="visitor"
+            role="button"
+            aria-label="Visitor team swipe to score"
+            @gesture=${this._handleVisitorGesture}
+          >
+            <span class="name">${visitorName}</span>
+            <span class="score">${visitorScore}</span>
             <div class="gesture-hints">
               <span>↑ +1</span>
               <span>2× +3</span>
             </div>
           </div>
-          <mad-button variant="danger" size="small" pill class="end-btn" data-action="end-match" aria-label="End match">End Match</mad-button>
+          <mad-button
+            variant="danger"
+            size="small"
+            pill
+            class="end-btn"
+            data-action="end-match"
+            aria-label="End match"
+            @click=${this._handleEndClick.bind(this)}
+          >End Match</mad-button>
         </div>
       </div>
-    `;
-
-    // Attach end button listener
-    const endBtn = this._renderRoot.querySelector('[data-action="end-match"]');
-    this._boundEndClickHandler = this._handleEndClick.bind(this);
-    endBtn?.addEventListener("click", this._boundEndClickHandler);
+    `);
   }
 
   private _handleEndClick(): void {

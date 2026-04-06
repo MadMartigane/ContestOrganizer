@@ -55,7 +55,10 @@ export class NavigationOrchestrator extends EventTarget {
     this.keyboardManager.enable();
 
     // Connect zones to layout
-    const zoneElements = this.container.querySelectorAll<HTMLElement>(
+    // If this.container is inside a Shadow DOM, get the host element to find light DOM zones
+    const root = this.container.getRootNode();
+    const searchRoot = root instanceof ShadowRoot ? root.host : this.container;
+    const zoneElements = searchRoot.querySelectorAll<HTMLElement>(
       "config-zone, home-zone, tournaments-zone, tournament-zone, matchs-zone"
     );
     for (const el of Array.from(zoneElements)) {

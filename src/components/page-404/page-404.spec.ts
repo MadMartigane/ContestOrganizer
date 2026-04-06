@@ -18,17 +18,19 @@ describe("Page404", () => {
     const element = document.createElement("page-404");
     document.body.appendChild(element);
 
-    expect(element.innerHTML).toContain("404");
-    expect(element.innerHTML).toContain("undraw_page_not_found");
+    expect((element as any)._renderRoot.innerHTML).toContain("404");
+    expect((element as any)._renderRoot.innerHTML).toContain(
+      "undraw_page_not_found"
+    );
   });
 
   it("should render navigation buttons", () => {
     const element = document.createElement("page-404");
     document.body.appendChild(element);
 
-    expect(element.innerHTML).toContain("Accueil");
-    expect(element.innerHTML).toContain("Tournois");
-    expect(element.innerHTML).toContain("#/home");
-    expect(element.innerHTML).toContain("#/tournaments");
+    expect((element as any)._renderRoot.innerHTML).toContain("Accueil");
+    expect((element as any)._renderRoot.innerHTML).toContain("Tournois");
+    expect((element as any)._renderRoot.innerHTML).toContain("#/home");
+    expect((element as any)._renderRoot.innerHTML).toContain("#/tournaments");
   });
 });

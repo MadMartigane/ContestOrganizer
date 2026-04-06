@@ -1,3 +1,4 @@
+import { html, nothing } from "lit-html";
 import { BaseElement } from "../../core/base-element.js";
 import { Signal } from "../../core/signal.js";
 import { getTournaments } from "../../modules/init.js";
@@ -42,10 +43,6 @@ export class MatchTile extends BaseElement {
     this._trackSignal(this._visitorSignal);
 
     this._initialized = true;
-  }
-
-  protected _createRenderRoot(): Element {
-    return this;
   }
 
   protected _onAttributeChange(name: string, _value: string | null): void {
@@ -302,10 +299,12 @@ export class MatchTile extends BaseElement {
   ): void {
     const hostColClass = hasScore ? "col-span-3" : "col-span-5";
     const visitorColClass = hasScore ? "col-span-3" : "col-span-5";
+    const hostTeamName = host?.team?.name ?? "TBD";
+    const visitorTeamName = visitor?.team?.name ?? "TBD";
 
-    this.innerHTML = `
+    this._renderTemplate(html`
       <style>
-        mad-match-tile {
+        .match-tile-root {
           display: block;
         }
         .match-grid {
@@ -340,18 +339,35 @@ export class MatchTile extends BaseElement {
           font-size: 0.75rem;
         }
       </style>
-      <div class="match-grid" role="article" aria-label="Match between ${host?.team?.name ?? "TBD"} and ${visitor?.team?.name ?? "TBD"}">
+      <div class="match-tile-root">
+        <div class="match-grid" role="article" aria-label="Match between ${hostTeamName} and ${visitorTeamName}">
         <div class="host-section ${hostColClass}">
-          ${host?.team ? `<mad-team-tile class="host-team-tile" rank="${hostRank ?? ""}"></mad-team-tile>` : "<span>Sélection…</span>"}
+          ${
+            host?.team
+              ? html`<mad-team-tile class="host-team-tile" .rank=${hostRank ?? 0}></mad-team-tile>`
+              : html`<span>Sélection…</span>`
+          }
         </div>
-        ${hasScore ? `<div class="col-span-2 score" aria-label="Home score">${hostScore}</div>` : ""}
+        ${
+          hasScore
+            ? html`<div class="col-span-2 score" aria-label="Home score">${hostScore}</div>`
+            : nothing
+        }
         <div class="vs" aria-hidden="true">VS</div>
-        ${hasScore ? `<div class="col-span-2 score" aria-label="Visitor score">${visitorScore}</div>` : ""}
+        ${
+          hasScore
+            ? html`<div class="col-span-2 score" aria-label="Visitor score">${visitorScore}</div>`
+            : nothing
+        }
         <div class="visitor-section ${visitorColClass}">
-          ${visitor?.team ? `<mad-team-tile class="visitor-team-tile" rank="${visitorRank ?? ""}"></mad-team-tile>` : "<span>Sélection…</span>"}
+          ${
+            visitor?.team
+              ? html`<mad-team-tile class="visitor-team-tile" .rank=${visitorRank ?? 0}></mad-team-tile>`
+              : html`<span>Sélection…</span>`
+          }
         </div>
       </div>
-    `;
+    `);
 
     // Second pass: set properties on newly created team-tiles
     const hostTile = this._renderRoot.querySelector(
@@ -364,16 +380,10 @@ export class MatchTile extends BaseElement {
     if (hostTile && host?.team) {
       hostTile.team = host.team;
       hostTile.reverse = true;
-      if (hostRank !== undefined) {
-        hostTile.rank = hostRank;
-      }
     }
 
     if (visitorTile && visitor?.team) {
       visitorTile.team = visitor.team;
-      if (visitorRank !== undefined) {
-        visitorTile.rank = visitorRank;
-      }
     }
   }
 }

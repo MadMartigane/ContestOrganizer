@@ -1,5 +1,10 @@
 @import "./theme.css";
+@import "./variables.css";
+@import "./app.css";
 @import "tailwindcss";
+
+/* Scan all TS files for Tailwind classes */
+@source "../**/*.ts";
 
 @custom-variant dark (&:where(.dark, .dark *));
 

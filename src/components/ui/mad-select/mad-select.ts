@@ -1,85 +1,6 @@
 import { BaseElement } from "@core/base-element.js";
-
-/**
- * Template for MadSelect - contains the native select element with slot for options
- */
-const template = document.createElement("template");
-template.innerHTML = `
-  <style>
-    :host {
-      display: block;
-    }
-    :host([hidden]) {
-      display: none;
-    }
-    label {
-      display: block;
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: #404040;
-      margin-bottom: 0.25rem;
-    }
-    @media (prefers-color-scheme: dark) {
-      label {
-        color: #d4d4d4;
-      }
-    }
-    select {
-      width: 100%;
-      border-radius: 0.5rem;
-      border: 1px solid #d4d4d4;
-      background-color: #ffffff;
-      color: #171717;
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
-      line-height: 1.5;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    select:focus {
-      outline: none;
-      border-color: #f97316;
-      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
-    }
-    select:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    @media (prefers-color-scheme: dark) {
-      select {
-        border-color: #525252;
-        background-color: #262626;
-        color: #fafafa;
-      }
-    }
-    .size-small {
-      padding: 0.375rem 0.75rem;
-      font-size: 0.875rem;
-    }
-    .size-medium {
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
-    }
-    .size-large {
-      padding: 0.75rem 1rem;
-      font-size: 1.125rem;
-    }
-    .help-text {
-      margin-top: 0.25rem;
-      font-size: 0.875rem;
-      color: #737373;
-    }
-    @media (prefers-color-scheme: dark) {
-      .help-text {
-        color: #a3a3a3;
-      }
-    }
-  </style>
-  <label part="label"></label>
-  <select part="select">
-    <slot></slot>
-  </select>
-  <p part="help-text" class="help-text"></p>
-`;
+import { html, nothing } from "lit-html";
+import { repeat } from "lit-html/directives/repeat.js";
 
 /**
  * MadSelect - Custom select component with Shadow DOM and Form-Associated Custom Element (FACE) support
@@ -112,63 +33,33 @@ export class MadSelect extends BaseElement {
    */
   readonly #internals: ElementInternals;
 
-  /**
-   * Reference to shadow root
-   */
-  readonly #shadow: ShadowRoot;
-
-  /**
-   * Reference to the native select element in shadow DOM
-   */
-  readonly #select: HTMLSelectElement | null;
-
-  /**
-   * Reference to the label element in shadow DOM
-   */
-  readonly #label: HTMLLabelElement | null;
-
-  /**
-   * Reference to help text element in shadow DOM
-   */
-  readonly #helpText: HTMLParagraphElement | null;
-
-  /**
-   * Placeholder option value
-   */
-  #placeholder = "";
-
   constructor() {
     super();
 
     // Attach ElementInternals for form integration
     this.#internals = this.attachInternals();
 
-    // Create shadow root and append template
-    this.#shadow = this.attachShadow({ mode: "open" });
-    this.#shadow.appendChild(template.content.cloneNode(true));
-
-    // Get references to shadow DOM elements
-    this.#select = this.#shadow.querySelector("select");
-    this.#label = this.#shadow.querySelector("label");
-    this.#helpText = this.#shadow.querySelector(".help-text");
-
-    // Set up native select event listener
-    this.#setupSelectListener();
+    // Set up slotchange listener for re-rendering when options change
+    this._createRenderRoot().addEventListener("slotchange", () => {
+      this._requestRender();
+    });
   }
 
   /**
    * Get the current value of the select
    */
   get value(): string {
-    return this.#select?.value ?? "";
+    const select = this._renderRoot.querySelector("select");
+    return select?.value ?? "";
   }
 
   /**
    * Set the value of the select
    */
   set value(v: string) {
-    if (this.#select) {
-      this.#select.value = v;
+    const select = this._renderRoot.querySelector("select");
+    if (select) {
+      select.value = v;
     }
     this.#internals.setFormValue(v);
     this.setAttribute("value", v);
@@ -253,47 +144,17 @@ export class MadSelect extends BaseElement {
   }
 
   /**
-   * Set up event listener on the native select
+   * Handle change event from the native select
    */
-  #setupSelectListener(): void {
-    if (!this.#select) {
-      return;
-    }
+  #handleChange(): void {
+    const select = this._renderRoot.querySelector("select");
+    const selectedValue = select?.value ?? "";
 
-    this.#select.addEventListener("change", () => {
-      const selectedValue = this.#select?.value ?? "";
+    // Update form value
+    this.#internals.setFormValue(selectedValue);
 
-      // Update form value
-      this.#internals.setFormValue(selectedValue);
-
-      // Emit custom change event
-      this._emit("mad-change", { value: selectedValue });
-    });
-  }
-
-  /**
-   * Build options from light DOM <mad-option> children
-   */
-  #buildOptions(): string {
-    const options = Array.from(this.querySelectorAll("mad-option"));
-
-    let optionsHtml = "";
-
-    // Add placeholder option if defined and no value is set
-    const currentValue = this.getAttribute("value") ?? "";
-    if (!currentValue && this.#placeholder) {
-      optionsHtml += `<option value="" disabled selected>${this.#placeholder}</option>`;
-    }
-
-    // Add options from mad-option elements
-    for (const opt of options) {
-      const val = opt.getAttribute("value") ?? "";
-      const text = opt.textContent?.trim() ?? "";
-      const selected = val === currentValue ? " selected" : "";
-      optionsHtml += `<option value="${val}"${selected}>${text}</option>`;
-    }
-
-    return optionsHtml;
+    // Emit custom change event
+    this._emit("mad-change", { value: selectedValue });
   }
 
   protected _render(): void {
@@ -303,47 +164,109 @@ export class MadSelect extends BaseElement {
     const helpText = this.getAttribute("help-text") ?? "";
     const disabled = this.hasAttribute("disabled");
     const currentValue = this.getAttribute("value") ?? "";
+    const options = Array.from(this.querySelectorAll("mad-option"));
 
-    // Store placeholder for use in options
-    this.#placeholder = placeholder;
-
-    // Build options HTML
-    const optionsHtml = this.#buildOptions();
-
-    // Update label
-    if (this.#label) {
-      this.#label.textContent = label;
-      this.#label.style.display = label ? "block" : "none";
-    }
-
-    // Update select with options
-    if (this.#select) {
-      this.#select.innerHTML = optionsHtml;
-      this.#select.className = `size-${size}`;
-      this.#select.disabled = disabled;
-
-      // Restore selected value if present
-      if (currentValue && optionsHtml) {
-        this.#select.value = currentValue;
-      }
-    }
-
-    // Update help text
-    if (this.#helpText) {
-      this.#helpText.textContent = helpText;
-      this.#helpText.style.display = helpText ? "block" : "none";
-    }
+    this._renderTemplate(html`
+      <style>
+        :host {
+          display: block;
+        }
+        :host([hidden]) {
+          display: none;
+        }
+        label {
+          display: block;
+          font-size: 0.875rem;
+          font-weight: 500;
+          color: #404040;
+          margin-bottom: 0.25rem;
+        }
+        @media (prefers-color-scheme: dark) {
+          label {
+            color: #d4d4d4;
+          }
+        }
+        select {
+          width: 100%;
+          border-radius: 0.5rem;
+          border: 1px solid #d4d4d4;
+          background-color: #ffffff;
+          color: #171717;
+          padding: 0.5rem 1rem;
+          font-size: 1rem;
+          line-height: 1.5;
+          transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        select:focus {
+          outline: none;
+          border-color: #f97316;
+          box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
+        }
+        select:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+        @media (prefers-color-scheme: dark) {
+          select {
+            border-color: #525252;
+            background-color: #262626;
+            color: #fafafa;
+          }
+        }
+        .size-small {
+          padding: 0.375rem 0.75rem;
+          font-size: 0.875rem;
+        }
+        .size-medium {
+          padding: 0.5rem 1rem;
+          font-size: 1rem;
+        }
+        .size-large {
+          padding: 0.75rem 1rem;
+          font-size: 1.125rem;
+        }
+        .help-text {
+          margin-top: 0.25rem;
+          font-size: 0.875rem;
+          color: #737373;
+        }
+        @media (prefers-color-scheme: dark) {
+          .help-text {
+            color: #a3a3a3;
+          }
+        }
+      </style>
+      <label part="label" style="display: ${label ? "block" : "none"}">${label}</label>
+      <select
+        part="select"
+        class="size-${size}"
+        ?disabled=${disabled}
+        @change=${this.#handleChange}
+      >
+        ${
+          placeholder && !currentValue
+            ? html`<option value="" disabled selected>${placeholder}</option>`
+            : nothing
+        }
+        ${repeat(
+          options,
+          (opt) => opt.getAttribute("value") ?? "",
+          (opt) => html`
+            <option
+              value=${opt.getAttribute("value") ?? ""}
+              ?selected=${opt.getAttribute("value") === currentValue}
+            >${opt.textContent?.trim() ?? ""}</option>
+          `
+        )}
+      </select>
+      <p part="help-text" class="help-text" style="display: ${helpText ? "block" : "none"}">${helpText}</p>
+    `);
   }
 
   protected _onAttributeChange(name: string, value: string | null): void {
     if (name === "value" && value !== null) {
       // Update form value when value attribute changes externally
       this.#internals.setFormValue(value);
-      if (this.#select) {
-        this.#select.value = value;
-      }
-    } else if (name === "disabled" && this.#select) {
-      this.#select.disabled = value !== null;
     }
   }
 }
@@ -357,7 +280,7 @@ customElements.define("mad-select", MadSelect);
  */
 export class MadOption extends BaseElement {
   static get observedAttributes(): string[] {
-    return ["value"];
+    return ["value", "disabled"];
   }
 
   protected _setupProperties(): void {

@@ -1,5 +1,7 @@
 import { BaseElement } from "@core/base-element.js";
 import { Signal } from "@core/signal.js";
+import { html, type TemplateResult } from "lit-html";
+import { repeat } from "lit-html/directives/repeat.js";
 import { getTournaments } from "../../modules/init.js";
 import {
   type Tournament,
@@ -7,23 +9,7 @@ import {
   TournamentTypeLabel,
 } from "../../modules/tournaments/tournaments.types.js";
 import Utils from "../../modules/utils/utils.js";
-import "./page-tournament-select.css";
-
-const template = document.createElement("template");
-template.innerHTML = `
-  <style>
-    :host { display: block; }
-  </style>
-  <div part="base">
-    <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 dark:bg-neutral-800 rounded-lg shadow-md">
-      <slot name="tournament-list"></slot>
-
-      <hr class="my-4 border-neutral-200 dark:border-neutral-700">
-
-      <slot name="add-form"></slot>
-    </div>
-  </div>
-`;
+import pageTournamentSelectStyles from "./page-tournament-select.css?raw";
 
 /**
  * PageTournamentSelect - Tournament selection page component
@@ -34,9 +20,8 @@ export class PageTournamentSelect extends BaseElement {
   private declare tournaments: ReturnType<typeof getTournaments>;
 
   // DOM references
-  private domSelect: HTMLElement | null = null;
-  private domTournamentName: HTMLElement | null = null;
-  private uiAddingTournamentJustOpened = false;
+  private domSelect: HTMLSelectElement | null = null;
+  private domTournamentName: HTMLInputElement | null = null;
 
   // Signals for state
   private declare _uiAddingTournament: Signal<boolean>;
@@ -85,6 +70,9 @@ export class PageTournamentSelect extends BaseElement {
    */
   connectedCallback(): void {
     super.connectedCallback();
+    const sheet = new CSSStyleSheet();
+    sheet.replaceSync(pageTournamentSelectStyles);
+    this._injectStyles(sheet);
   }
 
   /**
@@ -95,90 +83,50 @@ export class PageTournamentSelect extends BaseElement {
   }
 
   /**
-   * Sets up event listeners after render
+   * Handle tournament card click - navigate to tournament
    */
-  protected _setupEvents(): void {
-    // Card click → navigate to tournament
-    const tournamentCards = Array.from(
-      this.querySelectorAll(".tournament-card")
+  private _selectTournament(id: number): void {
+    this.dispatchEvent(
+      new CustomEvent("navigate", {
+        detail: { hash: `#/tournament/${id}` },
+        bubbles: true,
+        composed: true,
+      })
     );
-    for (const card of tournamentCards) {
-      card.addEventListener("click", (ev: Event) => {
-        const target = ev.target as HTMLElement;
-        // Don't navigate if clicking the delete icon
-        if (target.closest(".delete-tournament-icon")) {
-          return;
-        }
-        const id = (card as HTMLElement).dataset.tournamentId;
-        if (id) {
-          this.dispatchEvent(
-            new CustomEvent("navigate", {
-              detail: { hash: `#/tournament/${id}` },
-              bubbles: true,
-              composed: true,
-            })
-          );
-        }
-      });
-    }
-
-    // New tournament button
-    const newTournamentBtn = this.querySelector(".new-tournament-btn");
-    newTournamentBtn?.addEventListener("click", () => {
-      this.displayUiAddingTournament();
-    });
-
-    // Cancel add button
-    const cancelAddBtn = this.querySelector(".cancel-add-btn");
-    cancelAddBtn?.addEventListener("click", () => {
-      this.hideUiAddingTournament();
-    });
-
-    // Confirm add button
-    const confirmAddBtn = this.querySelector(".confirm-add-btn");
-    confirmAddBtn?.addEventListener("click", () => {
-      this.addTournament();
-    });
-
-    // Name input keydown event
-    const nameInput = this.querySelector(".add-tournament-form mad-input");
-    if (nameInput) {
-      nameInput.addEventListener("keydown", (ev: Event) => {
-        this.onKeyPressNewName(ev as KeyboardEvent);
-      });
-    }
-
-    // Delete tournament icons
-    const deleteIcons = Array.from(
-      this.querySelectorAll(".delete-tournament-icon")
-    );
-    for (const icon of deleteIcons) {
-      icon.addEventListener("click", (ev: Event) => {
-        ev.stopPropagation(); // Prevent card click navigation
-        const id = (icon as HTMLElement).dataset.tournamentId;
-        if (id) {
-          this.confirmRemoveTournament(ev, Number(id));
-        }
-      });
-    }
-
-    // Focus management when form opens
-    if (this.uiAddingTournamentJustOpened) {
-      Utils.setFocus(this.domTournamentName as HTMLElement);
-      this.uiAddingTournamentJustOpened = false;
-    }
   }
 
   /**
-   * Confirm and remove a tournament
+   * Create new tournament - show add form
    */
-  private async confirmRemoveTournament(
-    event: Event,
-    id: number
-  ): Promise<void> {
-    event.preventDefault();
-    event.stopPropagation();
+  private _createNewTournament(): void {
+    this.displayUiAddingTournament();
+  }
 
+  /**
+   * Cancel selection - hide add form
+   */
+  private _cancelSelection(): void {
+    this.hideUiAddingTournament();
+  }
+
+  /**
+   * Confirm selection - add new tournament
+   */
+  private _confirmSelection(): void {
+    this.addTournament();
+  }
+
+  /**
+   * Handle keydown on name input
+   */
+  private _handleNameInputKeydown(event: KeyboardEvent): void {
+    this.onKeyPressNewName(event);
+  }
+
+  /**
+   * Delete tournament
+   */
+  private async _deleteTournament(id: number): Promise<void> {
     const tournament = await this.tournaments.get(id);
     const confirm = await Utils.confirmChoice(
       `Supprimer le tournoi: ${tournament?.name}?`
@@ -199,16 +147,14 @@ export class PageTournamentSelect extends BaseElement {
    * Get the new tournament name value from input
    */
   private getNewTournamentNameValue(): string | null {
-    const inputEl = this.domTournamentName as { value?: string } | null;
-    return inputEl?.value ?? null;
+    return this.domTournamentName?.value ?? null;
   }
 
   /**
    * Get tournament type selection
    */
   private getTournamentTypeSelection(): TournamentType {
-    const selectEl = this.domSelect as { value?: string } | null;
-    const selection = selectEl?.value as TournamentType | undefined;
+    const selection = this.domSelect?.value as TournamentType | undefined;
     return selection || TournamentType.NBA;
   }
 
@@ -238,7 +184,7 @@ export class PageTournamentSelect extends BaseElement {
    * without triggering a full re-render
    */
   private _updateConfirmButtonState(): void {
-    const confirmBtn = this.querySelector(
+    const confirmBtn = this._renderRoot.querySelector(
       ".confirm-add-btn"
     ) as HTMLElement | null;
     if (confirmBtn) {
@@ -288,56 +234,23 @@ export class PageTournamentSelect extends BaseElement {
   private displayUiAddingTournament(): void {
     this._uiAddingTournament.value = true;
     this._isNewTournamentNameReady.value = false;
-    this.uiAddingTournamentJustOpened = true;
   }
 
-  /**
-   * Renders the component's DOM
-   */
-  protected _render(): void {
-    const root = this._renderRoot;
-    if (!root.firstChild) {
-      root.appendChild(template.content.cloneNode(true));
-    }
-
-    const uiAddingTournament = this._uiAddingTournament.value;
-    const numberOfTournaments = this._numberOfTournaments.value;
-
-    const content = root.querySelector('[part="base"]');
-    if (content) {
-      content.innerHTML = `
-        <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 dark:bg-neutral-800 rounded-lg shadow-md">
-          ${numberOfTournaments > 0 ? this.renderTournamentList() : this.renderNoTournamentInfo()}
-
-          <hr class="my-4 border-neutral-200 dark:border-neutral-700">
-
-          ${uiAddingTournament ? this.renderAddTournament() : this.renderNewTournamentButton()}
-        </div>
-      `;
-    }
-
-    // Query DOM elements after render
-    const addForm = root.querySelector(".add-tournament-form");
-    if (addForm) {
-      this.domTournamentName = addForm.querySelector(
-        "mad-input"
-      ) as HTMLElement | null;
-      this.domSelect = addForm.querySelector(
-        "mad-select"
-      ) as HTMLElement | null;
-    }
-
-    // Setup event handlers after render
-    this._setupEvents();
+  private _getStyles(): TemplateResult {
+    return html`
+      <style>
+        .page-tournament-select { display: block; }
+      </style>
+    `;
   }
 
   /**
    * Render the add tournament form
    */
-  private renderAddTournament(): string {
+  private renderAddTournament(): TemplateResult {
     const isNewTournamentNameReady = this._isNewTournamentNameReady.value;
 
-    return `
+    return html`
       <mad-card class="add-tournament-form">
         <mad-input
           autofocus
@@ -348,6 +261,7 @@ export class PageTournamentSelect extends BaseElement {
           placeholder="Playoff"
           role="textbox"
           size="large"
+          @keydown=${this._handleNameInputKeydown}
         ></mad-input>
 
         <div>
@@ -370,6 +284,7 @@ export class PageTournamentSelect extends BaseElement {
             class="cancel-add-btn"
             size="large"
             variant="warning"
+            @click=${this._cancelSelection}
           >
             <mad-icon class="text-2xl" name="minus" slot="start"></mad-icon>
             Annuler
@@ -377,9 +292,10 @@ export class PageTournamentSelect extends BaseElement {
 
           <mad-button
             class="confirm-add-btn"
-            ${isNewTournamentNameReady ? "" : "disabled"}
+            ?disabled=${!isNewTournamentNameReady}
             size="large"
             variant="brand"
+            @click=${this._confirmSelection}
           >
             <mad-icon class="text-2xl" name="plus" slot="start"></mad-icon>
             Ajouter
@@ -392,13 +308,14 @@ export class PageTournamentSelect extends BaseElement {
   /**
    * Render the new tournament button
    */
-  private renderNewTournamentButton(): string {
-    return `
+  private renderNewTournamentButton(): TemplateResult {
+    return html`
       <mad-card>
         <mad-button
           class="new-tournament-btn"
           size="large"
           variant="brand"
+          @click=${this._createNewTournament}
         >
           <mad-icon class="text-2xl" name="plus" slot="start"></mad-icon>
           Nouveau tournoi
@@ -410,47 +327,59 @@ export class PageTournamentSelect extends BaseElement {
   /**
    * Render the tournament list
    */
-  private renderTournamentList(): string {
-    return `
+  private renderTournamentList(): TemplateResult {
+    const tournamentList = this.tournaments.map((t) => t) as Tournament[];
+    return html`
       <div class="tournament-grid">
-        ${this.tournaments
-          .map(
-            (tournament: Tournament) => `
-          <mad-card
-            class="tournament-card"
-            data-tournament-id="${tournament.id}"
-            clickable
-          >
-            <div class="tournament-card-body">
-              <div class="tournament-card-header">
-                <span class="tournament-name">${tournament.name}</span>
-                <mad-badge pill variant="neutral">
-                  ${this.tournaments.getTournamentTypeLabel(tournament.type)}
-                </mad-badge>
+        ${repeat(
+          tournamentList,
+          (t) => t.id,
+          (tournament) => html`
+            <mad-card
+              class="tournament-card"
+              data-tournament-id="${tournament.id}"
+              clickable
+              @click=${(e: Event) => {
+                const target = e.target as HTMLElement;
+                if (target.closest(".delete-tournament-icon")) {
+                  return;
+                }
+                this._selectTournament(tournament.id);
+              }}
+            >
+              <div class="tournament-card-body">
+                <div class="tournament-card-header">
+                  <span class="tournament-name">${tournament.name}</span>
+                  <mad-badge pill variant="neutral">
+                    ${this.tournaments.getTournamentTypeLabel(tournament.type)}
+                  </mad-badge>
+                </div>
+                <div class="tournament-card-meta">
+                  <mad-icon name="trophy" class="meta-icon"></mad-icon>
+                  <span>${tournament.grid.length} équipe${tournament.grid.length === 1 ? "" : "s"}</span>
+                  <mad-icon name="controller" class="meta-icon"></mad-icon>
+                  <span>${tournament.matchs.length} match${tournament.matchs.length === 1 ? "" : "s"}</span>
+                </div>
               </div>
-              <div class="tournament-card-meta">
-                <mad-icon name="trophy" class="meta-icon"></mad-icon>
-                <span>${tournament.grid.length} équipe${tournament.grid.length === 1 ? "" : "s"}</span>
-                <mad-icon name="controller" class="meta-icon"></mad-icon>
-                <span>${tournament.matchs.length} match${tournament.matchs.length === 1 ? "" : "s"}</span>
+              <div slot="footer" class="tournament-card-footer">
+                <mad-icon
+                  class="delete-tournament-icon text-xl text-yellow-600"
+                  data-tournament-id="${tournament.id}"
+                  name="trash3"
+                  label="Supprimer"
+                  @click=${(e: Event) => {
+                    e.stopPropagation();
+                    this._deleteTournament(tournament.id);
+                  }}
+                ></mad-icon>
+                <mad-icon
+                  class="text-xl text-neutral-400 dark:text-neutral-500"
+                  name="arrow-right-circle"
+                ></mad-icon>
               </div>
-            </div>
-            <div slot="footer" class="tournament-card-footer">
-              <mad-icon
-                class="delete-tournament-icon text-xl text-yellow-600"
-                data-tournament-id="${tournament.id}"
-                name="trash3"
-                label="Supprimer"
-              ></mad-icon>
-              <mad-icon
-                class="text-xl text-neutral-400 dark:text-neutral-500"
-                name="arrow-right-circle"
-              ></mad-icon>
-            </div>
-          </mad-card>
-        `
-          )
-          .join("")}
+            </mad-card>
+          `
+        )}
       </div>
     `;
   }
@@ -458,8 +387,8 @@ export class PageTournamentSelect extends BaseElement {
   /**
    * Render message when no tournaments exist
    */
-  private renderNoTournamentInfo(): string {
-    return `
+  private renderNoTournamentInfo(): TemplateResult {
+    return html`
       <div class="text-center">
         <h1>
           <mad-icon class="text-3xl text-yellow-600" name="trophy"></mad-icon>
@@ -468,6 +397,44 @@ export class PageTournamentSelect extends BaseElement {
         </h1>
       </div>
     `;
+  }
+
+  private _renderContent(): TemplateResult {
+    const uiAddingTournament = this._uiAddingTournament.value;
+    const numberOfTournaments = this._numberOfTournaments.value;
+
+    return html`
+      ${this._getStyles()}
+      <div class="page-tournament-select">
+        <div part="base">
+          <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 dark:bg-neutral-800 rounded-lg shadow-md">
+            ${numberOfTournaments > 0 ? this.renderTournamentList() : this.renderNoTournamentInfo()}
+
+            <hr class="my-4 border-neutral-200 dark:border-neutral-700">
+
+            ${uiAddingTournament ? this.renderAddTournament() : this.renderNewTournamentButton()}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * Renders the component's DOM
+   */
+  protected _render(): void {
+    this._renderTemplate(this._renderContent());
+
+    // Query DOM elements after render
+    const addForm = this._renderRoot.querySelector(".add-tournament-form");
+    if (addForm) {
+      this.domTournamentName = addForm.querySelector(
+        "mad-input"
+      ) as HTMLInputElement | null;
+      this.domSelect = addForm.querySelector(
+        "mad-select"
+      ) as HTMLSelectElement | null;
+    }
   }
 }
 

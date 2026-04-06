@@ -1,5 +1,6 @@
 import { BaseElement } from "@core/base-element.js";
 import { Signal } from "@core/signal.js";
+import { html, nothing } from "lit-html";
 import uuid from "../../modules/uuid/uuid.js";
 
 /**
@@ -8,7 +9,6 @@ import uuid from "../../modules/uuid/uuid.js";
  */
 export class MadInputNumber extends BaseElement {
   private readonly itemId: string;
-  private domInput: HTMLInputElement | null = null;
 
   private _placeholder = "";
   private _label: string | undefined;
@@ -17,11 +17,6 @@ export class MadInputNumber extends BaseElement {
   private _step: number | undefined;
   private _value: number | undefined;
   private _readonly = false;
-
-  // Bound handlers for cleanup
-  private _boundChangeHandler: (() => void) | null = null;
-  private _boundDecrementHandler: (() => void) | null = null;
-  private _boundIncrementHandler: (() => void) | null = null;
 
   private declare _number: Signal<number>;
 
@@ -57,10 +52,6 @@ export class MadInputNumber extends BaseElement {
     this._trackSignal(this._number);
 
     this._initialized = true;
-  }
-
-  protected _createRenderRoot(): Element {
-    return this;
   }
 
   protected _onAttributeChange(name: string, value: string | null): void {
@@ -101,28 +92,13 @@ export class MadInputNumber extends BaseElement {
     this._requestRender();
   }
 
-  disconnectedCallback(): void {
-    this._cleanupEventListeners();
-    super.disconnectedCallback();
-  }
-
-  private _cleanupEventListeners(): void {
-    if (this.domInput && this._boundChangeHandler) {
-      this.domInput.removeEventListener("change", this._boundChangeHandler);
-      this.domInput = null;
-    }
-    this._boundChangeHandler = null;
-    this._boundDecrementHandler = null;
-    this._boundIncrementHandler = null;
-  }
-
   protected _render(): void {
-    this._cleanupEventListeners();
-
     const inputId = this.itemId;
     const numberValue = this._number.value;
+    const labelAttr = this._label || "";
+    const placeholderAttr = this._placeholder || "Score";
 
-    this.innerHTML = `
+    this._renderTemplate(html`
       <style>
         .button-group {
           display: flex;
@@ -142,17 +118,18 @@ export class MadInputNumber extends BaseElement {
             autocomplete="off"
             autofocus
             id="${inputId}"
-            label="${this._label || ""}"
-            max="${this._max === undefined ? "" : this._max}"
+            label="${labelAttr}"
+            max="${this._max ?? nothing}"
             min="${this._min}"
             no-spin-buttons
-            placeholder="${this._placeholder || "Score"}"
-            ${this._readonly ? "readonly" : ""}
+            placeholder="${placeholderAttr}"
+            ?readonly=${this._readonly}
             size="large"
-            step="${this._step === undefined ? "" : this._step}"
+            step="${this._step ?? nothing}"
             type="number"
-            value="${numberValue}"
-            aria-label="${this._label || "Number input"}"
+            .value=${numberValue}
+            aria-label="${labelAttr || "Number input"}"
+            @change=${this._onNumberChange.bind(this)}
           ></mad-input>
         </span>
         <span class="m-6">
@@ -160,45 +137,29 @@ export class MadInputNumber extends BaseElement {
             <mad-button
               class="decrement-btn"
               variant="default"
-              ${this._readonly ? "disabled" : ""}
+              ?disabled=${this._readonly}
               pill
               size="large"
               aria-label="Decrease value"
+              @click=${this._decrementNumber.bind(this)}
             >
               <mad-icon class="text-yellow-600" name="minus"></mad-icon>
             </mad-button>
             <mad-button
               class="increment-btn"
               variant="default"
-              ${this._readonly ? "disabled" : ""}
+              ?disabled=${this._readonly}
               pill
               size="large"
               aria-label="Increase value"
+              @click=${this._incrementNumber.bind(this)}
             >
               <mad-icon class="text-orange-600" name="plus"></mad-icon>
             </mad-button>
           </div>
         </span>
       </span>
-    `;
-
-    this.domInput = this._renderRoot.querySelector(
-      `#${inputId}`
-    ) as HTMLInputElement;
-    if (this.domInput) {
-      this._boundChangeHandler = this._onNumberChange.bind(this);
-      this.domInput.addEventListener("change", this._boundChangeHandler);
-    }
-
-    // Setup button event handlers
-    const decrementBtn = this._renderRoot.querySelector(".decrement-btn");
-    const incrementBtn = this._renderRoot.querySelector(".increment-btn");
-
-    this._boundDecrementHandler = this._decrementNumber.bind(this);
-    decrementBtn?.addEventListener("click", this._boundDecrementHandler);
-
-    this._boundIncrementHandler = this._incrementNumber.bind(this);
-    incrementBtn?.addEventListener("click", this._boundIncrementHandler);
+    `);
   }
 
   private _incrementNumber(): void {
@@ -212,11 +173,8 @@ export class MadInputNumber extends BaseElement {
       number = this._max;
     }
 
-    if (this.domInput) {
-      this.domInput.value = String(number);
-    }
-
-    this._onNumberChange();
+    this._number.value = number;
+    this._emit("madNumberChange", { value: String(this._number.value) });
   }
 
   private _decrementNumber(): void {
@@ -226,31 +184,32 @@ export class MadInputNumber extends BaseElement {
 
     number -= this._step || 1;
 
-    if (this._min !== undefined && this._min !== null && number < this._min) {
+    if (this._min !== undefined && number < this._min) {
       number = this._min;
     }
 
-    if (this.domInput) {
-      this.domInput.value = String(number);
-    }
-
-    this._onNumberChange();
+    this._number.value = number;
+    this._emit("madNumberChange", { value: String(this._number.value) });
   }
 
   private _onNumberChange(): void {
     const oldValue: number = this._number.value;
 
-    if (!this.domInput) {
+    // Get the input element from the shadow root
+    const inputEl = this._renderRoot.querySelector(`#${this.itemId}`);
+    if (!inputEl) {
       return;
     }
 
-    this._number.value = Number.parseInt(this.domInput.value, 10);
+    // Get value from the mad-input component
+    const inputValue = (inputEl as HTMLElement & { value?: string }).value;
+    if (inputValue === undefined) {
+      return;
+    }
+
+    this._number.value = Number.parseInt(inputValue, 10);
     if (Number.isNaN(this._number.value)) {
-      console.warn(
-        "<mad-input-number> unable to parse input value as integer."
-      );
       this._number.value = oldValue;
-      this.domInput.value = String(oldValue);
       return;
     }
 

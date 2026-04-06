@@ -1,5 +1,6 @@
 import { BaseElement } from "@core/base-element.js";
 import { Signal } from "@core/signal.js";
+import { html, nothing } from "lit-html";
 
 interface TutorialStep {
   description: string;
@@ -19,7 +20,15 @@ const TUTORIAL_SECTIONS = {
 
 /**
  * GestureOverlay - Interactive tutorial overlay for first-time users.
+ *
+ * Displays a step-by-step tutorial teaching users about available gestures
+ * (swipe, long press, double tap, shake) and desktop shortcuts (arrow keys,
+ * right-click, command palette). Includes a practice section where users
+ * can try gestures before completing the tutorial.
+ *
  * @element gesture-overlay
+ * @observedAttributes none
+ * @customEvents none
  */
 export class GestureOverlay extends BaseElement {
   private declare _isVisible: Signal<boolean>;
@@ -32,8 +41,6 @@ export class GestureOverlay extends BaseElement {
 
   // Bound handlers for cleanup
   private _boundGestureHandler: ((_event: Event) => void) | null = null;
-  private _boundKeyboardHandler: ((_event: KeyboardEvent) => void) | null =
-    null;
   private _boundClickHandlers: Array<() => void> = [];
 
   private readonly _gestureSteps: TutorialStep[] = [
@@ -125,10 +132,6 @@ export class GestureOverlay extends BaseElement {
     this._initialized = true;
   }
 
-  protected _createRenderRoot(): Element {
-    return this;
-  }
-
   /** @inheritdoc */
   connectedCallback(): void {
     super.connectedCallback();
@@ -140,10 +143,6 @@ export class GestureOverlay extends BaseElement {
   disconnectedCallback(): void {
     super.disconnectedCallback();
     this._removeGestureListeners();
-    if (this._boundKeyboardHandler) {
-      document.removeEventListener("keydown", this._boundKeyboardHandler);
-      this._boundKeyboardHandler = null;
-    }
     this._cleanupClickHandlers();
   }
 
@@ -173,20 +172,6 @@ export class GestureOverlay extends BaseElement {
     }
     this._practiceCompleted.value = true;
     setTimeout(() => this._completePractice(), 500);
-  }
-
-  private _handleKeyboard(_event: KeyboardEvent): void {
-    if (_event.key === "Enter" || _event.key === " ") {
-      const nextBtn = this._renderRoot.querySelector(
-        "#next-btn"
-      ) as HTMLButtonElement | null;
-      if (nextBtn && !nextBtn.hasAttribute("disabled")) {
-        nextBtn.click();
-      }
-    }
-    if (_event.key === "Escape") {
-      this._skipTutorial();
-    }
   }
 
   private _checkFirstVisit(): void {
@@ -281,11 +266,11 @@ export class GestureOverlay extends BaseElement {
     this.hide();
   }
 
-  private _renderStepIndicators(): string {
+  private _renderStepIndicators(): ReturnType<typeof html> {
     const totalSteps = this._getTotalSteps();
     const currentGlobal = this._getGlobalStepIndex();
-    const indicators: string[] = [];
 
+    const indicators: ReturnType<typeof html>[] = [];
     for (let i = 0; i < totalSteps; i++) {
       const isActive = i === currentGlobal;
       const isCompleted = i < currentGlobal;
@@ -295,10 +280,10 @@ export class GestureOverlay extends BaseElement {
       } else if (isActive) {
         sectionClass = "active";
       }
-      indicators.push(`<span class="${sectionClass}"></span>`);
+      indicators.push(html`<span class="${sectionClass}"></span>`);
     }
 
-    return indicators.join("");
+    return html`${indicators}`;
   }
 
   private _renderSectionLabel(): string {
@@ -315,10 +300,10 @@ export class GestureOverlay extends BaseElement {
     return "";
   }
 
-  private _renderPracticeArea(completed: boolean): string {
+  private _renderPracticeArea(completed: boolean): ReturnType<typeof html> {
     const iconName = completed ? "check-circle" : "hand";
     const message = completed ? "Great job!" : "Perform any gesture here";
-    return `
+    return html`
       <div class="practice-area ${completed ? "completed" : ""}">
         <div class="practice-zone">
           <mad-icon name="${iconName}" size="large"></mad-icon>
@@ -328,8 +313,8 @@ export class GestureOverlay extends BaseElement {
     `;
   }
 
-  private _renderGesturePrompt(): string {
-    return `
+  private _renderGesturePrompt(): ReturnType<typeof html> {
+    return html`
       <div class="gesture-prompt">
         <span class="prompt-text">Swipe, tap, or shake!</span>
       </div>
@@ -350,7 +335,7 @@ export class GestureOverlay extends BaseElement {
     const isVisible = this._isVisible.value;
 
     if (!isVisible) {
-      this.innerHTML = "";
+      this._renderTemplate(html`${nothing}`);
       return;
     }
 
@@ -375,95 +360,73 @@ export class GestureOverlay extends BaseElement {
       buttonVariant = "brand";
     }
 
-    const nextButtonDisabled =
-      isPractice && !practiceCompleted ? "disabled" : "";
+    const nextButtonDisabled = isPractice && !practiceCompleted;
 
-    this.innerHTML = `
+    const practiceArea = isPractice
+      ? this._renderPracticeArea(practiceCompleted)
+      : nothing;
+    const gesturePrompt = isPractice ? this._renderGesturePrompt() : nothing;
+    const desktopHint = step.desktopHint
+      ? html`<p class="desktop-hint">${step.desktopHint}</p>`
+      : nothing;
+
+    this._renderTemplate(html`
       <div class="gesture-overlay" role="dialog" aria-modal="true" aria-labelledby="tutorial-title">
         <div class="gesture-card ${isPractice ? "practice" : ""}">
-          ${isPractice ? this._renderPracticeArea(practiceCompleted) : ""}
-          
+          ${practiceArea}
+
           <div class="gesture-animation">
             <mad-icon name="${step.icon}" size="large"></mad-icon>
-            ${isPractice ? this._renderGesturePrompt() : ""}
+            ${gesturePrompt}
           </div>
-          
+
           <mad-badge pill variant="brand">${this._renderSectionLabel()}</mad-badge>
           <h3 id="tutorial-title">${step.title}</h3>
           <p>${step.description}</p>
-          
-          ${step.desktopHint ? `<p class="desktop-hint">${step.desktopHint}</p>` : ""}
-          
+
+          ${desktopHint}
+
           <div class="step-indicator" role="progressbar" aria-valuenow="${globalStepIndex + 1}" aria-valuemin="1" aria-valuemax="${totalSteps}">
             ${this._renderStepIndicators()}
           </div>
-          
+
           <span class="step-counter">Step ${globalStepIndex + 1} of ${totalSteps}</span>
-          
+
           <div class="actions">
-            <mad-button id="skip-btn" variant="default">Skip Tutorial</mad-button>
-            <mad-button id="replay-btn" variant="default" title="Replay Tutorial">
+            <mad-button
+              id="skip-btn"
+              variant="default"
+              @click=${() => this._skipTutorial()}
+            >Skip Tutorial</mad-button>
+            <mad-button
+              id="replay-btn"
+              variant="default"
+              title="Replay Tutorial"
+              @click=${() => this.replay()}
+            >
               <mad-icon name="arrow-counterclockwise" size="small"></mad-icon>
             </mad-button>
-            <mad-button id="next-btn" variant="${buttonVariant}" ${nextButtonDisabled}>
+            <mad-button
+              id="next-btn"
+              variant="${buttonVariant}"
+              ?disabled=${nextButtonDisabled}
+              @click=${() => {
+                if (isLastStep) {
+                  this.hide();
+                  return;
+                }
+                if (isPractice && !this._practiceCompleted.value) {
+                  return;
+                }
+                this._nextStep();
+              }}
+            >
               ${buttonText}
             </mad-button>
           </div>
         </div>
       </div>
-    `;
 
-    this._attachEventListeners(isPractice, isLastStep);
-  }
-
-  private _attachEventListeners(
-    isPractice: boolean,
-    isLastStep: boolean
-  ): void {
-    const skipBtn = this._renderRoot.querySelector("#skip-btn");
-    const replayBtn = this._renderRoot.querySelector("#replay-btn");
-    const nextBtn = this._renderRoot.querySelector(
-      "#next-btn"
-    ) as HTMLButtonElement | null;
-
-    const skipHandler = (): void => {
-      this._skipTutorial();
-    };
-    skipBtn?.addEventListener("click", skipHandler);
-    this._boundClickHandlers.push(() =>
-      skipBtn?.removeEventListener("click", skipHandler)
-    );
-
-    const replayHandler = (): void => {
-      this.replay();
-    };
-    replayBtn?.addEventListener("click", replayHandler);
-    this._boundClickHandlers.push(() =>
-      replayBtn?.removeEventListener("click", replayHandler)
-    );
-
-    const nextHandler = (): void => {
-      if (isLastStep) {
-        this.hide();
-        return;
-      }
-      if (isPractice && !this._practiceCompleted.value) {
-        return;
-      }
-      this._nextStep();
-    };
-    nextBtn?.addEventListener("click", nextHandler);
-    this._boundClickHandlers.push(() =>
-      nextBtn?.removeEventListener("click", nextHandler)
-    );
-
-    this._boundKeyboardHandler = this._handleKeyboard.bind(this);
-    document.addEventListener("keydown", this._boundKeyboardHandler);
-  }
-
-  /** @inheritdoc */
-  protected _adoptedStyle(): string {
-    return `
       <style>
         .gesture-overlay {
           display: block;
@@ -646,7 +609,7 @@ export class GestureOverlay extends BaseElement {
           50% { transform: translateX(-50%) translateY(-5px); }
         }
       </style>
-    `;
+    `);
   }
 }
 

@@ -1,3 +1,4 @@
+import { html, nothing, render } from "lit-html";
 import { BaseElement } from "../../core/base-element.js";
 import { GestureEngine } from "../../core/gesture-engine.js";
 import { Signal } from "../../core/signal.js";
@@ -33,10 +34,6 @@ export class GestureScoring extends BaseElement {
     this._trackSignal(this._lastAction);
 
     this._initialized = true;
-  }
-
-  protected _createRenderRoot(): Element {
-    return this;
   }
 
   connectedCallback(): void {
@@ -137,14 +134,21 @@ export class GestureScoring extends BaseElement {
     const lastAction = this._lastAction.value;
 
     if (!isActive) {
-      this.innerHTML = "";
+      render(nothing, this._renderRoot);
       return;
     }
 
     const hostScore = match?.goals?.host ?? 0;
     const visitorScore = match?.goals?.visitor ?? 0;
+    const formattedTime = this._formatTime();
 
-    this.innerHTML = `
+    const lastActionContent = lastAction
+      ? html`<div class="last-action" aria-live="polite">
+          +${lastAction.points} ${lastAction.team}<span class="undo-hint">Shake to undo</span>
+        </div>`
+      : nothing;
+
+    this._renderTemplate(html`
       <style>
         .gesture-scoring {
           display: block;
@@ -263,19 +267,15 @@ export class GestureScoring extends BaseElement {
           <div class="team host">
             <span class="score">${hostScore}</span>
           </div>
-          <div class="timer" aria-live="polite">${this._formatTime()}</div>
+          <div class="timer" aria-live="polite">${formattedTime}</div>
           <div class="team visitor">
             <span class="score">${visitorScore}</span>
           </div>
         </div>
 
-        ${
-          lastAction
-            ? `<div class="last-action" aria-live="polite">+${lastAction.points} ${lastAction.team}<span class="undo-hint">Shake to undo</span></div>`
-            : ""
-        }
+        ${lastActionContent}
       </div>
-    `;
+    `);
   }
 
   private _formatTime(): string {

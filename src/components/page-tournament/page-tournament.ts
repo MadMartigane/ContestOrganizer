@@ -1,5 +1,6 @@
 import { BaseElement } from "@core/base-element.js";
 import { Signal } from "@core/signal.js";
+import { html, nothing, type TemplateResult } from "lit-html";
 import { getTournaments } from "../../modules/init.js";
 import type { GenericTeam } from "../../modules/team-row/team-row.d.js";
 import { TeamRow } from "../../modules/team-row/team-row.js";
@@ -21,37 +22,10 @@ interface PageConfConstants {
   teamNumberStep: number;
 }
 
-const template = document.createElement("template");
-template.innerHTML = `
-  <style>
-    :host { display: block; }
-  </style>
-  <div part="base">
-    <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-[var(--wa-color-neutral-100)] dark:bg-neutral-800 rounded-lg shadow-md">
-      <div>
-        <slot name="tournament-name"></slot>
-
-        <div class="my-4 grid grid-cols-1 items-center text-center">
-          <mad-input-number
-            id="teamNumberInput"
-            label="Nombre d'équipes (min:2, max:32)"
-            max="32"
-            min="2"
-            placeholder="4"
-            step="2"
-            value="4"
-          ></mad-input-number>
-        </div>
-
-        <slot name="grid-content"></slot>
-      </div>
-    </div>
-  </div>
-`;
-
 /**
  * PageTournament - Tournament page component for viewing and editing tournament details
  * @element page-tournament
+ * @fires navigate
  */
 export class PageTournament extends BaseElement {
   private readonly tournaments = getTournaments();
@@ -62,9 +36,6 @@ export class PageTournament extends BaseElement {
     TournamentType.NFL,
     TournamentType.RUGBY,
   ];
-
-  private domInputTournamentName: HTMLInputElement | null = null;
-  private domDivTournamentName: HTMLElement | null = null;
 
   // Property: tournament-id attribute
   private _tournamentId = 0;
@@ -136,13 +107,6 @@ export class PageTournament extends BaseElement {
   connectedCallback(): void {
     super.connectedCallback();
     this.initTournaments();
-  }
-
-  /**
-   * Use Light DOM for Shoelace compatibility
-   */
-  protected _createRenderRoot(): Element {
-    return this;
   }
 
   /**
@@ -274,19 +238,26 @@ export class PageTournament extends BaseElement {
       this.editTournamentName();
       return;
     }
-
-    if (event.key === "Escape") {
-      this._isEditTournamentName.value = false;
-      return;
-    }
   }
 
   private editTournamentName(): void {
-    if (!(this._tournament.value && this.domInputTournamentName)) {
+    if (!this._tournament.value) {
       return;
     }
 
-    const newName = String(this.domInputTournamentName.value).trim();
+    const tournamentNameInput = this._renderRoot.querySelector(
+      'mad-input[name="tournamentName"]'
+    );
+    if (!tournamentNameInput) {
+      return;
+    }
+
+    const input = tournamentNameInput.querySelector("input");
+    if (!input) {
+      return;
+    }
+
+    const newName = String((input as HTMLInputElement).value).trim();
     this._tournament.value.name = newName;
 
     this._isEditTournamentName.value = false;
@@ -305,246 +276,172 @@ export class PageTournament extends BaseElement {
     }
   }
 
+  private handleTournamentNameClick(): void {
+    this._isEditTournamentName.value = true;
+    // Focus the input after render
+    setTimeout(() => {
+      const input = this._renderRoot
+        .querySelector('mad-input[name="tournamentName"]')
+        ?.querySelector("input");
+      if (input) {
+        (input as HTMLInputElement).focus();
+      }
+    }, 100);
+  }
+
+  private handleTeamNumberInput(event: CustomEvent): void {
+    this.onTeamNumberChange(event.detail);
+  }
+
+  private handleGridTournamentChange(
+    ev: CustomEvent<{ tournamentId?: number }>
+  ): void {
+    if (ev.detail?.tournamentId) {
+      this.refreshTournament(ev.detail.tournamentId);
+    }
+  }
+
   protected _render(): void {
     const tournament = this._tournament.value;
     const uiError = this._uiError.value;
     const isEditTournamentName = this._isEditTournamentName.value;
     const teamNumber = this._teamNumber.value;
 
-    const gridHtml = this.renderGrid();
-    const footerActionsHtml = this.renderFooterActions();
+    const gridTemplate = this.renderGrid();
+    const footerActionsTemplate = this.renderFooterActions();
 
     if (uiError) {
-      this.innerHTML = `
-        <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 dark:bg-neutral-800 rounded-lg shadow-md">
-          <error-message message="${uiError}"></error-message>
-        </div>
-      `;
+      this._renderTemplate(
+        html`<div class="page-tournament">
+          <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 dark:bg-neutral-800 rounded-lg shadow-md">
+            <error-message message="${uiError}"></error-message>
+          </div>
+        </div>`
+      );
       return;
     }
 
-    const tournamentNameHtml = isEditTournamentName
-      ? `
-        <div class="my-4 grid grid-cols-1 items-center text-center">
-          <mad-input
-            autocomplete="off"
-            autofocus
-            id="tournamentName"
-            name="tournamentName"
-            type="text"
-            value="${tournament?.name ?? ""}"
-          ></mad-input>
-        </div>
-      `
-      : `
-        <div>
-          <div
-            class="grid grid-cols-1 items-center text-center"
-            id="divTournamentName"
-          >
-            <h1 class="can-be-clicked text-center">
-              ${tournament?.name}
-            </h1>
-          </div>
-        </div>
-      `;
+    const tournamentNameTemplate = isEditTournamentName
+      ? html`<div class="my-4 grid grid-cols-1 items-center text-center">
+            <mad-input
+              autocomplete="off"
+              autofocus
+              name="tournamentName"
+              type="text"
+              .value=${tournament?.name ?? ""}
+              @keydown="${this.onTournamentNameChange}"
+              @blur="${this.editTournamentName}"
+            ></mad-input>
+          </div>`
+      : html`<div>
+            <div
+              class="grid grid-cols-1 items-center text-center"
+              id="divTournamentName"
+              @click="${this.handleTournamentNameClick}"
+            >
+              <h1 class="can-be-clicked text-center">
+                ${tournament?.name}
+              </h1>
+            </div>
+          </div>`;
 
-    const gridContentHtml =
+    const gridContentTemplate =
       teamNumber > 0
-        ? `
-          <div>
-            <div class="w-fill overflow-x-auto">${gridHtml}</div>
-            ${footerActionsHtml}
-          </div>
-        `
-        : `
-          <div>
-            <h2 class="">
-              Choisissez le nombre d'équipes pour commencer !
-            </h2>
-          </div>
-        `;
+        ? html`<div>
+              <div class="w-fill overflow-x-auto">${gridTemplate}</div>
+              ${footerActionsTemplate}
+            </div>`
+        : html`<div>
+              <h2 class="">Choisissez le nombre d'équipes pour commencer !</h2>
+            </div>`;
 
-    this.innerHTML = `
-      <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-[var(--wa-color-neutral-100)] dark:bg-neutral-800 rounded-lg shadow-md">
-        <div>
-          ${tournamentNameHtml}
-
-          <div class="my-4 grid grid-cols-1 items-center text-center">
-            <mad-input-number
-              id="teamNumberInput"
-              label="Nombre d'équipes (min:${this.conf.teamNumberMin}, max:${this.conf.teamNumberMax})"
-              max="${this.conf.teamNumberMax}"
-              min="${this.conf.teamNumberMin}"
-              placeholder="${this.conf.teamNumberDefault}"
-              step="${this.conf.teamNumberStep}"
-              value="${teamNumber}"
-            ></mad-input-number>
-          </div>
-
-          ${gridContentHtml}
-        </div>
-      </div>
-    `;
-
-    this._setupEvents();
-  }
-
-  private _setupEvents(): void {
-    // Setup tournament name edit events
-    this.domDivTournamentName = this.querySelector(
-      "#divTournamentName"
-    ) as HTMLElement;
-    if (this.domDivTournamentName) {
-      Utils.installEventHandler(this.domDivTournamentName, "click", () => {
-        this._isEditTournamentName.value = true;
-        // Focus the input after render
-        setTimeout(() => {
-          const input = this.querySelector(
-            'mad-input[name="tournamentName"]'
-          )?.querySelector("input");
-          if (input) {
-            (input as HTMLInputElement).focus();
+    this._renderTemplate(
+      html`<style>
+          .page-tournament {
+            display: block;
           }
-        }, 100);
-      });
-    }
+        </style>
+        <div class="page-tournament">
+          <div part="base">
+            <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-[var(--wa-color-neutral-100)] dark:bg-neutral-800 rounded-lg shadow-md">
+            <div>
+              <slot name="tournament-name"></slot>
 
-    // Setup tournament name input
-    const tournamentNameInput = this.querySelector(
-      'mad-input[name="tournamentName"]'
-    ) as HTMLElement & { focus: () => void };
-    if (tournamentNameInput) {
-      this.domInputTournamentName = tournamentNameInput.querySelector(
-        "input"
-      ) as HTMLInputElement;
+              ${tournamentNameTemplate}
 
-      if (this.domInputTournamentName) {
-        this.domInputTournamentName.addEventListener("keydown", (ev) => {
-          this.onTournamentNameChange(ev);
-        });
+              <div class="my-4 grid grid-cols-1 items-center text-center">
+                <mad-input-number
+                  id="teamNumberInput"
+                  label="Nombre d'équipes (min:${this.conf.teamNumberMin}, max:${this.conf.teamNumberMax})"
+                  max="${this.conf.teamNumberMax}"
+                  min="${this.conf.teamNumberMin}"
+                  placeholder="${this.conf.teamNumberDefault}"
+                  step="${this.conf.teamNumberStep}"
+                  .value=${teamNumber}
+                  @madNumberChange="${this.handleTeamNumberInput}"
+                ></mad-input-number>
+              </div>
 
-        this.domInputTournamentName.addEventListener("blur", () => {
-          this.editTournamentName();
-        });
-      }
-    }
+              <slot name="grid-content"></slot>
 
-    // Setup team number input events
-    const teamNumberInput = this.querySelector(
-      "#teamNumberInput"
-    ) as HTMLElement;
-    if (teamNumberInput) {
-      teamNumberInput.addEventListener("madNumberChange", ((
-        ev: CustomEvent
-      ) => {
-        this.onTeamNumberChange(ev.detail);
-      }) as EventListener);
-    }
-
-    // Setup grid child events
-    const gridBasket = this.querySelector("grid-basket");
-    const gridDefault = this.querySelector("grid-default");
-
-    if (gridBasket) {
-      gridBasket.addEventListener("gridTournamentChange", ((
-        ev: CustomEvent<{ tournamentId?: number }>
-      ) => {
-        if (ev.detail?.tournamentId) {
-          this.refreshTournament(ev.detail.tournamentId);
-        }
-      }) as EventListener);
-    }
-
-    if (gridDefault) {
-      gridDefault.addEventListener("gridTournamentChange", ((
-        ev: CustomEvent<{ tournamentId?: number }>
-      ) => {
-        if (ev.detail?.tournamentId) {
-          this.refreshTournament(ev.detail.tournamentId);
-        }
-      }) as EventListener);
-    }
-
-    // Setup footer action buttons
-    const resetBtn = this.querySelector("#resetBtn");
-    if (resetBtn) {
-      resetBtn.addEventListener("click", () => {
-        this.confirmResetGrid();
-      });
-    }
-
-    const rankingBtn = this.querySelector("#rankingBtn");
-    if (rankingBtn) {
-      rankingBtn.addEventListener("click", () => {
-        this.goRanking();
-      });
-    }
-
-    const matchBtn = this.querySelector("#matchBtn");
-    if (matchBtn) {
-      matchBtn.addEventListener("click", () => {
-        this.goMatch(this._tournament.value?.id);
-      });
-    }
-
-    // Setup magic fill button click handler
-    const magicFillBtn = this.querySelector("#magicFillBtn");
-    if (magicFillBtn) {
-      magicFillBtn.addEventListener("click", () => {
-        const gridBasket = this.querySelector("grid-basket") as {
-          magicFillUpNbaTeams?: () => Promise<void>;
-        } | null;
-        gridBasket?.magicFillUpNbaTeams?.();
-      });
-    }
+              ${gridContentTemplate}
+            </div>
+          </div>
+        </div>
+      </div>`
+    );
   }
 
-  private renderGrid(): string {
+  private renderGrid(): TemplateResult | typeof nothing {
     if (!this._tournament.value) {
-      return "";
+      return nothing;
     }
 
     if (this.basketGridCompliants.includes(this._tournament.value.type)) {
-      return `<grid-basket tournament-id="${this._tournament.value.id}"></grid-basket>`;
+      return html`<grid-basket
+        tournament-id="${this._tournament.value.id}"
+        @gridTournamentChange=${this.handleGridTournamentChange}
+      ></grid-basket>`;
     }
 
-    return `<grid-default tournament-id="${this._tournament.value.id}"></grid-default>`;
+    return html`<grid-default
+      tournament-id="${this._tournament.value.id}"
+      @gridTournamentChange=${this.handleGridTournamentChange}
+    ></grid-default>`;
   }
 
-  private renderSortingButton(): string {
+  private renderSortingButton(): TemplateResult | typeof nothing {
     if (!this._tournament.value) {
-      return "";
+      return nothing;
     }
 
     if (this.basketGridCompliants.includes(this._tournament.value.type)) {
-      return "";
+      return nothing;
     }
 
-    return `
-      <mad-button
+    return html`<mad-button
         id="rankingBtn"
         size="large"
         variant="secondary"
+        @click="${this.goRanking}"
       >
         <mad-icon name="sort-numeric-down" slot="start"></mad-icon>
         <span slot="end">Classement !</span>
-      </mad-button>
-    `;
+      </mad-button>`;
   }
 
-  private renderFooterActions(): string {
+  private renderFooterActions(): TemplateResult | typeof nothing {
     const tournament = this._tournament.value;
     const isNbaType = tournament?.type === "NBA";
     const magicFillError = this._magicFillError.value;
     const magicFillLoading = this._magicFillLoading.value;
 
-    return `
-      <div class="grid-300 my-4">
+    return html`<div class="grid-300 my-4">
         <mad-button
           id="resetBtn"
           size="large"
           variant="warning"
+          @click="${this.confirmResetGrid}"
         >
           <mad-icon name="trash" slot="start"></mad-icon>
           <span slot="end">Effacer</span>
@@ -554,32 +451,42 @@ export class PageTournament extends BaseElement {
 
         ${
           isNbaType
-            ? `
-          <mad-button
-            id="magicFillBtn"
-            size="large"
-            variant="brand"
-            ${magicFillLoading ? "disabled" : ""}
-          >
-            <mad-icon name="magic" slot="start"></mad-icon>
-            ${magicFillLoading ? "Chargement..." : "Magic fill-up"}
-          </mad-button>
-        `
-            : ""
+            ? html`<mad-button
+                id="magicFillBtn"
+                size="large"
+                variant="brand"
+                ?disabled=${magicFillLoading}
+                @click="${this.handleMagicFillClick}"
+              >
+                <mad-icon name="magic" slot="start"></mad-icon>
+                ${magicFillLoading ? "Chargement..." : "Magic fill-up"}
+              </mad-button>`
+            : nothing
         }
 
         <mad-button
           id="matchBtn"
           size="large"
           variant="brand"
+          @click="${() => this.goMatch(this._tournament.value?.id)}"
         >
           <mad-icon name="trophy" slot="start"></mad-icon>
           <span slot="end">Go Match</span>
           <mad-icon name="forward" slot="end"></mad-icon>
         </mad-button>
       </div>
-      ${magicFillError ? `<p class="text-red-600 text-sm my-2">${magicFillError}</p>` : ""}
-    `;
+      ${
+        magicFillError
+          ? html`<p class="text-red-600 text-sm my-2">${magicFillError}</p>`
+          : nothing
+      }`;
+  }
+
+  private handleMagicFillClick(): void {
+    const gridBasket = this._renderRoot.querySelector("grid-basket") as {
+      magicFillUpNbaTeams?: () => Promise<void>;
+    } | null;
+    gridBasket?.magicFillUpNbaTeams?.();
   }
 }
 

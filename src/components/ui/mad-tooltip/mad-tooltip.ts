@@ -1,5 +1,6 @@
 import { BaseElement } from "@core/base-element.js";
 import { createComponentSheet } from "@core/styles.js";
+import { html } from "lit-html";
 
 const tooltipBaseSheet = createComponentSheet(`
   :host {
@@ -80,16 +81,6 @@ const tooltipStylesSheet = createComponentSheet(`
   }
 `);
 
-const template = document.createElement("template");
-template.innerHTML = `
-  <span class="tooltip-container">
-    <span class="tooltip-trigger" tabindex="0">
-      <slot></slot>
-    </span>
-    <span class="tooltip-content" role="tooltip"></span>
-  </span>
-`;
-
 /**
  * MadTooltip - A tooltip component with keyboard accessibility
  * @element mad-tooltip
@@ -101,8 +92,6 @@ export class MadTooltip extends BaseElement {
     return ["content", "placement"];
   }
 
-  private _tooltipContent: HTMLElement | null = null;
-  private _tooltipTrigger: HTMLElement | null = null;
   private _tooltipId = "";
 
   protected _setupProperties(): void {
@@ -110,7 +99,7 @@ export class MadTooltip extends BaseElement {
     this._tooltipId = `tooltip-${Math.random().toString(36).slice(2, 9)}`;
   }
 
-  protected _createRenderRoot(): Element | ShadowRoot {
+  protected _createRenderRoot(): ShadowRoot {
     const root = super._createRenderRoot();
     if (root instanceof ShadowRoot) {
       root.adoptedStyleSheets = [
@@ -124,42 +113,20 @@ export class MadTooltip extends BaseElement {
 
   connectedCallback(): void {
     super.connectedCallback();
-
-    const root = this._renderRoot;
-    if (root instanceof ShadowRoot) {
-      root.appendChild(template.content.cloneNode(true));
-    } else {
-      this.appendChild(template.content.cloneNode(true));
-    }
-
-    this._cacheElements();
     this._setupAccessibility();
-  }
-
-  private _cacheElements(): void {
-    const root = this._renderRoot;
-    if (!root) {
-      return;
-    }
-
-    if (root instanceof ShadowRoot) {
-      this._tooltipContent = root.querySelector(".tooltip-content");
-      this._tooltipTrigger = root.querySelector(".tooltip-trigger");
-    } else {
-      this._tooltipContent = this.querySelector(".tooltip-content");
-      this._tooltipTrigger = this.querySelector(".tooltip-trigger");
-    }
   }
 
   private _setupAccessibility(): void {
     // Set up aria-describedby on trigger element
-    if (this._tooltipTrigger) {
-      this._tooltipTrigger.setAttribute("aria-describedby", this._tooltipId);
+    const trigger = this._renderRoot.querySelector(".tooltip-trigger");
+    if (trigger) {
+      trigger.setAttribute("aria-describedby", this._tooltipId);
     }
 
     // Set the id on tooltip content
-    if (this._tooltipContent) {
-      this._tooltipContent.id = this._tooltipId;
+    const content = this._renderRoot.querySelector(".tooltip-content");
+    if (content) {
+      content.id = this._tooltipId;
     }
   }
 
@@ -180,11 +147,14 @@ export class MadTooltip extends BaseElement {
   }
 
   protected _render(): void {
-    const content = this.content;
-
-    if (this._tooltipContent) {
-      this._tooltipContent.textContent = content;
-    }
+    this._renderTemplate(html`
+      <span class="tooltip-container">
+        <span class="tooltip-trigger" tabindex="0">
+          <slot></slot>
+        </span>
+        <span class="tooltip-content" role="tooltip">${this.content}</span>
+      </span>
+    `);
   }
 
   protected _onAttributeChange(name: string, _value: string | null): void {

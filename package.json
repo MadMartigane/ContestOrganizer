@@ -59,6 +59,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@phosphor-icons/webcomponents": "^2.1.5"
+    "@phosphor-icons/webcomponents": "^2.1.5",
+    "lit-html": "^3.3.2"
   }
 }

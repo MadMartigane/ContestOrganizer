@@ -1,0 +1,201 @@
+import { BaseElement } from "@core/base-element.js";
+import { Signal } from "@core/signal.js";
+import { html } from "lit-html";
+import { getTournaments } from "../../modules/init.js";
+/**
+ * GridDefault - Displays tournament grid with team selections
+ * @element grid-default
+ */
+export class GridDefault extends BaseElement {
+  _tournaments = getTournaments();
+  _tournamentUpdateHandler = null;
+  _tournamentUnsubscribe = null;
+  // Bound handlers for cleanup
+  _boundSelectChangeHandlers = [];
+  static get observedAttributes() {
+    return ["tournament-id"];
+  }
+  _setupProperties() {
+    this._tournament = new Signal(null);
+    this._trackSignal(this._tournament);
+    this._initialized = true;
+  }
+  connectedCallback() {
+    super.connectedCallback();
+    this._tournamentUpdateHandler = () => {
+      this.forceGridRender();
+    };
+    this._tournamentUnsubscribe = this._tournaments.onUpdate(
+      this._tournamentUpdateHandler
+    );
+    this.forceGridRender();
+  }
+  disconnectedCallback() {
+    this._cleanupEventListeners();
+    if (this._tournamentUnsubscribe) {
+      this._tournamentUnsubscribe();
+      this._tournamentUnsubscribe = null;
+    }
+    this._tournamentUpdateHandler = null;
+    super.disconnectedCallback();
+  }
+  _cleanupEventListeners() {
+    for (const cleanup of this._boundSelectChangeHandlers) {
+      cleanup();
+    }
+    this._boundSelectChangeHandlers = [];
+  }
+  _onAttributeChange(name, _value) {
+    if (name === "tournament-id") {
+      this.forceGridRender();
+    }
+  }
+  async forceGridRender() {
+    const tournamentIdStr = this.getAttribute("tournament-id");
+    const tournamentId =
+      tournamentIdStr === null ? null : Number(tournamentIdStr);
+    this._tournament.value = null;
+    this._tournament.value = await this._tournaments.get(tournamentId);
+  }
+  updateTournament() {
+    const tournament = this._tournament.value;
+    if (tournament) {
+      this._emit("gridTournamentChange", {
+        tournamentId: tournament.id,
+      });
+    }
+  }
+  async onTeamTeamChange(detail) {
+    const tournament = this._tournament.value;
+    if (!tournament) {
+      return;
+    }
+    const gridRaw = tournament.grid.find(
+      (grid) => grid.id === detail.tournamentGridId
+    );
+    if (gridRaw) {
+      gridRaw.team = detail.genericTeam;
+    }
+    await this._tournaments.update(tournament);
+    this.updateTournament();
+  }
+  _renderGridHeader() {
+    return html`
+      <thead class="bg-orange-600 text-neutral-100 dark:bg-orange-700 dark:text-neutral-50 align-middle">
+        <th>
+          <mad-icon class="text-2xl" name="sort-numeric-down"></mad-icon>
+        </th>
+        <th>
+          <span>Équipes</span>
+        </th>
+        <th>
+          <span>Points</span>
+        </th>
+        <th>
+          <span class="text-green-600">Buts</span>
+          <mad-icon class="text-2xl text-green-600" name="plus"></mad-icon>
+        </th>
+        <th>
+          <span class="text-yellow-600">Buts</span>
+          <mad-icon class="text-2xl text-yellow-600" name="minus"></mad-icon>
+        </th>
+        <th>
+          <span>Goal average</span>
+        </th>
+        <th class="text-center">
+          <mad-icon class="inline-block text-2xl" name="calendar-event"></mad-icon>
+        </th>
+      </thead>
+    `;
+  }
+  _renderGridBody() {
+    const tournament = this._tournament.value;
+    const rows = tournament?.grid ?? [];
+    if (rows.length === 0) {
+      return html``;
+    }
+    let counter = 0;
+    const tableRows = rows.map((gridRow) => {
+      const rowNumber = ++counter;
+      const rowNumberPrefix = rowNumber > 9 ? "" : "0";
+      return html`
+        <tr>
+          <td>
+            <span class="counter">${rowNumberPrefix}${rowNumber}</span>
+          </td>
+          <td>
+            <mad-select-team
+              data-grid-id="${gridRow.id}"
+            ></mad-select-team>
+          </td>
+          <td>
+            <span class="text-orange-600">${gridRow.points}</span>
+          </td>
+          <td>
+            <span class="text-green-600">${gridRow.scoredGoals}</span>
+          </td>
+          <td>
+            <span class="text-yellow-600">${gridRow.concededGoals}</span>
+          </td>
+          <td>
+            <span class="text-orange-600">${gridRow.goalAverage}</span>
+          </td>
+          <td class="text-center">
+            <span class="text-orange-600">${gridRow.scheduledMatchs}</span>
+          </td>
+        </tr>
+      `;
+    });
+    return html`<tbody>${tableRows}</tbody>`;
+  }
+  _render() {
+    this._cleanupEventListeners();
+    this._renderTemplate(html`
+      <style>
+        :host { display: block; }
+      </style>
+      <div part="base">
+        <slot></slot>
+        <table class="w-full">
+          ${this._renderGridHeader()}
+          ${this._renderGridBody()}
+        </table>
+      </div>
+    `);
+    this._setupTeamSelectors();
+  }
+  _setupTeamSelectors() {
+    const tournament = this._tournament.value;
+    const selectors = Array.from(
+      this._renderRoot.querySelectorAll("mad-select-team")
+    );
+    for (const selector of selectors) {
+      const gridIdStr = selector.getAttribute("data-grid-id");
+      if (!gridIdStr) {
+        continue;
+      }
+      const gridId = Number(gridIdStr);
+      const gridRow = tournament?.grid.find((g) => g.id === gridId);
+      if (gridRow && selector) {
+        const element = selector;
+        element.setAttribute("tournament-grid-id", String(gridId));
+        element.setAttribute("color", "primary");
+        element.setAttribute("placeholder", "Équipe vide");
+        if (tournament?.type) {
+          element.setAttribute("type", tournament.type);
+        }
+        if (gridRow.team) {
+          element.setAttribute("value", JSON.stringify(gridRow.team));
+        }
+        const handler = (ev) => {
+          this.onTeamTeamChange(ev.detail);
+        };
+        selector.addEventListener("madSelectChange", handler);
+        this._boundSelectChangeHandlers.push(() =>
+          selector.removeEventListener("madSelectChange", handler)
+        );
+      }
+    }
+  }
+}
+customElements.define("grid-default", GridDefault);

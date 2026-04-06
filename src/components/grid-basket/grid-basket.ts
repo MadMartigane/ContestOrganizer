@@ -1,5 +1,7 @@
 import { BaseElement } from "@core/base-element.js";
 import { Signal } from "@core/signal.js";
+import { html, nothing } from "lit-html";
+import { repeat } from "lit-html/directives/repeat.js";
 import Basket from "../../modules/data-basket/data-basket.js";
 import type { GridTeamOnUpdateDetail } from "../../modules/grid-common/grid-common.types.js";
 import { getTournaments } from "../../modules/init.js";
@@ -7,19 +9,8 @@ import TeamRow from "../../modules/team-row/team-row.js";
 import theSportsDbService from "../../modules/thesportsdb/thesportsdb.service.js";
 import type {
   Tournament,
-  TournamentType,
   TournamentUpdateEvent,
 } from "../../modules/tournaments/tournaments.types.js";
-
-const template = document.createElement("template");
-template.innerHTML = `
-  <style>
-    :host { display: block; }
-  </style>
-  <div part="base">
-    <slot></slot>
-  </div>
-`;
 
 /**
  * GridBasket - Displays basketball/NBA tournament grid with team selections
@@ -31,9 +22,6 @@ export class GridBasket extends BaseElement {
   private declare _isLoadingNbaTeams: Signal<boolean>;
   private _tournamentUpdateHandler: (() => void) | null = null;
   private _tournamentUnsubscribe: (() => void) | null = null;
-
-  // Bound handlers for cleanup
-  private _boundSelectChangeHandlers: Array<() => void> = [];
 
   static get observedAttributes(): string[] {
     return ["tournament-id"];
@@ -48,10 +36,6 @@ export class GridBasket extends BaseElement {
     this._initialized = true;
   }
 
-  protected _createRenderRoot(): Element {
-    return this;
-  }
-
   connectedCallback(): void {
     super.connectedCallback();
     this._tournamentUpdateHandler = () => {
@@ -64,20 +48,12 @@ export class GridBasket extends BaseElement {
   }
 
   disconnectedCallback(): void {
-    this._cleanupEventListeners();
     if (this._tournamentUnsubscribe) {
       this._tournamentUnsubscribe();
       this._tournamentUnsubscribe = null;
     }
     this._tournamentUpdateHandler = null;
     super.disconnectedCallback();
-  }
-
-  private _cleanupEventListeners(): void {
-    for (const cleanup of this._boundSelectChangeHandlers) {
-      cleanup();
-    }
-    this._boundSelectChangeHandlers = [];
   }
 
   protected _onAttributeChange(name: string, _value: string | null): void {
@@ -124,7 +100,7 @@ export class GridBasket extends BaseElement {
     this.updateTournament();
   }
 
-  private getTournamentFormatedDatas() {
+  private getTournamentFormatedDatas(): ReturnType<typeof Basket.data> | null {
     const tournament = this._tournament.value;
     if (!tournament) {
       return null;
@@ -187,7 +163,7 @@ export class GridBasket extends BaseElement {
       // Add remaining teams as new rows
       while (shuffled.length > 0) {
         const newRow = new TeamRow({
-          type: tournament.type as TournamentType,
+          type: tournament.type,
         });
         // biome-ignore lint/style/noNonNullAssertion: Safe - checked in while condition
         newRow.team = shuffled.pop()!;
@@ -200,14 +176,41 @@ export class GridBasket extends BaseElement {
       await this._tournaments.update(tournament);
       this.updateTournament();
     } catch (error) {
-      console.error(error);
+      this._emit("gridBasketError", {
+        message:
+          error instanceof Error ? error.message : "Failed to load NBA teams",
+      });
     } finally {
       this._isLoadingNbaTeams.value = false;
     }
   }
 
-  private _renderGridHeader(): string {
-    return `
+  private _renderGridCaption(): ReturnType<typeof html> {
+    return html`
+      <caption class="caption-bottom md:hidden">
+        <div class="text-wrap text-left text-neutral-400 text-xs">
+          <span class="mx-1 text-orange-600">
+            <mad-icon name="percent"></mad-icon>: pourcentage de match gagnés.
+          </span>
+          <span class="mx-1">J: total de match joués</span>
+          <span class="mx-1 text-green-600">G: match gagnés</span>
+          <span class="mx-1 text-yellow-600">P: match perdus</span>
+          <span class="mx-1 text-green-600">
+            <mad-icon name="plus"></mad-icon>: points marqués
+          </span>
+          <span class="mx-1 text-yellow-600">
+            <mad-icon name="minus"></mad-icon>: points encaissés
+          </span>
+          <span class="mx-1">
+            <mad-icon name="calendar-event"></mad-icon>: match programmés
+          </span>
+        </div>
+      </caption>
+    `;
+  }
+
+  private _renderGridHeader(): ReturnType<typeof html> {
+    return html`
       <thead class="bg-orange-600 text-neutral-100 dark:bg-orange-700 dark:text-neutral-50 align-middle">
         <th>
           <mad-icon class="text-2xl" name="sort-numeric-down"></mad-icon>
@@ -251,34 +254,41 @@ export class GridBasket extends BaseElement {
     `;
   }
 
-  private _renderGridBody(): string {
+  private _renderGridBody(): ReturnType<typeof html> | typeof nothing {
     const gridDatas = this.getTournamentFormatedDatas();
     if (!gridDatas) {
-      return "";
+      return nothing;
     }
 
     let counter = 0;
-    const rows = gridDatas
-      .map((gridData) => {
+    const rows = repeat(
+      gridDatas,
+      (gridData) => gridData?.tournamentGridId,
+      (gridData) => {
         const rowNumber = ++counter;
-        return `
+        const rowNumberPrefix = rowNumber > 9 ? "" : "0";
+        const playedGames =
+          (gridData?.winGames || 0) + (gridData?.looseGames || 0);
+        return html`
           <tr class="">
             <td>
-              <span class="counter">
-                ${rowNumber > 9 ? "" : "0"}
-                ${rowNumber}
-              </span>
+              <span class="counter">${rowNumberPrefix}${rowNumber}</span>
             </td>
             <td>
               <mad-select-team
                 data-grid-id="${gridData?.tournamentGridId}"
+                @madSelectChange=${(
+                  ev: CustomEvent<GridTeamOnUpdateDetail>
+                ) => {
+                  this.onTeamTeamChange(ev.detail);
+                }}
               ></mad-select-team>
             </td>
             <td>
               <span class="text-orange-600">${gridData?.winGamesPercent}</span>
             </td>
             <td>
-              <span>${(gridData?.winGames || 0) + (gridData?.looseGames || 0)}</span>
+              <span>${playedGames}</span>
             </td>
             <td>
               <span class="text-green-600">${gridData?.winGames}</span>
@@ -297,91 +307,30 @@ export class GridBasket extends BaseElement {
             </td>
           </tr>
         `;
-      })
-      .join("");
+      }
+    );
 
-    return rows;
+    return html`<tbody>${rows}</tbody>`;
   }
 
   protected _render(): void {
-    this._cleanupEventListeners();
-
-    const root = this._renderRoot;
-    if (!root.firstChild) {
-      root.appendChild(template.content.cloneNode(true));
-    }
-
     const tournament = this._tournament.value;
 
-    const table = root.querySelector("table");
-    if (table) {
-      table.innerHTML = `
-        <caption class="caption-bottom md:hidden">
-          <div class="text-wrap text-left text-neutral-400 text-xs">
-            <span class="mx-1 text-orange-600">
-              <mad-icon name="percent"></mad-icon>: pourcentage de match gagnés.
-            </span>
-            <span class="mx-1">J: total de match joués</span>
-            <span class="mx-1 text-green-600">G: match gagnés</span>
-            <span class="mx-1 text-yellow-600">P: match perdus</span>
-            <span class="mx-1 text-green-600">
-              <mad-icon name="plus"></mad-icon>: points marqués
-            </span>
-            <span class="mx-1 text-yellow-600">
-              <mad-icon name="minus"></mad-icon>: points encaissés
-            </span>
-            <span class="mx-1">
-              <mad-icon name="calendar-event"></mad-icon>: match programmés
-            </span>
-          </div>
-        </caption>
-        ${this._renderGridHeader()}
-        <tbody>
-          ${tournament ? this._renderGridBody() : ""}
-        </tbody>
-      `;
-    }
-
-    // Two-pass rendering: setup mad-select-team elements
-    this._setupTeamSelectors();
-  }
-
-  private _setupTeamSelectors(): void {
-    const tournament = this._tournament.value;
-    const selectors = Array.from(
-      this._renderRoot.querySelectorAll("mad-select-team")
-    );
-
-    for (const selector of selectors) {
-      const gridIdStr = selector.getAttribute("data-grid-id");
-      if (!gridIdStr) {
-        continue;
-      }
-
-      const gridId = Number(gridIdStr);
-      const gridRow = tournament?.grid.find((g) => g.id === gridId);
-
-      if (gridRow && selector) {
-        const element = selector as HTMLElement;
-        element.setAttribute("tournament-grid-id", String(gridId));
-        element.setAttribute("color", "dark");
-        element.setAttribute("placeholder", "Équipe vide");
-        if (tournament?.type) {
-          element.setAttribute("type", tournament.type);
-        }
-        if (gridRow.team) {
-          element.setAttribute("value", JSON.stringify(gridRow.team));
-        }
-
-        const handler = ((ev: CustomEvent<GridTeamOnUpdateDetail>) => {
-          this.onTeamTeamChange(ev.detail);
-        }) as EventListener;
-        selector.addEventListener("madSelectChange", handler);
-        this._boundSelectChangeHandlers.push(() =>
-          selector.removeEventListener("madSelectChange", handler)
-        );
-      }
-    }
+    this._renderTemplate(html`
+      <style>
+        .grid-basket { display: block; }
+      </style>
+      <div class="grid-basket">
+        <div part="base">
+          <slot></slot>
+          <table class="w-full">
+            ${this._renderGridCaption()}
+            ${this._renderGridHeader()}
+            ${tournament ? this._renderGridBody() : nothing}
+          </table>
+        </div>
+      </div>
+    `);
   }
 }
 
