@@ -90,6 +90,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Built with [Vanilla Web Components](https://developer.mozilla.org/en-US/docs/Web/API/Web_components) & [BaseElement](src/core/BaseElement.ts)
 - Powered by [Vite](https://vitejs.dev/) and [Signals](https://github.com/preactjs/signals)
-- UI components from [Web Awesome](https://webawesome.org/)
 - Styling with [Tailwind CSS](https://tailwindcss.com/)
 - Data from [API-Sports](https://api-sports.io/)
