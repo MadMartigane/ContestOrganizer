@@ -382,7 +382,7 @@ export class PageTournament extends BaseElement {
     this._renderTemplate(
       html`<div class="page-tournament">
         <div part="base">
-          <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-[var(--wa-color-neutral-100)] dark:bg-neutral-800 rounded-lg shadow-md">
+          <div class="max-w-[1280px] px-4 mx-auto my-12 text-center bg-neutral-100 dark:bg-neutral-800 rounded-lg shadow-md">
             <div>
               <slot name="tournament-name"></slot>
 

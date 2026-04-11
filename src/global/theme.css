@@ -1,5 +1,5 @@
 @theme {
-  /* Animation tokens (renamed from --wa-* to --anim-*) */
+  /* Animation tokens */
   --anim-duration-fast: 150ms;
   --anim-duration-normal: 300ms;
   --anim-duration-slow: 500ms;

@@ -328,11 +328,11 @@ export class CommandPalette extends BaseElement {
           z-index: 9999;
         }
         .palette {
-          background: var(--wa-color-neutral-900, #171717);
+          background: #171717;
           border-radius: 12px;
           width: 90%;
           max-width: 600px;
-          box-shadow: var(--wa-shadow-x-large, 0 25px 50px -12px rgba(0, 0, 0, 0.25));
+          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
           overflow: hidden;
         }
         .search-container {
@@ -340,13 +340,13 @@ export class CommandPalette extends BaseElement {
           align-items: center;
           gap: 12px;
           padding: 16px;
-          border-bottom: 1px solid var(--wa-color-neutral-700, #404040);
+          border-bottom: 1px solid #404040;
         }
         .search-input {
           flex: 1;
           background: transparent;
           border: none;
-          color: var(--wa-color-neutral-100, #f5f5f5);
+          color: #f5f5f5;
           font-size: 18px;
           outline: none;
         }
@@ -355,7 +355,7 @@ export class CommandPalette extends BaseElement {
           outline-offset: 2px;
         }
         .search-input::placeholder {
-          color: var(--wa-color-neutral-500, #737373);
+          color: #737373;
         }
         .command-list {
           list-style: none;
@@ -374,21 +374,21 @@ export class CommandPalette extends BaseElement {
         }
         .command-list li:hover,
         .command-list li.selected {
-          background: var(--wa-color-neutral-800, #262626);
+          background: #262626;
         }
         .command-list li:focus-visible {
           outline: 2px solid #6366f1;
           outline-offset: -2px;
         }
         .command-list li.selected {
-          background: var(--wa-color-brand, #6366f1);
+          background: #6366f1;
         }
         .command-list .label {
           flex: 1;
-          color: var(--wa-color-neutral-100, #f5f5f5);
+          color: #f5f5f5;
         }
         .command-list .shortcut {
-          color: var(--wa-color-neutral-400, #a3a3a3);
+          color: #a3a3a3;
           font-size: 12px;
           font-family: monospace;
         }

@@ -445,13 +445,13 @@ export class GestureOverlay extends BaseElement {
         }
 
         .gesture-card {
-          background: var(--wa-color-neutral-900);
+          background: #171717;
           border-radius: 16px;
           padding: 32px;
           max-width: 400px;
           width: 90%;
           text-align: center;
-          box-shadow: var(--wa-shadow-x-large);
+          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
           animation: slideUp 400ms cubic-bezier(0.16, 1, 0.3, 1);
           position: relative;
         }
