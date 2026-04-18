@@ -51,7 +51,6 @@ export class LiveMatchCard extends BaseElement {
     this._onEnd = () => {
       /* End callback set via setProps */
     };
-    this._initialized = true;
   }
 
   connectedCallback(): void {

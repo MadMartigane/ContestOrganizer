@@ -50,8 +50,6 @@ export class MadInputNumber extends BaseElement {
 
     this._number = new Signal<number>(this._value || this._min || 0);
     this._trackSignal(this._number);
-
-    this._initialized = true;
   }
 
   protected _onAttributeChange(name: string, value: string | null): void {

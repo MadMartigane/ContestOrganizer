@@ -129,7 +129,6 @@ export class GestureOverlay extends BaseElement {
     this._trackSignal(this._section);
     this._trackSignal(this._isPracticing);
     this._trackSignal(this._practiceCompleted);
-    this._initialized = true;
   }
 
   /** @inheritdoc */
@@ -187,11 +186,21 @@ export class GestureOverlay extends BaseElement {
     this._section.value = TUTORIAL_SECTIONS.GESTURES;
     this._isPracticing.value = false;
     this._practiceCompleted.value = false;
+
+    // Remove hidden attribute to make overlay visible
+    this.removeAttribute("hidden");
+
+    this._requestRender();
   }
 
   hide(): void {
     this._isVisible.value = false;
     localStorage.setItem("gesture-tutorial-seen", "true");
+
+    // Add hidden attribute to remove from layout/accessibility tree
+    this.setAttribute("hidden", "");
+
+    this._requestRender();
   }
 
   replay(): void {
@@ -428,6 +437,14 @@ export class GestureOverlay extends BaseElement {
       </div>
 
       <style>
+        :host {
+          display: block;
+        }
+
+        :host([hidden]) {
+          display: none;
+        }
+
         .gesture-overlay {
           display: block;
           font-family: var(--font-sans, system-ui, sans-serif);

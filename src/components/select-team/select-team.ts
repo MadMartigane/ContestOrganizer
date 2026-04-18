@@ -163,9 +163,6 @@ export class SelectTeam extends BaseElement {
     this._trackSignal(this._isLoading);
     this._trackSignal(this._searchError);
     this._trackSignal(this._suggested);
-
-    // Mark initialization as complete to enable rendering
-    this._initialized = true;
   }
 
   /**

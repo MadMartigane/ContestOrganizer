@@ -32,8 +32,6 @@ export class GridBasket extends BaseElement {
     this._isLoadingNbaTeams = new Signal<boolean>(false);
     this._trackSignal(this._tournament);
     this._trackSignal(this._isLoadingNbaTeams);
-
-    this._initialized = true;
   }
 
   connectedCallback(): void {

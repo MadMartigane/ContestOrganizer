@@ -32,8 +32,6 @@ export class GestureScoring extends BaseElement {
     this._trackSignal(this._match);
     this._trackSignal(this._isActive);
     this._trackSignal(this._lastAction);
-
-    this._initialized = true;
   }
 
   connectedCallback(): void {

@@ -54,7 +54,7 @@ export class AppRoot extends BaseElement {
   }
 
   protected _setupProperties(): void {
-    this._initialized = true;
+    // No properties to set up
   }
 
   private _getStyles(): TemplateResult {
@@ -193,12 +193,29 @@ export class AppRoot extends BaseElement {
       if (!this.querySelector(`${tag}[slot="${name}"]`)) {
         const el = document.createElement(tag);
         el.setAttribute("slot", name);
-        el.classList.add("zone");
-        el.style.position = "absolute";
-        el.style.top = "0";
-        el.style.left = "0";
-        el.style.width = "100%";
-        el.style.height = "100%";
+        el.setAttribute("data-zone", name);
+
+        const isOverlay =
+          name === "command-palette" || name === "gesture-overlay";
+
+        if (isOverlay) {
+          // Overlays: hidden by default, manage own visibility
+          el.setAttribute("hidden", "");
+        } else {
+          // Zones: apply zone-specific styling
+          el.classList.add("zone");
+
+          const isHome = name === "home";
+          el.setAttribute("data-active", isHome ? "true" : "false");
+          el.setAttribute("data-collapsed", isHome ? "false" : "true");
+
+          el.style.position = "absolute";
+          el.style.top = "0";
+          el.style.left = "0";
+          el.style.width = "100%";
+          el.style.height = "100%";
+        }
+
         this.appendChild(el);
       }
     }

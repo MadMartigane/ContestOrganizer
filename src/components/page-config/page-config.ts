@@ -36,7 +36,6 @@ export class PageConfig extends BaseElement {
 
     this._trackSignal(this._isDarkModeActive);
     this._trackSignal(this._cacheCleared);
-    this._initialized = true;
   }
 
   protected _injectStyles(): void {

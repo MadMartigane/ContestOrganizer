@@ -14,7 +14,7 @@ export class NavigationOrchestrator extends EventTarget {
   private readonly container: HTMLElement;
   private readonly spatialLayout: SpatialLayout;
   private readonly keyboardManager: KeyboardManager;
-  private activeZoneIndex = 0; // Start at "home" (index 0)
+  private activeZoneIndex = 1; // "home" zone (index 1 in ZoneOrder)
 
   private readonly onGestureBound: (e: Event) => void;
   private readonly onKeyboardGestureBound: (e: Event) => void;

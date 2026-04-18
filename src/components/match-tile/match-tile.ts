@@ -41,8 +41,6 @@ export class MatchTile extends BaseElement {
 
     this._trackSignal(this._hostSignal);
     this._trackSignal(this._visitorSignal);
-
-    this._initialized = true;
   }
 
   protected _onAttributeChange(name: string, _value: string | null): void {

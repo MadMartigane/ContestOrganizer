@@ -26,8 +26,6 @@ export class GridDefault extends BaseElement {
   protected _setupProperties(): void {
     this._tournament = new Signal<Tournament | null>(null);
     this._trackSignal(this._tournament);
-
-    this._initialized = true;
   }
 
   connectedCallback(): void {

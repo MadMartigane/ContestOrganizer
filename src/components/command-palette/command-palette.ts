@@ -34,8 +34,6 @@ export class CommandPalette extends BaseElement {
     this._trackSignal(this._isOpen);
     this._trackSignal(this._query);
     this._trackSignal(this._selectedIndex);
-
-    this._initialized = true;
   }
 
   connectedCallback(): void {
@@ -115,6 +113,10 @@ export class CommandPalette extends BaseElement {
     this._isOpen.value = true;
     this._selectedIndex.value = 0;
     this._query.value = "";
+
+    // Remove hidden attribute to make overlay visible
+    this.removeAttribute("hidden");
+
     this._requestRender();
 
     // Focus input after render
@@ -131,6 +133,10 @@ export class CommandPalette extends BaseElement {
   private _close(): void {
     this._isOpen.value = false;
     this._query.value = "";
+
+    // Add hidden attribute to remove from layout/accessibility tree
+    this.setAttribute("hidden", "");
+
     this._requestRender();
   }
 
@@ -317,6 +323,11 @@ export class CommandPalette extends BaseElement {
     return html`
       <style>
         :host { display: block; }
+
+        :host([hidden]) {
+          display: none;
+        }
+
         .palette-overlay {
           position: fixed;
           inset: 0;

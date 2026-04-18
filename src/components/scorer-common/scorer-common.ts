@@ -37,13 +37,12 @@ export class MadScorerCommon extends BaseElement {
 
     // 2. Track all signals
     this._trackSignal(this._number);
-
-    // 3. Mark initialization as complete (REQUIRED)
-    this._initialized = true;
   }
 
-  protected _createRenderRoot(): ShadowRoot {
-    return this.attachShadow({ mode: "open" });
+  protected _injectStyles(): void {
+    const sheet = new CSSStyleSheet();
+    sheet.replaceSync(scorerCommonStyles);
+    super._injectStyles(sheet);
   }
 
   attributeChangedCallback(
@@ -88,9 +87,6 @@ export class MadScorerCommon extends BaseElement {
 
   connectedCallback(): void {
     super.connectedCallback();
-    const sheet = new CSSStyleSheet();
-    sheet.replaceSync(scorerCommonStyles);
-    this._injectStyles(sheet);
     // Initialize number from value or min
     const initialValue = this._value ?? this._min ?? 0;
     this._number.value = initialValue;

@@ -26,12 +26,12 @@ export class MadScorerRugby extends BaseElement {
 
     this._trackSignal(this._number);
     this._trackSignal(this._minusMode);
-
-    this._initialized = true;
   }
 
-  protected _createRenderRoot(): ShadowRoot {
-    return this.attachShadow({ mode: "open" });
+  protected _injectStyles(): void {
+    const sheet = new CSSStyleSheet();
+    sheet.replaceSync(scorerRugbyStyles);
+    super._injectStyles(sheet);
   }
 
   attributeChangedCallback(
@@ -67,9 +67,6 @@ export class MadScorerRugby extends BaseElement {
 
   connectedCallback(): void {
     super.connectedCallback();
-    const sheet = new CSSStyleSheet();
-    sheet.replaceSync(scorerRugbyStyles);
-    this._injectStyles(sheet);
     const initialValue = this._value ?? this._min ?? 0;
     this._number.value = initialValue;
   }

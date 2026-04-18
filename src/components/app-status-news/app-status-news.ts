@@ -38,7 +38,6 @@ export class AppStatusNews extends BaseElement {
     this._trackSignal(this._state);
     this._expandedSections = new Signal<Set<string>>(new Set());
     this._trackSignal(this._expandedSections);
-    this._initialized = true;
   }
 
   /** Main render method that uses _renderTemplate for Shadow DOM */

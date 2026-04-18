@@ -136,7 +136,11 @@ export class PageTournament extends BaseElement {
       };
 
       if (document.startViewTransition) {
-        document.startViewTransition(() => update());
+        try {
+          document.startViewTransition(() => update());
+        } catch {
+          update();
+        }
       } else {
         update();
       }

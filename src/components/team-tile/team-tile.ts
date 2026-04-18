@@ -56,8 +56,6 @@ export class MadTeamTile extends BaseElement {
     // Track signals for reactive rendering
     this._trackSignal(this._imgSrc);
     this._trackSignal(this._imageError);
-
-    this._initialized = true;
   }
 
   /**

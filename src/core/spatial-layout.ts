@@ -346,7 +346,9 @@ export class SpatialLayout extends EventTarget {
         continue;
       }
 
-      const zoneType = (element as { zoneType?: ZoneType }).zoneType;
+      const zoneType =
+        (element.getAttribute("data-zone") as ZoneType | null) ??
+        (element as { zoneType?: ZoneType }).zoneType;
       if (!zoneType) {
         continue;
       }
