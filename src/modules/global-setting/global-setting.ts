@@ -5,7 +5,9 @@ export class GlobalSetting {
   private alreadyInit: boolean;
   private devicePrefersDark: boolean; // Device system setting
   private darkModeSet: boolean | null; // The user choice
-  private readonly darkThemeChangeCallbacks: ((isDark: boolean) => void)[];
+  private readonly darkThemeChangeCallbacks: {
+    callback: (isDark: boolean) => void;
+  }[];
 
   constructor() {
     this.STORE_KEY = "CONTEST_ORGANIZER_SETTING";
@@ -79,9 +81,9 @@ export class GlobalSetting {
   }
 
   private execDarkThemeChangeCallbacks() {
-    for (const callback of this.darkThemeChangeCallbacks) {
+    for (const entry of this.darkThemeChangeCallbacks) {
       setTimeout(() => {
-        callback(this.isDarkThemeActive());
+        entry.callback(this.isDarkThemeActive());
       });
     }
   }
@@ -100,8 +102,15 @@ export class GlobalSetting {
     return this.devicePrefersDark;
   }
 
-  onDarkThemeChange(callback: (isDark: boolean) => void) {
-    this.darkThemeChangeCallbacks.push(callback);
+  onDarkThemeChange(callback: (isDark: boolean) => void): () => void {
+    const entry = { callback };
+    this.darkThemeChangeCallbacks.push(entry);
+    return () => {
+      const index = this.darkThemeChangeCallbacks.indexOf(entry);
+      if (index !== -1) {
+        this.darkThemeChangeCallbacks.splice(index, 1);
+      }
+    };
   }
 }
 

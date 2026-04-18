@@ -10,6 +10,7 @@ export { html, nothing } from "lit-html";
 
 // Import render and TemplateResult locally for use in _renderTemplate
 import { render, type TemplateResult } from "lit-html";
+import setting from "../modules/global-setting/global-setting";
 import type { Signal } from "./signal";
 import { baseSheet, tailwindSheet } from "./styles";
 
@@ -47,6 +48,11 @@ export abstract class BaseElement extends HTMLElement {
    * Shadow root reference for Shadow DOM support.
    */
   private _shadow: ShadowRoot | null = null;
+
+  /**
+   * Unsubscribe function for dark theme change listener.
+   */
+  private _unsubscribeDarkTheme: (() => void) | null = null;
 
   /**
    * Array of attribute names to observe for changes.
@@ -120,6 +126,12 @@ export abstract class BaseElement extends HTMLElement {
     this._createRenderRoot();
     this._injectStyles();
     this._render();
+
+    // Subscribe to dark theme changes and apply initial state
+    this._handleDarkThemeChange(setting.isDarkThemeActive());
+    this._unsubscribeDarkTheme = setting.onDarkThemeChange((isDark) => {
+      this._handleDarkThemeChange(isDark);
+    });
   }
 
   /**
@@ -127,6 +139,11 @@ export abstract class BaseElement extends HTMLElement {
    * Sets connection state to false and cleans up tracked signals.
    */
   disconnectedCallback(): void {
+    if (this._unsubscribeDarkTheme) {
+      this._unsubscribeDarkTheme();
+      this._unsubscribeDarkTheme = null;
+    }
+
     this._isConnected = false;
     this._cleanupSignals();
   }
@@ -226,6 +243,14 @@ export abstract class BaseElement extends HTMLElement {
    */
   protected _renderTemplate(template: TemplateResult): void {
     render(template, this._renderRoot);
+  }
+
+  /**
+   * Handles dark theme changes by toggling the "dark" class on the host element.
+   * @param isDark - Whether dark theme is active
+   */
+  private _handleDarkThemeChange(isDark: boolean): void {
+    this.classList.toggle("dark", isDark);
   }
 
   /**

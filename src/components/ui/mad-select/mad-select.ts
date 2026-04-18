@@ -10,10 +10,10 @@ const selectSheet = createComponentSheet(`
     font-weight: 500;
     color: #404040;
     margin-bottom: 0.25rem;
+  }
 
-    @media (prefers-color-scheme: dark) {
-      color: #d4d4d4;
-    }
+  :host(.dark) label {
+    color: #d4d4d4;
   }
 
   select {
@@ -37,12 +37,12 @@ const selectSheet = createComponentSheet(`
       opacity: 0.5;
       cursor: not-allowed;
     }
+  }
 
-    @media (prefers-color-scheme: dark) {
-      border-color: #525252;
-      background-color: #262626;
-      color: #fafafa;
-    }
+  :host(.dark) select {
+    border-color: #525252;
+    background-color: #262626;
+    color: #fafafa;
   }
 
   .size-small {
@@ -64,10 +64,10 @@ const selectSheet = createComponentSheet(`
     margin-top: 0.25rem;
     font-size: 0.875rem;
     color: #737373;
+  }
 
-    @media (prefers-color-scheme: dark) {
-      color: #a3a3a3;
-    }
+  :host(.dark) .help-text {
+    color: #a3a3a3;
   }
 `);
 

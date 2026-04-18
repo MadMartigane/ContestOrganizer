@@ -57,10 +57,8 @@ const tooltipSheet = createComponentSheet(`
     display: block;
   }
 
-  @media (prefers-color-scheme: dark) {
-    .tooltip-content {
-      background-color: #374151;
-    }
+  :host(.dark) .tooltip-content {
+    background-color: #374151;
   }
 
   ::slotted(*) {
@@ -133,7 +131,11 @@ export class MadTooltip extends BaseElement {
           }
         ).startViewTransition
       ) {
-        document.startViewTransition(() => update());
+        try {
+          document.startViewTransition(() => update());
+        } catch {
+          update();
+        }
       } else {
         update();
       }

@@ -149,6 +149,15 @@ export class MadInput extends BaseElement {
   /** ElementInternals for form integration */
   readonly #internals: ElementInternals;
 
+  #pendingValue: string | null = null;
+
+  #getInput(): HTMLInputElement | null {
+    if (!this._initialized) {
+      return null;
+    }
+    return this._renderRoot.querySelector("input");
+  }
+
   constructor() {
     super();
 
@@ -202,17 +211,19 @@ export class MadInput extends BaseElement {
    * Gets the current input value
    */
   get value(): string {
-    const input = this._renderRoot.querySelector("input");
-    return input?.value ?? "";
+    const input = this.#getInput();
+    return input?.value ?? this.#pendingValue ?? "";
   }
 
   /**
    * Sets the input value
    */
   set value(v: string) {
-    const input = this._renderRoot.querySelector("input");
+    const input = this.#getInput();
     if (input) {
       input.value = v;
+    } else {
+      this.#pendingValue = v;
     }
     this.#internals.setFormValue(v);
     this._requestRender();
@@ -376,9 +387,7 @@ export class MadInput extends BaseElement {
     const hasReadonly = this.hasAttribute("readonly");
     const size = this.getAttribute("size") ?? "medium";
     const isDark =
-      this.hasAttribute("data-theme") ||
-      (typeof window !== "undefined" &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches);
+      this.hasAttribute("data-theme") || this.classList.contains("dark");
 
     this._renderTemplate(html`
       <div class="mad-input-root">
@@ -420,11 +429,19 @@ export class MadInput extends BaseElement {
     if (input) {
       this.#internals.setFormValue(input.value);
     }
+
+    if (this.#pendingValue !== null) {
+      const input = this._renderRoot.querySelector("input");
+      if (input) {
+        input.value = this.#pendingValue;
+      }
+      this.#pendingValue = null;
+    }
   }
 
   protected _onAttributeChange(name: string, value: string | null): void {
     if (name === "value") {
-      const input = this._renderRoot.querySelector("input");
+      const input = this.#getInput();
       if (input && value !== null && value !== input.value) {
         input.value = value;
         this.#internals.setFormValue(value);

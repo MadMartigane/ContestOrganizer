@@ -23,36 +23,32 @@ const drawerSheet = createComponentSheet(`
     border: none;
     margin: 0;
     padding: 0;
-
-    @media (prefers-color-scheme: dark) {
-      background: #171717;
-    }
   }
 
-  :host([placement="start"]) {
-    & .drawer-panel {
-      left: 0;
-      border-right: 1px solid rgb(229, 229, 229);
-      transform: translateX(-100%);
-      transition: transform 0.3s ease-out;
-
-      @media (prefers-color-scheme: dark) {
-        border-color: rgb(38, 38, 38);
-      }
-    }
+  :host(.dark) .drawer-panel {
+    background: #171717;
   }
 
-  :host([placement="end"]) {
-    & .drawer-panel {
-      right: 0;
-      border-left: 1px solid rgb(229, 229, 229);
-      transform: translateX(100%);
-      transition: transform 0.3s ease-out;
+  :host([placement="start"]) .drawer-panel {
+    left: 0;
+    border-right: 1px solid rgb(229, 229, 229);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-out;
+  }
 
-      @media (prefers-color-scheme: dark) {
-        border-color: rgb(38, 38, 38);
-      }
-    }
+  :host(.dark[placement="start"]) .drawer-panel {
+    border-color: rgb(38, 38, 38);
+  }
+
+  :host([placement="end"]) .drawer-panel {
+    right: 0;
+    border-left: 1px solid rgb(229, 229, 229);
+    transform: translateX(100%);
+    transition: transform 0.3s ease-out;
+  }
+
+  :host(.dark[placement="end"]) .drawer-panel {
+    border-color: rgb(38, 38, 38);
   }
 
   /* When open, slide into view */
@@ -167,7 +163,11 @@ export class MadDrawer extends BaseElement {
           }
         ).startViewTransition
       ) {
-        document.startViewTransition(() => update());
+        try {
+          document.startViewTransition(() => update());
+        } catch {
+          update();
+        }
       } else {
         update();
       }
