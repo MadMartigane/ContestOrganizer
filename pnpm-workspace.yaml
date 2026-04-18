@@ -1,5 +1,0 @@
-allowBuilds:
-  esbuild: true
-  postcss-combine-duplicated-selectors: true
-  puppeteer: true
-
