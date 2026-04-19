@@ -92,3 +92,14 @@ export interface BreadcrumbItem {
   href?: string;
   label: string;
 }
+
+// ──────────────────────────────────────────────────
+// Component API
+// ──────────────────────────────────────────────────
+
+/** Scroll API exposed by MatchList for external navigation */
+export interface MatchListScrollApi {
+  scrollToBottom: () => void;
+  scrollToIndex: (index: number, align?: "center" | "end" | "start") => void;
+  scrollToTop: () => void;
+}
