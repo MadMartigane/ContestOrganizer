@@ -1008,7 +1008,7 @@ Corriger les anomalies connues documentées dans les spécifications et renforce
 - **Onglets multiples (C.11)** :
   - Chaque onglet maintient son état en mémoire. Les conflits sont résolus au prochain démarrage via le merge timestamp. Documenter ce comportement.
 - **Correction typo (C.12)** :
-  - S'assurer que « Accueil » est correctement orthographié partout (pas « Acceuil »).
+  - S'assurer que « Accueil » est correctement orthographié partout.
 - **Validation et accessibilité** :
   - Vérifier les navigations clavier sur tous les formulaires.
   - Ajouter les labels ARIA nécessaires sur les composants interactifs.

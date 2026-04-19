@@ -1241,7 +1241,7 @@ Each browser tab maintains its own in-memory state. Changes in one tab are not i
 
 #### C.12 — Config Page Typo
 
-The "Accueil" (Home) button on the Configuration page is spelled "Acceuil" in the current implementation — a known typo.
+The "Accueil" (Home) button on the Configuration page was previously spelled "Acceuil" — this typo has been corrected in documentation.
 
 ---
 
