@@ -31,7 +31,7 @@
 19. [Error Handling](#19-error-handling)
 20. [Reusable UI Components](#20-reusable-ui-components)
 21. [Cross-cutting Behaviors](#21-cross-cutting-behaviors)
-22. [Appendix A — Complete French UI Labels](#appendix-a--complete-french-ui-labels)
+22. [Appendix A — Internationalization Labels](#appendix-a--internationalization-labels)
 23. [Appendix B — Confirmation & Alert Dialog Specification](#appendix-b--confirmation--alert-dialog-specification)
 24. [Appendix C — Known Anomalies & Edge Cases](#appendix-c--known-anomalies--edge-cases)
 
@@ -78,35 +78,32 @@
 
 ### Route Registry
 
-The application uses **hash-based routing** (`#/path`). Only one page renders at a time.
+The application uses **file-based routing** (SvelteKit conventions). Only one page renders at a time.
 
-| URL Pattern | Page | Purpose | Parameters |
+| Route | Page | Purpose | Parameters |
 |---|---|---|---|
-| `#/home` | Home | Landing page | None |
-| `#/tournaments` | Tournament Selection | List, create, delete tournaments | None |
-| `#/tournament/:tournamentId` | Tournament Detail | Grid configuration & management | `tournamentId` |
-| `#/match/:tournamentId` | Match Page | Match management & scoring | `tournamentId` |
-| `#/team-select/:teamId/:teamType` | Team Selection | Search & pick a team | `teamId`, `teamType` |
-| `#/config` | Configuration | App settings | None |
-| `#/404` | Not Found | Error page | None |
+| `/home` | Home | Landing page | None |
+| `/tournaments` | Tournament Selection | List, create, delete tournaments | None |
+| `/tournament/[tournamentId]` | Tournament Detail | Grid configuration & management | `tournamentId` |
+| `/match/[tournamentId]` | Match Page | Match management & scoring | `tournamentId` |
+| `/team-select/[teamId]/[teamType]` | Team Selection | Search & pick a team (drawer) | `teamId`, `teamType` |
+| `/config` | Configuration | App settings | None |
 
 ### Routing Rules
 
 | Rule | Description |
 |---|---|
-| Default route | Empty hash or `#/` → redirects to `#/home` |
-| Legacy redirect | `#/app/:anything` → redirects to `#/home` |
-| 404 handling | No matching route → redirects to `#/404` |
-| Route parameters | Segments prefixed with `:` match any non-empty value |
+| Default route | Root path (`/`) redirects to `/home` |
+| 404 handling | Unmatched routes render the 404 page |
 | Deep linking | All routes support direct URL entry |
-| History | Browser back button works (hash-based history) |
+| History | Browser back/forward buttons work via History API |
 
 ### Navigation Map
 
 ```
 Home ←→ Config
 Home ←→ Tournaments ←→ Tournament Detail ←→ Match Page
-                                         ←→ Team Selection (drawer)
+                                          ←→ Team Selection (drawer)
 404 Page (fallback)
 ```
 
@@ -121,11 +118,6 @@ Home ←→ Tournaments ←→ Tournament Detail ←→ Match Page
 | Config | ⚙ Config (current) |
 | 404 | 4-0-4 (decorative) |
 
-### Route Transition Behavior
-- Navigating to a new route **completely removes** the current page from the DOM.
-- The new page is created fresh — no state is preserved between visits.
-- Route parameters are extracted and passed as DOM attributes to the page component.
-
 ---
 
 ## 3. Home Page
@@ -139,10 +131,10 @@ Home ←→ Tournaments ←→ Tournament Detail ←→ Match Page
    - Auto-rotates every **5 seconds**, randomly selecting from five sport-themed illustrations.
    - Initial image: "Greek freak basketball" (300×300).
    - No user controls — cannot be paused.
-4. **Status News Feed**: Project status, version, and development news (see Section 20.1).
+4. **App Version Badge**: Displays the current application version number.
 5. **Footer Navigation Buttons** (two large primary buttons side by side):
-   - ⚙ "Configuration" → navigates to `#/config`
-   - 🏆 "Tournois" → navigates to `#/tournaments`
+   - ⚙ "Configuration" → navigates to `/config`
+   - 🏆 "Tournois" → navigates to `/tournaments`
 
 ---
 
@@ -160,7 +152,7 @@ Home ←→ Tournaments ←→ Tournament Detail ←→ Match Page
      - Pill badge with team count
      - 🗑 Trash icon (warning color) — triggers deletion
      - ➡ Arrow-right icon — navigation indicator
-   - Clicking a tournament item navigates to `#/tournament/{id}`.
+   - Clicking a tournament item navigates to `/tournament/{id}`.
 
 3. **Empty State** (no tournaments):
    - 🏆 Trophy icon (warning color)
@@ -309,11 +301,11 @@ PENDING ──[Play]──► DOING ──[Stop]──► DONE ◄──[Play]�
 
 ### Auto-Scroll Behavior
 
-On page load, auto-scrolls to the most relevant match:
+On page load, the match list auto-scrolls to the most relevant match:
 1. Priority 1: Last match with DOING status.
 2. Priority 2: Last match with DONE status.
 3. No scroll if all matches are PENDING.
-- Smooth scroll animation. Retries up to 10 times if target not yet in DOM.
+- Smooth scroll animation. Uses virtual scrolling APIs for reliable targeting.
 
 ### Scroll Navigation Dock
 
@@ -350,8 +342,8 @@ Fixed dock in bottom-right corner:
    - Success feedback: green alert "Le cache des équipes a été vidé." — auto-dismisses after 3 seconds
 
 6. **Footer Navigation**:
-   - 🏠 "Accueil" → `#/home`
-   - 🏆 "Tournois" → `#/tournaments`
+   - 🏠 "Accueil" → `/home`
+   - 🏆 "Tournois" → `/tournaments`
 
 ---
 
@@ -366,8 +358,8 @@ Fixed dock in bottom-right corner:
 2. **Error Title**: "404 - La page demandée n'existe pas."
 3. **Image Carousel**: Auto-playing loop with two 404-themed illustrations (400×300) and pagination dots.
 4. **Footer Navigation**:
-   - 🏠 "Accueil" → `#/home`
-   - 🏆 "Tournois" → `#/tournaments`
+   - 🏠 "Accueil" → `/home`
+   - 🏆 "Tournois" → `/tournaments`
 
 ---
 
@@ -445,10 +437,8 @@ Tournaments are persisted to **two locations simultaneously**:
 | Backend server | REST API POST | Asynchronous (fire-and-forget) |
 
 ### Local Storage
-- Key: `{url_path_prefix}_CONTEST_TOURNAMENTS` (path-based to support multiple instances).
-- Fallback key: `CONTEST_TOURNAMENTS`.
+- Key: `CONTEST_ORGANIZER_TOURNAMENTS`.
 - Format: `{ timestamp: number, tournaments: Tournament[] }`.
-- Backward compatible with old-format keys.
 
 ### Backend
 - Load: `GET /api/index.php/list/tournaments`
@@ -477,11 +467,10 @@ When the app starts, data from both sources is merged:
 
 ### Initialization Sequence
 
-1. Single store instance created.
-2. `restore()` begins: local data loaded (sync), backend fetched (async).
-3. Merge applied, deserialization runs.
-4. Result persisted to both locations.
-5. All data operations wait for initialization to complete (busy state).
+1. On app startup, local data is loaded and backend data is fetched concurrently.
+2. Merge algorithm is applied using timestamps.
+3. Result is persisted to both locations.
+4. The app waits for initialization to complete before accepting user interactions.
 
 ---
 
@@ -571,10 +560,9 @@ PENDING ──[Play]──► DOING ──[Stop]──► DONE
 ### Score Propagation Per Click
 
 Every scorer click:
-1. Scorer emits change event with new total score.
-2. Match's goal value updated.
-3. Tournament saved/updated (triggers full score recalculation).
-4. Match tile display incrementally updated (no full re-render).
+1. Match score updated immediately.
+2. Tournament persisted (triggers full score recalculation).
+3. Match tile display updated incrementally.
 
 ### Score Recalculation Process
 
@@ -877,7 +865,7 @@ Authentication: API-Sports uses `x-apisports-key` header. TheSportsDB uses free 
 4. **Minimum characters**: 3. Below 3: results cleared, no API call.
 5. **Debounce**: 300ms after last keystroke.
 6. **Loading state**: Spinner + "Chargement des équipes…"
-7. **Request ID tracking**: Only the latest search's results are displayed (stale results discarded).
+7. Only the most recent search's results are displayed — stale results from earlier keystrokes are discarded.
 8. After results load, view scrolls to results container (smooth).
 
 ### API-Sports Response Mapping
@@ -900,9 +888,8 @@ Authentication: API-Sports uses `x-apisports-key` header. TheSportsDB uses free 
 ### Team Selection
 
 1. Results displayed as selectable menu items (logo + name + arrow icon).
-2. Click on a team → emits `madSelectChange` event with team data and grid slot ID.
-3. Drawer closes automatically.
-4. Selection area updates to show selected team (logo + name).
+2. The team is assigned to the grid slot and the drawer closes automatically.
+3. Selection area updates to show selected team (logo + name).
 
 ### Cancel
 
@@ -912,23 +899,16 @@ Authentication: API-Sports uses `x-apisports-key` header. TheSportsDB uses free 
 
 | Aspect | Value |
 |---|---|
-| Storage key | `api-sports-teams` |
-| Structure | `{allTeams: Team[], allSearch: SearchRecord[]}` |
-| TTL | None (permanent until manual clear) |
-| Lookup | Exact match on search text + sport type |
 | Scope | All sport types (Foot, Basket, NFL, Rugby) |
+| TTL | Permanent until manual clear |
 | Fallback | Corrupted cache → cleared, treated as empty |
 
 ### TheSportsDB Caching (NBA)
 
 | Aspect | Value |
 |---|---|
-| Storage key | `THESPORTSDB_NBA_CACHE_V1` |
-| Structure | `{version: 1, lastUpdated: timestamp, teams: NbaTeam[]}` |
-| TTL | 7 days (604,800,000 ms) |
-| Freshness check | `now − lastUpdated < 7 days` |
+| TTL | 7 days |
 | Stale fallback | If API fails but stale cache exists → use stale cache |
-| Version check | Schema version must match (currently 1) |
 
 ### Cache Clearing
 
@@ -993,8 +973,8 @@ See Section 14 (Rank Display) for full badge specification.
 
 ### Theme Application
 
-- Dark mode: CSS class `sl-theme-dark` added to `<html>`, `sl-theme-light` removed from `<body>`.
-- Light mode: CSS class `sl-theme-dark` removed from `<html>`, `sl-theme-light` added to `<body>`.
+- Theme is applied via the Skeleton v4 theme system.
+- Dark or light mode is toggled at the document root level.
 
 ### Edge Cases
 
@@ -1026,14 +1006,6 @@ All API errors are classified into five categories:
 - Bold title + descriptive message.
 - If retryable: "Réessayer" button (refresh icon) that re-executes the same search.
 
-### HTTP Error Format
-
-```
-[HttpRequest][STATUS STATUS_TEXT]: description
-```
-
-Status code extracted via pattern matching for classification.
-
 ### Backend Response Wrapping (Procedure Pattern)
 
 | Field | Description |
@@ -1050,43 +1022,22 @@ Status code extracted via pattern matching for classification.
 
 ## 20. Reusable UI Components
 
-### 20.1 Status News Component (`<app-status-news>`)
+### 20.1 Action Bar
+- Horizontal button container, right-aligned.
+- Used as a consistent footer action area across pages.
+- Built with Skeleton layout primitives.
 
-Displays project status feed on the home page from a bundled JSON file.
+### 20.2 Number Input
+- Labeled numeric input with increment/decrement buttons.
+- Configurable min, max, step, and readonly state.
+- Value clamped to valid range. Invalid input → previous value restored.
+- Disabled when match is not in DOING status.
 
-**States**: Ready (full display), Empty ("📭 No status updates"), Error ("⚠️ Unable to load status data" with retry), Loading (skeleton).
-
-**Ready state elements**:
-- Version badge: glassmorphism pill, "Version de l'application : {version}", green pulsing dot.
-- Header: project title, technology badge, last updated date ("MMM DD, YYYY at HH:MM AM/PM").
-- **Collapsible sections**: Cards with glassmorphism styling, staggered entrance animation, hover lift effect.
-  - Each section has a type badge (INFO/BUG/TASK/NOTE/WARNING with corresponding icon and color), title, and toggle arrow (▶/▼).
-  - Content: Markdown-rendered (paragraphs, bold, italic, bullet lists, numbered lists, code blocks, headings, tables).
-  - Multiple sections can be open simultaneously.
-  - Keyboard accessible (Enter/Space to toggle, tabindex=0).
-  - ARIA attributes updated dynamically.
-
-### 20.2 Action Bar (`<action-bar>`)
-
-- Horizontal flex container, right-aligned, medium gap.
-- Top border separator, 1rem padding, transparent background.
-- Slot-based content (no interactive behavior).
-
-### 20.3 Number Input (`<mad-input-number>`)
-
-- Text input (type number, no spin buttons) with label and placeholder.
-- Button group: decrement (warning color) and increment (primary color).
-- Attributes: `placeholder` ("Score"), `label`, `min` (0), `max` (unlimited), `step` (1), `value` (0), `readonly` (disables all).
-- Value clamped to min/max. Invalid manual input → previous value restored.
-- Emits `madNumberChange` event with new value on every change.
-
-### 20.4 Error Message (`<error-message>`)
-
-- Red/danger alert with large bug icon (🐛).
-- Heading: "Erreur" (danger color).
+### 20.3 Error Message
+- Red/danger alert with bug icon (🐛).
+- Heading: "Erreur".
 - Message text in bold.
-- Optional "Retour à l'accueil" button (shown by default, hidden when `go-home-button="false"`).
-- Attributes: `message`, `go-home-button`.
+- Optional "Retour à l'accueil" button.
 
 ---
 
@@ -1101,137 +1052,109 @@ Displays project status feed on the home page from a bundled JSON file.
 
 ### 21.2 Debounce
 
-- Unique name per debounced action.
-- 300ms timer. New call within 300ms resets timer.
-- Only the last callback in the debounce window executes.
-- Applied to: team search input (300ms).
-
-### 21.3 Focus Management
-
-- CSS selector: waits 300ms, finds first match, calls `.focus()`.
-- Direct element: waits 200ms, calls `.focus()`.
-- Applied to: search drawer opening, post-creation focus, post-cancel focus.
-
-### 21.4 Smooth Scroll
-
-- CSS selector: 300ms delay, then smooth scroll to top of viewport.
-- Direct element: 100ms delay, then smooth scroll.
-- Applied to: search results appearance.
-
-### 21.5 Event Handler Installation Guard
-
-- Prevents duplicate event handlers via `data-mad-hook` attribute.
-- First install: adds attribute "true". Subsequent installs: skipped.
-- Null/undefined element: silently skipped.
-
-### 21.6 DOM Element Cleanup
-
-- Delayed removal after dialog close (allows closing animations).
-- Removes from `document.body` or specified parent.
-
-### 21.7 Update Notification System
-
-- Components can subscribe to tournament data change notifications.
-- Callback invoked asynchronously (via setTimeout) on create, update, delete, persist.
-- Returns unsubscribe function. Components should call it on disconnect.
+Team search input is debounced: 300ms delay after the last keystroke before triggering the API call.
 
 ---
 
-## Appendix A — Complete French UI Labels
+## Appendix A — Internationalization Labels
 
-| Context | French | English |
-|---|---|---|
-| **Home Page** | | |
-| Page title | "Contest Tournament" | Contest Tournament |
-| Config button | "Configuration" | Configuration |
-| Tournaments button | "Tournois" | Tournaments |
-| **Tournament Selection** | | |
-| Page title (breadcrumb) | 🏆 (icon) | Tournaments |
-| New tournament button | "Nouveau tournoi" | New tournament |
-| Name input label | "Nom du tournois" | Tournament name |
-| Name input placeholder | "Playoff" | Playoff |
-| Sport selector label | "Quel sport ?" | Which sport? |
-| Sport selector help | "(defaut: Foot ⚽️)" | (default: Foot ⚽️) |
-| Sport selector placeholder | "Basket, NBA, Foot, …" | Basket, NBA, Foot, … |
-| Confirm add | "Ajouter" | Add |
-| Cancel add | "Annuler" | Cancel |
-| Empty state | "Pas encore de tournois" | No tournaments yet |
-| Delete confirmation | "Supprimer le tournoi: {name}?" | Delete tournament: {name}? |
-| **Tournament Detail** | | |
-| Team number label | "Nombre d'équipes (min:2, max:32)" | Number of teams |
-| Empty grid message | "Choisissez le nombre d'équipes pour commencer !" | Choose the number of teams to get started! |
-| Reset button | "Effacer" | Erase/Clear |
-| Ranking button | "Classement !" | Ranking! |
-| Go to match button | "Go Match" | Go Match |
-| Magic fill-up button | "🔮 Magic fill-up" | Magic fill-up |
-| Reset confirmation | "Es-tu sûre de vouloir effacer les noms, ainsi que les scores de toutes les équipes ?" | Are you sure you want to erase the names and scores of all teams? |
-| Team selector placeholder | "Équipe vide" | Empty team |
-| Not found error | "Tournois #{id} non trouvé." | Tournament #{id} not found. |
-| **Grid Columns (Foot)** | | |
-| Teams | "Équipes" | Teams |
-| Points | "Points" | Points |
-| Goals scored | "Buts +" | Goals + |
-| Goals conceded | "Buts −" | Goals − |
-| Goal average | "Goal average" | Goal average |
-| **Grid Columns (Basket)** | | |
-| Win percentage | "%" | % |
-| Played (desktop/mobile) | "Joués" / "J" | Played |
-| Won (desktop/mobile) | "Gagnés" / "G" | Won |
-| Lost (desktop/mobile) | "Perdus" / "P" | Lost |
-| Scored (desktop/mobile) | "Marqués" / "+" | Scored |
-| Conceded (desktop/mobile) | "Encaissés" / "−" | Conceded |
-| **Match Page** | | |
-| Match count | "Match(s) {count}" | Match(es) {count} |
-| Home column | "Locaux" | Home teams |
-| Visitor column | "Visiteurs" | Visitor teams |
-| Empty state | "Aucun match en cours" | No match in progress |
-| New match button | "Nouveau match" | New match |
-| Auto-match button | "Auto-Match" | Auto-Match |
-| NBA generate button | "Generate All Missing ({count})" | Generate All Missing ({count}) |
-| NBA complete | "Season Complete (82 games)" | Season Complete (82 games) |
-| Match scheduled | "Match programmé" | Match scheduled |
-| Match in progress | "Match en cours" | Match in progress |
-| Match completed | "Match terminé" | Match completed |
-| Team placeholder | "Sélection…" | Selection… |
-| Delete match confirmation | "Supprimer le match ?" | Delete the match? |
-| NBA generate confirmation | "Generate {count} matches to complete the season?" | Generate {count} matches to complete the season? |
-| **Team Search** | | |
-| Drawer title | "Recherche ton équipe. (3 lettres min)" | Search for your team. (3 letters minimum) |
-| Search placeholder | "nom d'équipe" | team name |
-| Loading message | "Chargement des équipes…" | Loading teams… |
-| No results | "Aucun résultat" | No results |
-| Default placeholder | "Sélectionner une équipe" | Select a team |
-| Retry button | "Réessayer" | Retry |
-| **Configuration** | | |
-| Page title | "Configuration" | Configuration |
-| Dark mode label | "Mode sombre" | Dark Mode |
-| Cache heading | "Cache des équipes" | Team Cache |
-| Cache description | "Vide le cache des équipes si vous rencontrez des problèmes de recherche." | Clears the team cache if you encounter search issues. |
-| Clear cache button | "Vider le cache" | Clear cache |
-| Cache cleared message | "Le cache des équipes a été vidé." | Team cache has been cleared. |
-| Home button (alt) | "Acceuil" / "Accueil" | Home |
-| **404 Page** | | |
-| Error title | "404 - La page demandée n'existe pas." | 404 - The requested page does not exist. |
-| Home button | "Accueil" | Home |
-| **Error Display** | | |
-| Error heading | "Erreur" | Error |
-| Home button | "Retour à l'accueil" | Return to Home |
-| **Confirmation Dialog** | | |
-| Dialog icon | "🚨" | (alarm emoji) |
-| Confirm button | "Oui" | Yes |
-| Cancel button | "Non" | No |
-| Default message | "Es-tu sûre ?" | Are you sure? |
-| **Alert Dialog** | | |
-| Dialog icon | "⚠️" | (warning emoji) |
-| Close button | "Fermer" | Close |
-| Default message | "Attention" | Attention |
-| **Scoring** | | |
-| Add/remove toggle | "Ajouter/Supprimer des points" | Add/Remove points |
-| **Status News** | | |
-| Version label | "Version de l'application" | Application version |
-| Empty state | "📭 No status updates available" | No status updates available |
-| Error state | "⚠️ Unable to load status data" | Unable to load status data |
-| Retry button | "Retry" | Retry |
+All UI labels are managed through the Paraglide JS message system. Messages are defined per language in:
+
+```
+messages/
+  fr.json    # French (base locale)
+  en.json    # English
+```
+
+### Message Key Registry
+
+The following message keys are used throughout the application. Each key maps to a localized string; parameters are noted where applicable.
+
+| Context | Message Key | Parameters | French (default) | English |
+|---|---|---|---|---|
+| **Home Page** | | | | |
+| Page title | `app_title` | — | Contest Tournament | Contest Tournament |
+| Config button | `home_config` | — | Configuration | Configuration |
+| Tournaments button | `home_tournaments` | — | Tournois | Tournaments |
+| Version badge | `app_version` | `version` | v{version} | v{version} |
+| **Tournament Selection** | | | | |
+| Breadcrumb | `nav_tournaments` | — | 🏆 Tournois | 🏆 Tournaments |
+| New tournament button | `tournament_new` | — | Nouveau tournoi | New tournament |
+| Name input label | `tournament_name_label` | — | Nom du tournois | Tournament name |
+| Name input placeholder | `tournament_name_placeholder` | — | Playoff | Playoff |
+| Sport selector label | `sport_selector_label` | — | Quel sport ? | Which sport? |
+| Sport selector help | `sport_selector_help` | — | (defaut: Foot ⚽️) | (default: Foot ⚽️) |
+| Sport selector placeholder | `sport_selector_placeholder` | — | Basket, NBA, Foot, … | Basket, NBA, Foot, … |
+| Confirm add | `action_add` | — | Ajouter | Add |
+| Cancel | `action_cancel` | — | Annuler | Cancel |
+| Empty state | `tournaments_empty` | — | Pas encore de tournois | No tournaments yet |
+| Delete confirmation | `tournament_delete_confirm` | `name` | Supprimer le tournoi: {name}? | Delete tournament: {name}? |
+| **Tournament Detail** | | | | |
+| Team number label | `team_count_label` | — | Nombre d'équipes (min:2, max:32) | Number of teams |
+| Empty grid message | `grid_empty` | — | Choisissez le nombre d'équipes pour commencer ! | Choose the number of teams to get started! |
+| Reset button | `action_reset` | — | Effacer | Erase/Clear |
+| Ranking button | `action_ranking` | — | Classement ! | Ranking! |
+| Go to match button | `action_go_match` | — | Go Match | Go Match |
+| Magic fill-up button | `action_magic_fillup` | — | 🔮 Magic fill-up | Magic fill-up |
+| Reset confirmation | `grid_reset_confirm` | — | Es-tu sûre de vouloir effacer les noms, ainsi que les scores de toutes les équipes ? | Are you sure you want to erase the names and scores of all teams? |
+| Team placeholder | `team_empty` | — | Équipe vide | Empty team |
+| Not found error | `tournament_not_found` | `id` | Tournois #{id} non trouvé. | Tournament #{id} not found. |
+| **Grid Columns** | | | | |
+| Teams | `grid_col_teams` | — | Équipes | Teams |
+| Points | `grid_col_points` | — | Points | Points |
+| Goals scored | `grid_col_goals_scored` | — | Buts + | Goals + |
+| Goals conceded | `grid_col_goals_conceded` | — | Buts − | Goals − |
+| Goal average | `grid_col_goal_avg` | — | Goal average | Goal average |
+| **Match Page** | | | | |
+| Match count | `match_count` | `count` | Match(s) {count} | Match(es) {count} |
+| Home column | `match_home` | — | Locaux | Home teams |
+| Visitor column | `match_visitor` | — | Visiteurs | Visitor teams |
+| Empty state | `match_empty` | — | Aucun match en cours | No match in progress |
+| New match button | `match_new` | — | Nouveau match | New match |
+| Auto-match button | `match_auto` | — | Auto-Match | Auto-Match |
+| NBA generate button | `nba_generate` | `count` | Generate All Missing ({count}) | Generate All Missing ({count}) |
+| NBA complete | `nba_complete` | — | Season Complete (82 games) | Season Complete (82 games) |
+| Match scheduled | `match_status_pending` | — | Match programmé | Match scheduled |
+| Match in progress | `match_status_doing` | — | Match en cours | Match in progress |
+| Match completed | `match_status_done` | — | Match terminé | Match completed |
+| Team placeholder | `match_team_placeholder` | — | Sélection… | Selection… |
+| Delete match confirm | `match_delete_confirm` | — | Supprimer le match ? | Delete the match? |
+| NBA generate confirm | `nba_generate_confirm` | `count` | Generate {count} matches to complete the season? | Generate {count} matches to complete the season? |
+| **Team Search** | | | | |
+| Drawer title | `team_search_title` | — | Recherche ton équipe. (3 lettres min) | Search for your team. (3 letters minimum) |
+| Search placeholder | `team_search_placeholder` | — | nom d'équipe | team name |
+| Loading message | `team_search_loading` | — | Chargement des équipes… | Loading teams… |
+| No results | `team_search_no_results` | — | Aucun résultat | No results |
+| Default placeholder | `team_select_placeholder` | — | Sélectionner une équipe | Select a team |
+| Retry button | `action_retry` | — | Réessayer | Retry |
+| **Configuration** | | | | |
+| Page title | `config_title` | — | Configuration | Configuration |
+| Dark mode label | `config_dark_mode` | — | Mode sombre | Dark Mode |
+| Cache heading | `config_cache_heading` | — | Cache des équipes | Team Cache |
+| Cache description | `config_cache_description` | — | Vide le cache des équipes si vous rencontrez des problèmes de recherche. | Clears the team cache if you encounter search issues. |
+| Clear cache button | `config_cache_clear` | — | Vider le cache | Clear cache |
+| Cache cleared message | `config_cache_cleared` | — | Le cache des équipes a été vidé. | Team cache has been cleared. |
+| Home button | `nav_home` | — | Accueil | Home |
+| **404 Page** | | | | |
+| Error title | `error_404_title` | — | 404 - La page demandée n'existe pas. | 404 - The requested page does not exist. |
+| **Error Display** | | | | |
+| Error heading | `error_heading` | — | Erreur | Error |
+| Home button | `error_go_home` | — | Retour à l'accueil | Return to Home |
+| **Confirmation Dialog** | | | | |
+| Confirm button | `dialog_confirm` | — | Oui | Yes |
+| Cancel button | `dialog_cancel` | — | Non | No |
+| Default message | `dialog_confirm_default` | — | Es-tu sûre ? | Are you sure? |
+| **Alert Dialog** | | | | |
+| Close button | `dialog_close` | — | Fermer | Close |
+| Default message | `dialog_alert_default` | — | Attention | Attention |
+| **Scoring** | | | | |
+| Add/remove toggle | `scoring_add_remove` | — | Ajouter/Supprimer des points | Add/Remove points |
+
+Usage in components:
+```typescript
+import * as m from '$lib/paraglide/messages'
+m.match_count({ count: 5 })  // "Match(s) 5" / "Match(es) 5"
+```
 
 ---
 
@@ -1245,7 +1168,6 @@ Displays project status feed on the home page from a bundled JSON file.
 - **Buttons**: "Oui" (primary, large) + "Non" (warning, large).
 - **Overlay click**: Does NOT dismiss.
 - **Return**: `true` (confirmed) or `false` (cancelled).
-- **Cleanup**: Dialog removed from DOM after closing.
 
 ### Alert Dialog
 
@@ -1254,7 +1176,6 @@ Displays project status feed on the home page from a bundled JSON file.
 - **Body**: Informational message.
 - **Buttons**: "Fermer" (primary, large).
 - **Overlay click**: Does NOT dismiss.
-- **Cleanup**: Dialog removed from DOM after closing.
 
 ---
 

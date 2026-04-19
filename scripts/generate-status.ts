@@ -202,12 +202,11 @@ function parseTable(tableBlock: string): TableData | null {
     return null;
   }
 
-  const parseRow = (line: string): string[] => {
-    return line
+  const parseRow = (line: string): string[] =>
+    line
       .split("|")
       .slice(1, -1)
       .map((cell) => cell.trim());
-  };
 
   const headers = parseRow(headerLine);
   const rows = rowLines.map(parseRow);

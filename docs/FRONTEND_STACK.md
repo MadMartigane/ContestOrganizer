@@ -29,7 +29,8 @@ Two primary pain points of the previous app that drive most decisions below:
 | Styling | Tailwind CSS v4 + Skeleton UI |
 | List performance | TanStack Virtual |
 | Data fetching / cache | TanStack Query (`@tanstack/svelte-query`) |
-| Forms | Superforms |
+| Linting & Formatting | Biome + Ultracite |
+| Git Hooks | Husky |
 | Testing | Vitest |
 | i18n | Paraglide JS |
 | Structure | Simple monorepo |
@@ -91,14 +92,39 @@ TanStack Virtual solves this with windowing: only the rows visible in the viewpo
 
 ---
 
-## Forms — Superforms
+## Linting & Formatting — Biome + Ultracite
 
-Superforms is the standard form library in the SvelteKit ecosystem.
+Biome is the formatting and linting engine. Written in Rust, it replaces the ESLint + Prettier combo with a single binary that handles both concerns. It supports JavaScript, TypeScript, JSON, CSS, HTML and GraphQL out of the box.
 
-- Form schemas defined once with Zod — types flow from schema through server action to component
-- Client and server validation from the same schema, no duplication
-- Progressive enhancement: forms work without JavaScript by default
-- Designed around SvelteKit's load functions and form actions — no adapter needed
+Ultracite is a zero-configuration preset on top of Biome. It ships hundreds of preconfigured rules optimised for modern TypeScript projects, so the developer does not curate rule lists or tweak severity levels. Ultracite supports multiple linter engines (Biome, ESLint, OxLint) — this project uses the Biome backend.
+
+Why this combination:
+
+- **One tool, one config** — Biome replaces ESLint, Prettier, and their plugins with a single `biome.jsonc` file. No plugin compatibility matrix to maintain.
+- **Instant feedback** — Rust-based analysis runs in milliseconds. On-save checks in the editor feel seamless, even on large files.
+- **Zero decisions** — Ultracite provides an opinionated rule set so the developer does not spend time choosing which rules to enable. The Svelte preset (`ultracite/biome/svelte`) covers framework-specific patterns.
+- **AI-ready** — Ultracite is designed to produce consistent output that AI coding agents can follow, reducing style drift in generated code.
+
+The configuration is minimal:
+
+```jsonc
+// biome.jsonc
+{
+  "extends": ["ultracite/biome/core", "ultracite/biome/svelte"]
+}
+```
+
+No custom rules, no overrides. If a specific rule needs adjustment later, it can be added inline in `biome.jsonc` without ejecting from the preset.
+
+---
+
+## Git Hooks — Husky
+
+Husky runs formatting and linting checks on staged files before each commit. This guarantees that every commit pushed to the repository follows the project's code style and passes lint rules — regardless of whether the developer's editor is configured to run Biome on save.
+
+Setup is lightweight: a `pre-commit` hook runs Ultracite's format and lint commands on staged files only (`--staged` flag), so the check takes milliseconds even on a large codebase.
+
+If a hook fails, the commit is blocked. The developer fixes the issues and commits again. No CI pipeline is needed for this concern — it is enforced locally at commit time.
 
 ---
 
@@ -120,7 +146,7 @@ Paraglide JS from the Inlang team is the chosen i18n library. Unlike traditional
 
 - Full type safety — translation keys and their parameters are typed, missing keys are caught at compile time
 - Tree-shaking — only the messages actually used in the bundle are included
-- SvelteKit plugin handles routing automatically: `/fr/...` and `/en/...` are generated from the existing route structure without modification
+- Locale is detected via cookie, falling back to the base locale (French). No URL prefixes are injected — all routes remain language-neutral.
 - Zero runtime overhead — no JSON parsing, no dynamic imports
 
 Messages are stored as JSON files per language:
@@ -140,7 +166,7 @@ m.match_status_live()                  // "En direct" / "Live"
 m.match_score({ home: 2, away: 1 })   // typed parameters
 ```
 
-French is the default language. The `/fr` URL prefix can be omitted for the default locale if desired.
+French is the default language. No URL locale prefix is used.
 
 ---
 

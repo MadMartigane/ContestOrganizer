@@ -1,0 +1,5 @@
+@import "tailwindcss";
+@import "@skeletonlabs/skeleton/themes/cerberus";
+@import "@skeletonlabs/skeleton";
+
+@custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *));
