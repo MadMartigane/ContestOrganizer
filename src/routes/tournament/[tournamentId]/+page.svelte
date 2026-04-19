@@ -7,6 +7,7 @@
   import ConfirmDialog from "$lib/components/confirm-dialog.svelte";
   import ErrorMessage from "$lib/components/error-message.svelte";
   import GridTable from "$lib/components/grid-table.svelte";
+  import NbaMagicFillupButton from "$lib/components/nba-magic-fillup-button.svelte";
   import NumericField from "$lib/components/numeric-field.svelte";
   import TeamSearchDrawer from "$lib/components/team-search-drawer.svelte";
   import TournamentHeader from "$lib/components/tournament-header.svelte";
@@ -16,7 +17,7 @@
     GRID_STEP,
     SPORT_CONFIG,
   } from "$lib/domain/constants";
-  import type { GenericTeam, Tournament } from "$lib/domain/types";
+  import type { GenericTeam, TeamRow, Tournament } from "$lib/domain/types";
   import {
     action_go_match,
     action_ranking,
@@ -128,6 +129,13 @@
     drawerOpen = false;
     selectedSlotId = undefined;
   }
+
+  function handleMagicFillup(newGrid: TeamRow[]): void {
+    saveTournament((t) => ({
+      ...t,
+      grid: newGrid,
+    }));
+  }
 </script>
 
 <svelte:head>
@@ -176,6 +184,11 @@
       >
         🗑 {action_reset()}
       </button>
+      <NbaMagicFillupButton
+        grid={tournament.grid}
+        onFill={handleMagicFillup}
+        sportType={tournament.type}
+      />
       {#if sportConfig?.gridModel === "default"}
         <button type="button" class="btn preset-tonal" onclick={handleRanking}>
           📊 {action_ranking()}

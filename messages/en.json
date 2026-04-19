@@ -67,6 +67,7 @@
   "match_visitor": "Visitor teams",
   "match_visitor_label": "Visitor",
   "match_vs": "VS",
+  "magic_fillup_error": "Failed to load NBA teams.",
   "nba_complete": "Season Complete (82 games)",
   "nba_generate": "Generate All Missing ({count})",
   "nba_generate_confirm": "Generate {count} matches to complete the season?",
