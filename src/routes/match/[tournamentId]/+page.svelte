@@ -20,8 +20,10 @@
     match_auto,
     match_count,
     match_empty,
+    match_home,
     match_new,
     match_no_teams,
+    match_visitor,
     nav_home,
     nav_match,
     nav_tournament,
@@ -229,6 +231,17 @@
     {:else if matchCount === 0}
       <p class="text-center text-surface-500 py-4">{match_empty()}</p>
     {:else}
+      <!-- Match list header: 3-column grid aligned with MatchTile layout -->
+      <div
+        class="grid grid-cols-[3fr_5fr_3fr] text-center text-sm font-semibold text-surface-500 py-2"
+      >
+        <div class="col-span-1">{match_home()}</div>
+        <div class="col-span-1">
+          {sportConfig?.emoji ?? ''} {sportConfig?.label ?? ''}
+        </div>
+        <div class="col-span-1">{match_visitor()}</div>
+      </div>
+
       <MatchList
         {tournament}
         bind:scrollApi={matchListScrollApi}
@@ -242,8 +255,10 @@
     {#if showNewMatch}
       <MatchCreator
         grid={tournament.grid}
+        matches={tournament.matchs}
         onCreateMatch={handleCreateMatch}
         onCancel={() => (showNewMatch = false)}
+        sportType={tournament.type}
       />
     {/if}
 

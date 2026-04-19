@@ -154,3 +154,46 @@ export function autoMatch(grid: TeamRow[], matches: Match[]): Match | null {
 
   return createMatch(hostSlot.id, visitorSlot.id);
 }
+
+/** Per-team match statistics broken down by status */
+export interface TeamMatchStats {
+  /** Matches with DONE status only */
+  played: number;
+  /** Matches with PENDING or DOING status */
+  scheduled: number;
+  /** Total matches across all statuses */
+  total: number;
+}
+
+/**
+ * Build match stats per team from the grid and matches arrays.
+ * Returns a Map keyed by TeamRow.id.
+ * Skips grid slots without a team assignment.
+ */
+export function buildTeamMatchStats(
+  grid: TeamRow[],
+  matches: Match[]
+): Map<string, TeamMatchStats> {
+  const stats = new Map<string, TeamMatchStats>();
+  for (const slot of grid) {
+    if (slot.team === undefined) {
+      continue;
+    }
+    stats.set(slot.id, { total: 0, played: 0, scheduled: 0 });
+  }
+  for (const match of matches) {
+    for (const teamId of [match.hostId, match.visitorId]) {
+      const s = stats.get(teamId);
+      if (!s) {
+        continue;
+      }
+      s.total++;
+      if (match.status === "DONE") {
+        s.played++;
+      } else {
+        s.scheduled++;
+      }
+    }
+  }
+  return stats;
+}
