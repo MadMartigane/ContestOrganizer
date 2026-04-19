@@ -94,3 +94,18 @@ export const validateTeamCount = (
   const clamped = clampTeamCount(count);
   return { value: clamped, wasAdjusted: clamped !== count };
 };
+
+/**
+ * Reset grid stats to zero while preserving team assignments.
+ * Unlike resetGrid() which creates a completely new grid,
+ * this keeps existing teams and only zeros out statistics.
+ */
+export const resetGridStats = (grid: TeamRow[]): TeamRow[] =>
+  grid.map((slot) => ({
+    ...slot,
+    points: 0,
+    scoredGoals: 0,
+    concededGoals: 0,
+    goalAverage: 0,
+    scheduledMatchs: 0,
+  }));
