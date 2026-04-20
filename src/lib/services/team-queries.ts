@@ -17,29 +17,26 @@ import { fetchAllNbaTeams, searchTeams } from "$lib/services/team-search";
 /** Create a TanStack Query hook for team search with cache-first strategy. */
 export const createTeamSearchQuery = (
   sportType: TournamentType,
-  query: string
+  getQuery: () => string
 ) => {
-  return createQuery(() => ({
-    enabled: query.trim().length >= 3,
-    queryFn: async (): Promise<GenericTeam[]> => {
-      // Check localStorage cache first
-      const cached = getCachedTeams(sportType, query);
-      if (cached) {
-        return cached;
-      }
-
-      // Fetch from API
-      const teams = await searchTeams(sportType, query);
-
-      // Store in cache
-      if (teams.length > 0) {
-        setCachedTeams(sportType, query, teams);
-      }
-
-      return teams;
-    },
-    queryKey: ["teams", "search", sportType, query],
-  }));
+  return createQuery(() => {
+    const query = getQuery(); // reactive read inside factory → tracked by Svelte
+    return {
+      enabled: query.trim().length >= 3,
+      queryFn: async (): Promise<GenericTeam[]> => {
+        const cached = getCachedTeams(sportType, query);
+        if (cached) {
+          return cached;
+        }
+        const teams = await searchTeams(sportType, query);
+        if (teams.length > 0) {
+          setCachedTeams(sportType, query, teams);
+        }
+        return teams;
+      },
+      queryKey: ["teams", "search", sportType, query],
+    };
+  });
 };
 
 /** Create a TanStack Query hook for fetching all NBA teams. */

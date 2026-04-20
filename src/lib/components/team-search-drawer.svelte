@@ -27,16 +27,18 @@
   let searchQuery = $state("");
   let debouncedQuery = $state("");
 
-  // Debounce: 300ms after last keystroke
+  // Svelte 5: capture searchQuery synchronously before the async boundary
+  // so $effect tracks it as a dependency. See AGENTS.md "Known Pitfalls".
   $effect(() => {
+    const query = searchQuery; // synchronous read = tracked as dependency
     const timer = setTimeout(() => {
-      debouncedQuery = searchQuery;
+      debouncedQuery = query;
     }, 300);
     return () => clearTimeout(timer);
   });
 
   const isSearchEnabled = $derived(debouncedQuery.trim().length >= 3);
-  const teamQuery = createTeamSearchQuery(sportType, debouncedQuery);
+  const teamQuery = createTeamSearchQuery(sportType, () => debouncedQuery);
 
   const errorType = $derived<ApiErrorType | null>(
     teamQuery.isError && teamQuery.error instanceof TeamSearchError

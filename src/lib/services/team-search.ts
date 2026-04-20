@@ -12,7 +12,6 @@ const API_SPORTS_BASE_URLS: Record<string, string> = {
 };
 
 const THESPORTSDB_BASE_URL = "https://www.thesportsdb.com/api/v1/json/3";
-const NBA_LEAGUE_ID = "4387";
 
 // ──────────────────────────────────────────────────
 // Error Types
@@ -54,7 +53,7 @@ export const searchTeams = (
 
 /** Fetch all NBA teams (used for search and magic fill-up). */
 export const fetchAllNbaTeams = async (): Promise<GenericTeam[]> => {
-  const url = `${THESPORTSDB_BASE_URL}/lookup_all_teams.php?id=${NBA_LEAGUE_ID}`;
+  const url = `${THESPORTSDB_BASE_URL}/search_all_teams.php?l=NBA`;
 
   let response: Response;
   try {

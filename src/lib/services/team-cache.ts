@@ -4,7 +4,7 @@ import type { GenericTeam, TournamentType } from "$lib/domain/types";
 // Cache Configuration
 // ──────────────────────────────────────────────────
 
-const CACHE_KEY = "CONTEST_ORGANIZER_TEAM_CACHE";
+const CACHE_KEY = "CONTEST_ORGANIZER_TEAM_CACHE_V2";
 const NBA_CACHE_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days in ms
 
 interface CacheEntry {
