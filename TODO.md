@@ -56,20 +56,20 @@
 
 ## §19 — Error Handling (Differentiated UI)
 
-- [ ] Network error display: title "Erreur réseau", message "Impossible de contacter le serveur. Vérifie ta connexion."
-- [ ] Network error: show "Réessayer" button (retryable)
-- [ ] Rate limit (HTTP 429) display: title "Trop de requêtes", message "Tu as effectué trop de recherches. Réessaie dans quelques minutes."
-- [ ] Rate limit error: show "Réessayer" button (retryable)
-- [ ] Not found (HTTP 404) display: title "Non trouvé", message "La ressource demandée n'existe pas."
-- [ ] Not found error: no retry button (not retryable)
-- [ ] Server error (HTTP 500+) display: title "Erreur serveur", message "Le serveur rencontre un problème. Réessaie plus tard."
-- [ ] Server error: show "Réessayer" button (retryable)
-- [ ] Client error (other 4xx) display: title "Erreur", message "Une erreur est survenue."
-- [ ] Client error: no retry button (not retryable)
-- [ ] All error displays use red/danger alert banner with warning triangle icon
-- [ ] All error displays show bold title + descriptive message
-- [ ] Retryable errors show "Réessayer" button with refresh icon that re-executes the same search
-- [ ] Error differentiation applied in team search drawer (currently shows generic error text)
+- [x] Network error display: title "Erreur réseau", message "Impossible de contacter le serveur. Vérifie ta connexion."
+- [x] Network error: show "Réessayer" button (retryable)
+- [x] Rate limit (HTTP 429) display: title "Trop de requêtes", message "Tu as effectué trop de recherches. Réessaie dans quelques minutes."
+- [x] Rate limit error: show "Réessayer" button (retryable)
+- [x] Not found (HTTP 404) display: title "Non trouvé", message "La ressource demandée n'existe pas."
+- [x] Not found error: no retry button (not retryable)
+- [x] Server error (HTTP 500+) display: title "Erreur serveur", message "Le serveur rencontre un problème. Réessaie plus tard."
+- [x] Server error: show "Réessayer" button (retryable)
+- [x] Client error (other 4xx) display: title "Erreur", message "Une erreur est survenue."
+- [x] Client error: no retry button (not retryable)
+- [x] All error displays use red/danger alert banner with warning triangle icon
+- [x] All error displays show bold title + descriptive message
+- [x] Retryable errors show "Réessayer" button with refresh icon that re-executes the same search
+- [x] Error differentiation applied in team search drawer (currently shows generic error text)
 
 ---
 
