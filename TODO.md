@@ -41,16 +41,16 @@
 
 ## §6 — Match Page (Match Creator UI)
 
-- [ ] Match list header: 3-column layout — Left (3/11): "Locaux" (Home teams), Center (5/11): sport type label, Right (3/11): "Visiteurs" (Visitor teams)
-- [ ] Match creator displays teams in a selection table layout (not a flat list)
-- [ ] Each row includes a checkbox column for team selection
-- [ ] Each row includes column for total matches (all statuses) per team
-- [ ] Each row includes column for played matches (DONE status) per team
-- [ ] Each row includes column for scheduled matches per team
-- [ ] Teams sorted by: completed matches ASC, then scheduled matches DESC
-- [ ] First team clicked/checked = host, second = visitor
-- [ ] "Valider" button disabled until both host and visitor are selected
-- [ ] "Annuler" button discards the match and closes the selector
+- [x] Match list header: 3-column layout — Left (3/11): "Locaux" (Home teams), Center (5/11): sport type label, Right (3/11): "Visiteurs" (Visitor teams)
+- [x] Match creator displays teams in a selection table layout (not a flat list)
+- [x] Each row includes a checkbox column for team selection
+- [x] Each row includes column for total matches (all statuses) per team
+- [x] Each row includes column for played matches (DONE status) per team
+- [x] Each row includes column for scheduled matches per team
+- [x] Teams sorted by: completed matches ASC, then scheduled matches DESC
+- [x] First team clicked/checked = host, second = visitor
+- [x] "Valider" button disabled until both host and visitor are selected
+- [x] "Annuler" button discards the match and closes the selector
 
 ---
 
