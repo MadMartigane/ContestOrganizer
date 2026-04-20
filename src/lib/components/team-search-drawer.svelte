@@ -3,13 +3,17 @@
   import type { GenericTeam, TournamentType } from "$lib/domain/types";
   import {
     action_cancel,
-    action_retry,
     team_search_loading,
     team_search_no_results,
     team_search_placeholder,
     team_search_title,
   } from "$lib/paraglide/messages";
   import { createTeamSearchQuery } from "$lib/services/team-queries";
+  import {
+    type ApiErrorType,
+    TeamSearchError,
+  } from "$lib/services/team-search";
+  import ApiErrorAlert from "./api-error-alert.svelte";
 
   interface Props {
     onOpenChange: (open: boolean) => void;
@@ -33,6 +37,12 @@
 
   const isSearchEnabled = $derived(debouncedQuery.trim().length >= 3);
   const teamQuery = createTeamSearchQuery(sportType, debouncedQuery);
+
+  const errorType = $derived<ApiErrorType | null>(
+    teamQuery.isError && teamQuery.error instanceof TeamSearchError
+      ? teamQuery.error.type
+      : null
+  );
 
   function handleClose(): void {
     searchQuery = "";
@@ -85,19 +95,10 @@
         <p class="text-surface-500 text-center">{team_search_placeholder()}</p>
       {:else if teamQuery.isFetching}
         <p class="text-surface-500 text-center">{team_search_loading()}</p>
+      {:else if teamQuery.isError && errorType}
+        <ApiErrorAlert type={errorType} onRetry={() => teamQuery.refetch()} />
       {:else if teamQuery.isError}
-        <p class="text-red-500">
-          {teamQuery.error instanceof Error
-            ? teamQuery.error.message
-            : String(teamQuery.error)}
-        </p>
-        <button
-          type="button"
-          class="btn preset-tonal"
-          onclick={() => teamQuery.refetch()}
-        >
-          {action_retry()}
-        </button>
+        <ApiErrorAlert type="client" />
       {:else if teamQuery.data && teamQuery.data.length === 0}
         <p class="text-surface-500 text-center">
           😞 {team_search_no_results()}
