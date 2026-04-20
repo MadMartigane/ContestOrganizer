@@ -100,5 +100,5 @@
 
 ## Appendix C — Known Issues & Edge Cases
 
-- [ ] Win percentage displays NaN (not 0) when a team has zero completed matches
+- [x] Win percentage displays NaN (not 0) when a team has zero completed matches
 - [x] Typo "Acceuil" → "Accueil" on the home button label — fixed in documentation, verify in source when config page is built

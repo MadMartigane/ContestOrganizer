@@ -16,6 +16,7 @@
   "api_error_rate_limit_title": "Too Many Requests",
   "api_error_server_message": "The server is experiencing a problem. Try again later.",
   "api_error_server_title": "Server Error",
+  "app_loading": "Loading…",
   "app_title": "Contest Tournament",
   "app_version": "v{version}",
   "config_cache_clear": "Clear cache",

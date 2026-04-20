@@ -131,3 +131,11 @@ export type ScorerType = keyof typeof POINT_SYSTEMS;
 
 export const STORAGE_KEY_TOURNAMENTS = "CONTEST_ORGANIZER_TOURNAMENTS";
 export const STORAGE_KEY_SETTINGS = "CONTEST_ORGANIZER_SETTING";
+
+// ──────────────────────────────────────────────────
+// Backend API Paths
+// ──────────────────────────────────────────────────
+
+export const BACKEND_LOAD_PATH = "/api/index.php/list/tournaments";
+export const BACKEND_STORE_PATH = "/api/index.php/store/tournaments";
+export const BACKEND_TIMEOUT_MS = 5000;

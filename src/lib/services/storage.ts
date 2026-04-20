@@ -5,6 +5,7 @@ import type {
   TournamentCollection,
   TournamentType,
 } from "$lib/domain/types";
+import { saveToBackend } from "$lib/services/backend-api";
 
 // ──────────────────────────────────────────────────
 // Internal Helpers
@@ -70,6 +71,9 @@ export const loadCollection = (): TournamentCollection => {
  */
 export const saveCollection = (collection: TournamentCollection): boolean => {
   collection.timestamp = Date.now();
+
+  // Fire-and-forget backend save (independent of localStorage result)
+  saveToBackend(collection);
 
   if (!isLocalStorageAvailable()) {
     return false;

@@ -77,6 +77,14 @@ export interface TournamentCollection {
   tournaments: Tournament[];
 }
 
+/** Backend Procedure Pattern response envelope */
+export interface BackendResponse<T> {
+  data?: T;
+  debug?: string;
+  error?: string;
+  procedure: "ERROR" | "OK";
+}
+
 /** Shape stored in localStorage under CONTEST_ORGANIZER_SETTING */
 export interface AppSettings {
   darkMode?: boolean;
