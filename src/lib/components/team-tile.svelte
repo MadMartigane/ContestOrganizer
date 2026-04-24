@@ -64,15 +64,6 @@
     bind:this={containerEl}
     class="flex items-center gap-3 p-3 rounded-lg bg-surface-50-950 hover:bg-surface-100-900 transition-colors {variant === 'reverse' ? 'flex-row-reverse' : ''} max-sm:flex-col max-sm:items-center"
   >
-    <!-- Rank badge -->
-    {#if rank !== undefined}
-      <div
-        class="flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold text-white border {rankBadgeClass}"
-      >
-        {rank}
-      </div>
-    {/if}
-
     <!-- Logo area -->
     <div class="w-1/2 max-w-12 flex-shrink-0 flex items-center justify-center">
       {#if isVisible}
@@ -102,11 +93,42 @@
             xmlns="http://www.w3.org/2000/svg"
           >
             <title>Loading placeholder</title>
-            <circle cx="20" cy="20" r="16" class="stroke-surface-300 dark:stroke-surface-600" stroke-width="1.5" fill="none" />
-            <line x1="20" y1="4" x2="20" y2="36" class="stroke-surface-300 dark:stroke-surface-600" stroke-width="1" />
-            <line x1="4" y1="20" x2="36" y2="20" class="stroke-surface-300 dark:stroke-surface-600" stroke-width="1" />
-            <path d="M8 12 Q20 16 32 12" class="stroke-surface-300 dark:stroke-surface-600" stroke-width="1" fill="none" />
-            <path d="M8 28 Q20 24 32 28" class="stroke-surface-300 dark:stroke-surface-600" stroke-width="1" fill="none" />
+            <circle
+              cx="20"
+              cy="20"
+              r="16"
+              class="stroke-surface-300 dark:stroke-surface-600"
+              stroke-width="1.5"
+              fill="none"
+            />
+            <line
+              x1="20"
+              y1="4"
+              x2="20"
+              y2="36"
+              class="stroke-surface-300 dark:stroke-surface-600"
+              stroke-width="1"
+            />
+            <line
+              x1="4"
+              y1="20"
+              x2="36"
+              y2="20"
+              class="stroke-surface-300 dark:stroke-surface-600"
+              stroke-width="1"
+            />
+            <path
+              d="M8 12 Q20 16 32 12"
+              class="stroke-surface-300 dark:stroke-surface-600"
+              stroke-width="1"
+              fill="none"
+            />
+            <path
+              d="M8 28 Q20 24 32 28"
+              class="stroke-surface-300 dark:stroke-surface-600"
+              stroke-width="1"
+              fill="none"
+            />
           </svg>
 
           <!-- Hidden image preloader -->
@@ -127,19 +149,61 @@
           xmlns="http://www.w3.org/2000/svg"
         >
           <title>Loading placeholder</title>
-          <circle cx="20" cy="20" r="16" class="stroke-surface-300 dark:stroke-surface-600" stroke-width="1.5" fill="none" />
-          <line x1="20" y1="4" x2="20" y2="36" class="stroke-surface-300 dark:stroke-surface-600" stroke-width="1" />
-          <line x1="4" y1="20" x2="36" y2="20" class="stroke-surface-300 dark:stroke-surface-600" stroke-width="1" />
-          <path d="M8 12 Q20 16 32 12" class="stroke-surface-300 dark:stroke-surface-600" stroke-width="1" fill="none" />
-          <path d="M8 28 Q20 24 32 28" class="stroke-surface-300 dark:stroke-surface-600" stroke-width="1" fill="none" />
+          <circle
+            cx="20"
+            cy="20"
+            r="16"
+            class="stroke-surface-300 dark:stroke-surface-600"
+            stroke-width="1.5"
+            fill="none"
+          />
+          <line
+            x1="20"
+            y1="4"
+            x2="20"
+            y2="36"
+            class="stroke-surface-300 dark:stroke-surface-600"
+            stroke-width="1"
+          />
+          <line
+            x1="4"
+            y1="20"
+            x2="36"
+            y2="20"
+            class="stroke-surface-300 dark:stroke-surface-600"
+            stroke-width="1"
+          />
+          <path
+            d="M8 12 Q20 16 32 12"
+            class="stroke-surface-300 dark:stroke-surface-600"
+            stroke-width="1"
+            fill="none"
+          />
+          <path
+            d="M8 28 Q20 24 32 28"
+            class="stroke-surface-300 dark:stroke-surface-600"
+            stroke-width="1"
+            fill="none"
+          />
         </svg>
       {/if}
     </div>
 
     <!-- Team name -->
-    <span class="font-medium text-surface-700 dark:text-surface-300 truncate w-full {variant === 'reverse' ? 'text-right' : ''}">
+    <span
+      class="font-medium text-surface-700 dark:text-surface-300 truncate w-full {variant === 'reverse' ? 'text-right' : ''}"
+    >
       {team.name}
     </span>
+
+    <!-- Rank badge (moved to end) -->
+    {#if rank !== undefined}
+      <div
+        class="flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold text-white border {rankBadgeClass}"
+      >
+        {rank}
+      </div>
+    {/if}
   </div>
 {:else}
   <!-- No team state -->
@@ -157,8 +221,15 @@
 
 <style>
   @keyframes placeholder-pulse {
-    0%, 100% { opacity: 0.3; transform: scale(1); }
-    50% { opacity: 0.6; transform: scale(1.05); }
+    0%,
+    100% {
+      opacity: 0.3;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.6;
+      transform: scale(1.05);
+    }
   }
   .animate-placeholder {
     animation: placeholder-pulse 2s ease-in-out infinite;

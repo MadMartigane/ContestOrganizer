@@ -157,8 +157,11 @@ export function recalculateGridStats(tournament: Tournament): Tournament {
  * Used for basket grid display (win%, played, won, lost).
  */
 export interface BasketTeamStats {
+  concededPoints: number;
   looseGames: number;
   playedGames: number;
+  scheduledMatchs: number;
+  scoredPoints: number;
   slotId: string;
   winGames: number;
   winGamesPercent: number;
@@ -178,18 +181,24 @@ export function computeBasketStats(
       looseGames: 0,
       winGamesPercent: 0,
       playedGames: 0,
+      scoredPoints: 0,
+      concededPoints: 0,
+      scheduledMatchs: 0,
     });
   }
 
   // Compute from DONE matches
   for (const match of matches) {
-    if (match.status !== "DONE") {
-      continue;
-    }
-
     const hostStats = stats.get(match.hostId);
     const visitorStats = stats.get(match.visitorId);
     if (!(hostStats && visitorStats)) {
+      continue;
+    }
+
+    hostStats.scheduledMatchs++;
+    visitorStats.scheduledMatchs++;
+
+    if (match.status !== "DONE") {
       continue;
     }
 
@@ -199,7 +208,11 @@ export function computeBasketStats(
     const hostGoals = match.goals.host;
     const visitorGoals = match.goals.visitor;
 
-    // On tie: visitor wins (basket rule)
+    hostStats.scoredPoints += hostGoals;
+    hostStats.concededPoints += visitorGoals;
+    visitorStats.scoredPoints += visitorGoals;
+    visitorStats.concededPoints += hostGoals;
+
     if (hostGoals > visitorGoals) {
       hostStats.winGames++;
       visitorStats.looseGames++;

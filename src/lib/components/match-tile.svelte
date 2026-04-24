@@ -21,10 +21,12 @@
     match_team_placeholder,
     match_vs,
   } from "$lib/paraglide/messages";
+  import { getRankMap } from "$lib/utils/ranking";
 
   interface Props {
     grid: TeamRow[];
     match: Match;
+    matches: Match[];
     onDelete: (matchId: string) => void;
     onGoalsChange: (matchId: string, goals: MatchGoals) => void;
     onStatusChange: (matchId: string, status: MatchStatus) => void;
@@ -34,6 +36,7 @@
   let {
     match,
     grid,
+    matches,
     sportType,
     onStatusChange,
     onDelete,
@@ -46,6 +49,12 @@
   const visitorTeam = $derived(visitorSlot?.team);
   const statusConfig = $derived(MATCH_STATUS_CONFIG[match.status]);
   const sportConfig = $derived(SPORT_CONFIG[sportType]);
+
+  const rankMap = $derived(getRankMap(grid, matches, sportType));
+  const hostRank = $derived(hostSlot ? rankMap.get(hostSlot.id) : undefined);
+  const visitorRank = $derived(
+    visitorSlot ? rankMap.get(visitorSlot.id) : undefined
+  );
 
   let showDeleteConfirm = $state(false);
 
@@ -123,11 +132,21 @@
   <!-- Teams row -->
   <div class="flex items-center gap-2">
     <div class="flex-1 min-w-0">
-      <TeamTile team={hostTeam} variant="normal" placeholder={match.status === "PENDING" ? match_team_placeholder() : undefined} />
+      <TeamTile
+        team={hostTeam}
+        variant="normal"
+        rank={hostRank}
+        placeholder={match.status === "PENDING" ? match_team_placeholder() : undefined}
+      />
     </div>
     <span class="text-lg font-bold text-surface-500 px-2">{match_vs()}</span>
     <div class="flex-1 min-w-0">
-      <TeamTile team={visitorTeam} variant="reverse" placeholder={match.status === "PENDING" ? match_team_placeholder() : undefined} />
+      <TeamTile
+        team={visitorTeam}
+        variant="reverse"
+        rank={visitorRank}
+        placeholder={match.status === "PENDING" ? match_team_placeholder() : undefined}
+      />
     </div>
   </div>
 
@@ -147,6 +166,13 @@
     <span
       class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium {badgeClass}"
     >
+      {#if match.status === "PENDING"}
+        📅
+      {:else if match.status === "DOING"}
+        ⏳
+      {:else}
+        ✅
+      {/if}
       {statusLabel}
     </span>
   </div>

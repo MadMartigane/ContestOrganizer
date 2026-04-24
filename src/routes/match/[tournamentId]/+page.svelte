@@ -129,7 +129,9 @@
     if (!tournament) {
       return -1;
     }
-    const doingIndex = tournament.matchs.findLastIndex((m) => m.status === "DOING");
+    const doingIndex = tournament.matchs.findLastIndex(
+      (m) => m.status === "DOING"
+    );
     if (doingIndex !== -1) {
       return doingIndex;
     }
@@ -145,9 +147,7 @@
 
   const hasTargetMatch = $derived(targetMatchIndex >= 0);
 
-  const showDock = $derived(
-    scrollPercentage > 2 && (hasTargetMatch || scrollPercentage > 75)
-  );
+  const showDock = $derived(scrollPercentage > 2);
 
   function handleScrollChange(percentage: number): void {
     scrollPercentage = percentage;
@@ -229,7 +229,9 @@
     {#if !hasEnoughTeams}
       <p class="text-center text-surface-500 py-4">{match_no_teams()}</p>
     {:else if matchCount === 0}
-      <p class="text-center text-surface-500 py-4">{match_empty()}</p>
+      <p class="text-center text-warning-600 dark:text-warning-400 py-4">
+        {match_empty()}
+      </p>
     {:else}
       <!-- Match list header: 3-column grid aligned with MatchTile layout -->
       <div

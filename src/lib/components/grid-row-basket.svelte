@@ -22,13 +22,14 @@
   let { onSlotClick, rank, slot, stats }: Props = $props();
 
   const paddedRank = $derived(String(rank).padStart(2, "0"));
-
 </script>
 
 <tr
   class="border-b border-surface-200-800 hover:bg-surface-100-900 transition-colors"
 >
-  <td class="px-2 py-2 text-center text-sm text-surface-600 dark:text-surface-400">
+  <td
+    class="px-2 py-2 text-center text-sm text-surface-600 dark:text-surface-400"
+  >
     {paddedRank}
   </td>
   <td class="px-2 py-2">
@@ -74,9 +75,13 @@
   <td class="px-2 py-2 text-center font-mono text-sm">
     {stats?.looseGames ?? 0}
   </td>
-  <td class="px-2 py-2 text-center font-mono text-sm hidden sm:table-cell">{slot.scoredGoals}</td>
-  <td class="px-2 py-2 text-center font-mono text-sm hidden sm:table-cell">{slot.concededGoals}</td>
+  <td class="px-2 py-2 text-center font-mono text-sm hidden sm:table-cell">
+    {stats?.scoredPoints ?? 0}
+  </td>
+  <td class="px-2 py-2 text-center font-mono text-sm hidden sm:table-cell">
+    {stats?.concededPoints ?? 0}
+  </td>
   <td class="px-2 py-2 text-center font-mono text-sm">
-    {slot.scheduledMatchs}
+    {stats?.scheduledMatchs ?? 0}
   </td>
 </tr>

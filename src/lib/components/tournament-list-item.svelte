@@ -49,6 +49,7 @@
 >
   <div class="flex items-center gap-3">
     <span class="text-2xl">{config.emoji}</span>
+    <span class="text-sm text-surface-500">{config.label}</span>
     <span class="font-medium text-surface-700 dark:text-surface-300"
       >{tournament.name}</span
     >
@@ -61,7 +62,7 @@
   <div class="flex items-center gap-2">
     <button
       type="button"
-      class="btn btn-sm preset-tonal text-error-500"
+      class="btn btn-sm preset-tonal text-warning-500"
       onclick={handleDeleteClick}
       aria-label="Delete"
     >

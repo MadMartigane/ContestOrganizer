@@ -33,10 +33,18 @@
         <Dialog.Title class="text-lg font-bold">{message}</Dialog.Title>
       </div>
       <footer class="flex justify-end gap-2">
-        <button type="button" class="btn preset-tonal" onclick={onCancel}>
+        <button
+          type="button"
+          class="btn btn-lg preset-tonal text-warning-600 dark:text-warning-400"
+          onclick={onCancel}
+        >
           {dialog_cancel()}
         </button>
-        <button type="button" class="btn preset-filled" onclick={onConfirm}>
+        <button
+          type="button"
+          class="btn btn-lg preset-filled"
+          onclick={onConfirm}
+        >
           {dialog_confirm()}
         </button>
       </footer>

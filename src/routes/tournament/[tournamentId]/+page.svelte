@@ -235,6 +235,13 @@
     sportType={tournament.type}
   />
 {:else}
+  <Breadcrumb
+    items={[
+      { emoji: "🏠", label: nav_home(), href: "/home" },
+      { emoji: "🏆", label: nav_tournaments(), href: "/tournaments" },
+      { emoji: "📋", label: nav_tournament() },
+    ]}
+  />
   <ErrorMessage
     description={tournament_not_found({ id: tournamentId })}
     showHomeButton={true}

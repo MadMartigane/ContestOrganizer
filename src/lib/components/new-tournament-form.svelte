@@ -24,7 +24,7 @@
   let { onAdd, onCancel }: Props = $props();
 
   let name = $state("");
-  let selectedSport = $state<TournamentType>(DEFAULT_SPORT);
+  let selectedSport = $state<TournamentType | "">("");
   // biome-ignore lint/suspicious/noUnassignedVariables: Svelte bind:this assigns at runtime
   let nameInputEl: HTMLInputElement | undefined;
 
@@ -35,7 +35,7 @@
     if (!canSubmit) {
       return;
     }
-    onAdd(name.trim(), selectedSport);
+    onAdd(name.trim(), selectedSport || DEFAULT_SPORT);
   }
 
   function handleKeydown(e: KeyboardEvent): void {
@@ -83,6 +83,7 @@
       {sport_selector_label()}
     </label>
     <select id="sport-selector" bind:value={selectedSport} class="select">
+      <option value="" disabled selected>{sport_selector_placeholder()}</option>
       {#each SPORT_OPTIONS as sportType}
         <option value={sportType}>
           {SPORT_CONFIG[sportType].emoji} {SPORT_CONFIG[sportType].label}
@@ -93,7 +94,11 @@
   </div>
 
   <ActionBar>
-    <button type="button" class="btn preset-tonal" onclick={onCancel}>
+    <button
+      type="button"
+      class="btn preset-tonal text-warning-600 dark:text-warning-400"
+      onclick={onCancel}
+    >
       {action_cancel()}
     </button>
     <button

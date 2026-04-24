@@ -46,7 +46,9 @@
       return;
     }
 
-    const doingIndex = tournament.matchs.findLastIndex((m) => m.status === "DOING");
+    const doingIndex = tournament.matchs.findLastIndex(
+      (m) => m.status === "DOING"
+    );
     if (doingIndex !== -1) {
       $virtualizer.scrollToIndex(doingIndex, {
         align: "center",
@@ -130,6 +132,7 @@
         <MatchTile
           match={tournament.matchs[virtualRow.index]}
           grid={tournament.grid}
+          matches={tournament.matchs}
           sportType={tournament.type}
           {onStatusChange}
           {onDelete}

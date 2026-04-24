@@ -149,7 +149,7 @@
     <div class="flex justify-center">
       <button
         type="button"
-        class="btn btn-sm preset-tonal"
+        class="btn btn-sm {isAddMode ? 'preset-tonal' : 'preset-tonal text-warning-600 dark:text-warning-400'}"
         onclick={toggleMode}
       >
         {scoring_add_remove()}

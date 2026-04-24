@@ -1,4 +1,8 @@
-import { NBA_MAX_GAMES_PER_TEAM, NBA_MIN_TEAMS } from "$lib/domain/constants";
+import {
+  NBA_HOME_AWAY_BALANCE,
+  NBA_MAX_GAMES_PER_TEAM,
+  NBA_MIN_TEAMS,
+} from "$lib/domain/constants";
 import type { Match, TeamRow } from "$lib/domain/types";
 import { createMatch } from "$lib/utils/match";
 
@@ -22,6 +26,7 @@ interface NbaTeamScheduleStats {
   gamesByOpponent: Map<string, number>;
   homeGames: number;
   lastMatchIndex: number;
+  opponentHistory: string[];
   remainingGames: number;
   slotId: string;
   totalGames: number;
@@ -49,6 +54,7 @@ function buildScheduleStats(
       gamesByOpponent: new Map<string, number>(),
       homeGames: 0,
       lastMatchIndex: -1,
+      opponentHistory: [],
       remainingGames: NBA_MAX_GAMES_PER_TEAM,
       slotId: row.id,
       totalGames: 0,
@@ -68,6 +74,7 @@ function buildScheduleStats(
 
       const opponentCount = hostStats.gamesByOpponent.get(match.visitorId) ?? 0;
       hostStats.gamesByOpponent.set(match.visitorId, opponentCount + 1);
+      hostStats.opponentHistory.push(match.visitorId);
     }
 
     if (visitorStats) {
@@ -79,6 +86,7 @@ function buildScheduleStats(
 
       const opponentCount = visitorStats.gamesByOpponent.get(match.hostId) ?? 0;
       visitorStats.gamesByOpponent.set(match.hostId, opponentCount + 1);
+      visitorStats.opponentHistory.push(match.hostId);
     }
   }
 
@@ -162,17 +170,39 @@ function calculateRestBonus(opponentRest: number): number {
   return Math.min(opponentRest, 100);
 }
 
+function countInWindow(
+  history: string[],
+  opponentId: string,
+  windowSize: number
+): number {
+  const start = Math.max(0, history.length - windowSize + 1);
+  let count = 0;
+  for (let i = start; i < history.length; i++) {
+    if (history[i] === opponentId) {
+      count++;
+    }
+  }
+  return count;
+}
+
+function violatesWindowConstraint(
+  history: string[],
+  opponentId: string,
+  maxInWindow = 2,
+  windowSize = 5
+): boolean {
+  return countInWindow(history, opponentId, windowSize) >= maxInWindow;
+}
+
 /** Select the best opponent from the pool */
 function selectBestOpponent(
   pool: TeamRow[],
   primaryStats: NbaTeamScheduleStats,
   stats: Map<string, NbaTeamScheduleStats>,
-  currentIndex: number,
-  isFallback: boolean
+  currentIndex: number
 ): TeamRow | undefined {
   let bestOpponentRow: TeamRow | undefined;
   let bestScore = Number.NEGATIVE_INFINITY;
-  const fallbackPenalty = isFallback ? -100_000 : 0;
 
   for (const opponentRow of pool) {
     const opponentStats = stats.get(opponentRow.id);
@@ -187,7 +217,6 @@ function selectBestOpponent(
     const restBonus = calculateRestBonus(opponentRest);
 
     const score =
-      fallbackPenalty +
       10_000 -
       totalGamesBetween * 1000 +
       opponentStats.remainingGames * 10 +
@@ -213,6 +242,18 @@ function determineHomeVisitor(
   const primaryHome = primaryStats?.homeGames ?? 0;
   const opponentHome = opponentStats?.homeGames ?? 0;
 
+  if (
+    primaryHome >= NBA_HOME_AWAY_BALANCE &&
+    opponentHome < NBA_HOME_AWAY_BALANCE
+  ) {
+    return [opponentRow.id, primaryRow.id];
+  }
+  if (
+    opponentHome >= NBA_HOME_AWAY_BALANCE &&
+    primaryHome < NBA_HOME_AWAY_BALANCE
+  ) {
+    return [primaryRow.id, opponentRow.id];
+  }
   if (primaryHome <= opponentHome) {
     return [primaryRow.id, opponentRow.id];
   }
@@ -236,6 +277,7 @@ function updateStatsAfterMatch(
     hostStats.lastMatchIndex = matchIndex;
     const count = hostStats.gamesByOpponent.get(visitorId) ?? 0;
     hostStats.gamesByOpponent.set(visitorId, count + 1);
+    hostStats.opponentHistory.push(visitorId);
   }
 
   if (visitorStats) {
@@ -246,6 +288,7 @@ function updateStatsAfterMatch(
     visitorStats.lastMatchIndex = matchIndex;
     const count = visitorStats.gamesByOpponent.get(hostId) ?? 0;
     visitorStats.gamesByOpponent.set(hostId, count + 1);
+    visitorStats.opponentHistory.push(hostId);
   }
 }
 
@@ -371,25 +414,25 @@ export function generateNbaSchedule(
 
     // Phase 2.2 — Select opponent
     const opponentPool = candidates.filter((row) => row.id !== primaryRow.id);
-
-    const preferredOpponents = opponentPool.filter((row) => {
+    const validPool = opponentPool.filter(
+      (row) =>
+        !violatesWindowConstraint(primaryStats.opponentHistory, row.id, 2, 5)
+    );
+    const preferredOpponents = validPool.filter((row) => {
       const opponentStats = stats.get(row.id);
       if (!opponentStats) {
         return false;
       }
       return computeRest(opponentStats, currentIndex) !== 1;
     });
-
     const poolToUse =
-      preferredOpponents.length > 0 ? preferredOpponents : opponentPool;
-    const isFallback = preferredOpponents.length === 0;
+      preferredOpponents.length > 0 ? preferredOpponents : validPool;
 
     const bestOpponentRow = selectBestOpponent(
       poolToUse,
       primaryStats,
       stats,
-      currentIndex,
-      isFallback
+      currentIndex
     );
 
     if (!bestOpponentRow) {

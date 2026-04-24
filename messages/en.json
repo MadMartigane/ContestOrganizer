@@ -36,6 +36,8 @@
   "grid_col_goal_avg": "Goal average",
   "grid_col_goals_conceded": "Goals −",
   "grid_col_goals_scored": "Goals +",
+  "grid_col_scored": "+",
+  "grid_col_conceded": "−",
   "grid_col_lost": "L",
   "grid_col_played": "P",
   "grid_col_points": "Points",

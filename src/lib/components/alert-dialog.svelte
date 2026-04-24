@@ -32,7 +32,11 @@
         <Dialog.Title class="text-lg font-bold">{message}</Dialog.Title>
       </div>
       <footer class="flex justify-end">
-        <button type="button" class="btn preset-filled" onclick={onClose}>
+        <button
+          type="button"
+          class="btn btn-lg preset-filled"
+          onclick={onClose}
+        >
           {dialog_close()}
         </button>
       </footer>

@@ -4,6 +4,7 @@
   import { SPORT_CONFIG } from "$lib/domain/constants";
   import type { Match, TeamRow, TournamentType } from "$lib/domain/types";
   import {
+    grid_col_conceded,
     grid_col_goal_avg,
     grid_col_goals_conceded,
     grid_col_goals_scored,
@@ -12,6 +13,7 @@
     grid_col_points,
     grid_col_rank,
     grid_col_scheduled,
+    grid_col_scored,
     grid_col_teams,
     grid_col_win_percent,
     grid_col_won,
@@ -78,10 +80,10 @@
             <th class="px-2 py-2 text-center">{grid_col_won()}</th>
             <th class="px-2 py-2 text-center">{grid_col_lost()}</th>
             <th class="px-2 py-2 text-center hidden sm:table-cell">
-              {grid_col_goals_scored()}
+              {grid_col_scored()}
             </th>
             <th class="px-2 py-2 text-center hidden sm:table-cell">
-              {grid_col_goals_conceded()}
+              {grid_col_conceded()}
             </th>
             <th class="px-2 py-2 text-center">{grid_col_scheduled()}</th>
           </tr>
@@ -119,14 +121,15 @@
   </div>
 
   {#if isBasket}
-    <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-surface-500">
+    <div
+      class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-surface-500 sm:hidden"
+    >
       <span><strong>%</strong> {grid_legend_percent()}</span>
       <span><strong>J</strong> {grid_legend_played()}</span>
       <span><strong>G</strong> {grid_legend_won()}</span>
       <span><strong>P</strong> {grid_legend_lost()}</span>
       <span><strong>+</strong> {grid_legend_scored()}</span>
       <span><strong>−</strong> {grid_legend_conceded()}</span>
-      <span><strong>📅</strong> {grid_legend_scheduled()}</span>
     </div>
   {/if}
 {/if}

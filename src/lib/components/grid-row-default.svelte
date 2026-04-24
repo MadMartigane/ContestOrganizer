@@ -20,13 +20,14 @@
   let { onSlotClick, rank, slot }: Props = $props();
 
   const paddedRank = $derived(String(rank).padStart(2, "0"));
-
 </script>
 
 <tr
   class="border-b border-surface-200-800 hover:bg-surface-100-900 transition-colors"
 >
-  <td class="px-2 py-2 text-center text-sm text-surface-600 dark:text-surface-400">
+  <td
+    class="px-2 py-2 text-center text-sm text-surface-600 dark:text-surface-400"
+  >
     {paddedRank}
   </td>
   <td class="px-2 py-2">
@@ -60,10 +61,26 @@
       </button>
     {/if}
   </td>
-  <td class="px-2 py-2 text-center font-mono text-sm text-primary-600 dark:text-primary-400 font-bold">{slot.points}</td>
-  <td class="px-2 py-2 text-center font-mono text-sm text-success-600 dark:text-success-400 hidden sm:table-cell">{slot.scoredGoals}</td>
-  <td class="px-2 py-2 text-center font-mono text-sm text-success-600 dark:text-success-400 hidden sm:table-cell">{slot.concededGoals}</td>
-  <td class="px-2 py-2 text-center font-mono text-sm text-warning-600 dark:text-warning-400 hidden sm:table-cell">{slot.goalAverage}</td>
+  <td
+    class="px-2 py-2 text-center font-mono text-sm text-primary-600 dark:text-primary-400 font-bold"
+  >
+    {slot.points}
+  </td>
+  <td
+    class="px-2 py-2 text-center font-mono text-sm text-success-600 dark:text-success-400 hidden sm:table-cell"
+  >
+    {slot.scoredGoals}
+  </td>
+  <td
+    class="px-2 py-2 text-center font-mono text-sm text-success-600 dark:text-success-400 hidden sm:table-cell"
+  >
+    {slot.concededGoals}
+  </td>
+  <td
+    class="px-2 py-2 text-center font-mono text-sm text-warning-600 dark:text-warning-400 hidden sm:table-cell"
+  >
+    {slot.goalAverage}
+  </td>
   <td class="px-2 py-2 text-center font-mono text-sm">
     {slot.scheduledMatchs}
   </td>
