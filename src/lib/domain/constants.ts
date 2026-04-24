@@ -118,9 +118,9 @@ export const POINTS_LOSS = 0;
 
 /** Point systems per scorer type */
 export const POINT_SYSTEMS = {
-  common: { win: 3, draw: 1, loss: 0 },
-  basket: { win: 1, draw: 0, loss: 0 },
-  rugby: { win: 4, draw: 2, loss: 0 },
+  common: { win: POINTS_WIN, draw: POINTS_DRAW, loss: POINTS_LOSS },
+  basket: { win: POINTS_WIN, draw: POINTS_DRAW, loss: POINTS_LOSS },
+  rugby: { win: POINTS_WIN, draw: POINTS_DRAW, loss: POINTS_LOSS },
 } as const;
 
 export type ScorerType = keyof typeof POINT_SYSTEMS;

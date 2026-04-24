@@ -133,7 +133,13 @@ export const updateTournament = (
     return;
   }
 
-  collection.tournaments[index] = updater(collection.tournaments[index]);
+  const original = collection.tournaments[index];
+  const updated = updater(original);
+  collection.tournaments[index] = {
+    ...updated,
+    id: original.id,
+    type: original.type,
+  };
   collection.tournaments[index].timestamp = Date.now();
   saveCollection(collection);
 

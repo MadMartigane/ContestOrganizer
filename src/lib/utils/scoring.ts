@@ -52,7 +52,7 @@ function applyBasketPoints(
   }
 }
 
-/** Apply points for a rugby scorer type match result */
+/** Apply points for a rugby scorer type match result (visitor wins on tie) */
 function applyRugbyPoints(
   hostSlot: TeamRow | undefined,
   visitorSlot: TeamRow | undefined,
@@ -65,23 +65,8 @@ function applyRugbyPoints(
     if (hostSlot) {
       hostSlot.points += pointSystem.win;
     }
-    if (visitorSlot) {
-      visitorSlot.points += pointSystem.loss;
-    }
-  } else if (hostGoals < visitorGoals) {
-    if (hostSlot) {
-      hostSlot.points += pointSystem.loss;
-    }
-    if (visitorSlot) {
-      visitorSlot.points += pointSystem.win;
-    }
-  } else {
-    if (hostSlot) {
-      hostSlot.points += pointSystem.draw;
-    }
-    if (visitorSlot) {
-      visitorSlot.points += pointSystem.draw;
-    }
+  } else if (visitorSlot) {
+    visitorSlot.points += pointSystem.win;
   }
 }
 

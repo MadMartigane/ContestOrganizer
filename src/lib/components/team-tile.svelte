@@ -2,12 +2,13 @@
   import type { GenericTeam } from "$lib/domain/types";
 
   interface Props {
+    placeholder?: string;
     rank?: number;
     team: GenericTeam | undefined;
     variant?: "normal" | "reverse";
   }
 
-  let { rank, team, variant = "normal" }: Props = $props();
+  let { rank, team, variant = "normal", placeholder }: Props = $props();
 
   // Lazy loading state
   let isVisible = $state(false);
@@ -61,7 +62,7 @@
 {#if team !== undefined}
   <div
     bind:this={containerEl}
-    class="flex items-center gap-3 p-3 rounded-lg bg-surface-50-950 hover:bg-surface-100-900 transition-colors {variant === 'reverse' ? 'flex-row-reverse' : ''}"
+    class="flex items-center gap-3 p-3 rounded-lg bg-surface-50-950 hover:bg-surface-100-900 transition-colors {variant === 'reverse' ? 'flex-row-reverse' : ''} max-sm:flex-col max-sm:items-center"
   >
     <!-- Rank badge -->
     {#if rank !== undefined}
@@ -73,12 +74,12 @@
     {/if}
 
     <!-- Logo area -->
-    <div class="w-12 h-12 flex-shrink-0 flex items-center justify-center">
+    <div class="w-1/2 max-w-12 flex-shrink-0 flex items-center justify-center">
       {#if isVisible}
         {#if logoError}
           <!-- Error state: shield-X icon -->
           <svg
-            class="w-12 h-12 text-error-500"
+            class="w-16 h-16 text-surface-400 dark:text-surface-500"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -91,28 +92,21 @@
           </svg>
         {:else if logoLoaded}
           <!-- Loaded state: actual image -->
-          <img src={team.logo} alt={team.name} class="w-12 h-12 object-contain">
+          <img src={team.logo} alt={team.name} class="w-full object-contain">
         {:else}
           <!-- Loading state: animated SVG placeholder -->
           <svg
-            class="w-10 h-10 {prefersReducedMotion ? '' : 'animate-pulse'}"
+            class="w-10 h-10 {prefersReducedMotion ? 'opacity-80' : 'animate-placeholder'}"
             viewBox="0 0 40 40"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
             <title>Loading placeholder</title>
-            <circle
-              cx="20"
-              cy="20"
-              r="18"
-              class="fill-surface-200 dark:fill-surface-700"
-            />
-            <circle
-              cx="20"
-              cy="20"
-              r="10"
-              class="fill-surface-300 dark:fill-surface-600"
-            />
+            <circle cx="20" cy="20" r="16" class="stroke-surface-300 dark:stroke-surface-600" stroke-width="1.5" fill="none" />
+            <line x1="20" y1="4" x2="20" y2="36" class="stroke-surface-300 dark:stroke-surface-600" stroke-width="1" />
+            <line x1="4" y1="20" x2="36" y2="20" class="stroke-surface-300 dark:stroke-surface-600" stroke-width="1" />
+            <path d="M8 12 Q20 16 32 12" class="stroke-surface-300 dark:stroke-surface-600" stroke-width="1" fill="none" />
+            <path d="M8 28 Q20 24 32 28" class="stroke-surface-300 dark:stroke-surface-600" stroke-width="1" fill="none" />
           </svg>
 
           <!-- Hidden image preloader -->
@@ -121,36 +115,29 @@
             alt=""
             class="hidden"
             onload={() => { logoLoaded = true; }}
-            onerror={() => { logoError = true; }}
+            onerror={() => { logoError = true; console.warn('Failed to load team logo:', team.logo); }}
           >
         {/if}
       {:else}
         <!-- Not yet in viewport: animated SVG placeholder -->
         <svg
-          class="w-10 h-10 {prefersReducedMotion ? '' : 'animate-pulse'}"
+          class="w-10 h-10 {prefersReducedMotion ? 'opacity-80' : 'animate-placeholder'}"
           viewBox="0 0 40 40"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
           <title>Loading placeholder</title>
-          <circle
-            cx="20"
-            cy="20"
-            r="18"
-            class="fill-surface-200 dark:fill-surface-700"
-          />
-          <circle
-            cx="20"
-            cy="20"
-            r="10"
-            class="fill-surface-300 dark:fill-surface-600"
-          />
+          <circle cx="20" cy="20" r="16" class="stroke-surface-300 dark:stroke-surface-600" stroke-width="1.5" fill="none" />
+          <line x1="20" y1="4" x2="20" y2="36" class="stroke-surface-300 dark:stroke-surface-600" stroke-width="1" />
+          <line x1="4" y1="20" x2="36" y2="20" class="stroke-surface-300 dark:stroke-surface-600" stroke-width="1" />
+          <path d="M8 12 Q20 16 32 12" class="stroke-surface-300 dark:stroke-surface-600" stroke-width="1" fill="none" />
+          <path d="M8 28 Q20 24 32 28" class="stroke-surface-300 dark:stroke-surface-600" stroke-width="1" fill="none" />
         </svg>
       {/if}
     </div>
 
     <!-- Team name -->
-    <span class="font-medium text-surface-700 dark:text-surface-300 truncate">
+    <span class="font-medium text-surface-700 dark:text-surface-300 truncate w-full {variant === 'reverse' ? 'text-right' : ''}">
       {team.name}
     </span>
   </div>
@@ -159,7 +146,21 @@
   <div
     class="flex items-center gap-3 p-3 rounded-lg bg-surface-50-950 opacity-60"
   >
-    <span class="text-3xl">⏳</span>
-    <span class="text-surface-500 text-sm">—</span>
+    {#if placeholder}
+      <span class="text-sm text-surface-500 italic">{placeholder}</span>
+    {:else}
+      <span class="text-3xl">⏳</span>
+      <span class="text-surface-500 text-sm">—</span>
+    {/if}
   </div>
 {/if}
+
+<style>
+  @keyframes placeholder-pulse {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.05); }
+  }
+  .animate-placeholder {
+    animation: placeholder-pulse 2s ease-in-out infinite;
+  }
+</style>

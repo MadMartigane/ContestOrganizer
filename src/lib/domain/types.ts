@@ -60,11 +60,11 @@ export interface Match {
 /** Tournament aggregate root */
 export interface Tournament {
   grid: TeamRow[];
-  id: string;
+  readonly id: string;
   matchs: Match[];
   name: string;
   timestamp: number;
-  type: TournamentType;
+  readonly type: TournamentType;
 }
 
 // ──────────────────────────────────────────────────

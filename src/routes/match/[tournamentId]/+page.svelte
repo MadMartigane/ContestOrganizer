@@ -129,7 +129,7 @@
     if (!tournament) {
       return -1;
     }
-    const doingIndex = tournament.matchs.findIndex((m) => m.status === "DOING");
+    const doingIndex = tournament.matchs.findLastIndex((m) => m.status === "DOING");
     if (doingIndex !== -1) {
       return doingIndex;
     }

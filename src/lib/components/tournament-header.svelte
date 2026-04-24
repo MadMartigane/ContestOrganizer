@@ -23,17 +23,15 @@
 
   function saveEdit(): void {
     const trimmed = editValue.trim();
-    if (trimmed.length >= 3) {
+    if (trimmed.length > 0) {
       onNameChange(trimmed);
     }
     isEditing = false;
   }
 
   function handleKeydown(e: KeyboardEvent): void {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" || e.key === "Escape") {
       saveEdit();
-    } else if (e.key === "Escape") {
-      isEditing = false;
     }
   }
 </script>

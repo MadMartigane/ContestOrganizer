@@ -18,6 +18,7 @@
     match_status_done,
     match_status_pending,
     match_stop,
+    match_team_placeholder,
     match_vs,
   } from "$lib/paraglide/messages";
 
@@ -122,11 +123,11 @@
   <!-- Teams row -->
   <div class="flex items-center gap-2">
     <div class="flex-1 min-w-0">
-      <TeamTile team={hostTeam} variant="normal" />
+      <TeamTile team={hostTeam} variant="normal" placeholder={match.status === "PENDING" ? match_team_placeholder() : undefined} />
     </div>
     <span class="text-lg font-bold text-surface-500 px-2">{match_vs()}</span>
     <div class="flex-1 min-w-0">
-      <TeamTile team={visitorTeam} variant="reverse" />
+      <TeamTile team={visitorTeam} variant="reverse" placeholder={match.status === "PENDING" ? match_team_placeholder() : undefined} />
     </div>
   </div>
 

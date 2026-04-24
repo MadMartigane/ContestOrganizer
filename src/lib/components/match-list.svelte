@@ -37,7 +37,7 @@
     estimateSize: () => 120,
   });
 
-  // Auto-scroll on load: first DOING match, then last DONE match
+  // Auto-scroll on load: last DOING match, fallback last DONE match
   $effect(() => {
     if (autoScrollDone) {
       return;
@@ -46,7 +46,7 @@
       return;
     }
 
-    const doingIndex = tournament.matchs.findIndex((m) => m.status === "DOING");
+    const doingIndex = tournament.matchs.findLastIndex((m) => m.status === "DOING");
     if (doingIndex !== -1) {
       $virtualizer.scrollToIndex(doingIndex, {
         align: "center",

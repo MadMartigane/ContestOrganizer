@@ -48,7 +48,7 @@
       return [1, 2, 3];
     }
     if (scorerType === "rugby") {
-      return [2, 3, 5];
+      return [3, 5, 7];
     }
     return [1];
   }

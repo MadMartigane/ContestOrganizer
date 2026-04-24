@@ -26,6 +26,7 @@
 
   let searchQuery = $state("");
   let debouncedQuery = $state("");
+  let resultsRef = $state<HTMLDivElement | undefined>(undefined);
 
   // Svelte 5: capture searchQuery synchronously before the async boundary
   // so $effect tracks it as a dependency. See AGENTS.md "Known Pitfalls".
@@ -35,6 +36,16 @@
       debouncedQuery = query;
     }, 300);
     return () => clearTimeout(timer);
+  });
+
+  // Auto-scroll to results when they load
+  $effect(() => {
+    const data = teamQuery.data; // synchronous read = tracked as dependency
+    if (data && data.length > 0 && resultsRef) {
+      requestAnimationFrame(() => {
+        resultsRef?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
   });
 
   const isSearchEnabled = $derived(debouncedQuery.trim().length >= 3);
@@ -106,6 +117,7 @@
           😞 {team_search_no_results()}
         </p>
       {:else if teamQuery.data}
+        <div bind:this={resultsRef}>
         {#each teamQuery.data as team (team.id)}
           <button
             type="button"
@@ -133,6 +145,7 @@
             </div>
           </button>
         {/each}
+        </div>
       {/if}
 
       <!-- Cancel button -->
