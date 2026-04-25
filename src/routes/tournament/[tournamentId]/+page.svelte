@@ -165,6 +165,7 @@
         max={GRID_MAX_TEAMS}
         step={GRID_STEP}
         value={teamCount}
+        placeholder="4"
         onchange={handleResizeGrid}
       />
     </div>
@@ -184,11 +185,6 @@
       >
         🗑 {action_reset()}
       </button>
-      <NbaMagicFillupButton
-        grid={tournament.grid}
-        onFill={handleMagicFillup}
-        sportType={tournament.type}
-      />
       {#if sportConfig?.gridModel === "default"}
         <button type="button" class="btn preset-tonal" onclick={handleRanking}>
           📊 {action_ranking()}
@@ -197,6 +193,11 @@
       <a href="/match/{tournamentId}" class="btn preset-filled">
         🎮 {action_go_match()}
       </a>
+      <NbaMagicFillupButton
+        grid={tournament.grid}
+        onFill={handleMagicFillup}
+        sportType={tournament.type}
+      />
     </ActionBar>
 
     <hr class="hr">

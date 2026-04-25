@@ -54,7 +54,7 @@
   "grid_legend_scored": "Marqués",
   "grid_legend_scheduled": "Programmés",
   "grid_legend_won": "Gagnés",
-  "grid_reset_confirm": "Es-tu sûre de vouloir effacer les noms, ainsi que les scores de toutes les équipes ?",
+  "grid_reset_confirm": "Es-tu sûre de vouloir effacer les noms, ainsi que les scores de toutes les équipes\u202F?",
   "home_config": "Configuration",
   "home_tournaments": "Tournois",
   "match_auto": "Auto-Match",

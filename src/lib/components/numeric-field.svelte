@@ -4,6 +4,7 @@
     max?: number;
     min?: number;
     onchange: (value: number) => void;
+    placeholder?: string;
     readonly?: boolean;
     step?: number;
     value: number;
@@ -15,6 +16,7 @@
     min = 0,
     onchange,
     readonly = false,
+    placeholder = "",
     step = 1,
     value = $bindable(),
   }: Props = $props();
@@ -80,6 +82,7 @@
       {max}
       {step}
       {readonly}
+      {placeholder}
       bind:value
       oninput={handleInput}
       onblur={handleBlur}

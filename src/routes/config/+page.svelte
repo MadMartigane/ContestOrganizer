@@ -44,7 +44,7 @@
 
 <!-- Team Cache Section -->
 <section class="card bg-surface-50-950 p-5">
-  <h2 class="text-lg font-bold">🗂️ {config_cache_heading()}</h2>
+  <h2 class="text-lg font-bold">{config_cache_heading()}</h2>
   <p class="text-surface-500 mt-1 text-sm">{config_cache_description()}</p>
   <button
     type="button"

@@ -17,11 +17,10 @@ function timeout(ms: number): Promise<never> {
 
 /**
  * Initialize tournament sync.
- * 1. Load localStorage collection synchronously.
- * 2. Fetch backend collection with timeout.
- * 3. Merge both sources.
- * 4. Persist merged result via saveCollection (dual persistence).
- * 5. Return merged collection.
+ * 1. Load local and backend concurrently.
+ * 2. Merge both sources.
+ * 3. Persist merged result via saveCollection (dual persistence).
+ * 4. Return merged collection.
  *
  * Guards against double initialization.
  */
@@ -30,24 +29,21 @@ export async function initializeSync(): Promise<TournamentCollection> {
     return loadCollection();
   }
 
-  // 1. Load local (synchronous)
-  const local = loadCollection();
+  // 1. Load local and backend concurrently
+  const [local, backend] = await Promise.all([
+    Promise.resolve(loadCollection()),
+    Promise.race([fetchBackendCollection(), timeout(BACKEND_TIMEOUT_MS)]).catch(
+      () => {
+        console.warn("Backend sync timed out or failed — using local data.");
+        return null;
+      }
+    ),
+  ]);
 
-  // 2. Load backend with timeout
-  let backend: TournamentCollection | null = null;
-  try {
-    backend = await Promise.race([
-      fetchBackendCollection(),
-      timeout(BACKEND_TIMEOUT_MS),
-    ]);
-  } catch {
-    console.warn("Backend sync timed out or failed — using local data.");
-  }
-
-  // 3. Merge
+  // 2. Merge
   const merged = mergeCollections(local, backend);
 
-  // 4. Persist (saveCollection handles dual: localStorage + backend)
+  // 3. Persist (saveCollection handles dual: localStorage + backend)
   saveCollection(merged);
 
   initialized = true;
