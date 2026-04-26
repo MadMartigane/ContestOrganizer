@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
   import { page } from "$app/stores";
   import ActionBar from "$lib/components/action-bar.svelte";
   import Breadcrumb from "$lib/components/breadcrumb.svelte";
@@ -73,15 +73,17 @@
     tournament ? isNbaSeasonComplete(tournament.grid, tournament.matchs) : false
   );
 
-  function handleCreateMatch(match: Match): void {
+  async function handleCreateMatch(match: Match): Promise<void> {
     saveTournament((t) => ({
       ...t,
       matchs: [...t.matchs, match],
     }));
     showNewMatch = false;
+    await tick();
+    setTimeout(() => matchListScrollApi?.scrollToBottom(), 100);
   }
 
-  function handleAutoMatch(): void {
+  async function handleAutoMatch(): Promise<void> {
     if (!tournament) {
       return;
     }
@@ -91,10 +93,12 @@
         ...t,
         matchs: [...t.matchs, match],
       }));
+      await tick();
+      setTimeout(() => matchListScrollApi?.scrollToBottom(), 100);
     }
   }
 
-  function handleNbaGenerate(newMatches: Match[]): void {
+  async function handleNbaGenerate(newMatches: Match[]): Promise<void> {
     if (!tournament) {
       return;
     }
@@ -102,6 +106,8 @@
       ...t,
       matchs: [...t.matchs, ...newMatches],
     }));
+    await tick();
+    setTimeout(() => matchListScrollApi?.scrollToBottom(), 100);
   }
 
   function handleStatusChange(matchId: string, status: MatchStatus): void {
