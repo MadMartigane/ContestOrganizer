@@ -57,7 +57,10 @@
   });
 
   const isSearchEnabled = $derived(debouncedQuery.trim().length >= 3);
-  const teamQuery = createTeamSearchQuery(sportType, () => debouncedQuery);
+  const teamQuery = createTeamSearchQuery(
+    () => sportType,
+    () => debouncedQuery
+  );
 
   const errorType = $derived<ApiErrorType | null>(
     teamQuery.isError && teamQuery.error instanceof TeamSearchError
