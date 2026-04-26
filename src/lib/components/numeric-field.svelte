@@ -10,6 +10,11 @@
     value: number;
   }
 
+  let numericFieldIdCounter = 0;
+  function generateNumericFieldId(): string {
+    return `nf-${++numericFieldIdCounter}`;
+  }
+
   let {
     label,
     max = 100,
@@ -20,6 +25,8 @@
     step = 1,
     value = $bindable(),
   }: Props = $props();
+
+  const inputId = generateNumericFieldId();
 
   let previousValid: number = $state(value);
 
@@ -63,7 +70,9 @@
 </script>
 
 <div class="flex flex-col gap-1">
-  <label class="text-sm font-medium text-surface-700 dark:text-surface-300"
+  <label
+    for={inputId}
+    class="text-sm font-medium text-surface-700 dark:text-surface-300"
     >{label}</label
   >
   <div class="flex items-center gap-1">
@@ -77,6 +86,7 @@
       −
     </button>
     <input
+      id={inputId}
       type="number"
       {min}
       {max}

@@ -32,7 +32,7 @@
   let autoScrollDone = $state(false);
 
   const virtualizer = createVirtualizer({
-    count: tournament.matchs.length,
+    count: 0,
     getScrollElement: () => scrollElement ?? null,
     estimateSize: () => 240,
   });

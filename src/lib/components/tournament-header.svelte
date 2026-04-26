@@ -55,11 +55,10 @@
       aria-label={tournament_edit_name()}
     >
   {:else}
-    <h1
-      class="text-xl font-bold cursor-pointer hover:text-primary-500 dark:hover:text-primary-400 transition-colors truncate"
+    <button
+      type="button"
+      class="text-xl font-bold cursor-pointer hover:text-primary-500 dark:hover:text-primary-400 transition-colors truncate bg-transparent border-0 p-0 m-0"
       onclick={startEditing}
-      role="button"
-      tabindex="0"
       onkeydown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           startEditing();
@@ -68,6 +67,6 @@
       title={tournament_edit_name()}
     >
       {name}
-    </h1>
+    </button>
   {/if}
 </div>

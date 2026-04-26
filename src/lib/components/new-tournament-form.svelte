@@ -39,10 +39,6 @@
   }
 
   function handleKeydown(e: KeyboardEvent): void {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleSubmit();
-    }
     if (e.key === "ArrowDown") {
       e.preventDefault();
       const selectEl = document.getElementById("sport-selector");
@@ -57,7 +53,10 @@
   });
 </script>
 
-<div class="card bg-surface-50-950 p-4 space-y-4" onkeydown={handleKeydown}>
+<form
+  class="card bg-surface-50-950 p-4 space-y-4"
+  onsubmit={(e) => { e.preventDefault(); handleSubmit(); }}
+>
   <div class="flex flex-col gap-2">
     <label
       for="tournament-name"
@@ -70,6 +69,7 @@
       type="text"
       bind:this={nameInputEl}
       bind:value={name}
+      onkeydown={handleKeydown}
       placeholder={tournament_name_placeholder()}
       class="input"
     >
@@ -110,4 +110,4 @@
       {action_add()}
     </button>
   </ActionBar>
-</div>
+</form>
