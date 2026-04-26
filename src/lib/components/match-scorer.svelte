@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Switch } from "@skeletonlabs/skeleton-svelte";
   import type { MatchGoals } from "$lib/domain/types";
   import { scoring_add_remove } from "$lib/paraglide/messages";
 
@@ -29,10 +30,6 @@
     }
 
     onGoalsChange({ host: newHost, visitor: newVisitor });
-  }
-
-  function toggleMode(): void {
-    isAddMode = !isAddMode;
   }
 
   function getModeMultiplier(): number {
@@ -149,14 +146,17 @@
   <!-- Toggle for basket/rugby -->
   {#if scorerType !== "common"}
     <div class="flex justify-center">
-      <button
-        type="button"
-        class="btn {isAddMode ? 'preset-tonal' : 'preset-tonal text-warning-600 dark:text-warning-400'}"
-        onclick={toggleMode}
+      <Switch
+        checked={isAddMode}
+        onCheckedChange={(e) => (isAddMode = e.checked)}
       >
-        {scoring_add_remove()}
-        ({isAddMode ? "+" : "−"})
-      </button>
+        <Switch.Control><Switch.Thumb /></Switch.Control>
+        <Switch.Label>
+          {scoring_add_remove()}
+          ({isAddMode ? "+" : "−"})
+        </Switch.Label>
+        <Switch.HiddenInput />
+      </Switch>
     </div>
   {/if}
 </div>
