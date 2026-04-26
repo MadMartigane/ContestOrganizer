@@ -80,7 +80,9 @@
     }));
     showNewMatch = false;
     await tick();
-    setTimeout(() => matchListScrollApi?.scrollToBottom(), 100);
+    requestAnimationFrame(() => {
+      matchListScrollApi?.scrollToBottom();
+    });
   }
 
   async function handleAutoMatch(): Promise<void> {
@@ -94,7 +96,9 @@
         matchs: [...t.matchs, match],
       }));
       await tick();
-      setTimeout(() => matchListScrollApi?.scrollToBottom(), 100);
+      requestAnimationFrame(() => {
+        matchListScrollApi?.scrollToBottom();
+      });
     }
   }
 
@@ -107,7 +111,9 @@
       matchs: [...t.matchs, ...newMatches],
     }));
     await tick();
-    setTimeout(() => matchListScrollApi?.scrollToBottom(), 100);
+    requestAnimationFrame(() => {
+      matchListScrollApi?.scrollToBottom();
+    });
   }
 
   function handleStatusChange(matchId: string, status: MatchStatus): void {
@@ -187,7 +193,7 @@
         {
           emoji: "📋",
           label: tournament.name,
-          href: "/tournament/{tournamentId}",
+          href: `/tournament/${tournamentId}`,
         },
         { emoji: "🎮", label: nav_match() },
       ]}

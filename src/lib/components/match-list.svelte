@@ -57,56 +57,52 @@
     if (autoScrollDone) {
       return;
     }
-    if (!scrollElement || tournament.matchs.length === 0) {
+    const matches = tournament.matchs;
+    const el = scrollElement;
+
+    if (!el || matches.length === 0) {
       return;
     }
 
-    const doingIndex = tournament.matchs.findLastIndex(
-      (m) => m.status === "DOING"
-    );
-    if (doingIndex !== -1) {
-      get(virtualizer).scrollToIndex(doingIndex, {
-        align: "center",
-        behavior: "smooth",
-      });
+    const doingIndex = matches.findLastIndex((m) => m.status === "DOING");
+    const targetIndex =
+      doingIndex === -1
+        ? matches.findLastIndex((m) => m.status === "DONE")
+        : doingIndex;
+
+    if (targetIndex === -1) {
       autoScrollDone = true;
       return;
     }
 
-    let doneIndex = -1;
-    for (let i = tournament.matchs.length - 1; i >= 0; i--) {
-      if (tournament.matchs[i].status === "DONE") {
-        doneIndex = i;
-        break;
+    requestAnimationFrame(() => {
+      const v = get(virtualizer);
+      if (targetIndex < v.options.count) {
+        v.scrollToIndex(targetIndex, { align: "center", behavior: "auto" });
       }
-    }
-    if (doneIndex !== -1) {
-      get(virtualizer).scrollToIndex(doneIndex, {
-        align: "center",
-        behavior: "smooth",
-      });
-    }
-    autoScrollDone = true;
+      autoScrollDone = true;
+    });
   });
 
   // Populate scrollApi for external navigation
   scrollApi = {
     scrollToBottom: () => {
-      if (scrollElement) {
-        scrollElement.scrollTo({
-          behavior: "smooth",
-          top: scrollElement.scrollHeight,
-        });
+      const v = get(virtualizer);
+      const lastIndex = v.options.count - 1;
+      if (lastIndex < 0) {
+        return;
       }
+      v.scrollToIndex(lastIndex, { align: "end", behavior: "auto" });
     },
     scrollToIndex: (
       index: number,
       align: "center" | "end" | "start" = "center"
     ) => {
-      const virtualizerInstance = get(virtualizer);
-      if (virtualizerInstance) {
-        virtualizerInstance.scrollToIndex(index, { align, behavior: "smooth" });
+      const v = get(virtualizer);
+      if (index < 0 || index >= v.options.count) {
+        return;
       }
+      v.scrollToIndex(index, { align, behavior: "auto" });
     },
     scrollToTop: () => {
       scrollElement?.scrollTo({ behavior: "smooth", top: 0 });
