@@ -129,6 +129,21 @@
 </script>
 
 <div class="card bg-surface-100-900 p-4 space-y-3">
+  <!-- Status badge -->
+  <div class="flex items-center justify-center">
+    <span
+      class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium {badgeClass}"
+    >
+      {#if match.status === "PENDING"}
+        📅
+      {:else if match.status === "DOING"}
+        ⏳
+      {:else}
+        ✅
+      {/if}
+      {statusLabel}
+    </span>
+  </div>
   <!-- Teams row -->
   <div class="flex items-center gap-2">
     <div class="flex-1 min-w-0">
@@ -150,34 +165,7 @@
     </div>
   </div>
 
-  <!-- Score display -->
-  <div class="flex items-center justify-center gap-4 text-2xl font-bold">
-    <span class="text-primary-600 dark:text-primary-400"
-      >{match.goals.host}</span
-    >
-    <span class="text-surface-500">-</span>
-    <span class="text-secondary-600 dark:text-secondary-400"
-      >{match.goals.visitor}</span
-    >
-  </div>
-
-  <!-- Status badge -->
-  <div class="flex items-center justify-center">
-    <span
-      class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium {badgeClass}"
-    >
-      {#if match.status === "PENDING"}
-        📅
-      {:else if match.status === "DOING"}
-        ⏳
-      {:else}
-        ✅
-      {/if}
-      {statusLabel}
-    </span>
-  </div>
-
-  <!-- Scorer (only when DOING) -->
+  <!-- Score display / Scorer -->
   {#if match.status === "DOING"}
     <MatchScorer
       goals={match.goals}
@@ -185,6 +173,16 @@
       disabled={false}
       onGoalsChange={handleGoalsChange}
     />
+  {:else}
+    <div class="flex items-center justify-center gap-4 text-2xl font-bold">
+      <span class="text-primary-600 dark:text-primary-400"
+        >{match.goals.host}</span
+      >
+      <span class="text-surface-500">-</span>
+      <span class="text-secondary-600 dark:text-secondary-400"
+        >{match.goals.visitor}</span
+      >
+    </div>
   {/if}
 
   <!-- Action buttons -->

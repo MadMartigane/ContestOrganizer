@@ -1,10 +1,6 @@
 <script lang="ts">
   import type { MatchGoals } from "$lib/domain/types";
-  import {
-    match_host_label,
-    match_visitor_label,
-    scoring_add_remove,
-  } from "$lib/paraglide/messages";
+  import { scoring_add_remove } from "$lib/paraglide/messages";
 
   interface Props {
     disabled: boolean;
@@ -63,37 +59,33 @@
   }
 </script>
 
-<div class="space-y-3">
-  <!-- Host row -->
-  <div class="flex items-center gap-2">
-    <span
-      class="text-sm font-medium text-surface-700 dark:text-surface-300 w-20 truncate"
-    >
-      {match_host_label()}
-    </span>
+<div class="space-y-2">
+  <!-- Inline score line: [host buttons] [host score] - [visitor score] [visitor buttons] -->
+  <div class="flex items-center justify-center gap-2 text-2xl font-bold">
+    <!-- Host buttons -->
     <div class="flex gap-1">
       {#if scorerType === "common"}
         <button
           type="button"
-          class="btn btn-sm preset-tonal"
+          class="btn preset-tonal"
           disabled={disabled || goals.host <= 0}
           onclick={() => adjustScore("host", -1)}
         >
-          −1
+          −
         </button>
         <button
           type="button"
-          class="btn btn-sm preset-filled"
+          class="btn preset-filled"
           {disabled}
           onclick={() => adjustScore("host", 1)}
         >
-          +1
+          +
         </button>
       {:else}
         {#each getSteps() as step}
           <button
             type="button"
-            class="btn btn-sm {isAddMode ? 'preset-filled' : 'preset-tonal'}"
+            class="btn {isAddMode ? 'preset-filled' : 'preset-tonal'}"
             {disabled}
             onclick={() => adjustScore("host", step * getModeMultiplier())}
           >
@@ -102,38 +94,48 @@
         {/each}
       {/if}
     </div>
-  </div>
 
-  <!-- Visitor row -->
-  <div class="flex items-center gap-2">
+    <!-- Host score -->
     <span
-      class="text-sm font-medium text-surface-700 dark:text-surface-300 w-20 truncate"
+      class="text-primary-600 dark:text-primary-400 min-w-[1.5ch] text-center"
     >
-      {match_visitor_label()}
+      {goals.host}
     </span>
+
+    <!-- Separator -->
+    <span class="text-surface-500">-</span>
+
+    <!-- Visitor score -->
+    <span
+      class="text-secondary-600 dark:text-secondary-400 min-w-[1.5ch] text-center"
+    >
+      {goals.visitor}
+    </span>
+
+    <!-- Visitor buttons -->
     <div class="flex gap-1">
       {#if scorerType === "common"}
         <button
           type="button"
-          class="btn btn-sm preset-tonal"
+          class="btn preset-tonal"
           disabled={disabled || goals.visitor <= 0}
           onclick={() => adjustScore("visitor", -1)}
         >
-          −1
+          −
         </button>
         <button
           type="button"
-          class="btn btn-sm preset-filled"
+          class="btn preset-filled"
           {disabled}
           onclick={() => adjustScore("visitor", 1)}
         >
-          +1
+          +
         </button>
       {:else}
         {#each getSteps() as step}
           <button
             type="button"
-            class="btn btn-sm {isAddMode ? 'preset-filled' : 'preset-tonal'}"
+            class="btn {isAddMode ? 'preset-filled' : 'preset-tonal'}"
             {disabled}
             onclick={() => adjustScore("visitor", step * getModeMultiplier())}
           >
@@ -149,7 +151,7 @@
     <div class="flex justify-center">
       <button
         type="button"
-        class="btn btn-sm {isAddMode ? 'preset-tonal' : 'preset-tonal text-warning-600 dark:text-warning-400'}"
+        class="btn {isAddMode ? 'preset-tonal' : 'preset-tonal text-warning-600 dark:text-warning-400'}"
         onclick={toggleMode}
       >
         {scoring_add_remove()}

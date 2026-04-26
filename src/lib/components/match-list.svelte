@@ -34,7 +34,22 @@
   const virtualizer = createVirtualizer({
     count: tournament.matchs.length,
     getScrollElement: () => scrollElement ?? null,
-    estimateSize: () => 120,
+    estimateSize: () => 240,
+  });
+
+  // biome-ignore lint/correctness/noUnusedVariables: used via Svelte `use:` directive
+  function measureItem(el: HTMLElement) {
+    get(virtualizer).measureElement(el);
+  }
+
+  $effect(() => {
+    const matchCount = tournament.matchs.length;
+    const currentScrollElement = scrollElement;
+
+    get(virtualizer).setOptions({
+      count: matchCount,
+      getScrollElement: () => currentScrollElement ?? null,
+    });
   });
 
   // Auto-scroll on load: last DOING match, fallback last DONE match
@@ -50,7 +65,7 @@
       (m) => m.status === "DOING"
     );
     if (doingIndex !== -1) {
-      $virtualizer.scrollToIndex(doingIndex, {
+      get(virtualizer).scrollToIndex(doingIndex, {
         align: "center",
         behavior: "smooth",
       });
@@ -66,7 +81,7 @@
       }
     }
     if (doneIndex !== -1) {
-      $virtualizer.scrollToIndex(doneIndex, {
+      get(virtualizer).scrollToIndex(doneIndex, {
         align: "center",
         behavior: "smooth",
       });
@@ -120,12 +135,13 @@
 <div
   bind:this={scrollElement}
   class="overflow-y-auto"
-  style="max-height: 70vh;"
+  style="max-height: 70vh; min-height: 200px;"
   onscroll={handleScroll}
 >
   <div style="height: {$virtualizer.getTotalSize()}px; position: relative;">
     {#each $virtualizer.getVirtualItems() as virtualRow (virtualRow.key)}
       <div
+        use:measureItem
         style="position: absolute; top: 0; left: 0; width: 100%; transform: translateY({virtualRow.start}px);"
         data-index={virtualRow.index}
       >
