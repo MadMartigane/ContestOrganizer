@@ -2,31 +2,33 @@
 
 ## Skills
 
-- **svelte** — Activé pour toutes les interactions avec le code Svelte/SvelteKit (`.svelte`, `.svelte.js`, `.svelte.ts`).
-  Invoquer automatiquement pour l'écriture, la revue, le refactoring et le debug de tout code Svelte.
+- **svelte** — Enabled for all interactions with Svelte/SvelteKit code (`.svelte`, `.svelte.js`, `.svelte.ts`).
+  Automatically invoke for writing, reviewing, refactoring, and debugging any Svelte code.
 
 ## Known Pitfalls
 
 ### `$effect` dependency tracking with async boundaries
 
-**Piège critique Svelte 5** : `$effect` ne traque que les lectures synchrones. Toute lecture de réactivité (`$state`) 
-à l'intérieur d'un `setTimeout`, `setInterval`, `Promise.then`, `await`, ou `requestAnimationFrame` est **invisible** 
-pour le compilateur — l'effet ne se redéclenchera jamais quand ces valeurs changent.
+**Critical Svelte 5 pitfall**: `$effect` only tracks synchronous reads. Any reactivity read (`$state`)
+inside a `setTimeout`, `setInterval`, `Promise.then`, `await`, or `requestAnimationFrame` is **invisible**
+to the compiler — the effect will never re-trigger when those values change.
 
-❌ **Cassé** — `searchQuery` n'est jamais traqué :
+❌ **Broken** — `searchQuery` is never tracked:
+
 ```svelte
 $effect(() => {
     const timer = setTimeout(() => {
-        debouncedQuery = searchQuery; // lu dans setTimeout → non traqué
+        debouncedQuery = searchQuery; // read inside setTimeout → not tracked
     }, 300);
     return () => clearTimeout(timer);
 });
 ```
 
-✅ **Correct** — lecture synchrone capturée avant l'asynchrone :
+✅ **Correct** — synchronous read captured before the async boundary:
+
 ```svelte
 $effect(() => {
-    const query = searchQuery; // lecture synchrone → traqué
+    const query = searchQuery; // synchronous read → tracked
     const timer = setTimeout(() => {
         debouncedQuery = query;
     }, 300);
@@ -34,9 +36,22 @@ $effect(() => {
 });
 ```
 
-**Règle** : toujours capturer les valeurs réactives **avant** la boundary asynchrone. Assigner dans une `const` 
-locale synchrone, puis utiliser cette constante dans le callback asynchrone.
+**Rule**: always capture reactive values **before** the async boundary. Assign to a synchronous local
+`const`, then use that constant inside the async callback.
 
-> Bug réel : `src/lib/components/team-search-drawer.svelte` — la recherche d'équipe NBA ne réagissait pas 
-> à la saisie utilisateur. Corrigé après diagnostic de ce pattern.
+> Real bug: `src/lib/components/team-search-drawer.svelte` — NBA team search was not responding
+> to user input. Fixed after diagnosing this pattern.
+
+## Development Workflow — Zero-Warning Policy
+
+All code changes must pass `svelte-check` with **zero warnings**.
+
+### Mandatory check command
+
+Run this after every non-trivial code change (especially after editing `.svelte` files):
+
+```bash
+npx svelte-check --threshold warning
 ```
+
+If any warnings appear, fix them before committing. Do not ignore or suppress warnings unless explicitly approved.
