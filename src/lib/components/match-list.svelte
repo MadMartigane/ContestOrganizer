@@ -105,7 +105,11 @@
       v.scrollToIndex(index, { align, behavior: "auto" });
     },
     scrollToTop: () => {
-      scrollElement?.scrollTo({ behavior: "smooth", top: 0 });
+      const v = get(virtualizer);
+      if (v.options.count <= 0) {
+        return;
+      }
+      v.scrollToIndex(0, { align: "start", behavior: "auto" });
     },
   };
 
