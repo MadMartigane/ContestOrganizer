@@ -44,7 +44,7 @@
 
 {#if isNba}
   <button
-    class="btn preset-filled"
+    class="btn btn-lg preset-filled"
     disabled={disabled || loading}
     type="button"
     onclick={handleClick}

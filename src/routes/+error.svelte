@@ -50,7 +50,9 @@
 
   <!-- Navigation buttons -->
   <div class="flex gap-4 mt-4">
-    <a href="/home" class="btn preset-filled">🏠 {nav_home()}</a>
-    <a href="/tournaments" class="btn preset-filled">🏆 {nav_tournaments()}</a>
+    <a href="/home" class="btn btn-lg preset-filled">🏠 {nav_home()}</a>
+    <a href="/tournaments" class="btn btn-lg preset-filled"
+      >🏆 {nav_tournaments()}</a
+    >
   </div>
 </div>

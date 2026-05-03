@@ -101,7 +101,11 @@
         <Dialog.Title class="text-lg font-bold">
           {team_search_title()}
         </Dialog.Title>
-        <button type="button" class="btn preset-tonal" onclick={handleClose}>
+        <button
+          type="button"
+          class="btn btn-lg preset-tonal"
+          onclick={handleClose}
+        >
           ✕
         </button>
       </div>
@@ -187,7 +191,7 @@
       <!-- Cancel button -->
       <button
         type="button"
-        class="btn preset-tonal w-full"
+        class="btn btn-lg preset-tonal w-full"
         onclick={handleClose}
       >
         {action_cancel()}

@@ -48,7 +48,7 @@
   <p class="text-surface-500 mt-1 text-sm">{config_cache_description()}</p>
   <button
     type="button"
-    class="btn mt-4 bg-warning-500 text-white hover:bg-warning-600"
+    class="btn btn-lg mt-4 bg-warning-500 text-white hover:bg-warning-600"
     onclick={handleClearCache}
   >
     🗑️ {config_cache_clear()}
@@ -57,8 +57,10 @@
 
 <!-- Footer Navigation -->
 <div class="flex gap-4 mt-6">
-  <a href="/home" class="btn preset-filled">🏠 {nav_home()}</a>
-  <a href="/tournaments" class="btn preset-filled">🏆 {nav_tournaments()}</a>
+  <a href="/home" class="btn btn-lg preset-filled">🏠 {nav_home()}</a>
+  <a href="/tournaments" class="btn btn-lg preset-filled"
+    >🏆 {nav_tournaments()}</a
+  >
 </div>
 
 <!-- Toast -->

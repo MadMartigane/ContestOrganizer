@@ -16,6 +16,8 @@
   <h2 class="text-xl font-bold">{error_heading()}</h2>
   <p class="font-bold">{description}</p>
   {#if showHomeButton}
-    <a href="/home" class="btn preset-filled mt-2">🏠 {error_go_home()}</a>
+    <a href="/home" class="btn btn-lg preset-filled mt-2"
+      >🏠 {error_go_home()}</a
+    >
   {/if}
 </div>

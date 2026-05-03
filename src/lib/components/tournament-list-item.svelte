@@ -62,7 +62,7 @@
   <div class="flex items-center gap-2">
     <button
       type="button"
-      class="btn btn-sm preset-tonal text-warning-500"
+      class="btn btn-lg preset-tonal text-warning-500"
       onclick={handleDeleteClick}
       aria-label="Delete"
     >

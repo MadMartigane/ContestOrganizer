@@ -1,6 +1,7 @@
+import { NBA_TEAMS } from "$lib/domain/nba-teams";
 import type { GenericTeam, TournamentType } from "$lib/domain/types";
 
-// ──────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────
 // API Configuration
 // ──────────────────────────────────────────────────
 
@@ -10,8 +11,6 @@ const API_SPORTS_BASE_URLS: Record<string, string> = {
   NFL: "https://v1.americanfootball.api-sports.io",
   Rugby: "https://v1.rugby.api-sports.io",
 };
-
-const THESPORTSDB_BASE_URL = "https://www.thesportsdb.com/api/v1/json/3";
 
 // ──────────────────────────────────────────────────
 // Error Types
@@ -51,30 +50,12 @@ export const searchTeams = (
   return searchApiSportsTeams(sportType, query);
 };
 
-/** Fetch all NBA teams (used for search and magic fill-up). */
-export const fetchAllNbaTeams = async (): Promise<GenericTeam[]> => {
-  const url = `${THESPORTSDB_BASE_URL}/search_all_teams.php?l=NBA`;
-
-  let response: Response;
-  try {
-    response = await fetch(url);
-  } catch (error) {
-    throw new TeamSearchError(
-      `Network error: ${error instanceof Error ? error.message : "Unknown error"}`,
-      "network"
-    );
-  }
-
-  if (!response.ok) {
-    throw classifyHttpError(response.status, response.statusText);
-  }
-
-  const data = await response.json();
-  if (!data.teams) {
-    return [];
-  }
-  return mapTheSportsDbResponse(data.teams);
-};
+/**
+ * Fetch all NBA teams from static dataset.
+ * Returns all 30 NBA franchises — no network call required.
+ */
+export const fetchAllNbaTeams = (): Promise<GenericTeam[]> =>
+  Promise.resolve([...NBA_TEAMS]);
 
 // ──────────────────────────────────────────────────
 // Internal: API-Sports Search
@@ -152,29 +133,6 @@ const mapApiSportsResponse = (
       type: sportType,
     };
   });
-};
-
-const mapTheSportsDbResponse = (
-  teams: Record<string, string>[]
-): GenericTeam[] =>
-  teams.map((team) => ({
-    country: team.strCountry
-      ? { code: team.strCountry, flag: "", id: 0, name: team.strCountry }
-      : undefined,
-    id: Number(team.idTeam ?? 0),
-    logo: resolveNbaLogo(team),
-    name: team.strTeam ?? "",
-    type: "NBA" as TournamentType,
-  }));
-
-const resolveNbaLogo = (team: Record<string, string>): string | undefined => {
-  if (team.strTeamBadge) {
-    return `${team.strTeamBadge}/small`;
-  }
-  if (team.strBadge) {
-    return `${team.strBadge}/small`;
-  }
-  return;
 };
 
 const mapApiSportsCountry = (

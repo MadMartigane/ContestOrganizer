@@ -61,7 +61,7 @@ export const SPORT_OPTIONS: TournamentType[] = [
 ];
 
 /** Default sport type */
-export const DEFAULT_SPORT: TournamentType = "Foot";
+export const DEFAULT_SPORT: TournamentType = "NBA";
 
 // ──────────────────────────────────────────────────
 // Match Status Configuration

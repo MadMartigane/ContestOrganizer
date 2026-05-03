@@ -81,7 +81,7 @@
 
 {#if isNba && !seasonComplete}
   <button
-    class="btn preset-filled"
+    class="btn btn-lg preset-filled"
     disabled={missingCount === 0}
     type="button"
     onclick={handleClick}

@@ -96,14 +96,14 @@
   <ActionBar>
     <button
       type="button"
-      class="btn preset-tonal text-warning-600 dark:text-warning-400"
+      class="btn btn-lg preset-tonal text-warning-600 dark:text-warning-400"
       onclick={onCancel}
     >
       {action_cancel()}
     </button>
     <button
       type="button"
-      class="btn preset-filled"
+      class="btn btn-lg preset-filled"
       onclick={handleSubmit}
       disabled={!canSubmit}
     >

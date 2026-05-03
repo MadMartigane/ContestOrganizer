@@ -213,7 +213,7 @@
     <ActionBar>
       <button
         type="button"
-        class="btn preset-filled"
+        class="btn btn-lg preset-filled"
         disabled={!hasEnoughTeams || seasonComplete}
         onclick={() => (showNewMatch = true)}
       >
@@ -221,7 +221,7 @@
       </button>
       <button
         type="button"
-        class="btn preset-tonal"
+        class="btn btn-lg preset-tonal"
         disabled={!hasEnoughTeams || seasonComplete}
         onclick={handleAutoMatch}
       >

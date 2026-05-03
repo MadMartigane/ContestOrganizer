@@ -216,12 +216,12 @@
   </div>
 
   <div class="flex justify-end gap-2 pt-2">
-    <button type="button" class="btn preset-tonal" onclick={onCancel}>
+    <button type="button" class="btn btn-lg preset-tonal" onclick={onCancel}>
       {action_cancel()}
     </button>
     <button
       type="button"
-      class="btn preset-filled"
+      class="btn btn-lg preset-filled"
       disabled={!canValidate}
       onclick={handleValidate}
     >

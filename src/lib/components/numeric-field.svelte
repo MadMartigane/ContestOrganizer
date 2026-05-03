@@ -78,7 +78,7 @@
   <div class="flex items-center gap-1">
     <button
       type="button"
-      class="btn btn-sm preset-tonal"
+      class="btn btn-lg preset-tonal"
       onclick={decrement}
       disabled={readonly || value <= min}
       aria-label="Decrement"
@@ -100,7 +100,7 @@
     >
     <button
       type="button"
-      class="btn btn-sm preset-tonal"
+      class="btn btn-lg preset-tonal"
       onclick={increment}
       disabled={readonly || value >= max}
       aria-label="Increment"

@@ -50,7 +50,7 @@
   >
     <button
       type="button"
-      class="btn preset-tonal shadow-lg"
+      class="btn btn-lg preset-tonal shadow-lg"
       onclick={onScrollToTop}
       title="{nav_scroll_top()} (Alt+T)"
     >
@@ -66,7 +66,7 @@
     </button>
     <button
       type="button"
-      class="btn preset-tonal shadow-lg"
+      class="btn btn-lg preset-tonal shadow-lg"
       disabled={!hasTargetMatch}
       onclick={onScrollToCurrentMatch}
       title="{nav_scroll_current()} (Alt+M)"
@@ -85,7 +85,7 @@
     </button>
     <button
       type="button"
-      class="btn preset-tonal shadow-lg"
+      class="btn btn-lg preset-tonal shadow-lg"
       onclick={onScrollToBottom}
       title="{nav_scroll_bottom()} (Alt+B)"
     >

@@ -66,7 +66,7 @@
   {:else}
     <button
       type="button"
-      class="btn preset-filled w-full"
+      class="btn btn-lg preset-filled w-full"
       onclick={() => (showForm = true)}
     >
       ➕ {tournament_new()}

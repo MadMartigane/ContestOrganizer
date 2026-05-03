@@ -196,7 +196,7 @@
     </button>
     <button
       type="button"
-      class="btn preset-tonal text-error-500"
+      class="btn btn-lg preset-tonal text-error-500"
       onclick={() => (showDeleteConfirm = true)}
     >
       🗑

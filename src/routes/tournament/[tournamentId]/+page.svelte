@@ -180,17 +180,21 @@
     <ActionBar>
       <button
         type="button"
-        class="btn preset-tonal"
+        class="btn btn-lg preset-tonal"
         onclick={() => (showResetConfirm = true)}
       >
         🗑 {action_reset()}
       </button>
       {#if sportConfig?.gridModel === "default"}
-        <button type="button" class="btn preset-tonal" onclick={handleRanking}>
+        <button
+          type="button"
+          class="btn btn-lg preset-tonal"
+          onclick={handleRanking}
+        >
           📊 {action_ranking()}
         </button>
       {/if}
-      <a href="/match/{tournamentId}" class="btn preset-filled">
+      <a href="/match/{tournamentId}" class="btn btn-lg preset-filled">
         🎮 {action_go_match()}
       </a>
       <NbaMagicFillupButton
@@ -204,7 +208,7 @@
 
     <button
       type="button"
-      class="btn preset-filled bg-error-500 hover:bg-error-600 dark:bg-error-500 dark:hover:bg-error-600 w-full"
+      class="btn btn-lg preset-filled bg-error-500 hover:bg-error-600 dark:bg-error-500 dark:hover:bg-error-600 w-full"
       onclick={() => (showDeleteConfirm = true)}
     >
       🗑 {tournament_delete_button()}

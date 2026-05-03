@@ -64,7 +64,7 @@
       {#if scorerType === "common"}
         <button
           type="button"
-          class="btn preset-tonal"
+          class="btn btn-lg preset-tonal"
           disabled={disabled || goals.host <= 0}
           onclick={() => adjustScore("host", -1)}
         >
@@ -72,7 +72,7 @@
         </button>
         <button
           type="button"
-          class="btn preset-filled"
+          class="btn btn-lg preset-filled"
           {disabled}
           onclick={() => adjustScore("host", 1)}
         >
@@ -82,7 +82,7 @@
         {#each getSteps() as step}
           <button
             type="button"
-            class="btn {isAddMode ? 'preset-filled' : 'preset-tonal'}"
+            class="btn btn-lg {isAddMode ? 'preset-filled' : 'preset-tonal'}"
             {disabled}
             onclick={() => adjustScore("host", step * getModeMultiplier())}
           >
@@ -114,7 +114,7 @@
       {#if scorerType === "common"}
         <button
           type="button"
-          class="btn preset-tonal"
+          class="btn btn-lg preset-tonal"
           disabled={disabled || goals.visitor <= 0}
           onclick={() => adjustScore("visitor", -1)}
         >
@@ -122,7 +122,7 @@
         </button>
         <button
           type="button"
-          class="btn preset-filled"
+          class="btn btn-lg preset-filled"
           {disabled}
           onclick={() => adjustScore("visitor", 1)}
         >
@@ -132,7 +132,7 @@
         {#each getSteps() as step}
           <button
             type="button"
-            class="btn {isAddMode ? 'preset-filled' : 'preset-tonal'}"
+            class="btn btn-lg {isAddMode ? 'preset-filled' : 'preset-tonal'}"
             {disabled}
             onclick={() => adjustScore("visitor", step * getModeMultiplier())}
           >

@@ -57,7 +57,7 @@
     {#if isRetryable && onRetry}
       <button
         type="button"
-        class="btn preset-tonal mt-2 inline-flex items-center gap-1.5 text-sm"
+        class="btn btn-lg preset-tonal mt-2 inline-flex items-center gap-1.5 text-sm"
         onclick={onRetry}
       >
         <span aria-hidden="true">🔄</span>
