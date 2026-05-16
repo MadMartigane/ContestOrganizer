@@ -28,39 +28,43 @@
 
 <Breadcrumb items={[{ emoji: "⚙", label: nav_config() }]} />
 
-<h1 class="text-2xl font-bold mt-4">{config_title()}</h1>
+<div class="flex flex-col items-center gap-6 mt-6">
+  <h1 class="text-2xl font-bold">{config_title()}</h1>
 
-<!-- Dark Mode Section -->
-<section class="card bg-surface-50-950 p-5 mt-6">
-  <Switch checked={getIsDarkMode()} onCheckedChange={() => toggleDarkMode()}>
-    <Switch.Control> <Switch.Thumb /> </Switch.Control>
-    <Switch.Label>💡 {config_dark_mode()}</Switch.Label>
-    <Switch.HiddenInput />
-  </Switch>
-</section>
+  <!-- Dark Mode Section -->
+  <section class="card bg-surface-50-950 p-5 w-full max-w-md">
+    <Switch checked={getIsDarkMode()} onCheckedChange={() => toggleDarkMode()}>
+      <Switch.Control> <Switch.Thumb /> </Switch.Control>
+      <Switch.Label>💡 {config_dark_mode()}</Switch.Label>
+      <Switch.HiddenInput />
+    </Switch>
+  </section>
 
-<!-- Divider -->
-<hr class="border-surface-200-800 my-6">
+  <!-- Divider -->
+  <hr class="border-surface-200-800 w-full max-w-md">
 
-<!-- Team Cache Section -->
-<section class="card bg-surface-50-950 p-5">
-  <h2 class="text-lg font-bold">{config_cache_heading()}</h2>
-  <p class="text-surface-500 mt-1 text-sm">{config_cache_description()}</p>
-  <button
-    type="button"
-    class="btn btn-lg mt-4 bg-warning-500 text-white hover:bg-warning-600"
-    onclick={handleClearCache}
-  >
-    🗑️ {config_cache_clear()}
-  </button>
-</section>
+  <!-- Team Cache Section -->
+  <section class="card bg-surface-50-950 p-5 w-full max-w-md">
+    <h2 class="text-lg font-bold">{config_cache_heading()}</h2>
+    <p class="text-surface-500 mt-1 text-sm">{config_cache_description()}</p>
+    <button
+      type="button"
+      class="btn btn-lg mt-4 bg-warning-500 text-white hover:bg-warning-600 w-full"
+      onclick={handleClearCache}
+    >
+      🗑️ {config_cache_clear()}
+    </button>
+  </section>
 
-<!-- Footer Navigation -->
-<div class="flex gap-4 mt-6">
-  <a href="/home" class="btn btn-lg preset-filled">🏠 {nav_home()}</a>
-  <a href="/tournaments" class="btn btn-lg preset-filled"
-    >🏆 {nav_tournaments()}</a
-  >
+  <!-- Footer Navigation -->
+  <div class="flex gap-4 w-full max-w-md">
+    <a href="/home" class="btn btn-lg preset-filled flex-1 text-lg py-3"
+      >🏠 {nav_home()}</a
+    >
+    <a href="/tournaments" class="btn btn-lg preset-filled flex-1 text-lg py-3"
+      >🏆 {nav_tournaments()}</a
+    >
+  </div>
 </div>
 
 <!-- Toast -->
