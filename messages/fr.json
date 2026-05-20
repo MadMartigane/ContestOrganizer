@@ -99,7 +99,7 @@
   "nav_tournament": "Tournoi",
   "nav_tournaments": "Tournois",
   "scoring_add_remove": "Ajouter/Supprimer des points",
-  "sport_selector_help": "(defaut: Foot ⚽️)",
+  "sport_selector_help": "(defaut: NBA 🏀)",
   "sport_selector_label": "Quel sport ?",
   "sport_selector_placeholder": "Basket, NBA, Foot, …",
   "team_count_label": "Nombre d'équipes (min:2, max:32)",
