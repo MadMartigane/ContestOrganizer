@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Dialog } from "@skeletonlabs/skeleton-svelte";
+  import { SPORT_CONFIG } from "$lib/domain/constants";
   import type { GenericTeam, TournamentType } from "$lib/domain/types";
   import {
     action_cancel,
@@ -14,7 +15,6 @@
     TeamSearchError,
   } from "$lib/services/team-search";
   import ApiErrorAlert from "./api-error-alert.svelte";
-  import { SPORT_CONFIG } from "$lib/domain/constants";
 
   interface Props {
     onOpenChange: (open: boolean) => void;

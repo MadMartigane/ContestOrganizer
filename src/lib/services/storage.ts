@@ -1,6 +1,6 @@
 import { DEFAULT_SPORT, STORAGE_KEY_TOURNAMENTS } from "$lib/domain/constants";
-import { NBA_TEAMS } from "$lib/domain/nba-teams";
 import { generateId } from "$lib/domain/id";
+import { NBA_TEAMS } from "$lib/domain/nba-teams";
 import type {
   Tournament,
   TournamentCollection,
