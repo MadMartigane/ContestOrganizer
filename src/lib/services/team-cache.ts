@@ -62,8 +62,15 @@ export const getCachedTeams = (
 ): GenericTeam[] | null => {
   const cache = loadCache();
 
-  // NBA: check full teams list first
+  // NBA: check full teams list first (with TTL)
   if (sportType === "NBA" && cache.nbaAllTeams) {
+    if (cache.nbaAllTeamsTimestamp) {
+      const age = Date.now() - cache.nbaAllTeamsTimestamp;
+      if (age > NBA_CACHE_TTL) {
+        return null; // Force re-fetch with fresh data (including logos)
+      }
+    }
+
     const lowerQuery = query.toLowerCase().trim();
     if (lowerQuery.length < 3) {
       return null;

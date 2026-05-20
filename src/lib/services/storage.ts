@@ -1,4 +1,5 @@
 import { DEFAULT_SPORT, STORAGE_KEY_TOURNAMENTS } from "$lib/domain/constants";
+import { NBA_TEAMS } from "$lib/domain/nba-teams";
 import { generateId } from "$lib/domain/id";
 import type {
   Tournament,
@@ -24,6 +25,42 @@ const isLocalStorageAvailable = (): boolean => {
     return true;
   } catch {
     return false;
+  }
+};
+
+// ──────────────────────────────────────────────────
+// NBA Logo Enrichment
+// ──────────────────────────────────────────────────
+
+const buildNbaLogoLookup = (): Map<number, string> => {
+  const map = new Map<number, string>();
+  for (const team of NBA_TEAMS) {
+    if (team.logo) {
+      map.set(team.id, team.logo);
+    }
+  }
+  return map;
+};
+
+const enrichTournamentTeams = (
+  tournament: Tournament,
+  logoLookup: Map<number, string>
+): void => {
+  for (const slot of tournament.grid) {
+    const team = slot.team;
+    if (team?.type === "NBA" && !team.logo) {
+      const logo = logoLookup.get(team.id);
+      if (logo) {
+        team.logo = logo;
+      }
+    }
+  }
+};
+
+const enrichNbaLogos = (tournaments: Tournament[]): void => {
+  const logoLookup = buildNbaLogoLookup();
+  for (const tournament of tournaments) {
+    enrichTournamentTeams(tournament, logoLookup);
   }
 };
 
@@ -54,6 +91,7 @@ export const loadCollection = (): TournamentCollection => {
       Array.isArray(parsed.tournaments) &&
       typeof parsed.timestamp === "number"
     ) {
+      enrichNbaLogos(parsed.tournaments);
       return parsed as TournamentCollection;
     }
 

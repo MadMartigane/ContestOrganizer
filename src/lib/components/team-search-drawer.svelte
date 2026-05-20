@@ -14,6 +14,7 @@
     TeamSearchError,
   } from "$lib/services/team-search";
   import ApiErrorAlert from "./api-error-alert.svelte";
+  import { SPORT_CONFIG } from "$lib/domain/constants";
 
   interface Props {
     onOpenChange: (open: boolean) => void;
@@ -173,7 +174,7 @@
                 <div
                   class="w-8 h-8 bg-surface-50-950 rounded-full flex items-center justify-center text-sm"
                 >
-                  ⚽
+                  {SPORT_CONFIG[sportType].emoji}
                 </div>
               {/if}
               <div class="flex-1 text-left">
