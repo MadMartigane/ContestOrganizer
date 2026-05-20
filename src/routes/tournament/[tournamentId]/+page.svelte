@@ -50,6 +50,11 @@
     tournament ? SPORT_CONFIG[tournament.type] : undefined
   );
   const teamCount = $derived(tournament ? tournament.grid.length : 0);
+  const breadcrumbItems = $derived([
+    { emoji: "🏠", label: nav_home(), href: "/home" },
+    { emoji: "🏆", label: nav_tournaments(), href: "/tournaments" },
+    { emoji: "📋", label: tournament ? tournament.name : nav_tournament() },
+  ]);
 
   onMount(() => {
     tournament = getTournamentById(tournamentId);
@@ -142,23 +147,17 @@
   <title>{tournament ? tournament.name : nav_tournament()}</title>
 </svelte:head>
 
+<Breadcrumb items={breadcrumbItems} />
+
 {#if tournament}
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col items-center gap-6 mt-6">
     <TournamentHeader
       name={tournament.name}
       onNameChange={handleNameChange}
       sportType={tournament.type}
     />
 
-    <Breadcrumb
-      items={[
-        { emoji: "🏠", label: nav_home(), href: "/home" },
-        { emoji: "🏆", label: nav_tournaments(), href: "/tournaments" },
-        { emoji: "📋", label: tournament.name },
-      ]}
-    />
-
-    <div class="mt-2">
+    <div class="w-full max-w-md">
       <NumericField
         label={team_count_label()}
         min={GRID_MIN_TEAMS}
@@ -170,49 +169,55 @@
       />
     </div>
 
-    <GridTable
-      grid={tournament.grid}
-      matches={tournament.matchs}
-      onSlotClick={handleSlotClick}
-      sportType={tournament.type}
-    />
+    <div class="w-full">
+      <GridTable
+        grid={tournament.grid}
+        matches={tournament.matchs}
+        onSlotClick={handleSlotClick}
+        sportType={tournament.type}
+      />
+    </div>
 
-    <ActionBar>
-      <button
-        type="button"
-        class="btn btn-lg preset-tonal"
-        onclick={() => (showResetConfirm = true)}
-      >
-        🗑 {action_reset()}
-      </button>
-      {#if sportConfig?.gridModel === "default"}
+    <div class="w-full max-w-md">
+      <ActionBar>
         <button
           type="button"
           class="btn btn-lg preset-tonal"
-          onclick={handleRanking}
+          onclick={() => (showResetConfirm = true)}
         >
-          📊 {action_ranking()}
+          🗑 {action_reset()}
         </button>
-      {/if}
-      <a href="/match/{tournamentId}" class="btn btn-lg preset-filled">
-        🎮 {action_go_match()}
-      </a>
-      <NbaMagicFillupButton
-        grid={tournament.grid}
-        onFill={handleMagicFillup}
-        sportType={tournament.type}
-      />
-    </ActionBar>
+        {#if sportConfig?.gridModel === "default"}
+          <button
+            type="button"
+            class="btn btn-lg preset-tonal"
+            onclick={handleRanking}
+          >
+            📊 {action_ranking()}
+          </button>
+        {/if}
+        <a href="/match/{tournamentId}" class="btn btn-lg preset-filled">
+          🎮 {action_go_match()}
+        </a>
+        <NbaMagicFillupButton
+          grid={tournament.grid}
+          onFill={handleMagicFillup}
+          sportType={tournament.type}
+        />
+      </ActionBar>
+    </div>
 
-    <hr class="hr">
+    <hr class="hr w-full max-w-md">
 
-    <button
-      type="button"
-      class="btn btn-lg preset-filled bg-error-500 hover:bg-error-600 dark:bg-error-500 dark:hover:bg-error-600 w-full"
-      onclick={() => (showDeleteConfirm = true)}
-    >
-      🗑 {tournament_delete_button()}
-    </button>
+    <div class="w-full max-w-md">
+      <button
+        type="button"
+        class="btn btn-lg preset-filled bg-error-500 hover:bg-error-600 dark:bg-error-500 dark:hover:bg-error-600 w-full"
+        onclick={() => (showDeleteConfirm = true)}
+      >
+        🗑 {tournament_delete_button()}
+      </button>
+    </div>
   </div>
 
   <ConfirmDialog
@@ -240,13 +245,6 @@
     sportType={tournament.type}
   />
 {:else}
-  <Breadcrumb
-    items={[
-      { emoji: "🏠", label: nav_home(), href: "/home" },
-      { emoji: "🏆", label: nav_tournaments(), href: "/tournaments" },
-      { emoji: "📋", label: nav_tournament() },
-    ]}
-  />
   <ErrorMessage
     description={tournament_not_found({ id: tournamentId })}
     showHomeButton={true}

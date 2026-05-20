@@ -48,28 +48,32 @@
   ]}
 />
 
-<div class="mt-4">
+<div class="flex flex-col items-center gap-6 mt-6">
+  <h1 class="text-2xl font-bold">{nav_tournaments()}</h1>
+
   {#if tournaments.length === 0 && !showForm}
     <TournamentsEmptyState />
   {:else}
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-2 w-full max-w-md">
       {#each tournaments as tournament (tournament.id)}
         <TournamentListItem {tournament} onDelete={handleDelete} />
       {/each}
     </div>
   {/if}
 
-  <hr class="hr my-4">
+  <hr class="hr w-full max-w-md">
 
-  {#if showForm}
-    <NewTournamentForm onAdd={handleAdd} onCancel={handleCancel} />
-  {:else}
-    <button
-      type="button"
-      class="btn btn-lg preset-filled w-full"
-      onclick={() => (showForm = true)}
-    >
-      ➕ {tournament_new()}
-    </button>
-  {/if}
+  <div class="w-full max-w-md">
+    {#if showForm}
+      <NewTournamentForm onAdd={handleAdd} onCancel={handleCancel} />
+    {:else}
+      <button
+        type="button"
+        class="btn btn-lg preset-filled w-full"
+        onclick={() => (showForm = true)}
+      >
+        ➕ {tournament_new()}
+      </button>
+    {/if}
+  </div>
 </div>

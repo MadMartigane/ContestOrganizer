@@ -185,21 +185,21 @@
 </svelte:head>
 
 {#if tournament}
-  <div class="flex flex-col gap-4">
-    <Breadcrumb
-      items={[
-        { emoji: "🏠", label: nav_home(), href: "/home" },
-        { emoji: "🏆", label: nav_tournaments(), href: "/tournaments" },
-        {
-          emoji: "📋",
-          label: tournament.name,
-          href: `/tournament/${tournamentId}`,
-        },
-        { emoji: "🎮", label: nav_match() },
-      ]}
-    />
+  <Breadcrumb
+    items={[
+      { emoji: "🏠", label: nav_home(), href: "/home" },
+      { emoji: "🏆", label: nav_tournaments(), href: "/tournaments" },
+      {
+        emoji: "📋",
+        label: tournament.name,
+        href: `/tournament/${tournamentId}`,
+      },
+      { emoji: "🎮", label: nav_match() },
+    ]}
+  />
 
-    <div class="flex items-center justify-between gap-2">
+  <div class="flex flex-col items-center gap-6 mt-6">
+    <div class="flex items-center justify-center gap-2">
       <h1 class="text-2xl font-bold">{match_count({ count: matchCount })}</h1>
       {#if isNba && seasonComplete}
         <span
@@ -210,70 +210,76 @@
       {/if}
     </div>
 
-    <ActionBar>
-      <button
-        type="button"
-        class="btn btn-lg preset-filled"
-        disabled={!hasEnoughTeams || seasonComplete}
-        onclick={() => (showNewMatch = true)}
-      >
-        ➕ {match_new()}
-      </button>
-      <button
-        type="button"
-        class="btn btn-lg preset-tonal"
-        disabled={!hasEnoughTeams || seasonComplete}
-        onclick={handleAutoMatch}
-      >
-        🔄 {match_auto()}
-      </button>
-      {#if isNba}
-        <NbaGenerateButton
-          grid={tournament.grid}
-          matchs={tournament.matchs}
-          onGenerate={handleNbaGenerate}
-          {seasonComplete}
-          sportType={tournament.type}
+    <div class="w-full max-w-md">
+      <ActionBar>
+        <button
+          type="button"
+          class="btn btn-lg preset-filled"
+          disabled={!hasEnoughTeams || seasonComplete}
+          onclick={() => (showNewMatch = true)}
+        >
+          ➕ {match_new()}
+        </button>
+        <button
+          type="button"
+          class="btn btn-lg preset-tonal"
+          disabled={!hasEnoughTeams || seasonComplete}
+          onclick={handleAutoMatch}
+        >
+          🔄 {match_auto()}
+        </button>
+        {#if isNba}
+          <NbaGenerateButton
+            grid={tournament.grid}
+            matchs={tournament.matchs}
+            onGenerate={handleNbaGenerate}
+            {seasonComplete}
+            sportType={tournament.type}
+          />
+        {/if}
+      </ActionBar>
+    </div>
+
+    <div class="w-full">
+      {#if !hasEnoughTeams}
+        <p class="text-center text-surface-500 py-4">{match_no_teams()}</p>
+      {:else if matchCount === 0}
+        <p class="text-center text-warning-600 dark:text-warning-400 py-4">
+          {match_empty()}
+        </p>
+      {:else}
+        <!-- Match list header: 3-column grid aligned with MatchTile layout -->
+        <div
+          class="grid grid-cols-[3fr_5fr_3fr] text-center text-sm font-semibold text-surface-500 py-2"
+        >
+          <div class="col-span-1">{match_home()}</div>
+          <div class="col-span-1">
+            {sportConfig?.emoji ?? ''} {sportConfig?.label ?? ''}
+          </div>
+          <div class="col-span-1">{match_visitor()}</div>
+        </div>
+
+        <MatchList
+          {tournament}
+          bind:scrollApi={matchListScrollApi}
+          onStatusChange={handleStatusChange}
+          onDelete={handleDelete}
+          onGoalsChange={handleGoalsChange}
+          onScrollChange={handleScrollChange}
         />
       {/if}
-    </ActionBar>
-
-    {#if !hasEnoughTeams}
-      <p class="text-center text-surface-500 py-4">{match_no_teams()}</p>
-    {:else if matchCount === 0}
-      <p class="text-center text-warning-600 dark:text-warning-400 py-4">
-        {match_empty()}
-      </p>
-    {:else}
-      <!-- Match list header: 3-column grid aligned with MatchTile layout -->
-      <div
-        class="grid grid-cols-[3fr_5fr_3fr] text-center text-sm font-semibold text-surface-500 py-2"
-      >
-        <div class="col-span-1">{match_home()}</div>
-        <div class="col-span-1">
-          {sportConfig?.emoji ?? ''} {sportConfig?.label ?? ''}
-        </div>
-        <div class="col-span-1">{match_visitor()}</div>
-      </div>
-
-      <MatchList
-        {tournament}
-        bind:scrollApi={matchListScrollApi}
-        onStatusChange={handleStatusChange}
-        onDelete={handleDelete}
-        onGoalsChange={handleGoalsChange}
-        onScrollChange={handleScrollChange}
-      />
-    {/if}
+    </div>
 
     {#if showNewMatch}
-      <MatchCreator
-        grid={tournament.grid}
-        matches={tournament.matchs}
-        onCreateMatch={handleCreateMatch}
-        onCancel={() => (showNewMatch = false)}
-        sportType={tournament.type}
-      />
+      <div class="w-full">
+        <MatchCreator
+          grid={tournament.grid}
+          matches={tournament.matchs}
+          onCreateMatch={handleCreateMatch}
+          onCancel={() => (showNewMatch = false)}
+          sportType={tournament.type}
+        />
+      </div>
     {/if}
 
     <NavDock
