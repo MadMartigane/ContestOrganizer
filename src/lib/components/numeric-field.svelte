@@ -75,7 +75,7 @@
     class="text-sm font-medium text-surface-700 dark:text-surface-300"
     >{label}</label
   >
-  <div class="flex items-center gap-1">
+  <div class="flex items-center justify-center gap-1">
     <button
       type="button"
       class="btn btn-lg preset-tonal"

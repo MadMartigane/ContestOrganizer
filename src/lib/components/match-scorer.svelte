@@ -58,7 +58,7 @@
 
 <div class="space-y-2">
   <!-- Inline score line: [host buttons] [host score] - [visitor score] [visitor buttons] -->
-  <div class="flex items-center justify-center gap-2 text-2xl font-bold">
+  <div class="flex flex-wrap items-center justify-center gap-2 max-sm:gap-1 max-sm:text-lg font-bold">
     <!-- Host buttons -->
     <div class="flex gap-1">
       {#if scorerType === "common"}
@@ -92,22 +92,25 @@
       {/if}
     </div>
 
-    <!-- Host score -->
-    <span
-      class="text-primary-600 dark:text-primary-400 min-w-[1.5ch] text-center"
-    >
-      {goals.host}
-    </span>
+    <!-- Score display (kept as one unit to prevent wrapping inside) -->
+    <div class="flex items-center gap-2 shrink-0">
+      <!-- Host score -->
+      <span
+        class="text-primary-600 dark:text-primary-400 min-w-[1.5ch] text-center"
+      >
+        {goals.host}
+      </span>
 
-    <!-- Separator -->
-    <span class="text-surface-500">-</span>
+      <!-- Separator -->
+      <span class="text-surface-500">-</span>
 
-    <!-- Visitor score -->
-    <span
-      class="text-secondary-600 dark:text-secondary-400 min-w-[1.5ch] text-center"
-    >
-      {goals.visitor}
-    </span>
+      <!-- Visitor score -->
+      <span
+        class="text-secondary-600 dark:text-secondary-400 min-w-[1.5ch] text-center"
+      >
+        {goals.visitor}
+      </span>
+    </div>
 
     <!-- Visitor buttons -->
     <div class="flex gap-1">

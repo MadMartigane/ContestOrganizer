@@ -7,6 +7,6 @@
   let { children, class: className = "" }: Props = $props();
 </script>
 
-<footer class="flex justify-center gap-2 pt-4 {className}">
+<footer class="flex flex-wrap justify-center gap-2 pt-4 {className}">
   {@render children()}
 </footer>
