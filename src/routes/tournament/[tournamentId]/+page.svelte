@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { base } from "$app/paths";
   import { goto } from "$app/navigation";
+  import { base } from "$app/paths";
   import { page } from "$app/stores";
   import ActionBar from "$lib/components/action-bar.svelte";
   import Breadcrumb from "$lib/components/breadcrumb.svelte";

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { base } from "$app/paths";
   import { Switch } from "@skeletonlabs/skeleton-svelte";
+  import { base } from "$app/paths";
   import Breadcrumb from "$lib/components/breadcrumb.svelte";
   import Toast from "$lib/components/toast.svelte";
   import {
@@ -62,7 +62,9 @@
     <a href="{base}/home" class="btn btn-lg preset-filled flex-1 text-lg py-3"
       >🏠 {nav_home()}</a
     >
-    <a href="{base}/tournaments" class="btn btn-lg preset-filled flex-1 text-lg py-3"
+    <a
+      href="{base}/tournaments"
+      class="btn btn-lg preset-filled flex-1 text-lg py-3"
       >🏆 {nav_tournaments()}</a
     >
   </div>

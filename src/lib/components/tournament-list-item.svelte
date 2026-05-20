@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { base } from "$app/paths";
   import { goto } from "$app/navigation";
+  import { base } from "$app/paths";
   import ConfirmDialog from "$lib/components/confirm-dialog.svelte";
   import { SPORT_CONFIG } from "$lib/domain/constants";
   import type { Tournament } from "$lib/domain/types";

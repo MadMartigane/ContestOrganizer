@@ -30,10 +30,16 @@
   <span class="text-xs text-surface-500">v{__APP_VERSION__}</span>
 
   <div class="flex gap-4 w-full max-w-md">
-    <a href="{base}/config" class="btn btn-lg preset-filled flex-1 text-lg py-3">
+    <a
+      href="{base}/config"
+      class="btn btn-lg preset-filled flex-1 text-lg py-3"
+    >
       ⚙ {home_config()}
     </a>
-    <a href="{base}/tournaments" class="btn btn-lg preset-filled flex-1 text-lg py-3">
+    <a
+      href="{base}/tournaments"
+      class="btn btn-lg preset-filled flex-1 text-lg py-3"
+    >
       🏆 {home_tournaments()}
     </a>
   </div>
