@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { base } from "$app/paths";
   import { error_go_home, error_heading } from "$lib/paraglide/messages";
 
   interface Props {
@@ -16,7 +17,7 @@
   <h2 class="text-xl font-bold">{error_heading()}</h2>
   <p class="font-bold">{description}</p>
   {#if showHomeButton}
-    <a href="/home" class="btn btn-lg preset-filled mt-2"
+    <a href="{base}/home" class="btn btn-lg preset-filled mt-2"
       >🏠 {error_go_home()}</a
     >
   {/if}

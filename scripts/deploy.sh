@@ -1,44 +1,29 @@
 #!/bin/bash
+set -euo pipefail
 
 # =====================================================================
-# @LLM-WARNING: CONFIGURATION PARITY REQUIRED
-# If you add, remove, or modify environment variables here, you MUST:
-# 1. Make the exact same change in the Vite middleware (vite.config.ts)
-# Read docs/CONFIG_MANAGEMENT.md before modifying this section.
+# ContestOrganizer — Deploy Script (SvelteKit)
+# Usage: ./scripts/deploy.sh {prod|pre-prod} [--dry-run]
+#
+# VITE_ env vars are baked at build time by Vite.
+# BASE_PATH is set at build time for paths.base in svelte.config.js.
 # =====================================================================
 
 # Load .env if it exists
 if [ -f .env ]; then
-    export $(grep -v '^#' .env | xargs)
+    export $(grep -v '^#' .env | grep -v '^\s*$' | xargs)
 fi
 
-# Colors
+# Colors & emojis
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
-
-# Emojis
+NC='\033[0m'
 ROCKET="🚀"
 CHECK="✅"
 CROSS="❌"
 
-# Function to print step
-print_step() {
-    echo -e "${ROCKET} $1"
-}
-
-# Function to print success
-print_success() {
-    echo -e "${CHECK} $1"
-}
-
-# Function to print error
-print_error() {
-    echo -e "${CROSS} $1"
-}
-
-# Function to print step with dry-run indicator
+# Print helpers
 print_step() {
     if [ "$DRY_RUN" = true ]; then
         echo -e "${YELLOW}[DRY-RUN]${NC} ${ROCKET} $1"
@@ -46,8 +31,9 @@ print_step() {
         echo -e "${ROCKET} $1"
     fi
 }
+print_success() { echo -e "${CHECK} $1"; }
+print_error()   { echo -e "${CROSS} $1" >&2; }
 
-# Function to check if we should skip destructive operations
 should_skip() {
     if [ "$DRY_RUN" = true ]; then
         echo -e "${YELLOW}[DRY-RUN]${NC}   ⏭️  $1 (skipped)"
@@ -56,22 +42,18 @@ should_skip() {
     return 1
 }
 
+# Parse --dry-run
 DRY_RUN=false
-
-# Detect --dry-run flag (order-independent)
 for arg in "$@"; do
     if [ "$arg" = "--dry-run" ]; then
         DRY_RUN=true
         break
     fi
 done
-
-# Remove --dry-run for clean argument parsing
 set -- "${@//--dry-run/}"
-# Clean up any resulting empty arguments
 set -- $(echo "$@" | xargs)
 
-# Check argument
+# Validate environment argument
 if [[ "$1" != "prod" && "$1" != "pre-prod" ]]; then
     print_error "Usage: $0 {prod|pre-prod} [--dry-run]"
     exit 1
@@ -79,17 +61,16 @@ fi
 
 ENV=$1
 
-# Define REQUIRED_KEYS
+# Validate required env vars
 REQUIRED_KEYS=("VITE_API_SPORTS_KEY")
-
-# Verify REQUIRED_KEYS
 for key in "${REQUIRED_KEYS[@]}"; do
-    if [ -z "${!key}" ]; then
+    if [ -z "${!key:-}" ]; then
         print_error "Environment variable $key is not set."
         exit 1
     fi
 done
 
+# Environment configuration
 case $ENV in
     prod)
         TARGET_PATH="/var/www/marius.click/html/contest"
@@ -102,137 +83,104 @@ case $ENV in
 esac
 
 BACKUP_DIR="$HOME/backup/contest-data"
+BUILD_DIR="build"
+STAGING_DIR="$HOME/staging/contest-deploy"
 
-# Step 0: Generate status data from TODO.md
+# Step 0: Generate status data
 print_step "Generating status data..."
-if ! pnpm exec tsx scripts/generate-status.ts --skip-version; then
-    print_error "Status generation failed."
-    exit 1
+if should_skip "Would run generate-status.ts"; then
+    :
+else
+    if ! pnpm exec tsx scripts/generate-status.ts --skip-version; then
+        print_error "Status generation failed."
+        exit 1
+    fi
 fi
 print_success "Status data generated."
 
-# Step 1: Build the project (requires VITE_API_SPORTS_KEY in environment)
-print_step "Building the project..."
-if ! pnpm run build; then
-    print_error "Build failed. Ensure VITE_API_SPORTS_KEY is set in environment."
-    exit 1
+# Step 1: Build with BASE_PATH (Vite bakes in VITE_ vars + paths.base)
+print_step "Building for $ENV (BASE_PATH=$BASE_PATH)..."
+if should_skip "Would run: BASE_PATH=$BASE_PATH pnpm build"; then
+    :
+else
+    if ! BASE_PATH="$BASE_PATH" pnpm build; then
+        print_error "Build failed. Ensure VITE_API_SPORTS_KEY is set."
+        exit 1
+    fi
 fi
 print_success "Build completed."
 
-# Step 1b: Generate config
-print_step "Generating config..."
-echo "window.APP_CONFIG = {" > www/config.js
-for key in "${REQUIRED_KEYS[@]}"; do
-    # Strip VITE_ prefix
-    config_key=${key#VITE_}
-    echo "  $config_key: '${!key}'," >> www/config.js
-done
-echo "};" >> www/config.js
-print_success "Config generated."
+# Step 1b: Verify build output exists
+print_step "Verifying build output..."
+if should_skip "Would verify $BUILD_DIR/index.html exists"; then
+    :
+else
+    if [ ! -f "$BUILD_DIR/index.html" ]; then
+        print_error "$BUILD_DIR/index.html not found. Build may have failed."
+        exit 1
+    fi
+fi
+print_success "Build output verified."
 
-# Step 2: Backup existing API data if exists
+# Step 2: Backup existing API data
 print_step "Backing up existing API data..."
-if [ -d "$TARGET_PATH/api/data" ]; then
-    mkdir -p "$BACKUP_DIR"
-    cp -r "$TARGET_PATH/api/data"/* "$BACKUP_DIR/" 2>/dev/null || true
-    print_success "API data backed up."
-else
-    print_success "No API data to backup."
-fi
-
-# Step 3: Clean target directory
-print_step "Cleaning target directory..."
-if should_skip "Would remove all files from $TARGET_PATH"; then
-    :
-else
-    rm -rf "$TARGET_PATH"/*
-fi
-print_success "Target directory cleaned."
-
-# Step 4: Create target directory
-print_step "Creating target directory..."
-mkdir -p "$TARGET_PATH"
-print_success "Target directory created."
-
-# Step 5: Copy www/* to target
-print_step "Copying files to target..."
-if should_skip "Would copy www/* to $TARGET_PATH"; then
-    :
-else
-    cp -r www/* "$TARGET_PATH/"
-fi
-print_success "Files copied."
-
-# Step 5b: Verify vanilla bundle was copied
-print_step "Verifying vanilla bundle..."
-if should_skip "Would verify $TARGET_PATH/vanilla exists"; then
-    :
-else
-    if [ -d "$TARGET_PATH/vanilla" ]; then
-        print_success "Vanilla directory copied."
-    else
-        print_error "Vanilla directory not found."
-        exit 1
-    fi
-fi
-
-# Step 6: Update paths in index.html
-print_step "Updating paths in index.html..."
-if should_skip "Would modify $TARGET_PATH/index.html"; then
-    :
-else
-    INDEX_FILE="$TARGET_PATH/index.html"
-    if [ -f "$INDEX_FILE" ]; then
-        sed -i "s|src=\"|src=\"$BASE_PATH|g" "$INDEX_FILE"
-        sed -i "s|href=\"|href=\"$BASE_PATH|g" "$INDEX_FILE"
-        print_success "Paths updated."
-    else
-        print_error "index.html not found."
-        exit 1
-    fi
-fi
-
-# Step 7: Restore API data if backup exists
-print_step "Restoring API data..."
-if should_skip "Would restore API data to $TARGET_PATH/api/data"; then
-    :
-else
-    if [ -d "$BACKUP_DIR" ] && [ "$(ls -A $BACKUP_DIR)" ]; then
-        mkdir -p "$TARGET_PATH/api/data"
-        cp -r "$BACKUP_DIR"/* "$TARGET_PATH/api/data/"
-        print_success "API data restored."
-    else
-        print_success "No backup to restore."
-    fi
-fi
-
-# Step 8: Set permissions
-print_step "Setting permissions..."
-if should_skip "Would set ownership/permissions on $TARGET_PATH"; then
+if should_skip "Would backup $TARGET_PATH/api/data"; then
     :
 else
     if [ -d "$TARGET_PATH/api/data" ]; then
-        chown -R debian:www-data "$TARGET_PATH/api/data"
-        chmod -R g+rw "$TARGET_PATH/api/data"
-        print_success "Permissions set."
+        mkdir -p "$BACKUP_DIR"
+        cp -r "$TARGET_PATH/api/data"/* "$BACKUP_DIR/" 2>/dev/null || true
+        print_success "API data backed up."
     else
-        print_success "No API data directory to set permissions."
+        print_success "No API data to backup."
     fi
 fi
 
-# Print dry-run summary
+# Step 3: Atomic deploy via staging directory
+print_step "Deploying to staging..."
+if should_skip "Would stage to $STAGING_DIR"; then
+    :
+else
+    # Clean and populate staging
+    rm -rf "$STAGING_DIR"
+    mkdir -p "$STAGING_DIR"
+    cp -r "$BUILD_DIR"/* "$STAGING_DIR/"
+
+    # Restore API data into staging (before swap)
+    if [ -d "$BACKUP_DIR" ] && [ "$(ls -A "$BACKUP_DIR" 2>/dev/null)" ]; then
+        mkdir -p "$STAGING_DIR/api/data"
+        cp -r "$BACKUP_DIR"/* "$STAGING_DIR/api/data/"
+    fi
+
+    # Set permissions in staging
+    if [ -d "$STAGING_DIR/api/data" ]; then
+        chown -R debian:www-data "$STAGING_DIR/api/data"
+        chmod -R g+rw "$STAGING_DIR/api/data"
+    fi
+fi
+print_success "Staging complete."
+
+# Step 4: Atomic swap
+print_step "Swapping $STAGING_DIR → $TARGET_PATH..."
+if should_skip "Would swap $STAGING_DIR to $TARGET_PATH"; then
+    :
+else
+    # Remove old target (keep parent dir)
+    rm -rf "$TARGET_PATH"
+    # Atomic rename (same filesystem)
+    mv "$STAGING_DIR" "$TARGET_PATH"
+fi
+print_success "Deploy swapped."
+
+# Summary
 if [ "$DRY_RUN" = true ]; then
     echo ""
     echo -e "${YELLOW}========================================${NC}"
     echo -e "${YELLOW}  DRY-RUN COMPLETE${NC}"
-    echo -e "${YELLOW}  No files were copied to target server${NC}"
+    echo -e "${YELLOW}  No files were deployed${NC}"
     echo -e "${YELLOW}========================================${NC}"
     echo ""
     exit 0
 fi
 
-if [ "$DRY_RUN" = true ]; then
-    print_success "Dry-run deployment to $ENV completed. 🎉"
-else
-    print_success "Deployment to $ENV completed successfully! 🎉"
-fi
+print_success "Deployment to $ENV completed successfully! 🎉"

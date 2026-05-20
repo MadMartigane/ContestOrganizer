@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { base } from "$app/paths";
   import { goto } from "$app/navigation";
   import ConfirmDialog from "$lib/components/confirm-dialog.svelte";
   import { SPORT_CONFIG } from "$lib/domain/constants";
@@ -17,7 +18,7 @@
   const teamCount = $derived(tournament.grid.length);
 
   function handleNavigate(): void {
-    goto(`/tournament/${tournament.id}`);
+    goto(`${base}/tournament/${tournament.id}`);
   }
 
   function handleDeleteClick(e: MouseEvent): void {

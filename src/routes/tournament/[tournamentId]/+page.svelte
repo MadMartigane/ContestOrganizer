@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { base } from "$app/paths";
   import { goto } from "$app/navigation";
   import { page } from "$app/stores";
   import ActionBar from "$lib/components/action-bar.svelte";
@@ -51,8 +52,8 @@
   );
   const teamCount = $derived(tournament ? tournament.grid.length : 0);
   const breadcrumbItems = $derived([
-    { emoji: "🏠", label: nav_home(), href: "/home" },
-    { emoji: "🏆", label: nav_tournaments(), href: "/tournaments" },
+    { emoji: "🏠", label: nav_home(), href: `${base}/home` },
+    { emoji: "🏆", label: nav_tournaments(), href: `${base}/tournaments` },
     { emoji: "📋", label: tournament ? tournament.name : nav_tournament() },
   ]);
 
@@ -72,7 +73,7 @@
 
   function handleDeleteTournament(): void {
     deleteTournament(tournamentId);
-    goto("/tournaments");
+    goto(`${base}/tournaments`);
   }
 
   function handleResetGrid(): void {
@@ -196,7 +197,7 @@
             📊 {action_ranking()}
           </button>
         {/if}
-        <a href="/match/{tournamentId}" class="btn btn-lg preset-filled">
+        <a href="{base}/match/{tournamentId}" class="btn btn-lg preset-filled">
           🎮 {action_go_match()}
         </a>
         <NbaMagicFillupButton

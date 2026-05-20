@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { base } from "$app/paths";
   import { page } from "$app/stores";
   import ImageCarousel from "$lib/components/image-carousel.svelte";
   import {
@@ -50,8 +51,8 @@
 
   <!-- Navigation buttons -->
   <div class="flex gap-4 mt-4">
-    <a href="/home" class="btn btn-lg preset-filled">🏠 {nav_home()}</a>
-    <a href="/tournaments" class="btn btn-lg preset-filled"
+    <a href="{base}/home" class="btn btn-lg preset-filled">🏠 {nav_home()}</a>
+    <a href="{base}/tournaments" class="btn btn-lg preset-filled"
       >🏆 {nav_tournaments()}</a
     >
   </div>

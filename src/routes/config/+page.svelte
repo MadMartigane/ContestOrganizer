@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { base } from "$app/paths";
   import { Switch } from "@skeletonlabs/skeleton-svelte";
   import Breadcrumb from "$lib/components/breadcrumb.svelte";
   import Toast from "$lib/components/toast.svelte";
@@ -58,10 +59,10 @@
 
   <!-- Footer Navigation -->
   <div class="flex gap-4 w-full max-w-md">
-    <a href="/home" class="btn btn-lg preset-filled flex-1 text-lg py-3"
+    <a href="{base}/home" class="btn btn-lg preset-filled flex-1 text-lg py-3"
       >🏠 {nav_home()}</a
     >
-    <a href="/tournaments" class="btn btn-lg preset-filled flex-1 text-lg py-3"
+    <a href="{base}/tournaments" class="btn btn-lg preset-filled flex-1 text-lg py-3"
       >🏆 {nav_tournaments()}</a
     >
   </div>

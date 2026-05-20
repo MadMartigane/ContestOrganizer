@@ -1,6 +1,4 @@
 dist/
-!www/favicon.ico
-www/
 
 # Generated files (versioned by release script)
 # src/generated/
@@ -15,7 +13,6 @@ log.txt
 *.sublime-project
 *.sublime-workspace
 
-.stencil/
 .idea/
 .vscode/
 .sass-cache/
