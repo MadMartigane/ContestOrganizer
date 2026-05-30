@@ -186,7 +186,7 @@
   {/if}
 
   <!-- Action buttons -->
-  <div class="flex items-center justify-center gap-2 pt-1">
+  <div class="flex flex-col items-center gap-2 pt-1 sm:flex-row sm:justify-center">
     <button
       type="button"
       class={actionButtonClass}

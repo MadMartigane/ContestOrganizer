@@ -215,7 +215,7 @@
     </table>
   </div>
 
-  <div class="flex justify-end gap-2 pt-2">
+  <div class="flex flex-col gap-2 pt-2 sm:flex-row sm:justify-end">
     <button type="button" class="btn btn-lg preset-tonal" onclick={onCancel}>
       {action_cancel()}
     </button>

@@ -199,7 +199,7 @@
   />
 
   <div class="flex flex-col items-center gap-6 mt-6">
-    <div class="flex items-center justify-center gap-2">
+    <div class="flex flex-col items-center justify-center gap-2 md:flex-row md:gap-3">
       <h1 class="text-2xl font-bold">{match_count({ count: matchCount })}</h1>
       {#if isNba && seasonComplete}
         <span

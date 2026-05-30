@@ -36,7 +36,7 @@
   }
 </script>
 
-<div class="flex items-center gap-3 flex-wrap">
+<div class="flex flex-col items-center gap-3 md:flex-row md:flex-wrap">
   <span
     class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-surface-200-800 select-none"
   >
