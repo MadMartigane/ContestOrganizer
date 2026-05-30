@@ -57,93 +57,48 @@
 </script>
 
 <div class="space-y-2">
-  <!-- Inline score line: [host buttons] [host score] - [visitor score] [visitor buttons] -->
-  <div class="flex flex-wrap items-center justify-center gap-2 max-sm:gap-1 max-sm:text-lg font-bold">
-    <!-- Host buttons -->
-    <div class="flex gap-1">
-      {#if scorerType === "common"}
-        <button
-          type="button"
-          class="btn btn-lg preset-tonal"
-          disabled={disabled || goals.host <= 0}
-          onclick={() => adjustScore("host", -1)}
-        >
-          −
-        </button>
-        <button
-          type="button"
-          class="btn btn-lg preset-filled"
-          {disabled}
-          onclick={() => adjustScore("host", 1)}
-        >
-          +
-        </button>
-      {:else}
-        {#each getSteps() as step}
-          <button
-            type="button"
-            class="btn btn-lg {isAddMode ? 'preset-filled' : 'preset-tonal'}"
-            {disabled}
-            onclick={() => adjustScore("host", step * getModeMultiplier())}
-          >
-            {getLabelForStep(step)}
-          </button>
-        {/each}
-      {/if}
-    </div>
-
-    <!-- Score display (kept as one unit to prevent wrapping inside) -->
-    <div class="flex items-center gap-2 shrink-0">
-      <!-- Host score -->
-      <span
-        class="text-primary-600 dark:text-primary-400 min-w-[1.5ch] text-center"
-      >
-        {goals.host}
-      </span>
-
-      <!-- Separator -->
-      <span class="text-surface-500">-</span>
-
-      <!-- Visitor score -->
-      <span
-        class="text-secondary-600 dark:text-secondary-400 min-w-[1.5ch] text-center"
-      >
-        {goals.visitor}
-      </span>
-    </div>
-
-    <!-- Visitor buttons -->
-    <div class="flex gap-1">
-      {#if scorerType === "common"}
-        <button
-          type="button"
-          class="btn btn-lg preset-tonal"
-          disabled={disabled || goals.visitor <= 0}
-          onclick={() => adjustScore("visitor", -1)}
-        >
-          −
-        </button>
-        <button
-          type="button"
-          class="btn btn-lg preset-filled"
-          {disabled}
-          onclick={() => adjustScore("visitor", 1)}
-        >
-          +
-        </button>
-      {:else}
-        {#each getSteps() as step}
-          <button
-            type="button"
-            class="btn btn-lg {isAddMode ? 'preset-filled' : 'preset-tonal'}"
-            {disabled}
-            onclick={() => adjustScore("visitor", step * getModeMultiplier())}
-          >
-            {getLabelForStep(step)}
-          </button>
-        {/each}
-      {/if}
-    </div>
+  <div class="flex flex-row gap-3">
+    {#each [
+      { side: 'host' as const, color: 'text-primary-600 dark:text-primary-400' },
+      { side: 'visitor' as const, color: 'text-secondary-600 dark:text-secondary-400' }
+    ] as col}
+      <div class="flex-1 flex flex-col items-center gap-2">
+        <span class="text-2xl font-bold {col.color} min-w-[1.5ch]">
+          {goals[col.side]}
+        </span>
+        <div class="flex gap-1 font-bold">
+          {#if scorerType === "common"}
+            <button
+              type="button"
+              class="btn btn-lg max-sm:btn-base preset-tonal"
+              disabled={disabled || goals[col.side] <= 0}
+              onclick={() => adjustScore(col.side, -1)}
+            >
+              −
+            </button>
+            <button
+              type="button"
+              class="btn btn-lg max-sm:btn-base preset-filled"
+              {disabled}
+              onclick={() => adjustScore(col.side, 1)}
+            >
+              +
+            </button>
+          {:else}
+            {#each getSteps() as step}
+              <button
+                type="button"
+                class="btn btn-lg max-sm:btn-base {isAddMode ? 'preset-filled' : 'preset-tonal'}"
+                {disabled}
+                onclick={() => adjustScore(col.side, step * getModeMultiplier())}
+              >
+                {getLabelForStep(step)}
+              </button>
+            {/each}
+          {/if}
+        </div>
+      </div>
+    {/each}
   </div>
 
   <!-- Toggle for basket/rugby -->
