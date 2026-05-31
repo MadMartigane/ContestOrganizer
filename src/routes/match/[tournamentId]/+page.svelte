@@ -36,11 +36,15 @@
   import { isNbaSeasonComplete } from "$lib/utils/nba-schedule";
   import { recalculateGridStats } from "$lib/utils/scoring";
 
+  const LAYOUT_TOP_OFFSET = "9rem";
+  const ACTION_BAR_COLLAPSE_GAP = "1.5rem";
+
   const tournamentId = $derived(String($page.params.tournamentId));
   let tournament = $state<Tournament | undefined>(undefined);
   let matchListScrollApi = $state<MatchListScrollApi | undefined>(undefined);
   let scrollPercentage = $state(0);
   let showNewMatch = $state(false);
+  const actionBarVisible = $derived(scrollPercentage === 0);
 
   onMount(() => {
     tournament = getTournamentById(tournamentId);
@@ -161,6 +165,16 @@
 
   const showDock = $derived(scrollPercentage > 2);
 
+  const matchListMaxHeight = $derived(
+    actionBarVisible ? undefined : `calc(100dvh - ${LAYOUT_TOP_OFFSET})`
+  );
+
+  const actionBarWrapperStyle = $derived(
+    actionBarVisible
+      ? "grid-template-rows: 1fr; opacity: 1; margin: 0;"
+      : `grid-template-rows: 0fr; opacity: 0; margin: -${ACTION_BAR_COLLAPSE_GAP} 0;`
+  );
+
   function handleScrollChange(percentage: number): void {
     scrollPercentage = percentage;
   }
@@ -198,8 +212,11 @@
     ]}
   />
 
-  <div class="flex flex-col items-center gap-6 mt-6">
-    <div class="flex flex-col items-center justify-center gap-2 md:flex-row md:gap-3">
+  <!-- gap tracks ACTION_BAR_COLLAPSE_GAP — collapse animation uses the negated value -->
+  <div class="flex flex-col items-center mt-6" style="gap: {ACTION_BAR_COLLAPSE_GAP}">
+    <div
+      class="flex flex-col items-center justify-center gap-2 md:flex-row md:gap-3"
+    >
       <h1 class="text-2xl font-bold">{match_count({ count: matchCount })}</h1>
       {#if isNba && seasonComplete}
         <span
@@ -210,34 +227,42 @@
       {/if}
     </div>
 
-    <div class="w-full max-w-md">
-      <ActionBar>
-        <button
-          type="button"
-          class="btn btn-lg preset-filled"
-          disabled={!hasEnoughTeams || seasonComplete}
-          onclick={() => (showNewMatch = true)}
-        >
-          ➕ {match_new()}
-        </button>
-        <button
-          type="button"
-          class="btn btn-lg preset-tonal"
-          disabled={!hasEnoughTeams || seasonComplete}
-          onclick={handleAutoMatch}
-        >
-          🔄 {match_auto()}
-        </button>
-        {#if isNba}
-          <NbaGenerateButton
-            grid={tournament.grid}
-            matchs={tournament.matchs}
-            onGenerate={handleNbaGenerate}
-            {seasonComplete}
-            sportType={tournament.type}
-          />
-        {/if}
-      </ActionBar>
+    <div
+      class="grid overflow-hidden transition-[grid-template-rows,opacity,margin] duration-300 ease-in-out"
+      style={actionBarWrapperStyle}
+      inert={!actionBarVisible || undefined}
+    >
+      <div class="overflow-hidden">
+        <div class="w-full max-w-md">
+          <ActionBar>
+            <button
+              type="button"
+              class="btn btn-lg preset-filled"
+              disabled={!hasEnoughTeams || seasonComplete}
+              onclick={() => (showNewMatch = true)}
+            >
+              ➕ {match_new()}
+            </button>
+            <button
+              type="button"
+              class="btn btn-lg preset-tonal"
+              disabled={!hasEnoughTeams || seasonComplete}
+              onclick={handleAutoMatch}
+            >
+              🔄 {match_auto()}
+            </button>
+            {#if isNba}
+              <NbaGenerateButton
+                grid={tournament.grid}
+                matchs={tournament.matchs}
+                onGenerate={handleNbaGenerate}
+                {seasonComplete}
+                sportType={tournament.type}
+              />
+            {/if}
+          </ActionBar>
+        </div>
+      </div>
     </div>
 
     <div class="w-full">
@@ -262,6 +287,7 @@
         <MatchList
           {tournament}
           bind:scrollApi={matchListScrollApi}
+          maxHeight={matchListMaxHeight}
           onStatusChange={handleStatusChange}
           onDelete={handleDelete}
           onGoalsChange={handleGoalsChange}

@@ -42,6 +42,15 @@ $effect(() => {
 > Real bug: `src/lib/components/team-search-drawer.svelte` — NBA team search was not responding
 > to user input. Fixed after diagnosing this pattern.
 
+### TanStack Virtual bounded container
+
+**Critical layout constraint**: `match-list.svelte` uses `@tanstack/svelte-virtual` with `useVirtualizer`, which **requires a scroll parent with a bounded height** (`max-height` + `overflow-y-auto`). This is what enables the virtualizer to render only the visible match tiles instead of all of them.
+
+- An NBA season has ~1200+ matches. Without virtualization, every tile renders in the DOM, causing severe performance degradation.
+- The scroll div in `match-list.svelte` MUST keep its `max-height` (or equivalent bounded height) and `overflow-y-auto`. There is a protective comment above this div explaining why.
+- **Never replace with `flex-1`** on the scroll div without a validated alternative that preserves the bounded container constraint (e.g., switching to `createWindowVirtualizer` with window scroll).
+- If the double-scroll UX issue on mobile needs to be addressed, the correct approach is to switch to `createWindowVirtualizer` (which uses `window` as scroll element) — NOT to remove the height constraint.
+
 ## Development Workflow — Zero-Warning Policy
 
 All code changes must pass `svelte-check` with **zero warnings**.

@@ -3,7 +3,6 @@
   import { get } from "svelte/store";
   import MatchTile from "$lib/components/match-tile.svelte";
   import type {
-    Match,
     MatchGoals,
     MatchListScrollApi,
     MatchStatus,
@@ -11,21 +10,23 @@
   } from "$lib/domain/types";
 
   interface Props {
+    tournament: Tournament;
+    maxHeight?: string;
+    scrollApi?: MatchListScrollApi;
     onDelete: (matchId: string) => void;
     onGoalsChange: (matchId: string, goals: MatchGoals) => void;
     onScrollChange?: (scrollPercentage: number) => void;
     onStatusChange: (matchId: string, status: MatchStatus) => void;
-    scrollApi?: MatchListScrollApi;
-    tournament: Tournament;
   }
 
   let {
     tournament,
-    onStatusChange,
+    maxHeight = "70vh",
+    scrollApi = $bindable(),
     onDelete,
     onGoalsChange,
     onScrollChange,
-    scrollApi = $bindable(),
+    onStatusChange,
   }: Props = $props();
 
   let scrollElement = $state<HTMLDivElement | undefined>(undefined);
@@ -132,10 +133,20 @@
   }
 </script>
 
+<!--
+  TanStack Virtual guard — DO NOT modify the height/overflow constraints on this div.
+ 
+  useVirtualizer requires a scroll parent with a bounded height to virtualize the list.
+  Without these constraints, ALL match tiles render in the DOM at once, which causes
+  severe performance degradation with large lists (e.g., NBA season ≈ 1200+ matches).
+ 
+  Never replace max-height/overflow with flex-1 or remove the inline style without a
+  validated architectural alternative that preserves virtualization.
+-->
 <div
   bind:this={scrollElement}
   class="overflow-y-auto"
-  style="max-height: 70vh; min-height: 200px;"
+  style="max-height: {maxHeight}; min-height: 200px;"
   onscroll={handleScroll}
 >
   <div style="height: {$virtualizer.getTotalSize()}px; position: relative;">
