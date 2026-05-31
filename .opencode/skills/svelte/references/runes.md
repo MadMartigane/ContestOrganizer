@@ -168,6 +168,27 @@ let { a, b, c } = $derived(stuff());
 Push-pull reactivity: dependents are notified immediately (push) but only recalculated on read (pull). If the new value
 is referentially identical to the previous value, downstream updates are skipped.
 
+### Prefer $derived Over Redundant $state
+
+If a value is a pure function of another reactive variable, use `$derived` — never `$state` with manual assignment in an event handler:
+
+```js
+// ❌ Wrong: redundant $state + manual sync
+let visible = $state(true);
+function handleScroll(pct: number) {
+  scrollPercentage = pct;
+  visible = pct === 0; // manual synchronization — fragile
+}
+
+// ✅ Correct: single source of truth, derived automatically
+const visible = $derived(scrollPercentage === 0);
+function handleScroll(pct: number) {
+  scrollPercentage = pct; // visible updates automatically
+}
+```
+
+This eliminates one `$state` variable, one manual assignment, and any latent desynchronization risk. Applies anywhere a value is deterministically computed from existing state — boolean flags, formatted strings, filtered arrays, etc.
+
 ## $effect
 
 Side-effect that runs when dependencies change. Runs only in the browser, after DOM updates.
