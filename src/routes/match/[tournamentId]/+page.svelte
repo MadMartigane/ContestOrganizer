@@ -213,7 +213,10 @@
   />
 
   <!-- gap tracks ACTION_BAR_COLLAPSE_GAP — collapse animation uses the negated value -->
-  <div class="flex flex-col items-center mt-6" style="gap: {ACTION_BAR_COLLAPSE_GAP}">
+  <div
+    class="flex flex-col items-center mt-6"
+    style="gap: {ACTION_BAR_COLLAPSE_GAP}"
+  >
     <div
       class="flex flex-col items-center justify-center gap-2 md:flex-row md:gap-3"
     >

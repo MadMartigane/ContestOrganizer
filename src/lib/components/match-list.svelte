@@ -10,13 +10,13 @@
   } from "$lib/domain/types";
 
   interface Props {
-    tournament: Tournament;
     maxHeight?: string;
-    scrollApi?: MatchListScrollApi;
     onDelete: (matchId: string) => void;
     onGoalsChange: (matchId: string, goals: MatchGoals) => void;
     onScrollChange?: (scrollPercentage: number) => void;
     onStatusChange: (matchId: string, status: MatchStatus) => void;
+    scrollApi?: MatchListScrollApi;
+    tournament: Tournament;
   }
 
   let {
