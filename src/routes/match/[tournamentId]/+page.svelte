@@ -38,6 +38,7 @@
 
   const LAYOUT_TOP_OFFSET = "9rem";
   const ACTION_BAR_COLLAPSE_GAP = "1.5rem";
+  const DOCK_VISIBILITY_THRESHOLD = 0.1;
 
   const tournamentId = $derived(String($page.params.tournamentId));
   let tournament = $state<Tournament | undefined>(undefined);
@@ -163,7 +164,7 @@
 
   const hasTargetMatch = $derived(targetMatchIndex >= 0);
 
-  const showDock = $derived(scrollPercentage > 2);
+  const showDock = $derived(scrollPercentage > DOCK_VISIBILITY_THRESHOLD);
 
   const matchListMaxHeight = $derived(
     actionBarVisible ? undefined : `calc(100dvh - ${LAYOUT_TOP_OFFSET})`

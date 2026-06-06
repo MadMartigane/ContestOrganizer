@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { fade } from "svelte/transition";
   import {
     nav_scroll_bottom,
     nav_scroll_current,
@@ -20,6 +21,8 @@
     onScrollToBottom,
     visible,
   }: Props = $props();
+
+  const DOCK_FADE_DURATION = 150;
 
   function handleKeyDown(event: KeyboardEvent): void {
     if (!visible) {
@@ -44,6 +47,7 @@
 
 {#if visible}
   <div
+    transition:fade={{ duration: DOCK_FADE_DURATION }}
     class="fixed bottom-4 right-4 z-40 flex flex-col gap-2"
     role="navigation"
     aria-label="Match navigation"
