@@ -18,8 +18,7 @@
     "deploy:prod:dry-run": "bash scripts/deploy.sh prod --dry-run",
     "deploy:preprod:dry-run": "bash scripts/deploy.sh pre-prod --dry-run",
     "release": "tsx scripts/release.ts",
-    "release:dry-run": "tsx scripts/release.ts patch --skip-git --skip-push",
-    "generate:status": "tsx scripts/generate-status.ts --skip-version"
+    "release:dry-run": "tsx scripts/release.ts patch --skip-git --skip-push"
   },
   "type": "module",
   "dependencies": {

@@ -86,18 +86,6 @@ BACKUP_DIR="$HOME/backup/contest-data"
 BUILD_DIR="build"
 STAGING_DIR="$HOME/staging/contest-deploy"
 
-# Step 0: Generate status data
-print_step "Generating status data..."
-if should_skip "Would run generate-status.ts"; then
-    :
-else
-    if ! pnpm exec tsx scripts/generate-status.ts --skip-version; then
-        print_error "Status generation failed."
-        exit 1
-    fi
-fi
-print_success "Status data generated."
-
 # Step 1: Build with BASE_PATH (Vite bakes in VITE_ vars + paths.base)
 print_step "Building for $ENV (BASE_PATH=$BASE_PATH)..."
 if should_skip "Would run: BASE_PATH=$BASE_PATH pnpm build"; then
