@@ -66,11 +66,11 @@
         <span class="text-2xl font-bold {col.color} min-w-[1.5ch]">
           {goals[col.side]}
         </span>
-        <div class="flex gap-1 font-bold">
+        <div class="flex flex-wrap justify-center gap-1 font-bold">
           {#if scorerType === "common"}
             <button
               type="button"
-              class="btn btn-lg max-sm:btn-base preset-tonal"
+              class="btn btn-xl preset-tonal"
               disabled={disabled || goals[col.side] <= 0}
               onclick={() => adjustScore(col.side, -1)}
             >
@@ -78,7 +78,7 @@
             </button>
             <button
               type="button"
-              class="btn btn-lg max-sm:btn-base preset-filled"
+              class="btn btn-xl preset-filled"
               {disabled}
               onclick={() => adjustScore(col.side, 1)}
             >
@@ -88,7 +88,7 @@
             {#each getSteps() as step}
               <button
                 type="button"
-                class="btn btn-lg max-sm:btn-base {isAddMode ? 'preset-filled' : 'preset-tonal'}"
+                class="btn btn-xl {isAddMode ? 'preset-filled' : 'preset-tonal'}"
                 {disabled}
                 onclick={() => adjustScore(col.side, step * getModeMultiplier())}
               >

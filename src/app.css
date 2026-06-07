@@ -4,3 +4,13 @@
 @import "@skeletonlabs/skeleton-svelte";
 
 @custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *));
+
+/* Touch-primary button size — used for scoring steppers.
+   Extends the Skeleton btn-* size scale (sm → base → lg → xl). */
+@utility btn-xl {
+	font-size: var(--text-2xl);
+	line-height: var(--text-2xl--line-height);
+	padding-block: --spacing(3);
+	padding-inline: --spacing(5);
+	min-height: 3rem; /* 48px — WCAG 44px + comfortable margin */
+}
