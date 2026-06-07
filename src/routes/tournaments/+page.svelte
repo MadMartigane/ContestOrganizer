@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { base } from "$app/paths";
   import Breadcrumb from "$lib/components/breadcrumb.svelte";
   import NewTournamentForm from "$lib/components/new-tournament-form.svelte";
   import TournamentListItem from "$lib/components/tournament-list-item.svelte";
@@ -43,7 +44,7 @@
 
 <Breadcrumb
   items={[
-    { emoji: "🏠", label: nav_home(), href: "/home" },
+    { emoji: "🏠", label: nav_home(), href: `${base}/home` },
     { emoji: "🏆", label: nav_tournaments() },
   ]}
 />

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, tick } from "svelte";
+  import { base } from "$app/paths";
   import { page } from "$app/stores";
   import ActionBar from "$lib/components/action-bar.svelte";
   import Breadcrumb from "$lib/components/breadcrumb.svelte";
@@ -202,12 +203,12 @@
 {#if tournament}
   <Breadcrumb
     items={[
-      { emoji: "🏠", label: nav_home(), href: "/home" },
-      { emoji: "🏆", label: nav_tournaments(), href: "/tournaments" },
+      { emoji: "🏠", label: nav_home(), href: `${base}/home` },
+      { emoji: "🏆", label: nav_tournaments(), href: `${base}/tournaments` },
       {
         emoji: "📋",
         label: tournament.name,
-        href: `/tournament/${tournamentId}`,
+        href: `${base}/tournament/${tournamentId}`,
       },
       { emoji: "🎮", label: nav_match() },
     ]}
