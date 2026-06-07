@@ -1,6 +1,7 @@
 dist/
-!www/favicon.ico
-www/
+
+# Generated files (versioned by release script)
+# src/generated/
 
 *~
 *.sw[mnpcod]
@@ -12,7 +13,6 @@ log.txt
 *.sublime-project
 *.sublime-workspace
 
-.stencil/
 .idea/
 .vscode/
 .sass-cache/
@@ -25,3 +25,5 @@ $RECYCLE.BIN/
 Thumbs.db
 UserInterfaceState.xcuserstate
 .env
+.svelte-kit/
+build/

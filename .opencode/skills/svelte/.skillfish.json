@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "name": "svelte",
+  "owner": "xobotyi",
+  "repo": "cc-foundry",
+  "path": "plugins/frontend/skills/svelte",
+  "branch": "master",
+  "sha": "8eb9d5d4e9b1dfc7d1d212c48588b36d123c650f",
+  "source": "manual"
+}

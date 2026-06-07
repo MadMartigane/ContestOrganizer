@@ -1,64 +1,25 @@
-import path from "node:path";
-import { defineConfig } from "vite";
+import { readFileSync } from "node:fs";
+import { paraglideVitePlugin } from "@inlang/paraglide-js";
+import { sveltekit } from "@sveltejs/kit/vite";
+import tailwindcss from "@tailwindcss/vite";
+import { defineConfig } from "vitest/config";
 
-const config = defineConfig({
-  root: "src",
-  envDir: "../", // Serve from src/
-  publicDir: "../www", // Serve www/ at root (relative to src/)
+const pkg = JSON.parse(readFileSync("./package.json", "utf-8"));
 
-  build: {
-    target: "es2015",
-    outDir: "../www/vanilla",
-    emptyOutDir: false,
-    sourcemap: true,
-    lib: {
-      entry: "./vanilla-entry.ts",
-      name: "VanillaComponents",
-      fileName: "vanilla",
-    },
-    rollupOptions: {
-      output: {
-        format: "es",
-      },
-    },
+export default defineConfig({
+  define: {
+    __APP_VERSION__: JSON.stringify(pkg.version),
   },
-
-  resolve: {
-    alias: {
-      // Use absolute paths (Option A)
-      "@": path.resolve(import.meta.dirname, "./src"),
-      "@modules": path.resolve(import.meta.dirname, "./src/modules"),
-      "@components": path.resolve(import.meta.dirname, "./src/components"),
-      "@core": path.resolve(import.meta.dirname, "./src/core"),
-    },
-  },
-
-  server: {
-    port: 5173,
-    open: true,
-  },
-
-  css: {
-    modules: {
-      localsConvention: "camelCase",
-    },
-  },
-
-  esbuild: {
-    tsconfigRaw: JSON.stringify({
-      compilerOptions: {
-        strict: true,
-        target: "ES2015",
-        module: "ES2015",
-        moduleResolution: "bundler",
-        lib: ["ES2015", "DOM", "DOM.Iterable"],
-        jsx: "preserve",
-        jsxFactory: "h",
-        jsxFragmentFactory: "Fragment",
-        downlevelIteration: true,
-      },
+  plugins: [
+    sveltekit(),
+    tailwindcss(),
+    paraglideVitePlugin({
+      project: "./project.inlang",
+      outdir: "./src/lib/paraglide",
+      strategy: ["cookie", "baseLocale"],
     }),
+  ],
+  test: {
+    include: ["tests/**/*.{test,spec}.{js,ts}"],
   },
 });
-
-export default config;

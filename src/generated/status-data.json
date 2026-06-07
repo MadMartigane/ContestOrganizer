@@ -1,0 +1,16 @@
+{
+  "lastUpdated": "2026-06-06T21:28:19.921Z",
+  "projectName": "Error: TODO.md not found",
+  "technology": "N/A",
+  "sections": [
+    {
+      "id": "error",
+      "title": "Error",
+      "content": "TODO.md file was not found at project root.",
+      "type": "warning",
+      "badgeVariant": "warning",
+      "tables": []
+    }
+  ],
+  "version": "0.1.1"
+}

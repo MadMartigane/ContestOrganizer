@@ -16,10 +16,10 @@ const API_OPTIONS = {
   path: "/contest-preprod",
 };
 
-function requestListener(clientReq, clientRes, stencilProxy) {
+function requestListener(clientReq, clientRes, devProxy) {
   if (!REQUEST_API_PATTERN.test(clientReq.url)) {
     console.log("[DEV]: ", clientReq.url);
-    stencilProxy.web(clientReq, clientRes);
+    devProxy.web(clientReq, clientRes);
     return;
   }
 
@@ -89,7 +89,7 @@ function launchServer(
 
 function main(proxyHost, proxyPort, defaultDevHost, defaultDevPort) {
   console.warn(
-    "=========== ContestOrganizer API & Stencil proxy ====================="
+    "=========== ContestOrganizer API & Dev proxy ====================="
   );
   console.warn(
     "======================================================================"

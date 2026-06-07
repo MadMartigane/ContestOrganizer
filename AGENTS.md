@@ -1,131 +1,110 @@
-# Ultracite Code Standards
+# Project Rules — ContestOrganizer
 
-This project uses **Ultracite**, a zero-config preset that enforces strict code quality standards through automated formatting and linting.
+## Skills
 
-## Package Manager
+- **svelte** — Enabled for all interactions with Svelte/SvelteKit code (`.svelte`, `.svelte.js`, `.svelte.ts`).
+  Automatically invoke for writing, reviewing, refactoring, and debugging any Svelte code.
 
-This project uses **pnpm** as its package manager.
+## Known Pitfalls
 
-- **Install dependencies**: `pnpm install`
-- **Run scripts**: `pnpm <script-name>` (e.g., `pnpm build`)
-- **Execute packages**: `pnpm exec <package>` (e.g., `pnpm exec ultracite fix`)
+### `$effect` dependency tracking with async boundaries
 
-## Quick Reference
+**Critical Svelte 5 pitfall**: `$effect` only tracks synchronous reads. Any reactivity read (`$state`)
+inside a `setTimeout`, `setInterval`, `Promise.then`, `await`, or `requestAnimationFrame` is **invisible**
+to the compiler — the effect will never re-trigger when those values change.
 
-- **Format code**: `pnpm exec ultracite fix`
-- **Check for issues**: `pnpm exec ultracite check`
-- **Diagnose setup**: `pnpm exec ultracite doctor`
+❌ **Broken** — `searchQuery` is never tracked:
 
-Biome (the underlying engine) provides robust linting and formatting. Most issues are automatically fixable.
+```svelte
+$effect(() => {
+    const timer = setTimeout(() => {
+        debouncedQuery = searchQuery; // read inside setTimeout → not tracked
+    }, 300);
+    return () => clearTimeout(timer);
+});
+```
 
----
+✅ **Correct** — synchronous read captured before the async boundary:
 
-## Core Principles
+```svelte
+$effect(() => {
+    const query = searchQuery; // synchronous read → tracked
+    const timer = setTimeout(() => {
+        debouncedQuery = query;
+    }, 300);
+    return () => clearTimeout(timer);
+});
+```
 
-Write code that is **accessible, performant, type-safe, and maintainable**. Focus on clarity and explicit intent over brevity.
+**Rule**: always capture reactive values **before** the async boundary. Assign to a synchronous local
+`const`, then use that constant inside the async callback.
 
-### Type Safety & Explicitness
+> Real bug: `src/lib/components/team-search-drawer.svelte` — NBA team search was not responding
+> to user input. Fixed after diagnosing this pattern.
 
-- Use explicit types for function parameters and return values when they enhance clarity
-- Prefer `unknown` over `any` when the type is genuinely unknown
-- Use const assertions (`as const`) for immutable values and literal types
-- Leverage TypeScript's type narrowing instead of type assertions
-- Use meaningful variable names instead of magic numbers - extract constants with descriptive names
+### TanStack Virtual bounded container
 
-### Modern JavaScript/TypeScript
+**Critical layout constraint**: `match-list.svelte` uses `@tanstack/svelte-virtual` with `useVirtualizer`, which **requires a scroll parent with a bounded height** (`max-height` + `overflow-y-auto`). This is what enables the virtualizer to render only the visible match tiles instead of all of them.
 
-- Use arrow functions for callbacks and short functions
-- Prefer `for...of` loops over `.forEach()` and indexed `for` loops
-- Use optional chaining (`?.`) and nullish coalescing (`??`) for safer property access
-- Prefer template literals over string concatenation
-- Use destructuring for object and array assignments
-- Use `const` by default, `let` only when reassignment is needed, never `var`
+- An NBA season has ~1200+ matches. Without virtualization, every tile renders in the DOM, causing severe performance degradation.
+- The scroll div in `match-list.svelte` MUST keep its `max-height` (or equivalent bounded height) and `overflow-y-auto`. There is a protective comment above this div explaining why.
+- **Never replace with `flex-1`** on the scroll div without a validated alternative that preserves the bounded container constraint (e.g., switching to `createWindowVirtualizer` with window scroll).
+- If the double-scroll UX issue on mobile needs to be addressed, the correct approach is to switch to `createWindowVirtualizer` (which uses `window` as scroll element) — NOT to remove the height constraint.
 
-### Async & Promises
+## Development Workflow — Zero-Warning Policy
 
-- Always `await` promises in async functions - don't forget to use the return value
-- Use `async/await` syntax instead of promise chains for better readability
-- Handle errors appropriately in async code with try-catch blocks
-- Don't use async functions as Promise executors
+All code changes must pass `svelte-check` with **zero warnings**.
 
-### React & JSX
+### Mandatory check command
 
-- Use function components over class components
-- Call hooks at the top level only, never conditionally
-- Specify all dependencies in hook dependency arrays correctly
-- Use the `key` prop for elements in iterables (prefer unique IDs over array indices)
-- Nest children between opening and closing tags instead of passing as props
-- Don't define components inside other components
-- Use semantic HTML and ARIA attributes for accessibility:
-  - Provide meaningful alt text for images
-  - Use proper heading hierarchy
-  - Add labels for form inputs
-  - Include keyboard event handlers alongside mouse events
-  - Use semantic elements (`<button>`, `<nav>`, etc.) instead of divs with roles
+Run this after every non-trivial code change (especially after editing `.svelte` files):
 
-### Error Handling & Debugging
+```bash
+npx svelte-check --threshold warning
+```
 
-- Remove `console.log`, `debugger`, and `alert` statements from production code
-- Throw `Error` objects with descriptive messages, not strings or other values
-- Use `try-catch` blocks meaningfully - don't catch errors just to rethrow them
-- Prefer early returns over nested conditionals for error cases
+If any warnings appear, fix them before committing. Do not ignore or suppress warnings unless explicitly approved.
 
-### Code Organization
+<!-- gitnexus:start -->
+# GitNexus — Code Intelligence
 
-- Keep functions focused and under reasonable cognitive complexity limits
-- Extract complex conditions into well-named boolean variables
-- Use early returns to reduce nesting
-- Prefer simple conditionals over nested ternary operators
-- Group related code together and separate concerns
+This project is indexed by GitNexus as **ContestOrganizer** (1548 symbols, 2148 relationships, 76 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
-### Security
+> If any GitNexus tool warns the index is stale, run `npx gitnexus analyze` in terminal first.
 
-- Add `rel="noopener"` when using `target="_blank"` on links
-- Avoid `dangerouslySetInnerHTML` unless absolutely necessary
-- Don't use `eval()` or assign directly to `document.cookie`
-- Validate and sanitize user input
+## Always Do
 
-### Performance
+- **MUST run impact analysis before editing any symbol.** Before modifying a function, class, or method, run `gitnexus_impact({target: "symbolName", direction: "upstream"})` and report the blast radius (direct callers, affected processes, risk level) to the user.
+- **MUST run `gitnexus_detect_changes()` before committing** to verify your changes only affect expected symbols and execution flows.
+- **MUST warn the user** if impact analysis returns HIGH or CRITICAL risk before proceeding with edits.
+- When exploring unfamiliar code, use `gitnexus_query({query: "concept"})` to find execution flows instead of grepping. It returns process-grouped results ranked by relevance.
+- When you need full context on a specific symbol — callers, callees, which execution flows it participates in — use `gitnexus_context({name: "symbolName"})`.
 
-- Avoid spread syntax in accumulators within loops
-- Use top-level regex literals instead of creating them in loops
-- Prefer specific imports over namespace imports
-- Avoid barrel files (index files that re-export everything)
-- Use proper image components (e.g., Next.js `<Image>`) over `<img>` tags
+## Never Do
 
-### Framework-Specific Guidance
+- NEVER edit a function, class, or method without first running `gitnexus_impact` on it.
+- NEVER ignore HIGH or CRITICAL risk warnings from impact analysis.
+- NEVER rename symbols with find-and-replace — use `gitnexus_rename` which understands the call graph.
+- NEVER commit changes without running `gitnexus_detect_changes()` to check affected scope.
 
-**Next.js:**
-- Use Next.js `<Image>` component for images
-- Use `next/head` or App Router metadata API for head elements
-- Use Server Components for async data fetching instead of async Client Components
+## Resources
 
-**React 19+:**
-- Use ref as a prop instead of `React.forwardRef`
+| Resource | Use for |
+|----------|---------|
+| `gitnexus://repo/ContestOrganizer/context` | Codebase overview, check index freshness |
+| `gitnexus://repo/ContestOrganizer/clusters` | All functional areas |
+| `gitnexus://repo/ContestOrganizer/processes` | All execution flows |
+| `gitnexus://repo/ContestOrganizer/process/{name}` | Step-by-step execution trace |
 
-**Solid/Svelte/Vue/Qwik:**
-- Use `class` and `for` attributes (not `className` or `htmlFor`)
+## CLI
 
----
+| Task | Read this skill file |
+|------|---------------------|
+| Understand architecture / "How does X work?" | `.claude/skills/gitnexus/gitnexus-exploring/SKILL.md` |
+| Blast radius / "What breaks if I change X?" | `.claude/skills/gitnexus/gitnexus-impact-analysis/SKILL.md` |
+| Trace bugs / "Why is X failing?" | `.claude/skills/gitnexus/gitnexus-debugging/SKILL.md` |
+| Rename / extract / split / refactor | `.claude/skills/gitnexus/gitnexus-refactoring/SKILL.md` |
+| Tools, resources, schema reference | `.claude/skills/gitnexus/gitnexus-guide/SKILL.md` |
+| Index, status, clean, wiki CLI commands | `.claude/skills/gitnexus/gitnexus-cli/SKILL.md` |
 
-## Testing
-
-- Write assertions inside `it()` or `test()` blocks
-- Avoid done callbacks in async tests - use async/await instead
-- Don't use `.only` or `.skip` in committed code
-- Keep test suites reasonably flat - avoid excessive `describe` nesting
-
-## When Biome Can't Help
-
-Biome's linter will catch most issues automatically. Focus your attention on:
-
-1. **Business logic correctness** - Biome can't validate your algorithms
-2. **Meaningful naming** - Use descriptive names for functions, variables, and types
-3. **Architecture decisions** - Component structure, data flow, and API design
-4. **Edge cases** - Handle boundary conditions and error states
-5. **User experience** - Accessibility, performance, and usability considerations
-6. **Documentation** - Add comments for complex logic, but prefer self-documenting code
-
----
-
-Most formatting and common issues are automatically fixed by Biome. Run `pnpm exec ultracite fix` before committing to ensure compliance.
+<!-- gitnexus:end -->
