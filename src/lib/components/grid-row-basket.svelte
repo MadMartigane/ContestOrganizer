@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { BASKET_COLUMN_CLASSES } from "$lib/domain/constants";
   import type { TeamRow } from "$lib/domain/types";
   import {
     grid_col_lost,
@@ -27,12 +28,13 @@
 <tr
   class="border-b border-surface-200-800 hover:bg-surface-100-900 transition-colors"
 >
+  <!-- Cell order must match BASKET_COLUMN_CLASSES and the header order -->
   <td
-    class="px-2 py-2 text-center text-sm text-surface-600 dark:text-surface-400"
+    class="px-2 py-2 text-center text-sm text-surface-600 dark:text-surface-400 {BASKET_COLUMN_CLASSES[0]}"
   >
     {paddedRank}
   </td>
-  <td class="px-2 py-2">
+  <td class="px-2 py-2 {BASKET_COLUMN_CLASSES[1]}">
     {#if slot.team}
       <button
         type="button"
@@ -63,25 +65,39 @@
       </button>
     {/if}
   </td>
-  <td class="px-2 py-2 text-center font-mono text-sm">
+  <td
+    class="px-2 py-2 text-center font-mono text-sm {BASKET_COLUMN_CLASSES[2]}"
+  >
     {stats?.winGamesPercent ?? 0}%
   </td>
-  <td class="px-2 py-2 text-center font-mono text-sm">
+  <td
+    class="px-2 py-2 text-center font-mono text-sm {BASKET_COLUMN_CLASSES[3]}"
+  >
     {stats?.playedGames ?? 0}
   </td>
-  <td class="px-2 py-2 text-center font-mono text-sm">
+  <td
+    class="px-2 py-2 text-center font-mono text-sm {BASKET_COLUMN_CLASSES[4]}"
+  >
     {stats?.winGames ?? 0}
   </td>
-  <td class="px-2 py-2 text-center font-mono text-sm">
+  <td
+    class="px-2 py-2 text-center font-mono text-sm {BASKET_COLUMN_CLASSES[5]}"
+  >
     {stats?.looseGames ?? 0}
   </td>
-  <td class="px-2 py-2 text-center font-mono text-sm hidden sm:table-cell">
+  <td
+    class="px-2 py-2 text-center font-mono text-sm {BASKET_COLUMN_CLASSES[6]}"
+  >
     {stats?.scoredPoints ?? 0}
   </td>
-  <td class="px-2 py-2 text-center font-mono text-sm hidden sm:table-cell">
+  <td
+    class="px-2 py-2 text-center font-mono text-sm {BASKET_COLUMN_CLASSES[7]}"
+  >
     {stats?.concededPoints ?? 0}
   </td>
-  <td class="px-2 py-2 text-center font-mono text-sm">
+  <td
+    class="px-2 py-2 text-center font-mono text-sm {BASKET_COLUMN_CLASSES[8]}"
+  >
     {stats?.scheduledMatchs ?? 0}
   </td>
 </tr>

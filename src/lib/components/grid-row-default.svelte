@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { DEFAULT_COLUMN_CLASSES } from "$lib/domain/constants";
   import type { TeamRow } from "$lib/domain/types";
   import {
     grid_col_goal_avg,
@@ -25,12 +26,13 @@
 <tr
   class="border-b border-surface-200-800 hover:bg-surface-100-900 transition-colors"
 >
+  <!-- Cell order must match DEFAULT_COLUMN_CLASSES and the header order -->
   <td
-    class="px-2 py-2 text-center text-sm text-surface-600 dark:text-surface-400"
+    class="px-2 py-2 text-center text-sm text-surface-600 dark:text-surface-400 {DEFAULT_COLUMN_CLASSES[0]}"
   >
     {paddedRank}
   </td>
-  <td class="px-2 py-2">
+  <td class="px-2 py-2 {DEFAULT_COLUMN_CLASSES[1]}">
     {#if slot.team}
       <button
         type="button"
@@ -62,26 +64,28 @@
     {/if}
   </td>
   <td
-    class="px-2 py-2 text-center font-mono text-sm text-primary-600 dark:text-primary-400 font-bold"
+    class="px-2 py-2 text-center font-mono text-sm text-primary-600 dark:text-primary-400 font-bold {DEFAULT_COLUMN_CLASSES[2]}"
   >
     {slot.points}
   </td>
   <td
-    class="px-2 py-2 text-center font-mono text-sm text-success-600 dark:text-success-400 hidden sm:table-cell"
+    class="px-2 py-2 text-center font-mono text-sm text-success-600 dark:text-success-400 {DEFAULT_COLUMN_CLASSES[3]}"
   >
     {slot.scoredGoals}
   </td>
   <td
-    class="px-2 py-2 text-center font-mono text-sm text-success-600 dark:text-success-400 hidden sm:table-cell"
+    class="px-2 py-2 text-center font-mono text-sm text-success-600 dark:text-success-400 {DEFAULT_COLUMN_CLASSES[4]}"
   >
     {slot.concededGoals}
   </td>
   <td
-    class="px-2 py-2 text-center font-mono text-sm text-warning-600 dark:text-warning-400 hidden sm:table-cell"
+    class="px-2 py-2 text-center font-mono text-sm text-warning-600 dark:text-warning-400 {DEFAULT_COLUMN_CLASSES[5]}"
   >
     {slot.goalAverage}
   </td>
-  <td class="px-2 py-2 text-center font-mono text-sm">
+  <td
+    class="px-2 py-2 text-center font-mono text-sm {DEFAULT_COLUMN_CLASSES[6]}"
+  >
     {slot.scheduledMatchs}
   </td>
 </tr>

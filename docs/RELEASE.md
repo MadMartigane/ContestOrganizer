@@ -28,14 +28,12 @@ pnpm run release:dry-run patch
 
 This will:
 - Bump the version in package.json
-- Generate status-data files
 - Skip all git operations
 
 ## Workflow
 
 1. **Release first**: Run `pnpm run release <patch|minor|major>`
    - Bumps version in package.json
-   - Generates status-data.json and status-data.d.ts
    - Creates git commit: `release: vX.Y.Z (type)`
    - Creates git tag: `vX.Y.Z`
    - Pushes commit and tag to origin
@@ -56,7 +54,7 @@ The deployment script uses the version already set by the release command.
 
 The release command performs the following git operations:
 
-1. `git add package.json src/generated/status-data.json src/generated/status-data.d.ts`
+1. `git add package.json`
 2. `git commit -m "release: vX.Y.Z (type)"`
 3. `git tag vX.Y.Z`
 4. `git push origin <branch> --tags`

@@ -1,8 +1,5 @@
 dist/
 
-# Generated files (versioned by release script)
-# src/generated/
-
 *~
 *.sw[mnpcod]
 *.log

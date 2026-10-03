@@ -95,15 +95,6 @@ function getCurrentBranch(): string {
     .trim();
 }
 
-// === Status Data Generation ===
-
-function generateStatusData(): void {
-  execSync("pnpm exec tsx scripts/generate-status.ts --skip-version", {
-    cwd: PROJECT_ROOT,
-    stdio: "inherit",
-  });
-}
-
 // === Main ===
 
 function validateIncrement(arg: string | undefined): IncrementType {
@@ -130,11 +121,7 @@ function main(): void {
   const versionResult = processVersion(increment);
   console.log(`   Version: ${versionResult.baseVersion}`);
 
-  // 2. Generate status data files (using generate-status.ts which parses TODO.md)
-  generateStatusData();
-  console.log("   Status data generated");
-
-  // 3. Update package.json version (base version only)
+  // 2. Update package.json version (base version only)
   const pkgPath = join(PROJECT_ROOT, "package.json");
   const pkg = JSON.parse(readFileSync(pkgPath, "utf-8"));
   pkg.version = versionResult.baseVersion;
@@ -146,19 +133,15 @@ function main(): void {
     return;
   }
 
-  // 4. Git add
-  gitAdd([
-    "package.json",
-    "src/generated/status-data.json",
-    "src/generated/status-data.d.ts",
-  ]);
+  // 3. Git add
+  gitAdd(["package.json"]);
 
-  // 5. Git commit
+  // 4. Git commit
   const commitMessage = `release: v${versionResult.baseVersion} (${versionResult.incrementType})`;
   gitCommit(commitMessage);
   console.log(`   Committed: ${commitMessage}`);
 
-  // 6. Git tag
+  // 5. Git tag
   const tagName = `v${versionResult.baseVersion}`;
   gitTag(tagName);
   console.log(`   Tagged: ${tagName}`);
@@ -168,7 +151,7 @@ function main(): void {
     return;
   }
 
-  // 7. Git push (commit + tags)
+  // 6. Git push (commit + tags)
   const branch = getCurrentBranch();
   gitPush("origin", branch, true);
   console.log(`   Pushed to origin/${branch} (including tags)`);

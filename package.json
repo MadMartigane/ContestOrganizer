@@ -18,8 +18,7 @@
     "deploy:prod:dry-run": "bash scripts/deploy.sh prod --dry-run",
     "deploy:preprod:dry-run": "bash scripts/deploy.sh pre-prod --dry-run",
     "release": "tsx scripts/release.ts",
-    "release:dry-run": "tsx scripts/release.ts patch --skip-git --skip-push",
-    "generate:status": "tsx scripts/generate-status.ts --skip-version"
+    "release:dry-run": "tsx scripts/release.ts patch --skip-git --skip-push"
   },
   "type": "module",
   "dependencies": {
@@ -35,6 +34,7 @@
     "@sveltejs/kit": "^2.57.1",
     "@sveltejs/vite-plugin-svelte": "^7.0.0",
     "@tailwindcss/vite": "^4.2.2",
+    "@types/node": "^25.9.2",
     "http-proxy": "^1.18.1",
     "husky": "^9.1.7",
     "svelte": "^5.55.4",

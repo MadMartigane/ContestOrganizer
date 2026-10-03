@@ -1,7 +1,11 @@
 <script lang="ts">
   import GridRowBasket from "$lib/components/grid-row-basket.svelte";
   import GridRowDefault from "$lib/components/grid-row-default.svelte";
-  import { SPORT_CONFIG } from "$lib/domain/constants";
+  import {
+    BASKET_COLUMN_CLASSES,
+    DEFAULT_COLUMN_CLASSES,
+    SPORT_CONFIG,
+  } from "$lib/domain/constants";
   import type { Match, TeamRow, TournamentType } from "$lib/domain/types";
   import {
     grid_col_conceded,
@@ -71,35 +75,57 @@
       <thead>
         {#if isBasket}
           <tr class="border-b border-surface-200-800 text-surface-500">
-            <th class="px-2 py-2 text-center">{grid_col_rank()}</th>
-            <th class="px-2 py-2 text-left">{grid_col_teams()}</th>
-            <th class="px-2 py-2 text-center hidden sm:table-cell">
+            <th class="px-2 py-2 text-center {BASKET_COLUMN_CLASSES[0]}">
+              {grid_col_rank()}
+            </th>
+            <th class="px-2 py-2 text-left {BASKET_COLUMN_CLASSES[1]}">
+              {grid_col_teams()}
+            </th>
+            <th class="px-2 py-2 text-center {BASKET_COLUMN_CLASSES[2]}">
               {grid_col_win_percent()}
             </th>
-            <th class="px-2 py-2 text-center">{grid_col_played()}</th>
-            <th class="px-2 py-2 text-center">{grid_col_won()}</th>
-            <th class="px-2 py-2 text-center">{grid_col_lost()}</th>
-            <th class="px-2 py-2 text-center hidden sm:table-cell">
+            <th class="px-2 py-2 text-center {BASKET_COLUMN_CLASSES[3]}">
+              {grid_col_played()}
+            </th>
+            <th class="px-2 py-2 text-center {BASKET_COLUMN_CLASSES[4]}">
+              {grid_col_won()}
+            </th>
+            <th class="px-2 py-2 text-center {BASKET_COLUMN_CLASSES[5]}">
+              {grid_col_lost()}
+            </th>
+            <th class="px-2 py-2 text-center {BASKET_COLUMN_CLASSES[6]}">
               {grid_col_scored()}
             </th>
-            <th class="px-2 py-2 text-center hidden sm:table-cell">
+            <th class="px-2 py-2 text-center {BASKET_COLUMN_CLASSES[7]}">
               {grid_col_conceded()}
             </th>
-            <th class="px-2 py-2 text-center">{grid_col_scheduled()}</th>
+            <th class="px-2 py-2 text-center {BASKET_COLUMN_CLASSES[8]}">
+              {grid_col_scheduled()}
+            </th>
           </tr>
         {:else}
           <tr class="border-b border-surface-200-800 text-surface-500">
-            <th class="px-2 py-2 text-center">{grid_col_rank()}</th>
-            <th class="px-2 py-2 text-left">{grid_col_teams()}</th>
-            <th class="px-2 py-2 text-center">{grid_col_points()}</th>
-            <th class="px-2 py-2 text-center hidden sm:table-cell">
+            <th class="px-2 py-2 text-center {DEFAULT_COLUMN_CLASSES[0]}">
+              {grid_col_rank()}
+            </th>
+            <th class="px-2 py-2 text-left {DEFAULT_COLUMN_CLASSES[1]}">
+              {grid_col_teams()}
+            </th>
+            <th class="px-2 py-2 text-center {DEFAULT_COLUMN_CLASSES[2]}">
+              {grid_col_points()}
+            </th>
+            <th class="px-2 py-2 text-center {DEFAULT_COLUMN_CLASSES[3]}">
               {grid_col_goals_scored()}
             </th>
-            <th class="px-2 py-2 text-center hidden sm:table-cell">
+            <th class="px-2 py-2 text-center {DEFAULT_COLUMN_CLASSES[4]}">
               {grid_col_goals_conceded()}
             </th>
-            <th class="px-2 py-2 text-center">{grid_col_goal_avg()}</th>
-            <th class="px-2 py-2 text-center">{grid_col_scheduled()}</th>
+            <th class="px-2 py-2 text-center {DEFAULT_COLUMN_CLASSES[5]}">
+              {grid_col_goal_avg()}
+            </th>
+            <th class="px-2 py-2 text-center {DEFAULT_COLUMN_CLASSES[6]}">
+              {grid_col_scheduled()}
+            </th>
           </tr>
         {/if}
       </thead>
