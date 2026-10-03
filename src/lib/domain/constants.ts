@@ -101,6 +101,43 @@ export const GRID_STEP = 2;
 export const GRID_DEFAULT_TEAMS = 4;
 
 // ──────────────────────────────────────────────────
+// Grid Column Visibility
+// ──────────────────────────────────────────────────
+
+/** Shown at every viewport width */
+const ALWAYS = "";
+
+/** Hidden below the sm breakpoint (640px) */
+const STACKED = "hidden sm:table-cell";
+
+/**
+ * Visibility class per grid column, indexed by render position. The header
+ * (`grid-table.svelte`) and the body rows (`grid-row-*`) index the same array,
+ * so a hidden cell cannot lose its header. Indexes must follow header order.
+ */
+export const BASKET_COLUMN_CLASSES = [
+  ALWAYS,
+  ALWAYS,
+  ALWAYS,
+  ALWAYS,
+  ALWAYS,
+  ALWAYS,
+  STACKED,
+  STACKED,
+  ALWAYS,
+] as const;
+
+export const DEFAULT_COLUMN_CLASSES = [
+  ALWAYS,
+  ALWAYS,
+  ALWAYS,
+  STACKED,
+  STACKED,
+  STACKED,
+  ALWAYS,
+] as const;
+
+// ──────────────────────────────────────────────────
 // NBA Constants
 // ──────────────────────────────────────────────────
 
