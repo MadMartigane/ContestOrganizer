@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Dialog } from "@skeletonlabs/skeleton-svelte";
   import { SPORT_CONFIG } from "$lib/domain/constants";
+  import { resolveTeamLogo } from "$lib/domain/nba-teams";
   import type { GenericTeam, TournamentType } from "$lib/domain/types";
   import {
     action_cancel,
@@ -29,6 +30,7 @@
   let debouncedQuery = $state("");
   let resultsRef = $state<HTMLDivElement | undefined>(undefined);
   let searchInputEl = $state<HTMLInputElement | undefined>(undefined);
+  let failedLogoSrcs = $state<string[]>([]);
 
   // M13: Autofocus on open
   $effect(() => {
@@ -159,16 +161,22 @@
       {:else if teamQuery.data}
         <div bind:this={resultsRef}>
           {#each teamQuery.data as team (team.id)}
+            {@const logoSrc = resolveTeamLogo(team)}
             <button
               type="button"
               class="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-surface-50-950/50 transition-colors"
               onclick={() => handleSelect(team)}
             >
-              {#if team.logo}
+              {#if logoSrc && !failedLogoSrcs.includes(logoSrc)}
                 <img
-                  src={team.logo}
+                  src={logoSrc}
                   alt={team.name}
                   class="w-8 h-8 object-contain"
+                  onerror={() => {
+                    if (logoSrc && !failedLogoSrcs.includes(logoSrc)) {
+                      failedLogoSrcs = [...failedLogoSrcs, logoSrc];
+                    }
+                  }}
                 >
               {:else}
                 <div

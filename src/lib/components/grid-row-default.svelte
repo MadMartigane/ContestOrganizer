@@ -1,5 +1,6 @@
 <script lang="ts">
   import { DEFAULT_COLUMN_CLASSES } from "$lib/domain/constants";
+  import { resolveTeamLogo } from "$lib/domain/nba-teams";
   import type { TeamRow } from "$lib/domain/types";
   import {
     grid_col_goal_avg,
@@ -21,6 +22,9 @@
   let { onSlotClick, rank, slot }: Props = $props();
 
   const paddedRank = $derived(String(rank).padStart(2, "0"));
+  let failedLogoSrc = $state<string | undefined>(undefined);
+  const logoSrc = $derived(slot.team ? resolveTeamLogo(slot.team) : undefined);
+  const showLogo = $derived(Boolean(logoSrc) && failedLogoSrc !== logoSrc);
 </script>
 
 <tr
@@ -39,11 +43,16 @@
         class="flex items-center gap-2 w-full text-left cursor-pointer hover:text-primary-500 dark:hover:text-primary-400 transition-colors"
         onclick={() => onSlotClick(slot.id)}
       >
-        {#if slot.team.logo}
+        {#if showLogo}
           <img
-            src={slot.team.logo}
+            src={logoSrc}
             alt={slot.team.name}
             class="w-6 h-6 object-contain"
+            onerror={() => {
+              if (logoSrc) {
+                failedLogoSrc = logoSrc;
+              }
+            }}
           >
         {:else}
           <span class="w-6 h-6 flex items-center justify-center text-sm"

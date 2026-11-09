@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { resolveTeamLogo } from "$lib/domain/nba-teams";
   import type { GenericTeam } from "$lib/domain/types";
 
   interface Props {
@@ -14,7 +15,10 @@
   let isVisible = $state(false);
   let logoLoaded = $state(false);
   let logoError = $state(false);
+  let trackedLogoSrc = $state<string | undefined>(undefined);
   let containerEl = $state<HTMLElement | undefined>(undefined);
+
+  const logoSrc = $derived(team ? resolveTeamLogo(team) : undefined);
 
   // Rank badge gradient classes
   function getRankBadgeClass(r: number | undefined): string {
@@ -33,8 +37,9 @@
   const rankBadgeClass = $derived(getRankBadgeClass(rank));
 
   // IntersectionObserver for lazy loading
+  // Svelte 5: read logoSrc synchronously so $effect tracks it (AGENTS.md).
   $effect(() => {
-    if (!team?.logo || isVisible) {
+    if (!logoSrc || isVisible) {
       return;
     }
     const observer = new IntersectionObserver(
@@ -67,7 +72,7 @@
     <!-- Logo area -->
     <div class="w-1/2 max-w-12 flex-shrink-0 flex items-center justify-center">
       {#if isVisible}
-        {#if logoError}
+        {#if logoSrc && logoError && trackedLogoSrc === logoSrc}
           <!-- Error state: shield-X icon -->
           <svg
             class="w-16 h-16 text-surface-400 dark:text-surface-500"
@@ -81,11 +86,11 @@
             <line x1="15" y1="9" x2="9" y2="15" />
             <line x1="9" y1="9" x2="15" y2="15" />
           </svg>
-        {:else if logoLoaded}
+        {:else if logoSrc && logoLoaded && trackedLogoSrc === logoSrc}
           <!-- Loaded state: actual image -->
-          <img src={team.logo} alt={team.name} class="w-full object-contain">
+          <img src={logoSrc} alt={team.name} class="w-full object-contain">
         {:else}
-          <!-- Loading state: animated SVG placeholder -->
+          <!-- Loading state / missing logo when visible: animated SVG placeholder -->
           <svg
             class="w-10 h-10 {prefersReducedMotion ? 'opacity-80' : 'animate-placeholder'}"
             viewBox="0 0 40 40"
@@ -131,14 +136,23 @@
             />
           </svg>
 
-          <!-- Hidden image preloader -->
-          <img
-            src={team.logo}
-            alt=""
-            class="hidden"
-            onload={() => { logoLoaded = true; }}
-            onerror={() => { logoError = true; console.warn('Failed to load team logo:', team.logo); }}
-          >
+          {#if logoSrc}
+            <!-- Hidden image preloader -->
+            <img
+              src={logoSrc}
+              alt=""
+              class="hidden"
+              onload={() => {
+                logoLoaded = true;
+                trackedLogoSrc = logoSrc;
+              }}
+              onerror={() => {
+                logoError = true;
+                trackedLogoSrc = logoSrc;
+                console.warn("Failed to load team logo:", logoSrc);
+              }}
+            >
+          {/if}
         {/if}
       {:else}
         <!-- Not yet in viewport: animated SVG placeholder -->
