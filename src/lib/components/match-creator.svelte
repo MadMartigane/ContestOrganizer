@@ -1,5 +1,6 @@
 <script lang="ts">
   import { SPORT_CONFIG } from "$lib/domain/constants";
+  import { resolveTeamLogo } from "$lib/domain/nba-teams";
   import type { Match, TeamRow, TournamentType } from "$lib/domain/types";
   import {
     action_cancel,
@@ -61,6 +62,7 @@
 
   let selectedHostId = $state<string | undefined>(undefined);
   let selectedVisitorId = $state<string | undefined>(undefined);
+  let failedLogoSrcs = $state<string[]>([]);
 
   const canValidate = $derived(
     selectedHostId !== undefined &&
@@ -164,6 +166,9 @@
       </thead>
       <tbody>
         {#each sortedTeams as { slot, stats } (slot.id)}
+          {@const logoSrc = slot.team
+            ? resolveTeamLogo(slot.team)
+            : undefined}
           <tr
             class="border-b border-surface-200-800 cursor-pointer transition-colors {rowClass(slot.id)}"
             onclick={() => handleSlotClick(slot.id)}
@@ -188,11 +193,16 @@
             </td>
             <td class="px-2 py-2">
               <div class="flex items-center gap-2">
-                {#if slot.team?.logo}
+                {#if logoSrc && !failedLogoSrcs.includes(logoSrc)}
                   <img
-                    src={slot.team.logo}
+                    src={logoSrc}
                     alt=""
                     class="w-8 h-8 object-contain flex-shrink-0"
+                    onerror={() => {
+                      if (!failedLogoSrcs.includes(logoSrc)) {
+                        failedLogoSrcs = [...failedLogoSrcs, logoSrc];
+                      }
+                    }}
                   >
                 {:else}
                   <div

@@ -1,3 +1,4 @@
+import { resolveTeamLogo } from "$lib/domain/nba-teams";
 import type { GenericTeam, TournamentType } from "$lib/domain/types";
 
 // ──────────────────────────────────────────────────
@@ -51,6 +52,17 @@ const saveCache = (cache: TeamCache): void => {
 const getCacheKey = (sportType: TournamentType, query: string): string =>
   `${sportType}:${query.toLowerCase().trim()}`;
 
+const withResolvedNbaLogo = (team: GenericTeam): GenericTeam => {
+  if (team.type !== "NBA") {
+    return team;
+  }
+  const resolvedLogo = resolveTeamLogo(team);
+  if (resolvedLogo === undefined || resolvedLogo === team.logo) {
+    return team;
+  }
+  return { ...team, logo: resolvedLogo };
+};
+
 // ──────────────────────────────────────────────────
 // Public API
 // ──────────────────────────────────────────────────
@@ -75,9 +87,9 @@ export const getCachedTeams = (
     if (lowerQuery.length < 3) {
       return null;
     }
-    return cache.nbaAllTeams.filter((team) =>
-      team.name.toLowerCase().includes(lowerQuery)
-    );
+    return cache.nbaAllTeams
+      .map(withResolvedNbaLogo)
+      .filter((team) => team.name.toLowerCase().includes(lowerQuery));
   }
 
   const key = getCacheKey(sportType, query);
@@ -127,7 +139,7 @@ export const getCachedNbaAllTeams = (): GenericTeam[] | null => {
     return null;
   }
 
-  return cache.nbaAllTeams;
+  return cache.nbaAllTeams.map(withResolvedNbaLogo);
 };
 
 /** Check if NBA cache is expired but exists (for fallback). */
@@ -142,7 +154,7 @@ export const hasStaleNbaCache = (): boolean => {
 /** Get stale NBA cache (for fallback when API fails). */
 export const getStaleNbaAllTeams = (): GenericTeam[] | null => {
   const cache = loadCache();
-  return cache.nbaAllTeams ?? null;
+  return cache.nbaAllTeams?.map(withResolvedNbaLogo) ?? null;
 };
 
 /** Clear all team cache entries. Used by config page. */

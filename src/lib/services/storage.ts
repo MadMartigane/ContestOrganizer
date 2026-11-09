@@ -1,6 +1,6 @@
 import { DEFAULT_SPORT, STORAGE_KEY_TOURNAMENTS } from "$lib/domain/constants";
 import { generateId } from "$lib/domain/id";
-import { NBA_TEAMS } from "$lib/domain/nba-teams";
+import { NBA_TEAMS, resolveTeamLogo } from "$lib/domain/nba-teams";
 import type {
   Tournament,
   TournamentCollection,
@@ -35,8 +35,9 @@ const isLocalStorageAvailable = (): boolean => {
 const buildNbaLogoLookup = (): Map<number, string> => {
   const map = new Map<number, string>();
   for (const team of NBA_TEAMS) {
-    if (team.logo) {
-      map.set(team.id, team.logo);
+    const logo = resolveTeamLogo(team);
+    if (typeof logo === "string") {
+      map.set(team.id, logo);
     }
   }
   return map;
@@ -48,11 +49,12 @@ const enrichTournamentTeams = (
 ): void => {
   for (const slot of tournament.grid) {
     const team = slot.team;
-    if (team?.type === "NBA" && !team.logo) {
-      const logo = logoLookup.get(team.id);
-      if (logo) {
-        team.logo = logo;
-      }
+    if (team?.type !== "NBA") {
+      continue;
+    }
+    const logo = logoLookup.get(team.id);
+    if (typeof logo === "string" && logo !== team.logo) {
+      team.logo = logo;
     }
   }
 };
